@@ -46,6 +46,8 @@
 .atomic-section {
   padding: 0.5rem;
   overflow-y: auto;
+  border: 1px dashed #999; /* Debug border */
+  background: rgba(200, 200, 200, 0.1); /* Light grey background */
 }
 
 /* Canvas & inspector */
@@ -91,21 +93,63 @@
   text-align: center;
 }
 
-/* SplitPane gutters (optional styling) */
+/* SplitPane gutters (enhanced visibility and usability) */
 .SplitPane .Resizer {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.3); /* Slightly darker for better visibility */
   z-index: 1;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.6); /* Stronger shadow for contrast */
 }
+
 .SplitPane .Resizer:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.7); /* Darker on hover */
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.9); /* Stronger shadow on hover */
 }
+
 /* Vertical resizer */
 .SplitPane.vertical .Resizer {
-  width: 5px;
+  width: 10px; /* Increase width for better usability */
   cursor: col-resize;
+  border-left: 2px solid rgba(0, 0, 0, 0.4);
+  border-right: 2px solid rgba(0, 0, 0, 0.4);
+  margin: 0 -5px; /* Adjust overlap for increased width */
 }
+
 /* Horizontal resizer */
 .SplitPane.horizontal .Resizer {
-  height: 5px;
+  height: 10px; /* Increase height for better usability */
   cursor: row-resize;
+  border-top: 2px solid rgba(0, 0, 0, 0.4);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+  margin: -5px 0; /* Adjust overlap for increased height */
+}
+
+/* Common styling for all handles */
+.resize-handle {
+  background: rgba(0, 0, 0, 0.15);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+/* Hover effect */
+.resize-handle:hover {
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Horizontal handle (between vertical stacks) */
+.resize-handle[aria-orientation="horizontal"] {
+  height: 8px;       /* Tall enough to grab */
+  width: 100%;
+  cursor: row-resize;
+  margin: -4px 0;    /* Overlap its neighbors */
+}
+
+/* Vertical handle (between side-by-side panels) */
+.resize-handle[aria-orientation="vertical"] {
+  width: 8px;        /* Wide enough to grab */
+  height: 100%;
+  cursor: col-resize;
+  margin: 0 -4px;    /* Overlap its neighbors */
 }

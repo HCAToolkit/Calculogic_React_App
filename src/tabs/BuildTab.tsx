@@ -4,7 +4,7 @@ import './BuildTab.css';
 export default function BuildTab() {
   return (
     <div className="build-container">
-      {/* Header with tabs */}
+      {/* Header */}
       <header className="builder-header">
         <h1>🔧 Calculogic Builder</h1>
         <nav className="main-tabs">
@@ -20,12 +20,12 @@ export default function BuildTab() {
         </nav>
       </header>
 
-      {/* Outer split: Left (Atomic Control) vs Middle+Right */}
+      {/* Outer vertical split: Atomic Control | (Canvas + Inspector) */}
       <PanelGroup direction="horizontal">
         {/* LEFT: Atomic Control with internal vertical splits */}
         <Panel defaultSize={20}>
           <PanelGroup direction="vertical">
-            {/* Section 1: Atomic Components */}
+            {/* Section A: Atomic Components */}
             <Panel defaultSize={40}>
               <div className="atomic-section">
                 <h4>Atomic Components</h4>
@@ -38,10 +38,9 @@ export default function BuildTab() {
                 </ul>
               </div>
             </Panel>
-
             <PanelResizeHandle className="resize-handle" />
 
-            {/* Section 2: Configurations */}
+            {/* Section B: Configurations */}
             <Panel defaultSize={30}>
               <div className="atomic-section">
                 <h4>Configurations</h4>
@@ -53,10 +52,9 @@ export default function BuildTab() {
                 <div className="box placeholder">[ configurations list ]</div>
               </div>
             </Panel>
-
             <PanelResizeHandle className="resize-handle" />
 
-            {/* Section 3: Search Configurations */}
+            {/* Section C: Search Configurations */}
             <Panel defaultSize={30}>
               <div className="atomic-section">
                 <h4>Search Configurations</h4>
@@ -70,7 +68,6 @@ export default function BuildTab() {
             </Panel>
           </PanelGroup>
         </Panel>
-
         <PanelResizeHandle className="resize-handle" />
 
         {/* CENTER: Canvas */}
@@ -81,7 +78,6 @@ export default function BuildTab() {
             </div>
           </div>
         </Panel>
-
         <PanelResizeHandle className="resize-handle" />
 
         {/* RIGHT: Config Settings */}
