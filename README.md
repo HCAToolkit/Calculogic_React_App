@@ -1,54 +1,120 @@
-# React + TypeScript + Vite
+Calculogic React App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-only implementation of the Calculogic Builder: a no-code, atomic-component form and logic builder designed to be portable to WordPress, desktop (Electron), and mobile (Capacitor) environments.
 
-Currently, two official plugins are available:
+📦 Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Framework & Build: React, Vite
 
-## Expanding the ESLint configuration
+State Management: Zustand (with persist middleware)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Logic Engine: json-logic-js
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+Templating Engine: Mustache.js
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Routing (optional): React Router DOM
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Language: TypeScript
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+⚙️ Prerequisites
+
+Node.js (v14+)
+
+npm (v6+)
+
+Git
+
+🚀 Getting Started
+
+Clone the repository
+
+git clone https://github.com/<your-username>/calculogic-core.git
+cd calculogic-core
+
+Install dependencies
+
+npm install
+
+Run in development mode
+
+npm run dev
+
+Open your browser at http://localhost:5173 (or the URL printed by Vite).
+
+Build for production
+
+npm run build
+
+The static output will be in the dist/ folder.
+
+Preview the production build
+
+npm run serve
+
+🗂 Project Structure
+
+calculogic-core/
+├── public/                # Public assets (favicon, vite.svg)
+├── src/
+│   ├── assets/            # Static assets (SVG, images)
+│   ├── components/        # Reusable atomic React components
+│   ├── state/             # Zustand store definitions
+│   ├── tabs/              # UI for each builder tab (Build, Logic, etc.)
+│   │   └── BuildTab.tsx   # Initial Build tab implementation
+│   ├── App.tsx            # Root component (renders tab navigation)
+│   └── main.tsx           # React entrypoint
+├── .gitignore
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── README.md             # You are here
+
+📋 Core Features (MVP)
+
+Build Tab (src/tabs/BuildTab.tsx)
+
+Add "Number Input" fields dynamically.
+
+Fields stored in a global Zustand store (src/state/useStore.ts).
+
+Global State
+
+Managed in useStore with structure (field definitions).
+
+setStructure action to update the form schema.
+
+Persistence (LocalStorage)
+
+(Planned) use Zustand persist middleware to auto-save the builder state.
+
+🎯 Next Steps & Roadmap
+
+Logic Tab: integrate json-logic-js to let users define calculation rules.
+
+View Tab: allow styling of fields via atomic CSS classes or inline styles.
+
+Knowledge Tab: support importing external data sets or reference tables.
+
+Results Tab: render final output with mustache.js templates and live preview.
+
+Dashboard: list, load, and manage multiple projects.
+
+Data Providers: abstract save/load to WordPress REST, Electron FS, or Capacitor Storage.
+
+Packaging: wrap the final build as a WordPress plugin, an Electron app, and a Capacitor mobile app.
+
+🤝 Contributing
+
+Fork the repository
+
+Create your feature branch (git checkout -b feature/your-feature)
+
+Commit your changes (git commit -m 'feat: add new ...')
+
+Push to the branch (git push origin feature/your-feature)
+
+Open a Pull Request
+
+📄 License
+
+This project is licensed under the MIT License. See LICENSE for details.
