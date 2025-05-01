@@ -1,4 +1,5 @@
-import BuildTab from './tabs/BuildTab'; // Correct the import path
+import React from 'react';
+import BuildTab from './tabs/BuildTab';
 
 export default function App() {
   return (
