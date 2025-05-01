@@ -2,8 +2,7 @@ import BuildTab from './tabs/BuildTab'; // Correct the import path
 
 export default function App() {
   return (
-    <div style={{ padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h1>🔧 Calculogic Builder</h1>
+    <div style={{ height: '100vh', fontFamily: 'sans-serif' }}>
       <BuildTab />
     </div>
   );
