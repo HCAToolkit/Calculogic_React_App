@@ -5,6 +5,7 @@
   height: 100vh;
   overflow: hidden;
   font-family: sans-serif;
+  width: 100vw;
 }
 
 /* Header + tabs */
@@ -46,7 +47,7 @@
 .atomic-section {
   padding: 0.5rem;
   overflow-y: auto;
-  border: 1px dashed #999; /* Debug border */
+  border: none;
   background: rgba(200, 200, 200, 0.1); /* Light grey background */
 }
 
@@ -57,7 +58,7 @@
   overflow: auto;
 }
 .canvas-inner {
-  border: 1px solid #eee;
+  border: none;
   flex: 1;
   padding: 1rem;
 }
@@ -65,6 +66,7 @@
   width: 280px; /* overridden by SplitPane */
   padding: 0.75rem;
   overflow-y: auto;
+  border: none;
 }
 
 /* Shared styles */
@@ -95,30 +97,327 @@
 
 /* Common styling for all handles */
 .resize-handle {
-  background: rgba(0, 0, 0, 0.15);
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
-  z-index: 1;
+  background: linear-gradient(90deg, #e0e0e0 0%, #bdbdbd 100%);
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 6px rgba(0,0,0,0.08);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  user-select: none;
+}
+
+/* Hide the default resize handles between left/center and center/right panels */
+.resize-handle.main-horizontal {
+  display: none !important;
 }
 
 /* Hover effect */
 .resize-handle:hover {
-  background: rgba(0, 0, 0, 0.35);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(90deg, #bdbdbd 0%, #e0e0e0 100%);
+  box-shadow: 0 0 12px rgba(0,0,0,0.18);
 }
 
 /* Horizontal handle (between vertical stacks) */
 .resize-handle[aria-orientation="horizontal"] {
-  height: 8px;       /* Tall enough to grab */
+  height: 12px;       /* Tall enough to grab */
   width: 100%;
   cursor: row-resize;
-  margin: -4px 0;    /* Overlap its neighbors */
+  margin: -6px 0;    /* Overlap its neighbors */
+}
+.resize-handle[aria-orientation="horizontal"]::before {
+  width: 32px;
+  height: 4px;
+  background: repeating-linear-gradient(
+    to right,
+    #888 0 4px,
+    transparent 4px 8px
+  );
 }
 
 /* Vertical handle (between side-by-side panels) */
 .resize-handle[aria-orientation="vertical"] {
-  width: 8px;        /* Wide enough to grab */
+  width: 12px;        /* Wide enough to grab */
   height: 100%;
   cursor: col-resize;
-  margin: 0 -4px;    /* Overlap its neighbors */
+  margin: 0 -6px;    /* Overlap its neighbors */
+}
+.resize-handle[aria-orientation="vertical"]::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 32px;
+  margin: auto;
+  border-radius: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    #888 0 4px,
+    transparent 4px 8px
+  );
+}
+
+/* Dockable panel look */
+.dock-panel-group {
+  height: 100%;
+  width: 100%;
+}
+.dock-panel {
+  background: #f8f9fa;
+  height: 100%;
+  box-sizing: border-box;
+  /* Remove border if present */
+  border: none;
+  position: relative;
+}
+
+.dock-panel.right-dock-panel {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Collapse button for panels */
+.collapse-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  background: #e0e0e0;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.collapse-btn:hover {
+  opacity: 1;
+  background: #bdbdbd;
+}
+
+/* Make the right collapse button always visible, even when collapsed */
+.collapse-btn.right {
+  right: auto;
+  left: -11px; /* Half the button width, so it sticks out */
+  top: 8px;
+  background: #e0e0e0;
+  border: 1px solid #ccc;
+  box-shadow: 1px 0 4px rgba(0,0,0,0.08);
+}
+
+/* Optional: keep it above the resize handle */
+.dock-panel.right-dock-panel {
+  z-index: 20;
+}
+
+/* Left panel section container */
+.left-section-panel {
+  background: #f3f6fa;
+  border-bottom: 1px solid #d0d6e0;
+  position: relative;
+  min-height: 32px;
+  transition: background 0.2s;
+}
+
+/* Section collapse button */
+.section-collapse-btn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
+  background: #e0e0e0;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s, background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.section-collapse-btn:hover {
+  opacity: 1;
+  background: #bdbdbd;
+}
+
+/* Section handle: more visible and thinner than main handles */
+.resize-handle.section {
+  background: linear-gradient(90deg, #d0d6e0 0%, #e0e0e0 100%);
+  min-height: 6px;
+  height: 6px;
+  margin: -3px 0;
+  user-select: none;
+}
+.resize-handle.section[aria-orientation="horizontal"] {
+  height: 6px;
+  min-height: 6px;
+  width: 100%;
+  cursor: row-resize;
+}
+.resize-handle.section[aria-orientation="vertical"] {
+  width: 6px;
+  min-width: 6px;
+  height: 100%;
+  cursor: col-resize;
+}
+.resize-handle.section:hover {
+  background: linear-gradient(90deg, #bdbdbd 0%, #d0d6e0 100%);
+}
+
+/* Section header spacing */
+.left-section-panel h4 {
+  margin-left: 32px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #223;
+}
+
+/* Focus styles for accessibility */
+.collapse-btn:focus,
+.section-collapse-btn:focus {
+  outline: 2px solid #0073aa;
+  outline-offset: 2px;
+}
+
+/* Optional: visually indicate double-click is possible */
+.resize-handle::after,
+.resize-handle.section::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Prevent panels from being resized too small (visual cue) */
+.left-section-panel:has(.atomic-section:empty) {
+  min-height: 24px;
+  background: #f8f9fa;
+  opacity: 0.5;
+}
+
+/* Improve handle visibility on dark backgrounds */
+@media (prefers-color-scheme: dark) {
+  .resize-handle,
+  .resize-handle.section {
+    background: linear-gradient(90deg, #444 0%, #888 100%);
+  }
+  .resize-handle:hover,
+  .resize-handle.section:hover {
+    background: linear-gradient(90deg, #888 0%, #444 100%);
+  }
+}
+
+/* Dark mode styles */
+body.dark, .dark {
+  background: #181a1b;
+  color: #e0e0e0;
+}
+body.dark .builder-header,
+.dark .builder-header {
+  background: #23272a;
+  border-bottom: 1px solid #333;
+}
+body.dark .main-tabs .tab,
+.dark .main-tabs .tab {
+  color: #e0e0e0;
+}
+body.dark .main-tabs .active,
+.dark .main-tabs .active {
+  border-bottom-color: #fff;
+}
+body.dark .dock-panel,
+.dark .dock-panel {
+  background: #23272a;
+}
+body.dark .left-section-panel,
+.dark .left-section-panel {
+  background: #23272a;
+  border-bottom: 1px solid #333;
+}
+body.dark .left-section-panel h4,
+.dark .left-section-panel h4,
+body.dark .left-section-panel .list,
+.dark .left-section-panel .list li {
+  color: #fff;
+}
+body.dark .box,
+.dark .box {
+  border-color: #444;
+  background: #222;
+  color: #ccc;
+}
+body.dark .resize-handle,
+.dark .resize-handle {
+  background: linear-gradient(90deg, #444 0%, #888 100%);
+}
+body.dark .resize-handle:hover,
+.dark .resize-handle:hover {
+  background: linear-gradient(90deg, #888 0%, #444 100%);
+}
+
+/* Drag handle for left and right panels - full bar, visually distinct */
+.panel-drag-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 16px; /* was 28px, now thinner */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  cursor: ew-resize; /* horizontal resize cursor */
+  background: linear-gradient(90deg, #e0e0e0 60%, #bdbdbd 100%);
+  transition: background 0.2s;
+  /* Add a subtle shadow for separation */
+  box-shadow: 2px 0 6px rgba(0,0,0,0.04);
+}
+.panel-drag-handle.left {
+  right: 0;
+  border-left: 1px solid #ccc;
+  border-radius: 0 8px 8px 0;
+}
+.panel-drag-handle.right {
+  left: 0;
+  border-right: 1px solid #ccc;
+  border-radius: 8px 0 0 8px;
+}
+.panel-drag-handle .grip {
+  width: 6px; /* was 8px */
+  height: 36px; /* was 48px */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+.panel-drag-handle .grip-dot {
+  width: 6px; /* was 8px */
+  height: 6px; /* was 8px */
+  border-radius: 3px; /* was 4px */
+  background: #888;
+  opacity: 0.7;
+}
+
+/* Dark mode for drag handles */
+body.dark .panel-drag-handle,
+.dark .panel-drag-handle {
+  background: linear-gradient(90deg, #444 60%, #888 100%);
+  border-color: #333;
+}
+body.dark .panel-drag-handle .grip-dot,
+.dark .panel-drag-handle .grip-dot {
+  background: #bbb;
+  opacity: 0.8;
 }
