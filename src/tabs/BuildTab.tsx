@@ -118,7 +118,7 @@ export default function BuildTab() {
               className="panel-drag-handle left"
               tabIndex={-1}
               aria-label="Drag panel"
-              onMouseDown={e => handlePanelDrag('left', e)}
+              onMouseDown={e => handlePanelDrag('left', e)}    // <-- ensure binding is here on the container
             >
               <div className="grip">
                 <div className="grip-dot"></div>
@@ -255,7 +255,7 @@ export default function BuildTab() {
               className="panel-drag-handle right"
               tabIndex={-1}
               aria-label="Drag panel"
-              onMouseDown={e => handlePanelDrag('right', e)}
+              onMouseDown={e => handlePanelDrag('right', e)}   // <-- ensure binding is here on the container
             >
               <div className="grip">
                 <div className="grip-dot"></div>

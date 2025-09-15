@@ -573,7 +573,7 @@ body.dark .resize-handle:hover,
   align-items: center;
   justify-content: center;
   z-index: 15;
-  cursor: ew-resize; /* horizontal resize cursor */
+  cursor: col-resize; /* ensures resize cursor everywhere on the bar */
   background: linear-gradient(90deg, #e0e0e0 60%, #bdbdbd 100%);
   transition: background 0.2s;
   /* Add a subtle shadow for separation */
@@ -590,14 +590,12 @@ body.dark .resize-handle:hover,
   border-radius: 0 8px 8px 0;
 }
 
-/* Right-side handle variant
-   • Positioned on the left edge of right panel
-   • Rounded inner corners
-*/
-.panel-drag-handle.right {
+/* Right-side handle variant: target actual DOM class so lighter color faces canvas */
+.dock-panel.right-dock-panel .panel-drag-handle {
   left: 0;
   border-right: 1px solid #ccc;
   border-radius: 8px 0 0 8px;
+  background: linear-gradient(to left, #e0e0e0 60%, #bdbdbd 100%);
 }
 
 /* Grip dots container
@@ -628,11 +626,10 @@ body.dark .resize-handle:hover,
   display: none;
 }
 
-/* make the handle largely transparent to pointer events so wheel/scroll can reach the panel's scrollbar.
-   Only the central .grip will accept pointer events for dragging. */
+/* make the handle interactive: enable pointer events for the full bar and use col-resize */
 .panel-drag-handle {
-  pointer-events: none; /* allow wheel events and clicks to pass through to panel content except on .grip */
-  cursor: ew-resize; /* maintain resize cursor as fallback */
+  pointer-events: auto;
+  cursor: col-resize; /* or row-resize if vertical */
 }
 
 /* central small hit target that actually receives pointer events for dragging */
@@ -646,7 +643,7 @@ body.dark .resize-handle:hover,
   border-radius: 6px;
   background: transparent;
   transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
-  cursor: ew-resize;         /* explicit cursor over the grip */
+  /* cursor removed so it inherits from .panel-drag-handle */
 }
 
 /* render a single ≡ character centered in the grip */
@@ -654,23 +651,18 @@ body.dark .resize-handle:hover,
   content: "≡";
   font-size: 18px;
   line-height: 1;
-  color: #4a4a4a;
+  color: #2e2e2e;
   display: block;
   transition: color 120ms ease, transform 120ms ease;
   will-change: transform, color;
+  /* cursor removed so it inherits from .panel-drag-handle */
 }
 
-/* hover/focus visual feedback on the small grip */
-.panel-drag-handle .grip:hover,
-.panel-drag-handle .grip:focus {
-  background: rgba(0,0,0,0.06);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
-  transform: translateY(-1px);
-}
-.panel-drag-handle .grip:hover::before,
-.panel-drag-handle .grip:focus::before {
-  color: #222;
-  transform: scale(1.06);
+/* Hover the full handle to affect the grip symbol (so the entire bar provides feedback) */
+.panel-drag-handle:hover .grip::before {
+  opacity: 1;
+  transform: scale(1.05);
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 /* keep strong visible affordance when keyboard-focused */
@@ -698,3 +690,17 @@ body.dark .panel-drag-handle .grip::before {
 }
 
 /* --- Responsive Layout --- */
+.dark .panel-drag-handle .grip-dot {
+  background: #bbb;
+  opacity: 0.8;
+}
+body.dark .panel-drag-handle .grip::before {
+  color: #f0f0f0;
+}
+
+/* Dark mode: right handle with inward-facing lighter edge */
+body.dark .dock-panel.right-dock-panel .panel-drag-handle,
+.dark .dock-panel.right-dock-panel .panel-drag-handle {
+  background: linear-gradient(to left, #555 60%, #777 100%);
+  border-color: #333;
+}
