@@ -128,7 +128,41 @@ export default function BuildTab() {
               </div>
             </div>
             <PanelGroup direction="vertical" className="left-vertical-group">
-              {/* Section A: Atomic Components */}
+              {/* Section B: Configurations (moved above Atomic Components) */}
+              <Panel
+                ref={configRef}
+                defaultSize={30}
+                minSize={10}
+                collapsible
+                collapsedSize={6}
+                className="left-section-panel"
+              >
+                <div className="atomic-section">
+                  <button
+                    className="section-collapse-btn"
+                    aria-label="Collapse/Expand Section"
+                    data-tooltip
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (configRef.current?.isCollapsed()) {
+                        configRef.current.expand();
+                      } else {
+                        configRef.current?.collapse();
+                      }
+                    }}
+                    title="Collapse/Expand Section"
+                  >&#x25BC;</button>
+                  <h4>Configurations</h4>
+                  <div className="button-group">
+                    {['All', 'User', 'Public', 'Official', 'Favs'].map((t) => (
+                      <button key={t}>{t}</button>
+                    ))}
+                  </div>
+                  <div className="box placeholder">[ configurations list ]</div>
+                </div>
+              </Panel>
+
+              {/* Section A: Atomic Components (now below Configurations) */}
               <Panel
                 ref={atomicRef}
                 defaultSize={40}
@@ -160,40 +194,6 @@ export default function BuildTab() {
                     <li>Number Input Field</li>
                     <li>Checkbox Field</li>
                   </ul>
-                </div>
-              </Panel>
-
-              {/* Section B: Configurations */}
-              <Panel
-                ref={configRef}
-                defaultSize={30}
-                minSize={10}
-                collapsible
-                collapsedSize={6}
-                className="left-section-panel"
-              >
-                <div className="atomic-section">
-                  <button
-                    className="section-collapse-btn"
-                    aria-label="Collapse/Expand Section"
-                    data-tooltip
-                    onClick={e => {
-                      e.stopPropagation();
-                      if (configRef.current?.isCollapsed()) {
-                        configRef.current.expand();
-                      } else {
-                        configRef.current?.collapse();
-                      }
-                    }}
-                    title="Collapse/Expand Section"
-                  >&#x25BC;</button>
-                  <h4>Configurations</h4>
-                  <div className="button-group">
-                    {['All', 'User', 'Public', 'Official', 'Favs'].map((t) => (
-                      <button key={t}>{t}</button>
-                    ))}
-                  </div>
-                  <div className="box placeholder">[ configurations list ]</div>
                 </div>
               </Panel>
 
