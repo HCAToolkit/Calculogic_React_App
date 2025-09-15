@@ -618,12 +618,69 @@ body.dark .resize-handle:hover,
    • Semi-transparent for subtlety
 */
 .panel-drag-handle .grip-dot {
-  width: 6px; /* was 8px */
-  height: 6px; /* was 8px */
-  border-radius: 3px; /* was 4px */
-  background: #888;
-  opacity: 0.7;
+  display: none;
 }
+
+/* --- Drag handle visual: replace many dots with one "≡" symbol --- */
+
+/* hide the existing dot elements while keeping them in DOM (no JSX change required) */
+.panel-drag-handle .grip-dot {
+  display: none;
+}
+
+/* make the handle largely transparent to pointer events so wheel/scroll can reach the panel's scrollbar.
+   Only the central .grip will accept pointer events for dragging. */
+.panel-drag-handle {
+  pointer-events: none; /* allow wheel events and clicks to pass through to panel content except on .grip */
+  cursor: ew-resize; /* maintain resize cursor as fallback */
+}
+
+/* central small hit target that actually receives pointer events for dragging */
+.panel-drag-handle .grip {
+  pointer-events: auto;
+  width: 28px;               /* comfortable hit area */
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: transparent;
+  transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+  cursor: ew-resize;         /* explicit cursor over the grip */
+}
+
+/* render a single ≡ character centered in the grip */
+.panel-drag-handle .grip::before {
+  content: "≡";
+  font-size: 18px;
+  line-height: 1;
+  color: #4a4a4a;
+  display: block;
+  transition: color 120ms ease, transform 120ms ease;
+  will-change: transform, color;
+}
+
+/* hover/focus visual feedback on the small grip */
+.panel-drag-handle .grip:hover,
+.panel-drag-handle .grip:focus {
+  background: rgba(0,0,0,0.06);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+  transform: translateY(-1px);
+}
+.panel-drag-handle .grip:hover::before,
+.panel-drag-handle .grip:focus::before {
+  color: #222;
+  transform: scale(1.06);
+}
+
+/* keep strong visible affordance when keyboard-focused */
+.panel-drag-handle .grip:focus {
+  outline: 2px solid rgba(0,115,170,0.18);
+  outline-offset: 2px;
+}
+
+/* Ensure both left & right variants inherit the behavior */
+/* Removed empty ruleset for .panel-drag-handle.left .grip, .panel-drag-handle.right .grip */
 
 /* Dark mode overrides for drag handles */
 body.dark .panel-drag-handle,
@@ -635,6 +692,9 @@ body.dark .panel-drag-handle .grip-dot,
 .dark .panel-drag-handle .grip-dot {
   background: #bbb;
   opacity: 0.8;
+}
+body.dark .panel-drag-handle .grip::before {
+  color: #f0f0f0;
 }
 
 /* --- Responsive Layout --- */
