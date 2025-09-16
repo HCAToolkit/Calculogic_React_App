@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Panel, PanelGroup, type ImperativePanelHandle } from 'react-resizable-panels';
 import './BuildTab.css';
 
@@ -11,6 +11,13 @@ export default function BuildTab() {
   const atomicRef = useRef<ImperativePanelHandle>(null);
   const configRef = useRef<ImperativePanelHandle>(null);
   const searchRef = useRef<ImperativePanelHandle>(null);
+
+  // Track collapsed state for each section for icon and class
+  const [collapsed, setCollapsed] = useState({
+    atomic: false,
+    config: false,
+    search: false,
+  });
 
   // Persistent layout: load on mount, save on change
   useEffect(() => {
@@ -78,6 +85,26 @@ export default function BuildTab() {
     window.addEventListener('mouseup', onMouseUp);
   }
 
+  // Helper to update collapsed state
+  function handleSectionToggle(ref: React.RefObject<ImperativePanelHandle | null>, key: keyof typeof collapsed) {
+      if (ref.current?.isCollapsed()) {
+        ref.current.expand();
+        setCollapsed(c => ({ ...c, [key]: false }));
+      } else {
+        ref.current?.collapse();
+        setCollapsed(c => ({ ...c, [key]: true }));
+      }
+    }
+
+  // Sync collapsed state on mount (in case of persisted layout)
+  useEffect(() => {
+    setCollapsed({
+      atomic: !!atomicRef.current?.isCollapsed?.() && atomicRef.current.isCollapsed(),
+      config: !!configRef.current?.isCollapsed?.() && configRef.current.isCollapsed(),
+      search: !!searchRef.current?.isCollapsed?.() && searchRef.current.isCollapsed(),
+    });
+  }, []);
+
   return (
     <div className="build-container">
       {/* Header */}
@@ -128,30 +155,29 @@ export default function BuildTab() {
               </div>
             </div>
             <PanelGroup direction="vertical" className="left-vertical-group">
-              {/* Section B: Configurations (moved above Atomic Components) */}
+              {/* Section B: Configurations */}
               <Panel
                 ref={configRef}
                 defaultSize={30}
                 minSize={10}
                 collapsible
                 collapsedSize={6}
-                className="left-section-panel"
+                className={`left-section-panel${collapsed.config ? ' collapsed' : ''}`}
+                onCollapse={() => setCollapsed(c => ({ ...c, config: true }))}
+                onExpand={() => setCollapsed(c => ({ ...c, config: false }))}
               >
                 <div className="atomic-section">
                   <button
                     className="section-collapse-btn"
-                    aria-label="Collapse/Expand Section"
+                    aria-label={collapsed.config ? "Expand Section" : "Collapse Section"}
+                    aria-expanded={!collapsed.config}
                     data-tooltip
                     onClick={e => {
                       e.stopPropagation();
-                      if (configRef.current?.isCollapsed()) {
-                        configRef.current.expand();
-                      } else {
-                        configRef.current?.collapse();
-                      }
+                      handleSectionToggle(configRef, 'config');
                     }}
-                    title="Collapse/Expand Section"
-                  >&#x25BC;</button>
+                    title={collapsed.config ? "Expand Section" : "Collapse Section"}
+                  >{collapsed.config ? '»' : '«'}</button>
                   <h4>Configurations</h4>
                   <div className="button-group">
                     {['All', 'User', 'Public', 'Official', 'Favs'].map((t) => (
@@ -162,30 +188,29 @@ export default function BuildTab() {
                 </div>
               </Panel>
 
-              {/* Section A: Atomic Components (now below Configurations) */}
+              {/* Section A: Atomic Components */}
               <Panel
                 ref={atomicRef}
                 defaultSize={40}
                 minSize={10}
                 collapsible
                 collapsedSize={6}
-                className="left-section-panel"
+                className={`left-section-panel${collapsed.atomic ? ' collapsed' : ''}`}
+                onCollapse={() => setCollapsed(c => ({ ...c, atomic: true }))}
+                onExpand={() => setCollapsed(c => ({ ...c, atomic: false }))}
               >
                 <div className="atomic-section">
                   <button
                     className="section-collapse-btn"
-                    aria-label="Collapse/Expand Section"
+                    aria-label={collapsed.atomic ? "Expand Section" : "Collapse Section"}
+                    aria-expanded={!collapsed.atomic}
                     data-tooltip
                     onClick={e => {
                       e.stopPropagation();
-                      if (atomicRef.current?.isCollapsed()) {
-                        atomicRef.current.expand();
-                      } else {
-                        atomicRef.current?.collapse();
-                      }
+                      handleSectionToggle(atomicRef, 'atomic');
                     }}
-                    title="Collapse/Expand Section"
-                  >&#x25BC;</button>
+                    title={collapsed.atomic ? "Expand Section" : "Collapse Section"}
+                  >{collapsed.atomic ? '»' : '«'}</button>
                   <h4>Atomic Components</h4>
                   <ul className="list">
                     <li>Container Field</li>
@@ -204,23 +229,22 @@ export default function BuildTab() {
                 minSize={10}
                 collapsible
                 collapsedSize={6}
-                className="left-section-panel"
+                className={`left-section-panel${collapsed.search ? ' collapsed' : ''}`}
+                onCollapse={() => setCollapsed(c => ({ ...c, search: true }))}
+                onExpand={() => setCollapsed(c => ({ ...c, search: false }))}
               >
                 <div className="atomic-section">
                   <button
                     className="section-collapse-btn"
-                    aria-label="Collapse/Expand Section"
+                    aria-label={collapsed.search ? "Expand Section" : "Collapse Section"}
+                    aria-expanded={!collapsed.search}
                     data-tooltip
                     onClick={e => {
                       e.stopPropagation();
-                      if (searchRef.current?.isCollapsed()) {
-                        searchRef.current.expand();
-                      } else {
-                        searchRef.current?.collapse();
-                      }
+                      handleSectionToggle(searchRef, 'search');
                     }}
-                    title="Collapse/Expand Section"
-                  >&#x25BC;</button>
+                    title={collapsed.search ? "Expand Section" : "Collapse Section"}
+                  >{collapsed.search ? '»' : '«'}</button>
                   <h4>Search Configurations</h4>
                   <div className="button-group">
                     {['Official', 'Public'].map((t) => (

@@ -377,22 +377,36 @@
   top: 6px;
   left: 6px;
   z-index: 2;
-  background: #e0e0e0;
+  background: transparent;
   border: none;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 0.9rem;
-  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  font-size: 1.25rem;
+  color: #888;
   opacity: 0.7;
-  transition: opacity 0.2s, background 0.2s;
+  box-shadow: none;
+  transition: background 0.2s, color 0.2s, opacity 0.2s, transform 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.section-collapse-btn:hover {
+.section-collapse-btn:hover, .section-collapse-btn:focus {
   opacity: 1;
-  background: #bdbdbd;
+  background: #e0e0e0;
+  color: #222;
+  outline: none;
+  transform: scale(1.08);
+}
+body.dark .section-collapse-btn,
+.dark .section-collapse-btn {
+  color: #bbb;
+  background: transparent;
+}
+body.dark .section-collapse-btn:hover,
+.dark .section-collapse-btn:hover {
+  background: #333;
+  color: #fff;
 }
 
 /* Thin handles for section resizing
@@ -703,4 +717,102 @@ body.dark .dock-panel.right-dock-panel .panel-drag-handle,
 .dark .dock-panel.right-dock-panel .panel-drag-handle {
   background: linear-gradient(to left, #555 60%, #777 100%);
   border-color: #333;
+}
+
+/* --- Section collapse chevron button --- */
+.section-collapse-btn {
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1.25rem;
+  color: #888;
+  opacity: 0.7;
+  box-shadow: none;
+  transition: background 0.2s, color 0.2s, opacity 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+}
+.section-collapse-btn:hover, .section-collapse-btn:focus {
+  opacity: 1;
+  background: #e0e0e0;
+  color: #222;
+  outline: none;
+  transform: scale(1.08);
+}
+body.dark .section-collapse-btn,
+.dark .section-collapse-btn {
+  color: #bbb;
+  background: transparent;
+}
+body.dark .section-collapse-btn:hover,
+.dark .section-collapse-btn:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* --- Collapsed left section panel --- */
+.left-section-panel {
+  transition: width 0.3s cubic-bezier(.4,1.2,.4,1), min-width 0.3s cubic-bezier(.4,1.2,.4,1), background 0.2s;
+  overflow: hidden;
+  position: relative;
+  min-width: 0;
+  width: auto;
+}
+
+/* Collapsed state: fixed width, hide content except button */
+.left-section-panel.collapsed {
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  transition: width 0.3s cubic-bezier(.4,1.2,.4,1), min-width 0.3s cubic-bezier(.4,1.2,.4,1), background 0.2s;
+  overflow: hidden;
+  padding: 0;
+}
+.left-section-panel.collapsed .atomic-section > *:not(.section-collapse-btn) {
+  opacity: 0;
+  pointer-events: none;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  transition: opacity 0.2s, height 0.2s;
+}
+.left-section-panel.collapsed .section-collapse-btn {
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  z-index: 2;
+  opacity: 1;
+  background: transparent;
+  color: #888;
+  transform: none;
+}
+.left-section-panel.collapsed h4,
+.left-section-panel.collapsed .button-group,
+.left-section-panel.collapsed .box,
+.left-section-panel.collapsed .list {
+  display: none !important;
+}
+
+/* Animate content in/out for smoothness */
+.left-section-panel .atomic-section > * {
+  transition: opacity 0.2s, height 0.2s;
+}
+
+/* Prevent overflow in collapsed state */
+.left-section-panel.collapsed .atomic-section {
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+/* --- Animate resizing of panels for smooth collapse/expand --- */
+.left-section-panel,
+.left-section-panel .atomic-section {
+  transition: width 0.3s cubic-bezier(.4,1.2,.4,1), min-width 0.3s cubic-bezier(.4,1.2,.4,1), background 0.2s, padding 0.2s;
 }
