@@ -2,6 +2,21 @@ import { useRef, useEffect, useState } from 'react';
 import { Panel, PanelGroup, type ImperativePanelHandle } from 'react-resizable-panels';
 import './BuildTab.css';
 
+function ChevronLeftIcon({ style }: { style?: React.CSSProperties }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 20 20" style={style} aria-hidden="true" focusable="false">
+      <polyline points="13 5 8 10 13 15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function ChevronRightIcon({ style }: { style?: React.CSSProperties }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 20 20" style={style} aria-hidden="true" focusable="false">
+      <polyline points="7 5 12 10 7 15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 export default function BuildTab() {
   const leftPanelRef = useRef<ImperativePanelHandle>(null);
   const rightPanelRef = useRef<ImperativePanelHandle>(null);
@@ -166,25 +181,31 @@ export default function BuildTab() {
                 onCollapse={() => setCollapsed(c => ({ ...c, config: true }))}
                 onExpand={() => setCollapsed(c => ({ ...c, config: false }))}
               >
-                <div className="atomic-section">
-                  <button
-                    className="section-collapse-btn"
-                    aria-label={collapsed.config ? "Expand Section" : "Collapse Section"}
-                    aria-expanded={!collapsed.config}
-                    data-tooltip
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleSectionToggle(configRef, 'config');
-                    }}
-                    title={collapsed.config ? "Expand Section" : "Collapse Section"}
-                  >{collapsed.config ? '»' : '«'}</button>
-                  <h4>Configurations</h4>
-                  <div className="button-group">
-                    {['All', 'User', 'Public', 'Official', 'Favs'].map((t) => (
-                      <button key={t}>{t}</button>
-                    ))}
+                <div className="atomic-section section">
+                  <div className="section-header">
+                    <button
+                      className="section-collapse-btn"
+                      aria-label={collapsed.config ? "Expand Section" : "Collapse Section"}
+                      aria-expanded={!collapsed.config}
+                      data-tooltip
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleSectionToggle(configRef, 'config');
+                      }}
+                      title={collapsed.config ? "Expand Section" : "Collapse Section"}
+                    >
+                      {collapsed.config ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                    </button>
+                    <h4>Configurations</h4>
                   </div>
-                  <div className="box placeholder">[ configurations list ]</div>
+                  <div className="section-content">
+                    <div className="button-group">
+                      {['All', 'User', 'Public', 'Official', 'Favs'].map((t) => (
+                        <button key={t}>{t}</button>
+                      ))}
+                    </div>
+                    <div className="box placeholder">[ configurations list ]</div>
+                  </div>
                 </div>
               </Panel>
 
@@ -199,26 +220,32 @@ export default function BuildTab() {
                 onCollapse={() => setCollapsed(c => ({ ...c, atomic: true }))}
                 onExpand={() => setCollapsed(c => ({ ...c, atomic: false }))}
               >
-                <div className="atomic-section">
-                  <button
-                    className="section-collapse-btn"
-                    aria-label={collapsed.atomic ? "Expand Section" : "Collapse Section"}
-                    aria-expanded={!collapsed.atomic}
-                    data-tooltip
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleSectionToggle(atomicRef, 'atomic');
-                    }}
-                    title={collapsed.atomic ? "Expand Section" : "Collapse Section"}
-                  >{collapsed.atomic ? '»' : '«'}</button>
-                  <h4>Atomic Components</h4>
-                  <ul className="list">
-                    <li>Container Field</li>
-                    <li>Sub-Container Field</li>
-                    <li>Text Input Field</li>
-                    <li>Number Input Field</li>
-                    <li>Checkbox Field</li>
-                  </ul>
+                <div className="atomic-section section">
+                  <div className="section-header">
+                    <button
+                      className="section-collapse-btn"
+                      aria-label={collapsed.atomic ? "Expand Section" : "Collapse Section"}
+                      aria-expanded={!collapsed.atomic}
+                      data-tooltip
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleSectionToggle(atomicRef, 'atomic');
+                      }}
+                      title={collapsed.atomic ? "Expand Section" : "Collapse Section"}
+                    >
+                      {collapsed.atomic ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                    </button>
+                    <h4>Atomic Components</h4>
+                  </div>
+                  <div className="section-content">
+                    <ul className="list">
+                      <li>Container Field</li>
+                      <li>Sub-Container Field</li>
+                      <li>Text Input Field</li>
+                      <li>Number Input Field</li>
+                      <li>Checkbox Field</li>
+                    </ul>
+                  </div>
                 </div>
               </Panel>
 
@@ -233,25 +260,31 @@ export default function BuildTab() {
                 onCollapse={() => setCollapsed(c => ({ ...c, search: true }))}
                 onExpand={() => setCollapsed(c => ({ ...c, search: false }))}
               >
-                <div className="atomic-section">
-                  <button
-                    className="section-collapse-btn"
-                    aria-label={collapsed.search ? "Expand Section" : "Collapse Section"}
-                    aria-expanded={!collapsed.search}
-                    data-tooltip
-                    onClick={e => {
-                      e.stopPropagation();
-                      handleSectionToggle(searchRef, 'search');
-                    }}
-                    title={collapsed.search ? "Expand Section" : "Collapse Section"}
-                  >{collapsed.search ? '»' : '«'}</button>
-                  <h4>Search Configurations</h4>
-                  <div className="button-group">
-                    {['Official', 'Public'].map((t) => (
-                      <button key={t}>{t}</button>
-                    ))}
+                <div className="atomic-section section">
+                  <div className="section-header">
+                    <button
+                      className="section-collapse-btn"
+                      aria-label={collapsed.search ? "Expand Section" : "Collapse Section"}
+                      aria-expanded={!collapsed.search}
+                      data-tooltip
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleSectionToggle(searchRef, 'search');
+                      }}
+                      title={collapsed.search ? "Expand Section" : "Collapse Section"}
+                    >
+                      {collapsed.search ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                    </button>
+                    <h4>Search Configurations</h4>
                   </div>
-                  <div className="box placeholder">[ search results ]</div>
+                  <div className="section-content">
+                    <div className="button-group">
+                      {['Official', 'Public'].map((t) => (
+                        <button key={t}>{t}</button>
+                      ))}
+                    </div>
+                    <div className="box placeholder">[ search results ]</div>
+                  </div>
                 </div>
               </Panel>
             </PanelGroup>
