@@ -177,6 +177,7 @@ export default function BuildTab() {
                 minSize={10}
                 collapsible
                 collapsedSize={6}
+                id="cs" // Updated from id="rr"
                 className={`left-section-panel${collapsed.config ? ' collapsed' : ''}`}
                 onCollapse={() => setCollapsed(c => ({ ...c, config: true }))}
                 onExpand={() => setCollapsed(c => ({ ...c, config: false }))}
@@ -216,6 +217,7 @@ export default function BuildTab() {
                 minSize={10}
                 collapsible
                 collapsedSize={6}
+                id="acs" // Updated from id="rs"
                 className={`left-section-panel${collapsed.atomic ? ' collapsed' : ''}`}
                 onCollapse={() => setCollapsed(c => ({ ...c, atomic: true }))}
                 onExpand={() => setCollapsed(c => ({ ...c, atomic: false }))}
@@ -256,6 +258,7 @@ export default function BuildTab() {
                 minSize={10}
                 collapsible
                 collapsedSize={6}
+                id="scs" // Updated from id="rt"
                 className={`left-section-panel${collapsed.search ? ' collapsed' : ''}`}
                 onCollapse={() => setCollapsed(c => ({ ...c, search: true }))}
                 onExpand={() => setCollapsed(c => ({ ...c, search: false }))}

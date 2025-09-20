@@ -845,3 +845,39 @@ body.dark .section-collapse-btn:hover,
 .left-section-panel .atomic-section {
   transition: width 0.3s cubic-bezier(.4,1.2,.4,1), min-width 0.3s cubic-bezier(.4,1.2,.4,1), background 0.2s, padding 0.2s;
 }
+
+/* ==========================================================================
+   CONFIGURATIONS SECTION (ID: cs)
+   ========================================================================== */
+
+#cs {
+  /* Styles for Configurations Section */
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   ATOMIC COMPONENTS SECTION (ID: acs)
+   ========================================================================== */
+
+#acs {
+  /* Styles for Atomic Components Section */
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   SEARCH CONFIGURATIONS SECTION (ID: scs)
+   ========================================================================== */
+
+#scs {
+  /* Styles for Search Configurations Section */
+  padding: 1rem;
+  background: #f1f1f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
