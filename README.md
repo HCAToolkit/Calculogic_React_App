@@ -1,120 +1,122 @@
 Calculogic React App
+A modular, JSON-driven form-builder in React. Design, preview and publish dynamic questionnaires via a five-stage UI.
 
-A React-only implementation of the Calculogic Builder: a no-code, atomic-component form and logic builder designed to be portable to WordPress, desktop (Electron), and mobile (Capacitor) environments.
+Table of Contents
+Features
 
-📦 Tech Stack
+Tech Stack
 
-Framework & Build: React, Vite
+Getting Started
 
-State Management: Zustand (with persist middleware)
+Development
 
-Logic Engine: json-logic-js
+Building for Production
 
-Templating Engine: Mustache.js
+Project Structure
 
-Routing (optional): React Router DOM
+Configuration Architecture
 
-Language: TypeScript
+Contributing
 
-⚙️ Prerequisites
+License
 
-Node.js (v14+)
+Features
+Five-tab builder:
 
-npm (v6+)
+Build – drag & drop containers, fields, sub-containers
 
-Git
+View – style and layout controls
 
-🚀 Getting Started
+Knowledge – attach tooltips, help text, validation rules
 
-Clone the repository
+Results – configure scoring, branching logic
 
-git clone https://github.com/<your-username>/calculogic-core.git
-cd calculogic-core
+Publish – export/share final JSON
 
-Install dependencies
+Atomic components: text input, number input, checkbox, search selector
 
+Live preview pane updates as you edit
+
+Pluggable runtime engine evaluates conditions & maps outputs
+
+TypeScript, ESLint, Vite for fast feedback loops
+
+Tech Stack
+React 18 + TypeScript
+
+Vite (development server & build)
+
+ESLint + Prettier (code quality)
+
+Jest + React Testing Library (unit/integration tests)
+
+Getting Started
+Prerequisites
+Node.js ≥ 16
+
+npm (or Yarn)
+
+Install
+bash
+git clone https://github.com/your-org/Calculogic_React_App.git
+cd Calculogic_React_App
 npm install
+Development
+Launch a local dev server with hot-reload:
 
-Run in development mode
-
+bash
 npm run dev
+Open http://localhost:5173 to view the builder. Changes to src/ reload instantly.
 
-Open your browser at http://localhost:5173 (or the URL printed by Vite).
+Building for Production
+Generate an optimized build in dist/:
 
-Build for production
-
+bash
 npm run build
+You can then serve dist/ with any static file host.
 
-The static output will be in the dist/ folder.
+Project Structure
+Code
+/
+├─ public/            
+│   └─ index.html     # HTML template
+├─ src/               
+│   ├─ builder/       # Builder UI & tab modules
+│   ├─ components/    # Shared React components
+│   ├─ engine/        # JSON runtime & logic evaluator
+│   └─ App.tsx        # Root component & routing
+├─ dist/              # Production output
+├─ package.json       # Scripts & dependencies
+├─ eslint.config.js   # ESLint rules
+├─ tsconfig.json      # TypeScript config
+└─ vite.config.ts     # Vite build/dev config
+Configuration Architecture
+All the details on how your JSON “Configurations” are structured lives in our living spec:
 
-Preview the production build
+https://docs.google.com/document/d/1UNlEDQTqWKbuq2QIFNIhYWxzMzj_opopgXu4QIScZKA/edit
 
-npm run serve
+That guide covers:
 
-🗂 Project Structure
+Configuration schema (containers, fields, sub-containers)
 
-calculogic-core/
-├── public/                # Public assets (favicon, vite.svg)
-├── src/
-│   ├── assets/            # Static assets (SVG, images)
-│   ├── components/        # Reusable atomic React components
-│   ├── state/             # Zustand store definitions
-│   ├── tabs/              # UI for each builder tab (Build, Logic, etc.)
-│   │   └── BuildTab.tsx   # Initial Build tab implementation
-│   ├── App.tsx            # Root component (renders tab navigation)
-│   └── main.tsx           # React entrypoint
-├── .gitignore
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-└── README.md             # You are here
+How Build/View/Knowledge/Results/Publish tabs map to JSON
 
-📋 Core Features (MVP)
+Runtime rendering, validation and scoring
 
-Build Tab (src/tabs/BuildTab.tsx)
+Exporting/shareable JSON format
 
-Add "Number Input" fields dynamically.
+Contributing
+Fork the repo
 
-Fields stored in a global Zustand store (src/state/useStore.ts).
+Create a feature branch (git checkout -b feature/name)
 
-Global State
+Commit your changes (git commit -m "feat: add xyz")
 
-Managed in useStore with structure (field definitions).
+Push to your branch (git push origin feature/name)
 
-setStructure action to update the form schema.
+Open a Pull Request with details and screenshots
 
-Persistence (LocalStorage)
+See CONTRIBUTING.md for full guidelines.
 
-(Planned) use Zustand persist middleware to auto-save the builder state.
-
-🎯 Next Steps & Roadmap
-
-Logic Tab: integrate json-logic-js to let users define calculation rules.
-
-View Tab: allow styling of fields via atomic CSS classes or inline styles.
-
-Knowledge Tab: support importing external data sets or reference tables.
-
-Results Tab: render final output with mustache.js templates and live preview.
-
-Dashboard: list, load, and manage multiple projects.
-
-Data Providers: abstract save/load to WordPress REST, Electron FS, or Capacitor Storage.
-
-Packaging: wrap the final build as a WordPress plugin, an Electron app, and a Capacitor mobile app.
-
-🤝 Contributing
-
-Fork the repository
-
-Create your feature branch (git checkout -b feature/your-feature)
-
-Commit your changes (git commit -m 'feat: add new ...')
-
-Push to the branch (git push origin feature/your-feature)
-
-Open a Pull Request
-
-📄 License
-
-This project is licensed under the MIT License. See LICENSE for details.
+License
+This project is MIT-licensed. See LICENSE for details.
