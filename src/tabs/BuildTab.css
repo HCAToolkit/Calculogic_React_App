@@ -123,6 +123,7 @@
   justify-content: space-between; /* place chevron and title apart */
   padding: 0.4rem 0.6rem;
   background: var(--header-bg, #f3f4f6);
+  border-bottom: 1px solid #e5e7eb;
   box-sizing: border-box;
   gap: 8px;
 }
@@ -262,7 +263,52 @@
   background-color: #d1d5db;
 }
 
-/* Keep existing focus-visible rule elsewhere (no change needed) */
+/* Right panel grip (vertical) — similar visual treatment to left-panel-grip */
+.right-panel-grip {
+  width: 8px;
+  background-color: #e5e7eb;
+  cursor: col-resize;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.right-panel-grip::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 8px;
+  transform: translate(-50%, -50%) rotate(90deg);
+  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(#6b7280, #6b7280),
+    linear-gradient(#6b7280, #6b7280),
+    linear-gradient(#6b7280, #6b7280);
+  background-size: 16px 2px, 16px 2px, 16px 2px;
+  background-position:
+    center calc(50% - 3px),
+    center center,
+    center calc(50% + 3px);
+}
+.right-panel-grip:hover::before,
+.right-panel-grip:focus::before {
+  filter: brightness(0.8);
+}
+.right-panel-grip:hover,
+.right-panel-grip:focus {
+  background-color: #d1d5db;
+}
+
+/* Ensure focus-visible outlines for all grips */
+.section-grip:focus-visible,
+.left-panel-grip:focus-visible,
+.right-panel-grip:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
 /* ==========================================================================
    ATOMIC CONTROLS PANEL
    ========================================================================== */
@@ -1054,7 +1100,7 @@ body.dark .section-collapse-btn:hover,
 }
 
 /* ==========================================================================
-   ATOMIC COMPONENTS SECTION (ID: acs)
+   ATOMIC COMPONENTS SECTION (ID: acs
    ========================================================================== */
 
 #acs {
@@ -1076,3 +1122,5 @@ body.dark .section-collapse-btn:hover,
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+/* No additional CSS changes needed; inline styles toggle transitions during drag. */
