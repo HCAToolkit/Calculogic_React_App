@@ -1,0 +1,31 @@
+[data-anchor="app-frame"] {
+  height: 100vh;
+  font-family: sans-serif;
+  background: var(--app-surface, #f8f9fc);
+  color: var(--app-foreground, #0f172a);
+  position: relative;
+}
+
+[data-anchor="theme-toggle"] {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1000;
+  border: 1px solid rgba(15, 23, 42, 0.35);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  background: var(--toggle-bg, #f1f5f9);
+  color: inherit;
+  cursor: pointer;
+}
+
+[data-anchor="theme-toggle"]:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+body.dark {
+  --app-surface: #0f172a;
+  --app-foreground: #e2e8f0;
+  --toggle-bg: #1e293b;
+}
