@@ -1,23 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BuildTab from './tabs/BuildTab';
+import './App.css';
 
 export default function App() {
   const [dark, setDark] = useState(() =>
     window.matchMedia('(prefers-color-scheme: dark)').matches
   );
 
+  useEffect(() => {
+    document.body.classList.toggle('dark', dark);
+  }, [dark]);
+
   function toggleDark() {
-    setDark(d => !d);
-    document.body.classList.toggle('dark', !dark);
+    setDark(prev => !prev);
   }
 
   return (
-    <div style={{ height: '100vh', fontFamily: 'sans-serif' }} className={dark ? 'dark' : ''}>
+    <div data-anchor="app-frame">
       <button
-        style={{
-          position: 'absolute', top: 8, right: 8, zIndex: 1000,
-          background: dark ? '#222' : '#eee', color: dark ? '#fff' : '#222', border: '1px solid #888', borderRadius: 4, padding: '4px 10px'
-        }}
+        data-anchor="theme-toggle"
         onClick={toggleDark}
         aria-label="Toggle dark mode"
       >

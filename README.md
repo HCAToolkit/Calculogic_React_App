@@ -118,5 +118,25 @@ Open a Pull Request with details and screenshots
 
 See CONTRIBUTING.md for full guidelines.
 
+Pushing Changes to GitHub
+For quick fixes on the tracked branch, you can push directly from your local clone:
+
+1. Verify the working tree is clean and you are on the correct branch.
+   ```bash
+   git status
+   ```
+2. Stage updated files.
+   ```bash
+   git add <paths>
+   ```
+3. Commit with a descriptive message.
+   ```bash
+   git commit -m "refactor: describe your change"
+   ```
+4. Push to the remote branch (replace `origin`/`main` if you use other names).
+   ```bash
+   git push origin main
+   ```
+
 License
 This project is MIT-licensed. See LICENSE for details.
