@@ -125,6 +125,7 @@ All structural, logic, and scoring details for Calculogic live in the **Configur
 a living specification describing how JSON configurations represent forms, quizzes, and templates.
 
 📄 [View the external document](https://docs.google.com/document/d/1UNlEDQTqWKbuq2QIFNIhYWxzMzj_opopgXu4QIScZKA/edit)
+📚 [Read the local summary](doc/ConfigurationArchitectureSummary.md)
 
 **Covers**
 
