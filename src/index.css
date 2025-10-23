@@ -1,4 +1,18 @@
-/* Reset and global styles */
+/*
+ * Concern: GlobalReset
+ * Layer: View
+ * BuildIndex: 00.00
+ * AttachesTo: html, body, #root
+ * Responsibility: Provide a predictable baseline for the SPA container.
+ * Invariants: Box-sizing remains border-box, root stretches full viewport height.
+ */
+
+/* [Section 00.10] DocumentBaseline
+ * Purpose: Normalize root element sizing and typography defaults.
+ * Inputs: Browser UA stylesheet
+ * Outputs: Global reset rules
+ * Constraints: Preserve 100% height for layout primitives.
+ */
 body, html {
   margin: 0;
   padding: 0;
@@ -7,6 +21,12 @@ body, html {
   font-family: sans-serif;
 }
 
+/* [Section 00.20] RootContainer
+ * Purpose: Ensure the React root participates in flex layouts consistently.
+ * Inputs: Document baseline rules
+ * Outputs: Flex column root container
+ * Constraints: Keep height 100% for downstream full-height layouts.
+ */
 #root {
   height: 100%;
   display: flex;
