@@ -1,3 +1,18 @@
+/*
+ * Concern: AppFrameView
+ * Layer: View
+ * BuildIndex: 01.00
+ * AttachesTo: [data-anchor="app-frame"]
+ * Responsibility: Skin the global frame and expose accessible theming affordances.
+ * Invariants: Frame fills viewport, theme toggle maintains focus treatment.
+ */
+
+/* [Section 01.10] FrameSurface
+ * Purpose: Establish full-viewport shell and default color variables.
+ * Inputs: CSS custom properties, body theme variables
+ * Outputs: App frame layout styling
+ * Constraints: Maintain responsive fill and readable contrast.
+ */
 [data-anchor="app-frame"] {
   height: 100vh;
   font-family: sans-serif;
@@ -6,6 +21,12 @@
   position: relative;
 }
 
+/* [Section 01.20] ThemeToggle
+ * Purpose: Position and style the theme toggle control.
+ * Inputs: App frame positioning context
+ * Outputs: Styled toggle button
+ * Constraints: Keep focus ring visible and button discoverable.
+ */
 [data-anchor="theme-toggle"] {
   position: absolute;
   top: 0.5rem;
@@ -24,6 +45,12 @@
   outline-offset: 2px;
 }
 
+/* [Section 01.30] DarkThemeVariables
+ * Purpose: Override design tokens when dark mode is active.
+ * Inputs: body.dark class
+ * Outputs: Alternate CSS custom property values
+ * Constraints: Preserve adequate contrast with base text.
+ */
 body.dark {
   --app-surface: #0f172a;
   --app-foreground: #e2e8f0;

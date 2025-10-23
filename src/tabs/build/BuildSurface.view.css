@@ -1,3 +1,18 @@
+/*
+ * Concern: BuildSurfaceView
+ * Layer: View
+ * BuildIndex: 20.00
+ * AttachesTo: builder-root
+ * Responsibility: Style the Build surface chrome, catalog, preview, and inspector panes.
+ * Invariants: Resizable grips stay visible, flex layout honors anchor boundaries.
+ */
+
+/* [Section 20.10] SurfaceChrome
+ * Purpose: Style the root container, header, and tab navigation chrome.
+ * Inputs: Build surface structure anchors
+ * Outputs: Flex layout and header presentation
+ * Constraints: Maintain sticky header height and clear CTA prominence.
+ */
 [data-anchor="builder-root"] {
   display: flex;
   flex-direction: column;
@@ -58,6 +73,12 @@
   overflow: hidden;
 }
 
+/* [Section 20.20] SectionCatalog
+ * Purpose: Style the collapsible catalog column and its resize affordances.
+ * Inputs: Builder left panel anchors
+ * Outputs: Panel layout, section headers, and grip treatments
+ * Constraints: Maintain readable typography and accessible focus states.
+ */
 [data-anchor="builder-left-panel"] {
   display: flex;
   flex-direction: column;
@@ -200,6 +221,12 @@
   transform: rotate(90deg);
 }
 
+/* [Section 20.30] CenterPreview
+ * Purpose: Style the preview canvas placeholder and maintain balanced spacing.
+ * Inputs: Builder center panel anchors
+ * Outputs: Flexible preview area styling
+ * Constraints: Preserve neutral background and dashed placeholder affordance.
+ */
 [data-anchor="builder-center-panel"] {
   flex: 1 1 auto;
   min-width: 0;
@@ -227,6 +254,12 @@
   color: rgba(30, 41, 59, 0.7);
 }
 
+/* [Section 20.40] RightInspector
+ * Purpose: Style the inspector column, including collapse control and content area.
+ * Inputs: Builder right panel anchors
+ * Outputs: Inspector layout and typography rules
+ * Constraints: Keep minimum width for readability and consistent focus treatments.
+ */
 [data-anchor="builder-right-panel"] {
   display: flex;
   flex-direction: column;

@@ -1,7 +1,21 @@
+/**
+ * Concern: BuildSurfaceStructure
+ * Layer: Build
+ * BuildIndex: 20.00
+ * AttachesTo: builder-root
+ * Responsibility: Render the Build tab's structural layout and anchor map.
+ * Invariants: Section order aligns with logic bindings, resizable panes respect anchor contracts.
+ */
 import type { ReactNode } from 'react';
 import { BUILD_ANCHORS } from './anchors';
 import type { BuildSurfaceBindings, SectionId, SectionLogicBinding } from './BuildSurface.logic';
 import { sectionTitle } from './BuildSurface.logic';
+
+// [Section 20.10] PanelChrome
+// Purpose: Provide reusable iconography for collapsible controls.
+// Inputs: Panel collapsed state
+// Outputs: Chevron icon components
+// Constraints: Icons remain accessible and purely presentational.
 
 function ChevronLeftIcon() {
   return (
@@ -33,6 +47,11 @@ function ChevronRightIcon() {
   );
 }
 
+// [Section 20.20] SectionCatalog
+// Purpose: Describe left-panel sections and their structural anchors.
+// Inputs: SectionId order from logic bindings
+// Outputs: Structured React nodes bound to BUILD_ANCHORS
+// Constraints: Anchor names stay deterministic; placeholders preserve layout spacing.
 interface SectionContentConfig {
   id: SectionId;
   render: () => ReactNode;
@@ -92,6 +111,11 @@ function renderSectionContent(id: SectionId) {
   return match ? match.render() : null;
 }
 
+// [Section 20.30] SectionPanels
+// Purpose: Render individual catalog panels with collapse and resize affordances.
+// Inputs: SectionLogicBinding from logic layer
+// Outputs: Section markup bound to anchors and ARIA contracts
+// Constraints: Header buttons stay accessible; grip hidden when logic disallows drag.
 function SectionPanel({ binding }: { binding: SectionLogicBinding }) {
   const title = sectionTitle(binding.id);
   return (
@@ -124,6 +148,11 @@ function SectionPanel({ binding }: { binding: SectionLogicBinding }) {
   );
 }
 
+// [Section 20.40] SurfaceLayout
+// Purpose: Assemble the builder frame, navigation chrome, and pane layout.
+// Inputs: BuildSurfaceBindings including anchors, sections, and panel states
+// Outputs: Complete Build tab DOM structure
+// Constraints: Anchor contracts stay intact; layout transitions remain CSS-driven.
 export function BuildSurface({
   anchors,
   sectionOrder,
