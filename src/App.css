@@ -1,3 +1,22 @@
+/*
+ * Configuration: cfg-appFrame (App Frame)
+ * Concern File: BuildStyle
+ * Source NL: doc/nl-config/cfg-appFrame.md
+ * Responsibility: Style the app frame container, theme toggle control, and dark theme variables.
+ * Invariants: Frame fills viewport and maintains accessible focus treatment for the toggle.
+ */
+
+/* ─────────────────────────────────────────────
+ * 4. BuildStyle – cfg-appFrame (App Frame)
+ * NL Sections: §4.1–4.3 in cfg-appFrame.md
+ * Purpose: Provide surface styling for the frame shell and toggle control.
+ * Constraints: No structural mutations; operate on anchors defined by Build.
+ * ───────────────────────────────────────────── */
+
+/* [4.1] cfg-appFrame · Container · "Frame Surface Styling"
+   Concern: BuildStyle · Parent: "—" · Catalog: surface.appShell
+   Notes: Ensures viewport fill and default design tokens for the frame.
+ */
 [data-anchor="app-frame"] {
   height: 100vh;
   font-family: sans-serif;
@@ -6,6 +25,10 @@
   position: relative;
 }
 
+/* [4.2] cfg-appFrame · Primitive · "Theme Toggle Styling"
+   Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: control.toggle
+   Notes: Positions toggle in top-right corner with visible focus outline.
+ */
 [data-anchor="theme-toggle"] {
   position: absolute;
   top: 0.5rem;
@@ -19,11 +42,19 @@
   cursor: pointer;
 }
 
+/* [4.2.1] cfg-appFrame · Primitive · "Theme Toggle Focus Ring"
+   Concern: BuildStyle · Parent: "Theme Toggle Styling" · Catalog: control.focus
+   Notes: Guarantees accessible focus outline for keyboard users.
+ */
 [data-anchor="theme-toggle"]:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
 
+/* [4.3] cfg-appFrame · Primitive · "Dark Theme Variables"
+   Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: tokens.theme
+   Notes: Swaps neutral tokens when body.dark is present to support dark mode.
+ */
 body.dark {
   --app-surface: #0f172a;
   --app-foreground: #e2e8f0;

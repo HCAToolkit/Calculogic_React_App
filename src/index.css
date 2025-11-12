@@ -1,4 +1,21 @@
-/* Reset and global styles */
+/*
+ * ProjectShell: SPA Host Shell (shell-spaHost)
+ * Concern File: BuildStyle
+ * Source NL: doc/nl-shell/shell-spaHost.md
+ * Responsibility: Normalize document-level layout primitives for the SPA host.
+ * Invariants: html, body, and #root all remain full-height with border-box sizing.
+ */
+
+/* ─────────────────────────────────────────────
+ * 4. BuildStyle – shell-spaHost (SPA Host Shell)
+ * NL Sections: §4.1–4.2 in shell-spaHost.md
+ * Purpose: Provide neutral global sizing without introducing component styling.
+ * Constraints: Limit selectors to html, body, and #root.
+ * ───────────────────────────────────────────── */
+
+/* [4.1] shell-spaHost · Primitive · "Document Baseline Reset"
+   Concern: BuildStyle · Parent: "—" · Catalog: surface.baseline
+   Notes: Zeroes margins and enforces border-box sizing with default typography. */
 body, html {
   margin: 0;
   padding: 0;
@@ -7,6 +24,9 @@ body, html {
   font-family: sans-serif;
 }
 
+/* [4.2] shell-spaHost · Primitive · "Root Flex Column"
+   Concern: BuildStyle · Parent: "Document Baseline Reset" · Catalog: layout.foundation
+   Notes: Forces the React root to occupy full height and expose flex column layout to children. */
 #root {
   height: 100%;
   display: flex;
