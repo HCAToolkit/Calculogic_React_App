@@ -1,23 +1,18 @@
 /*
- * Configuration: cfg-buildSurface (Build Surface)
- * Concern File: BuildStyle
- * Source NL: doc/nl-config/cfg-buildSurface.md
- * Responsibility: Style the Build surface chrome, catalog panels, preview stage, and inspector column.
- * Invariants: Grips remain visible and focusable; styling never introduces new structure.
+ * Concern: BuildSurfaceView
+ * Layer: View
+ * BuildIndex: 20.00
+ * AttachesTo: builder-root
+ * Responsibility: Style the Build surface chrome, catalog, preview, and inspector panes.
+ * Invariants: Resizable grips stay visible, flex layout honors anchor boundaries.
  */
 
-/* ─────────────────────────────────────────────
- * 4. BuildStyle – cfg-buildSurface (Build Surface)
- * NL Sections: §4.1–4.5 in cfg-buildSurface.md
- * Purpose: Skin surface chrome, catalog column, preview canvas, and inspector without altering DOM order.
- * Constraints: Operate exclusively on Build anchors; keep responsive behavior CSS-driven.
- * ───────────────────────────────────────────── */
-
-/* [4.1] cfg-buildSurface · Container · "Surface Chrome Styling"
-   Concern: BuildStyle · Parent: "—" · Catalog: surface.chrome
-   Notes: Frames the root surface, header chrome, and navigation tabs. */
-/* [4.1.1] cfg-buildSurface · Primitive · "Root Surface"
-   Concern: BuildStyle · Parent: "Surface Chrome Styling" · Catalog: surface.base */
+/* [Section 20.10] SurfaceChrome
+ * Purpose: Style the root container, header, and tab navigation chrome.
+ * Inputs: Build surface structure anchors
+ * Outputs: Flex layout and header presentation
+ * Constraints: Maintain sticky header height and clear CTA prominence.
+ */
 [data-anchor="builder-root"] {
   display: flex;
   flex-direction: column;
@@ -92,11 +87,12 @@
   overflow: hidden;
 }
 
-/* [4.2] cfg-buildSurface · Container · "Catalog Column Styling"
-   Concern: BuildStyle · Parent: "Surface Chrome Styling" · Catalog: surface.catalog
-   Notes: Styles the left panel sections, header chrome, and content placeholders. */
-/* [4.2.1] cfg-buildSurface · Primitive · "Catalog Column"
-   Concern: BuildStyle · Parent: "Catalog Column Styling" · Catalog: layout.column */
+/* [Section 20.20] SectionCatalog
+ * Purpose: Style the collapsible catalog column and its resize affordances.
+ * Inputs: Builder left panel anchors
+ * Outputs: Panel layout, section headers, and grip treatments
+ * Constraints: Maintain readable typography and accessible focus states.
+ */
 [data-anchor="builder-left-panel"] {
   display: flex;
   flex-direction: column;
@@ -276,11 +272,12 @@
   transform: rotate(90deg);
 }
 
-/* [4.4] cfg-buildSurface · Container · "Center Preview Styling"
-   Concern: BuildStyle · Parent: "Surface Chrome Styling" · Catalog: surface.preview
-   Notes: Maintains neutral preview canvas placeholder and spacing. */
-/* [4.4.1] cfg-buildSurface · Primitive · "Preview Shell"
-   Concern: BuildStyle · Parent: "Center Preview Styling" · Catalog: layout.region */
+/* [Section 20.30] CenterPreview
+ * Purpose: Style the preview canvas placeholder and maintain balanced spacing.
+ * Inputs: Builder center panel anchors
+ * Outputs: Flexible preview area styling
+ * Constraints: Preserve neutral background and dashed placeholder affordance.
+ */
 [data-anchor="builder-center-panel"] {
   flex: 1 1 auto;
   min-width: 0;
@@ -312,11 +309,12 @@
   color: rgba(30, 41, 59, 0.7);
 }
 
-/* [4.5] cfg-buildSurface · Container · "Inspector Column Styling"
-   Concern: BuildStyle · Parent: "Surface Chrome Styling" · Catalog: surface.inspector
-   Notes: Styles right panel layout, collapse control, and reusable button/placeholder rules. */
-/* [4.5.1] cfg-buildSurface · Primitive · "Inspector Column"
-   Concern: BuildStyle · Parent: "Inspector Column Styling" · Catalog: layout.column */
+/* [Section 20.40] RightInspector
+ * Purpose: Style the inspector column, including collapse control and content area.
+ * Inputs: Builder right panel anchors
+ * Outputs: Inspector layout and typography rules
+ * Constraints: Keep minimum width for readability and consistent focus treatments.
+ */
 [data-anchor="builder-right-panel"] {
   display: flex;
   flex-direction: column;

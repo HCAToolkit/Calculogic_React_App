@@ -1,24 +1,20 @@
 /**
- * Configuration: cfg-buildSurface (Build Surface)
- * Concern File: Logic
- * Source NL: doc/nl-config/cfg-buildSurface.md
- * Responsibility: Provide interactive bindings, persistence, and accessibility for the Build surface.
- * Invariants: Anchors remain aligned with Build; persisted values stay within guarded bounds.
+ * Concern: BuildSurfaceLogic
+ * Layer: Logic
+ * BuildIndex: 20.00
+ * AttachesTo: builder-root
+ * Responsibility: Manage pane sizing, persistence, and bindings for the Build surface.
+ * Invariants: Anchor usage mirrors Build structure, persisted dimensions stay within safe bounds.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, MouseEvent, TouchEvent, RefObject } from 'react';
 import { BUILD_ANCHORS } from './anchors';
 
-// ─────────────────────────────────────────────
-// 5. Logic – cfg-buildSurface (Build Surface)
-// NL Sections: §5.1–5.5 in cfg-buildSurface.md
-// Purpose: Manage section, panel, and surface state while exposing bindings for Build.
-// Constraints: Do not create DOM; interact through anchors and refs only.
-// ─────────────────────────────────────────────
-
-// [5.1] cfg-buildSurface · Container · "Section Contracts"
-// Concern: Logic · Parent: "—" · Catalog: contract.sections
-// Notes: Declares SectionId union, binding interfaces, and static ordering used throughout the surface.
+// [Section 20.10] SectionContracts
+// Purpose: Define identifiers and binding shapes shared with the Build layer.
+// Inputs: Build surface structure requirements
+// Outputs: SectionId union, binding interfaces, default ordering
+// Constraints: Section order remains stable for persisted state.
 
 export type SectionId = 'configurations' | 'atomic-components' | 'search-configurations';
 
@@ -125,9 +121,11 @@ export function sectionTitle(id: SectionId) {
   }
 }
 
-// [5.2] cfg-buildSurface · Container · "Section Logic Hook"
-// Concern: Logic · Parent: "Section Contracts" · Catalog: hook.section
-// Notes: Manages section height, collapse state, and accessibility bindings with persistence safeguards.
+// [Section 20.20] SectionState
+// Purpose: Handle height, collapse, and persistence for catalog sections.
+// Inputs: SectionId, localStorage snapshot
+// Outputs: SectionLogicBinding consumed by Build layer
+// Constraints: Keyboard resizing stays accessible; storage failures are non-fatal.
 function useSectionLogic(
   id: SectionId,
   { initialHeight, storageKey, gripVisible = true }: SectionLogicOptions
@@ -282,9 +280,11 @@ function useSectionLogic(
   };
 }
 
-// [5.3] cfg-buildSurface · Container · "Left Panel Logic"
-// Concern: Logic · Parent: "Section Logic Hook" · Catalog: hook.panel
-// Notes: Persists and constrains left panel width while exposing accessible grip handlers.
+// [Section 20.30] LeftPanelState
+// Purpose: Persist and manage the resizable left panel width.
+// Inputs: localStorage width value, pointer/keyboard interactions
+// Outputs: Left panel binding with grip props
+// Constraints: Width stays within readable bounds; drag restores pointer selection post-interaction.
 function useLeftPanelLogic(): LeftPanelLogic {
   const STORAGE_KEY = 'left-panel-width';
   const [width, setWidth] = useState(() => {
@@ -394,9 +394,11 @@ function useLeftPanelLogic(): LeftPanelLogic {
   };
 }
 
-// [5.4] cfg-buildSurface · Container · "Right Panel Logic"
-// Concern: Logic · Parent: "Section Logic Hook" · Catalog: hook.panel
-// Notes: Manages inspector width persistence, collapse state, and grip interactions.
+// [Section 20.40] RightPanelState
+// Purpose: Persist inspector width and collapse state for the right panel.
+// Inputs: localStorage state, pointer/keyboard interactions
+// Outputs: Right panel binding with collapse toggle
+// Constraints: Collapsing preserves last width; width clamps avoid overlap with center panel.
 function useRightPanelLogic(): RightPanelLogic {
   const STORAGE_KEY = 'right-panel-state';
   const [state, setState] = useState<RightPanelState>(() => {
@@ -528,9 +530,11 @@ function useRightPanelLogic(): RightPanelLogic {
   };
 }
 
-// [5.5] cfg-buildSurface · Container · "Surface Bindings"
-// Concern: Logic · Parent: "Right Panel Logic" · Catalog: hook.assembly
-// Notes: Aggregates section and panel bindings into the BuildSurfaceBindings contract.
+// [Section 20.50] SurfaceBindings
+// Purpose: Aggregate panel and section bindings for the Build surface view.
+// Inputs: Section logic hooks, panel state hooks
+// Outputs: BuildSurfaceBindings consumed by Build layer
+// Constraints: Returned object remains referentially stable aside from intended memoized fields.
 export function useBuildSurfaceLogic(): BuildSurfaceBindings {
   const configurations = useSectionLogic('configurations', {
     initialHeight: 180,

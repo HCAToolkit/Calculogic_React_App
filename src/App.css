@@ -1,21 +1,17 @@
 /*
- * Configuration: cfg-appFrame (App Frame)
- * Concern File: BuildStyle
- * Source NL: doc/nl-config/cfg-appFrame.md
- * Responsibility: Style the app frame container, theme toggle control, and dark theme variables.
- * Invariants: Frame fills viewport and maintains accessible focus treatment for the toggle.
+ * Concern: AppFrameView
+ * Layer: View
+ * BuildIndex: 01.00
+ * AttachesTo: [data-anchor="app-frame"]
+ * Responsibility: Skin the global frame and expose accessible theming affordances.
+ * Invariants: Frame fills viewport, theme toggle maintains focus treatment.
  */
 
-/* ─────────────────────────────────────────────
- * 4. BuildStyle – cfg-appFrame (App Frame)
- * NL Sections: §4.1–4.3 in cfg-appFrame.md
- * Purpose: Provide surface styling for the frame shell and toggle control.
- * Constraints: No structural mutations; operate on anchors defined by Build.
- * ───────────────────────────────────────────── */
-
-/* [4.1] cfg-appFrame · Container · "Frame Surface Styling"
-   Concern: BuildStyle · Parent: "—" · Catalog: surface.appShell
-   Notes: Ensures viewport fill and default design tokens for the frame.
+/* [Section 01.10] FrameSurface
+ * Purpose: Establish full-viewport shell and default color variables.
+ * Inputs: CSS custom properties, body theme variables
+ * Outputs: App frame layout styling
+ * Constraints: Maintain responsive fill and readable contrast.
  */
 [data-anchor="app-frame"] {
   height: 100vh;
@@ -25,9 +21,11 @@
   position: relative;
 }
 
-/* [4.2] cfg-appFrame · Primitive · "Theme Toggle Styling"
-   Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: control.toggle
-   Notes: Positions toggle in top-right corner with visible focus outline.
+/* [Section 01.20] ThemeToggle
+ * Purpose: Position and style the theme toggle control.
+ * Inputs: App frame positioning context
+ * Outputs: Styled toggle button
+ * Constraints: Keep focus ring visible and button discoverable.
  */
 [data-anchor="theme-toggle"] {
   position: absolute;
@@ -51,9 +49,11 @@
   outline-offset: 2px;
 }
 
-/* [4.3] cfg-appFrame · Primitive · "Dark Theme Variables"
-   Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: tokens.theme
-   Notes: Swaps neutral tokens when body.dark is present to support dark mode.
+/* [Section 01.30] DarkThemeVariables
+ * Purpose: Override design tokens when dark mode is active.
+ * Inputs: body.dark class
+ * Outputs: Alternate CSS custom property values
+ * Constraints: Preserve adequate contrast with base text.
  */
 body.dark {
   --app-surface: #0f172a;
