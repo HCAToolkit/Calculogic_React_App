@@ -1,208 +1,171 @@
-Calculogic Comment & Provenance Protocol (CCPP).
-1) Purpose
-Comments carry intent, rationale, and provenance—never restate code. They mirror the Build order so readers traverse files the same way the UI is structured.
-2) Types (use only these)
-File Header (one per file)
+Calculogic Comment & Provenance Protocol (CCPP, NL-Aligned)
+1. Purpose
+Comments encode intent, structure, and provenance in a way that:
+Mirrors the NL skeleton order,
 
+Helps AI reconstruct or extend code from NL,
 
-What this file is, where it sits in Build order, what it attaches to.
+And keeps files navigable top-down.
 
+Comments are not narration of obvious code; they are a projection of the NL skeleton and decisions into the codebase.
 
-Section Header (top of each major section, in Build order)
+2. Comment Types (Use Only These)
+File Header – one per file.
 
+Section Header – top of each config section inside a file.
 
-What this section does and its constraints.
+Atomic Comment – immediately before a Container/Subcontainer/Primitive.
 
+Inline Rationale – rare; why a non-obvious line/block exists.
 
-Inline Rationale (rare; next to non-obvious code)
+Decision Note – tiny ADR embedded in code.
 
+TODO with expiry – actionable, owner + date.
 
-Why this line/block exists (not what it does).
+Provenance Block – when external logic/content influences code (no payload).
 
-
-Decision Note (lightweight ADR)
-
-
-Record of a local trade-off with date & link/id.
-
-
-TODO with expiry
-
-
-Actionable, owner, deadline; auto-fails lint if stale.
-
-
-Provenance Block (when pulling external logic/content)
-
-
-Source URL, access time, hash; no payload.
-
-
-3) Required fields & format
-3.1 File Header (all languages)
+3. Required Fields & Format
+3.1 File Header (TS/TSX/TS, etc.)
 /**
- * Concern: <Name>
- * Layer: Build | View | Logic | Knowledge | Results
- * BuildIndex: <NN.MM>          // ordering source index
- * AttachesTo: <anchor/selector> // if not Build
- * Responsibility: <one sentence>
+ * ProjectShell/Config: Global Header Shell (shell-globalHeader)
+ * Concern File: Build | BuildStyle | Logic | Knowledge | Results | ResultsStyle
+ * Source NL: doc/nl-shell/shell-globalHeader.md
+ * Responsibility: <one sentence for this concern file>
  * Invariants: <comma-separated truths>
- * LastDecision: <ADR-<id> or link> (optional)
+ * Notes: <optional; ADR id, link, or short note>
+ */
+For non-shell configs, replace ProjectShell/Config with Configuration: cfg-....
+3.2 Section Header (per configuration inside a concern file)
+// ─────────────────────────────────────────────
+// 3. Build – cfg-tabNavigation (Tab Navigation)
+// NL Sections: §3.0–3.3 in cfg-tabNavigation.md
+// Purpose: <short purpose>
+// Constraints: <key constraints or perf/a11y notes>
+// ─────────────────────────────────────────────
+The leading number (3. here) matches the NL skeleton’s concern index.
+
+3.3 Atomic Comment (Container / Subcontainer / Primitive)
+// [3.2.2] cfg-tabNavigation · Subcontainer · "Center Zone – Tab Strip"
+// Concern: Build · Parent: "Global Header Shell" · Catalog: layout.group
+// Notes: hosts 4 tabs and info icons; no reordering; center-aligned
+function GlobalHeaderTabStripZone() {
+  ...
+}
+Rules:
+First line: [NLSectionNumber] cfg-id · HierarchicalType · "Name".
+
+Second line: Concern, Parent (if any), Catalog id.
+
+Third line: short intent/constraint note.
+
+These should read like compressed NL bullets and are the main thing AI should preserve.
+3.4 Inline Rationale
+// WHY: Avoids focus loss when switching tabs via keyboard
+Use sparingly, only when the reason is not obvious.
+3.5 Decision Note
+// DECISION: Tab hover previews via CSS only | 2025-11-05
+// Context: Keep Logic lightweight for header interactions
+// Choice: Use CSS hover for previews instead of JS listeners
+// Consequence: Less JS complexity; no previews on touch devices
+// ADR: header-hover-001   // optional
+3.6 TODO with expiry
+// TODO(@owner, 2025-12-01): Wire openDoc(docId) to docs modal shell
+Must always have owner and date.
+3.7 Provenance Block
+// SOURCE: https://example.org/a11y/tabs
+// Accessed: 2025-11-05T14:22:00Z
+// Note: Pattern used as reference for keyboard tab navigation; no content copied
+No payload; just reference.
+
+4. Language & Mapping
+TS/TSX/JS: /** ... */ for file header; // ... for everything else.
+
+CSS: /* ... */ for file and atomic comments; still match NL numbers.
+
+JSON: no comments; if needed, keep a .meta or .md doc instead.
+
+Markdown docs: NL skeletons themselves.
+
+5. NL Skeleton Alignment
+Every concern file must have:
+
+A file header linking to its NL doc.
+
+Section headers for each configuration in NL order.
+
+Atomic comments for each Container/Subcontainer/Primitive referenced in NL.
+
+The NL skeleton is the source:
+
+When a number changes in NL (e.g. 3.2.1 → 3.2.2), comments should be updated to match.
+
+When a new atomic is added to NL, a new atomic comment + code block is added in the same position.
+
+6. Strict Do / Don’t
+Do
+Use NL section numbers [3.2.1] consistently across files.
+
+Explain why something exists, not what it does.
+
+Keep comments short and structured (good for humans and AI).
+
+Update NL + comments in the same change as code.
+
+Don’t
+Narrate obvious code.
+
+Add code that doesn’t correspond to a skeleton section (unless you add it to NL first).
+
+Use unlabeled TODO:.
+
+Copy external content into comments.
+
+7. Minimal Examples
+Build file:
+/**
+ * Configuration: cfg-tabNavigation (Tab Navigation)
+ * Concern File: Build
+ * Source NL: doc/nl-config/cfg-tabNavigation.md
+ * Responsibility: Header tab strip structure (no styling, no behavior)
+ * Invariants: Tabs never wrap; center zone stays in single row
  */
 
-3.2 Section Header (mirrors Build order)
-// [Section 20.10] <SectionName>
-// Purpose: <short purpose>
-// Inputs: <signals/props/events>
-// Outputs: <signals/events>
-// Constraints: <key constraints or perf/a11y notes>
+// ─────────────────────────────────────────────
+// 3. Build – cfg-tabNavigation (Tab Navigation)
+// NL Sections: §3.0–3.3 in cfg-tabNavigation.md
+// Purpose: Provide 4 canonical tabs in fixed order
+// Constraints: Order fixed: Build, Logic, Knowledge, Results
+// ─────────────────────────────────────────────
 
-3.3 Inline Rationale
-// WHY: <reason that isn’t obvious from code/tests>
+// [3.1] cfg-tabNavigation · Container · "Global Header Shell"
+// Concern: Build · Catalog: layout.shell
+export function GlobalHeaderShell() { ... }
+BuildStyle file:
+/* 
+ * Configuration: cfg-tabNavigation (Tab Navigation)
+ * Concern File: BuildStyle
+ * Source NL: doc/nl-config/cfg-tabNavigation.md
+ * Responsibility: Visual styling of header tab strip (no structure)
+ * Invariants: Tabs remain single-line; scroll instead of wrap
+ */
 
-3.4 Decision Note (micro-ADR in code)
-// DECISION: <title> | <YYYY-MM-DD>
-// Context: <1 line>
-// Choice: <A over B because C>
-// Consequence: <1 line>
-// ADR: <id or link>    // optional
-
-3.5 TODO with expiry
-// TODO(@owner, YYYY-MM-DD): <actionable task>
-
-3.6 Provenance Block (external reference; no content retention)
-// SOURCE: <url>
-// Accessed: <UTC timestamp>
-// Hash: sha256:<...>
-// License: <string>
-// Note: evidence retained ephemerally; see logs
-
-4) Language & export mapping
-Target
-Line
-Block
-TS/JS
-//
-/** ... */
-CSS
-/* ... */
-/* ... */
-HTML
-<!-- ... -->
-<!-- ... -->
-Python
-#
-"""docblock""" (module/func/class)
-JSON
-(no inline comments)
-Sidecar: <file>.meta.json with the same headers; or embed under "__doc" keys if allowed
-Markdown docs
-> NOTE:
-fenced blocks
-
-JSON rule: never put comments in JSON; use <file>.meta.json with:
-{
-  "file": "thing.json",
-  "header": { "Concern":"...", "Layer":"...", "BuildIndex":"..." },
-  "sections": [{ "index":"20.10", "name":"...", "purpose":"..." }]
+/* [4.2.1] cfg-tabNavigation · Primitive · "Tab Item Base Rule"
+   Matches Build primitive [3.3.4–3.3.7] (tab buttons)
+*/
+.globalHeader__tab {
+  /* ... */
 }
 
-5) BOS alignment (Build-as-Order Source)
-File Header must include BuildIndex.
+8. Maintenance Rules
+On every structural change:
+Update the NL skeleton first.
 
+Then update code and comments to match:
 
-Section Headers must appear in ascending Build order.
+Keep section headers in NL order.
 
+Keep atomic comments synchronized with NL numbers.
 
-View/Logic/Knowledge/Results may not introduce new structural sections—only attach via AttachesTo.
+Remove or update any Decision notes that no longer apply (add new ones instead of rewriting history).
 
-
-6) Strict do/don’t
-Do
-Explain why, list invariants, cite decisions, add expiry to TODOs, include provenance for externals.
- Don’t
-
-
-Narrate obvious code, duplicate names/types, leave TODOs without owner/date, paste external payloads.
-
-
-7) Lint & CI checks (lightweight)
-Headers present (File + every Section).
-
-
-Monotonic order of [Section NN.MM].
-
-
-TODO expiry not past due.
-
-
-No plain “TODO:” without owner/date.
-
-
-No comments in JSON (enforce sidecar).
-
-
-Provenance required when external refs detected (e.g., http/https in strings).
-
-
-8) Knowledge integration
-Treat Knowledge as the upstream source of comment text.
-
-
-On export, render Knowledge entries into the appropriate comment syntax per target.
-
-
-Keep Knowledge canonical; code comments are projections.
-
-
-9) Minimal examples
-TSX (View)
-/**
- * Concern: BuilderShell
- * Layer: View
- * BuildIndex: 01.00
- * AttachesTo: .builder-shell
- * Responsibility: Responsive frame chrome (no behavior)
- * Invariants: No overflow; keyboard focus ring visible
- */
-export function BuilderShellView(){...}
-
-// [Section 01.10] Header
-// Purpose: Global header chrome & tabs
-// Inputs: layoutMode
-// Outputs: none
-// Constraints: sticky; min-height 56px
-
-Logic (TS)
-/**
- * Concern: AtomicComponents
- * Layer: Logic
- * BuildIndex: 20.00
- * AttachesTo: #atoms-canvas
- * Responsibility: DnD + selection
- * Invariants: No structure mutation; anchors are stable
- * LastDecision: ADR-042
- */
-
-// DECISION: Keyboard reordering over mouse-only | 2025-10-20
-// Context: a11y requirement
-// Choice: Arrow+Enter beats drag-only
-// Consequence: extra focus mgmt; simpler pointer code
-
-Provenance
-// SOURCE: https://example.org/a11y/drag-guidance
-// Accessed: 2025-10-20T15:04:12Z
-// Hash: sha256:9b7c…3ad
-// License: CC-BY 4.0
-
-10) Maintenance rules
-When structure changes in Build, update Section Headers and BuildIndex across layers in the same PR.
-
-
-When a Decision changes, append a new DECISION block; don’t edit history.
-
-
-Purge or convert stale TODOs during each release cut.
-
-
-That’s the whole method: five comment types, Build-ordered structure, language-aware export, sidecar for JSON, lintable rules, and Knowledge as the single source for comment content.
+Clean up or close TODOs on each release cut.

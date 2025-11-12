@@ -1,208 +1,202 @@
-Calculogic-Style Concern System (Codebase-Level)
-1) First Principles
-Canonical Layer Order: Build → View → Logic → Knowledge → Results.
+Calculogic Concern System (CCS, NL-Aligned, Codebase-Level)
+1. First Principles
+Configuration is semantic, not a file
 
+A Configuration is a semantic module (e.g. “Global Header Shell”, “Tab Navigation”).
 
-Ordering Source (BOS): The highest present layer in that order becomes the structural reference for the concern. All lower layers mirror its top-down order.
+It spans up to six concerns: Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle.
 
+Code lives in six concern files; the configuration is defined by its NL skeleton, not its file layout.
 
-Attachment-Only for Non-Sources: Layers that are not the ordering source attach to declared anchors; they do not create or reorder structure.
+NL Skeleton as the ordering source
 
+Each configuration has an NL Configuration Skeleton (or ProjectShell skeleton).
 
-Stable Anchors: Every part exposes a stable, public anchor (name/class/data-attr). All layers refer to anchors—never to incidental DOM.
+The skeleton’s numbered sections (3 = Build, 4 = BuildStyle, 5 = Logic, 6 = Knowledge, 7 = Results, 8 = ResultsStyle) define the canonical top-down order for all concerns.
 
+Code in all concern files must follow this order and mirror the same numbering in comments.
 
-Directional Dependencies: Build feeds View/Logic; Logic feeds Results; Knowledge informs all. No cycles; no reaching “up” the stack.
+Concerns vs. hierarchical types (orthogonal axes)
 
+Every Atomic Component has:
 
-Purity Per Layer:
+A Concern: Build / BuildStyle / Logic / Knowledge / Results / ResultsStyle, and
 
+A Hierarchical type: Container, Subcontainer, or Primitive.
 
-Build = structure only
+These axes are independent: you can have a Logic Container, a Build Primitive, a ResultsStyle Primitive, etc.
 
+Purity per concern
 
-View = appearance only
+Build – structure only (containers, subcontainers, primitives; no state, no visual design tokens).
 
+BuildStyle – styling of structure only (layout, spacing, responsive rules; no DOM creation, no state).
 
-Logic = interaction/state only
+Logic – interaction, workflows, state, derived flags; no DOM, no CSS.
 
+Knowledge – copy, constants, reference tables; no state mutation, no layout, no behavior.
 
-Knowledge = guidance/reference only
+Results – derived outputs / readouts; no structure creation beyond what Build defines.
 
+ResultsStyle – styling of results; no structure, no logic.
 
-Results = derived feedback only
+Structure source and fallbacks
 
+Build is the default structural source for any UI configuration or shell.
 
-Locality: Keep code for a concern co-located; nested concerns live inside their parent’s folder but follow the same rules independently.
+Non-structural concerns (BuildStyle, Logic, Knowledge, Results, ResultsStyle) never create or reorder structure; they attach to anchors defined by Build.
 
+Fallback (rare): if a configuration has no Build (e.g. a pure data concern), use the highest present non-style concern as the mental ordering source (Logic → Knowledge → Results), but it still must not invent DOM structure.
 
-Monotonic Diffs: A change to the ordering source appears in the same top-down sequence across its sibling layer files.
+Anchors are stable
 
+Every visible piece of structure exposes stable anchors (class, data-anchor, or id).
 
-Minimal Surface Area: Each concern exposes a tiny interface (anchors, events, and read-only signals). Internal details stay private.
+All non-Build concerns refer to these anchors, never to incidental DOM or query patterns.
 
+Directional dependencies
 
+Build → BuildStyle / Logic / ResultsStyle.
 
-2) Concern Definition Protocol (CDP)
-Use this as a one-page template for any concern before you write code.
-Name: Short, unambiguous.
+Logic → Results.
 
+Knowledge informs all but depends on none.
 
-Purpose (1 sentence): What outcome this concern provides.
+No upward or cyclic imports (e.g., Results cannot feed Logic, Logic cannot define anchors).
 
+Locality
 
-In-Scope / Out-of-Scope: Bulleted boundaries.
+Code for one configuration’s concerns lives in its folder under builder/configs/ or builder/shells/.
 
+Nested configurations (e.g., a shell zone as its own config) live inside the parent’s folder but obey all the same rules independently.
 
-Ordering Source: Build | View | Logic | Knowledge | Results (choose the highest present).
+Monotonic diffs
 
+When you change structure in the NL skeleton for a configuration, corresponding changes in Build, BuildStyle, Logic, Knowledge, Results, and ResultsStyle must appear in the same top-down order when you read each file.
 
-Anchors: The public selectors/IDs this concern owns or attaches to.
+2. Configuration Definition Template (Per Configuration or Shell)
+Use this before writing code or asking AI to generate code.
+NL Skeleton:
+Create doc/nl-config/cfg-*.md or doc/nl-shell/shell-*.md using the General NL Skeleton – Configuration-Level or ProjectShell-Level.
 
+That document is the canonical contract for:
 
-Inputs: Events, props, or data it consumes (read-only).
+Purpose and scope,
 
+Per-concern responsibilities,
 
-Outputs: Events, derived values, or UI it emits (no side effects outside scope).
+Containers/Subcontainers/Primitives and their order,
 
+Numbering (3.x.y, 4.x.y, 5.x.y, etc.).
 
-Invariants: Facts that must always hold true (e.g., “never reorders sibling regions”).
+Concern entry (per configuration):
+Name: Short, unambiguous; use cfg-* for configs, shell-* for shells.
 
+Purpose (1 sentence): What outcome this configuration achieves.
 
-Dependencies: Lower layers/foundations only; no upward imports.
+In-Scope / Out-of-Scope: Boundaries for behavior and structure.
 
+Concerns present: Build / BuildStyle / Logic / Knowledge / Results / ResultsStyle (which apply).
 
-Acceptance: 3–5 observable criteria to declare the concern “done.”
+Anchors: The structural anchors owned by this configuration (Build).
 
+Inputs: Props/context/events it consumes.
 
+Outputs: Events, derived values, results, or debug UI it emits.
 
-3) Decision Rules (what belongs where)
-Frame vs. Items:
+Invariants: Truths that must always hold (e.g. “Tabs never wrap; scroll instead”).
 
+Dependencies: Only on lower-level utilities, shared hooks, or Knowledge; no cross-concern cheating.
 
-Changes to page frame, regions, or section layout → Build (structure concern).
+3. Atomic Components (per concern)
+For each concern in the NL skeleton, list:
+Containers – top-level roots for that concern in this configuration.
 
+Subcontainers – nested encapsulations inside Containers.
 
-Creation/move/reorder/select of items (atoms/configs/etc.) → Logic in an item-owner concern.
+Primitives – leaves: individual fields, rules, styles, state atoms, maps, result lines.
 
+Rules:
+A concern can have one or more Containers at the top level.
 
-No Structure? Use Fallback: If a concern has no Build, View sets order; if no View, Logic; then Knowledge; then Results.
+Subcontainers only appear inside Containers (never at the root of a concern).
 
+Primitives never contain anything else.
 
-Results Belongs Where Data Ends: If something is purely a derived readout (counts, previews), it’s Results—never creates structure or state.
+Containers may be:
+Flat roots (contain only primitives), or
 
+Hierarchical roots (contain subcontainers and primitives).
 
-Knowledge Is Guidance, Not Behavior: Tooltips/help text/reference tables live in Knowledge and do not mutate state or structure.
+4. Decision Rules (What Belongs Where, NL-Aware)
+Use these to keep responsibilities clean:
+Structure vs interaction vs readout
 
+Changes to regions, zones, section layout → Build.
 
+Visual variants, responsiveness, spacing → BuildStyle / ResultsStyle.
 
-4) Nested vs. Sibling Concerns (classification)
-Nested if ALL are true:
+State, validation, transitions, routing → Logic.
 
+Copy, labels, options, thresholds → Knowledge.
 
-It attaches to specific parent anchors that must exist.
+Counters, scores, derived summaries → Results.
 
+No structure in non-structural concerns
 
-It cannot operate outside the parent’s structure.
+BuildStyle, Logic, Knowledge, Results, ResultsStyle must not introduce new DOM or change sibling ordering. They attach to anchors established in Build.
 
+Results is “where data ends”
 
-It never alters the parent’s structural order.
+Once you are just showing derived information (e.g., state summaries, counts, debug), it belongs in Results / ResultsStyle; it cannot mutate structure or state.
 
+Knowledge is guidance, not behavior
 
-Otherwise, it’s a Sibling concern: it renders within the same frame but manages its own internal anchors and lifecycle.
+Tooltips, doc text, label maps, thresholds live in Knowledge and do not contain side effects or layout code.
 
+Use the NL hierarchy to split or merge
 
+If you can’t describe a section of behavior/structure in a single NL bullet under one concern, it’s a sign you have multiple concerns tangled together—split them.
 
-5) The Four Tests (split/merge decisions)
-Run these before adding code, refactoring, or scoping tickets.
-Single Reason to Change: Will most changes to this code happen for the same reason?
+5. Nested vs Sibling Configurations
+Nested configuration if all are true:
 
+It attaches to specific anchors owned by a parent configuration.
 
-Yes → keep together. No → split into separate concerns.
+It cannot operate meaningfully without that parent structure.
 
+It never reorders or replaces the parent’s anchors.
 
-Boundary of Effects: Can this code change without forcing structural or behavioral changes outside its scope?
+Sibling configuration otherwise:
 
+It uses the same frame (shell) but defines its own Build structure and anchors.
 
-If not, you’re leaking responsibilities—split.
+Promote from nested → sibling when a feature gains its own structure, reuse, or lifecycle.
 
+6. Change Management
+When you change a configuration:
+Update its NL skeleton first:
 
-Ordering Consistency: Can lower layers mirror the ordering source 1:1 without re-grouping?
+Adjust the numbering and text for any moved/added/removed Container/Subcontainer/Primitive.
 
+Then update code:
 
-If not, you’ve mixed concerns—separate the parts.
+Adjust Build to match the new NL order.
 
+Update BuildStyle, Logic, Knowledge, Results, ResultsStyle in the same pass, keeping the same ordering and comment numbers.
 
-User-Visible Contract: Can you describe its inputs/outputs in one short paragraph?
+Preserve anchors if possible:
 
+If anchors must change, treat that as a deliberate breaking change and update all attached concerns.
 
-If not, you’ve bundled multiple concerns—split.
+Acceptance (per PR):
 
+NL skeleton updated and committed.
 
+Build matches NL structure and order.
 
-6) Change Management Rules
-Promotions: When a nested concern gains its own structure or broad usage, promote it to a sibling concern with its own ordering source.
+All other concerns follow the same ordering via comments.
 
+Concerns respect purity and directional dependencies.
 
-Deprecations: When two concerns always change together and share the same ordering and anchors, merge them.
-
-
-Renames: Preserve anchors; if they must change, provide an adapter layer and update all attachments in one PR.
-
-
-Spec Drift Guard: If a concern’s code requires new anchors, update the ordering source first, then mirror changes down the stack.
-
-
-
-7) Interfaces & Contracts (tiny but strict)
-Anchors: The only cross-layer selectors.
-
-
-Events: Named, scoped (“atomic:reordered”, “panel:collapsed”).
-
-
-Signals (read-only): Derived flags exposed by Logic to Results (e.g., isDragging, count).
-
-
-No Hidden Coupling: No direct DOM poking; no style reads in Logic; no state in Knowledge; no DOM creation in Logic/Results.
-
-
-
-8) Acceptance Checklist (applied to every PR)
-One (and only one) ordering source selected for the concern.
-
-
-All present layers mirror the source’s order.
-
-
-Non-source layers attach via declared anchors only.
-
-
-Roles respected (Build/View/Logic/Knowledge/Results purity).
-
-
-No upward or cyclic dependencies.
-
-
-Tests cover the concern’s acceptance criteria.
-
-
-Diffs read top-down consistently across files.
-
-
-
-9) Example classification (generic)
-Structure & Responsiveness: Concern = frame, panes, sections (Ordering source: Build; View mirrors; no DnD).
-
-
-Atomic Components (current): Concern = atom list/canvas interactions (Ordering source: Build for the atom list; DnD in Logic attaches to those anchors).
-
-
-Configurations (future): Concern = config blocks + persistence (its own Build order; Logic handles block-level DnD; Results show derived summaries).
-
-
-Search/Browse: Concern = find/filter UI (Build for list; Logic for queries; Results for counts; never alters frame order).
-
-
-
-This is the go/no-go rubric before coding anything. It’s brief enough to keep next to editor, strict enough to prevent drift, and flexible enough to apply to any feature while preserving coherence across the codebase.
+Comments (file headers + section headers + atomic comments) present and consistent.
