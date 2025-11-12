@@ -40,6 +40,10 @@
   cursor: pointer;
 }
 
+/* [4.2.1] cfg-appFrame · Primitive · "Theme Toggle Focus Ring"
+   Concern: BuildStyle · Parent: "Theme Toggle Styling" · Catalog: control.focus
+   Notes: Guarantees accessible focus outline for keyboard users.
+ */
 [data-anchor="theme-toggle"]:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;

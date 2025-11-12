@@ -8,6 +8,7 @@
  */
 import { useEffect, useState } from 'react';
 import BuildTab from './tabs/BuildTab';
+import { useAppFrameLogic } from './App.logic';
 import './App.css';
 
 // [Section 01.10] ThemeState
@@ -17,17 +18,25 @@ import './App.css';
 // Constraints: Never flicker on first paint; body mutation stays side-effect only.
 
 export default function App() {
-  const [dark, setDark] = useState(() =>
-    window.matchMedia('(prefers-color-scheme: dark)').matches
+  const { dark, toggleDark } = useAppFrameLogic();
+
+  // [3.2] cfg-appFrame · Primitive · "Theme Toggle Control"
+  // Concern: Build · Parent: "App Frame Shell" · Catalog: control.toggle
+  // Notes: Surface-level button that flips between dark and light modes.
+  const themeToggle = (
+    <button
+      data-anchor="theme-toggle"
+      onClick={toggleDark}
+      aria-label="Toggle dark mode"
+    >
+      {dark ? '🌙 Dark' : '☀️ Light'}
+    </button>
   );
 
-  useEffect(() => {
-    document.body.classList.toggle('dark', dark);
-  }, [dark]);
-
-  function toggleDark() {
-    setDark(prev => !prev);
-  }
+  // [3.3] cfg-appFrame · Primitive · "Build Tab Mount"
+  // Concern: Build · Parent: "App Frame Shell" · Catalog: layout.mount
+  // Notes: Always renders the Build tab to keep routing simple and anchors stable.
+  const buildTabMount = <BuildTab />;
 
   // [Section 01.20] BuilderHost
   // Purpose: Expose anchors for downstream layers and render the Build tab shell.
@@ -36,14 +45,8 @@ export default function App() {
   // Constraints: Theme toggle remains accessible, Build tab stays mounted for routing simplicity.
   return (
     <div data-anchor="app-frame">
-      <button
-        data-anchor="theme-toggle"
-        onClick={toggleDark}
-        aria-label="Toggle dark mode"
-      >
-        {dark ? '🌙 Dark' : '☀️ Light'}
-      </button>
-      <BuildTab />
+      {themeToggle}
+      {buildTabMount}
     </div>
   );
 }

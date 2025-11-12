@@ -32,6 +32,9 @@ function ChevronLeftIcon() {
   );
 }
 
+// [3.3] cfg-buildSurface · Primitive · "Chevron Right Icon"
+// Concern: Build · Parent: "Section Panel Template" · Catalog: chrome.icon
+// Notes: Points outward to indicate collapsing behavior for section panels.
 function ChevronRightIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
@@ -57,6 +60,9 @@ interface SectionContentConfig {
   render: () => ReactNode;
 }
 
+// [3.4] cfg-buildSurface · Primitive · "Section Content Catalog"
+// Concern: Build · Parent: "Section Panel Template" · Catalog: layout.catalog
+// Notes: Supplies placeholder markup for each section using deterministic anchors.
 const SECTION_CONTENT: SectionContentConfig[] = [
   {
     id: 'configurations',
@@ -64,7 +70,11 @@ const SECTION_CONTENT: SectionContentConfig[] = [
       <>
         <div data-anchor={BUILD_ANCHORS.buttonGroup('configurations')}>
           {['All', 'User', 'Public', 'Official', 'Favs'].map(filter => (
-            <button type="button" key={filter} data-anchor={`${BUILD_ANCHORS.buttonGroup('configurations')}-${filter.toLowerCase()}`}>
+            <button
+              type="button"
+              key={filter}
+              data-anchor={`${BUILD_ANCHORS.buttonGroup('configurations')}-${filter.toLowerCase()}`}
+            >
               {filter}
             </button>
           ))}
@@ -93,7 +103,11 @@ const SECTION_CONTENT: SectionContentConfig[] = [
       <>
         <div data-anchor={BUILD_ANCHORS.buttonGroup('search')}>
           {['Official', 'Public'].map(filter => (
-            <button type="button" key={filter} data-anchor={`${BUILD_ANCHORS.buttonGroup('search')}-${filter.toLowerCase()}`}>
+            <button
+              type="button"
+              key={filter}
+              data-anchor={`${BUILD_ANCHORS.buttonGroup('search')}-${filter.toLowerCase()}`}
+            >
               {filter}
             </button>
           ))}
@@ -160,78 +174,117 @@ export function BuildSurface({
   leftPanel,
   rightPanel,
 }: BuildSurfaceBindings) {
+  // [3.6.1] cfg-buildSurface · Subcontainer · "Header Chrome"
+  // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.header
+  // Notes: Hosts title, primary nav tabs, and publish CTA with fixed anchor IDs.
+  const headerChrome = (
+    <header data-anchor={anchors.header}>
+      <h1>🔧 Calculogic Builder</h1>
+      <nav data-anchor={anchors.tabList} aria-label="Builder navigation">
+        {['Build', 'Calculogic', 'View', 'Knowledge', 'Results'].map(tab => (
+          <button
+            key={tab}
+            type="button"
+            data-anchor={anchors.tabButton(tab.toLowerCase())}
+            aria-current={tab === 'Build' ? 'page' : undefined}
+          >
+            {tab}
+          </button>
+        ))}
+        <button
+          type="button"
+          data-anchor={anchors.tabButton('publish')}
+          className="publish"
+        >
+          Publish
+        </button>
+      </nav>
+    </header>
+  );
+
+  // [3.6.2] cfg-buildSurface · Subcontainer · "Catalog Column"
+  // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
+  // Notes: Lists section panels in logic-supplied order with live resize affordances.
+  const catalogColumn = (
+    <aside
+      data-anchor={anchors.leftPanel}
+      style={{
+        width: `${leftPanel.width}px`,
+        transition: leftPanel.isDragging ? 'none' : 'width 160ms ease',
+      }}
+    >
+      {sectionOrder.map(sectionId => (
+        <SectionPanel key={sectionId} binding={sections[sectionId]} />
+      ))}
+    </aside>
+  );
+
+  // [3.6.3] cfg-buildSurface · Primitive · "Catalog Grip"
+  // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
+  // Notes: Exposes left panel resize separator connected to logic grip props.
+  const catalogGrip = <div data-anchor={anchors.leftGrip} {...leftPanel.gripProps} />;
+
+  // [3.6.4] cfg-buildSurface · Subcontainer · "Preview Stage"
+  // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.region
+  // Notes: Placeholder canvas for future form preview anchored to center panel IDs.
+  const previewStage = (
+    <main data-anchor={anchors.centerPanel}>
+      <div data-anchor={anchors.centerInner}>
+        <p>Form preview placeholder</p>
+      </div>
+    </main>
+  );
+
+  // [3.6.5] cfg-buildSurface · Primitive · "Inspector Grip"
+  // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
+  // Notes: Provides resize handle between preview stage and inspector column.
+  const inspectorGrip = <div data-anchor={anchors.rightGrip} {...rightPanel.gripProps} />;
+
+  // [3.6.6] cfg-buildSurface · Subcontainer · "Inspector Column"
+  // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
+  // Notes: Collapsible inspector with settings placeholder anchored to logic-provided IDs.
+  const inspectorColumn = (
+    <aside
+      data-anchor={anchors.rightPanel}
+      data-collapsed={rightPanel.collapsed ? 'true' : 'false'}
+      style={{
+        width: `${rightPanel.width}px`,
+        transition: rightPanel.isDragging ? 'none' : 'width 160ms ease',
+      }}
+    >
+      <header>
+        <span>Configuration Settings</span>
+        <button
+          type="button"
+          className="chevron"
+          onClick={rightPanel.toggle}
+          aria-controls={rightPanel.contentAnchor}
+          aria-expanded={!rightPanel.collapsed}
+        >
+          {rightPanel.collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+        </button>
+      </header>
+      <div
+        data-anchor={rightPanel.contentAnchor}
+        aria-hidden={rightPanel.collapsed}
+        hidden={rightPanel.collapsed}
+      >
+        <div data-anchor={BUILD_ANCHORS.placeholder('settings')}>
+          Select a field on the canvas to edit its settings.
+        </div>
+      </div>
+    </aside>
+  );
+
   return (
     <div data-anchor={anchors.root}>
-      <header data-anchor={anchors.header}>
-        <h1>🔧 Calculogic Builder</h1>
-        <nav data-anchor={anchors.tabList} aria-label="Builder navigation">
-          {['Build', 'Calculogic', 'View', 'Knowledge', 'Results'].map(tab => (
-            <button
-              key={tab}
-              type="button"
-              data-anchor={anchors.tabButton(tab.toLowerCase())}
-              aria-current={tab === 'Build' ? 'page' : undefined}
-            >
-              {tab}
-            </button>
-          ))}
-          <button
-            type="button"
-            data-anchor={anchors.tabButton('publish')}
-            className="publish"
-          >
-            Publish
-          </button>
-        </nav>
-      </header>
-
+      {headerChrome}
       <div data-anchor={anchors.layout}>
-        <aside
-          data-anchor={anchors.leftPanel}
-          style={{
-            width: `${leftPanel.width}px`,
-            transition: leftPanel.isDragging ? 'none' : 'width 160ms ease',
-          }}
-        >
-          {sectionOrder.map(sectionId => (
-            <SectionPanel key={sectionId} binding={sections[sectionId]} />
-          ))}
-        </aside>
-
-        <div data-anchor={anchors.leftGrip} {...leftPanel.gripProps} />
-
-        <main data-anchor={anchors.centerPanel}>
-          <div data-anchor={anchors.centerInner}>
-            <p>Form preview placeholder</p>
-          </div>
-        </main>
-
-        <div data-anchor={anchors.rightGrip} {...rightPanel.gripProps} />
-
-        <aside
-          data-anchor={anchors.rightPanel}
-          data-collapsed={rightPanel.collapsed ? 'true' : 'false'}
-          style={{
-            width: `${rightPanel.width}px`,
-            transition: rightPanel.isDragging ? 'none' : 'width 160ms ease',
-          }}
-        >
-          <header>
-            <span>Configuration Settings</span>
-            <button type="button" className="chevron" onClick={rightPanel.toggle} aria-controls={rightPanel.contentAnchor} aria-expanded={!rightPanel.collapsed}>
-              {rightPanel.collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-            </button>
-          </header>
-          <div
-            data-anchor={rightPanel.contentAnchor}
-            aria-hidden={rightPanel.collapsed}
-            hidden={rightPanel.collapsed}
-          >
-            <div data-anchor={BUILD_ANCHORS.placeholder('settings')}>
-              Select a field on the canvas to edit its settings.
-            </div>
-          </div>
-        </aside>
+        {catalogColumn}
+        {catalogGrip}
+        {previewStage}
+        {inspectorGrip}
+        {inspectorColumn}
       </div>
     </div>
   );

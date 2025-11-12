@@ -8,7 +8,7 @@
  */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx'; // Ensure this path is correct
+import App from './App.tsx';
 import './index.css';
 
 // [Section 00.10] ReactRootMount
