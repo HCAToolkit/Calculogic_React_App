@@ -7,6 +7,9 @@
  */
 import type { GlobalHeaderShellBuildBindings } from './GlobalHeaderShell.logic';
 
+type HeaderMode = GlobalHeaderShellBuildBindings['activeModeByTab']['build'];
+type ModeDefinition = GlobalHeaderShellBuildBindings['modeMetadata']['build'][HeaderMode];
+
 // ─────────────────────────────────────────────
 // 3. Build – shell-globalHeader (Global Header Shell)
 // NL Sections: §3.1–§3.13 in shell-globalHeader.md
@@ -29,10 +32,10 @@ function InfoIcon({
 }: {
   label: string;
   docId: string;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  onFocus: () => void;
-  onBlur: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   onClick: () => void;
   describedById?: string;
 }) {
@@ -74,10 +77,10 @@ function TabButton({
   isActive: boolean;
   isHovered: boolean;
   onSelect: () => void;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  onFocus: () => void;
-  onBlur: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }) {
   return (
     <button
@@ -99,6 +102,109 @@ function TabButton({
   );
 }
 
+// [3.14] shell-globalHeader · Primitive · "Mode Menu Item Baseline"
+// Concern: Build · Parent: "Build/Results Mode Menu" · Catalog: navigation.pill
+// Notes: Shared renderer for Build/Results mode selectors with active state styling.
+function ModeMenuItem({
+  mode,
+  isActive,
+  onSelect,
+  anchor,
+}: {
+  mode: ModeDefinition;
+  isActive: boolean;
+  onSelect: () => void;
+  anchor: string;
+}) {
+  const tooltip = mode.hoverSummary ?? mode.description;
+  return (
+    <button
+      type="button"
+      className="mode-menu__item"
+      data-active={isActive ? 'true' : 'false'}
+      aria-pressed={isActive}
+      aria-label={mode.label}
+      title={tooltip}
+      data-mode-id={mode.id}
+      data-doc-id={mode.docId}
+      onClick={onSelect}
+      data-anchor={anchor}
+    >
+      {mode.label}
+    </button>
+  );
+}
+
+// [3.10.a] shell-globalHeader · Subcontainer · "Build Tab – Mode Menu"
+// Concern: Build · Parent: "Tab Item Row" · Catalog: navigation.breadcrumb
+// Notes: Presents inline Build modes when tab active or hovered.
+function BuildModeMenu({
+  activeMode,
+  isPinned,
+  selectMode,
+  modes,
+}: {
+  activeMode: HeaderMode;
+  isPinned: boolean;
+  selectMode: (mode: HeaderMode) => void;
+  modes: ModeDefinition[];
+}) {
+  return (
+    <div
+      className="mode-menu"
+      data-anchor="global-header.mode-menu-build"
+      data-pinned={isPinned ? 'true' : 'false'}
+      role="group"
+      aria-label="Build tab modes"
+    >
+      {modes.map(mode => (
+        <ModeMenuItem
+          key={mode.id}
+          mode={mode}
+          isActive={activeMode === mode.id}
+          onSelect={() => selectMode(mode.id)}
+          anchor={`global-header.mode-menu-build.${mode.id}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+// [3.10.b] shell-globalHeader · Subcontainer · "Results Tab – Mode Menu"
+// Concern: Build · Parent: "Tab Item Row" · Catalog: navigation.breadcrumb
+// Notes: Presents inline Results modes when tab active or hovered.
+function ResultsModeMenu({
+  activeMode,
+  isPinned,
+  selectMode,
+  modes,
+}: {
+  activeMode: HeaderMode;
+  isPinned: boolean;
+  selectMode: (mode: HeaderMode) => void;
+  modes: ModeDefinition[];
+}) {
+  return (
+    <div
+      className="mode-menu"
+      data-anchor="global-header.mode-menu-results"
+      data-pinned={isPinned ? 'true' : 'false'}
+      role="group"
+      aria-label="Results tab modes"
+    >
+      {modes.map(mode => (
+        <ModeMenuItem
+          key={mode.id}
+          mode={mode}
+          isActive={activeMode === mode.id}
+          onSelect={() => selectMode(mode.id)}
+          anchor={`global-header.mode-menu-results.${mode.id}`}
+        />
+      ))}
+    </div>
+  );
+}
+
 // [3.1] shell-globalHeader · Container · "Global Header Shell Frame"
 // Concern: Build · Catalog: layout.shell
 // Notes: Header landmark orchestrating all header zones and anchors.
@@ -106,19 +212,25 @@ export function GlobalHeaderShell({
   tabs,
   activeTab,
   hoveredTab,
+  modeMenuVisibleForTab,
+  activeModeByTab,
+  modeMetadata,
+  modeSequence,
   brand,
   publishLabel,
   selectTab,
+  selectTabMode,
   hoverTab,
   triggerPublish,
   isMobile,
-  isTablet,
   openDoc,
 }: GlobalHeaderShellBuildBindings) {
   // [3.6] shell-globalHeader · Primitive · "Brand Tagline"
   // Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
-  // Notes: Controlled here to suppress tagline on constrained viewports.
-  const showTagline = !(isMobile || isTablet);
+  // Notes: Controlled here to suppress tagline on mobile breakpoints.
+  const showTagline = !isMobile;
+  const buildModeItems = modeSequence.build.map(modeId => modeMetadata.build[modeId]);
+  const resultsModeItems = modeSequence.results.map(modeId => modeMetadata.results[modeId]);
 
   return (
     // [3.1] shell-globalHeader · Container · "Global Header Shell Frame"
@@ -154,7 +266,7 @@ export function GlobalHeaderShell({
         {showTagline && (
           /* [3.6] shell-globalHeader · Primitive · "Brand Tagline"
              Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
-             Notes: Optional supporting copy hidden on tablet/mobile breakpoints. */
+             Notes: Optional supporting copy hidden on mobile breakpoints. */
           <span className="brand-tagline" data-anchor="global-header.brand-tagline">
             {brand.tagline}
           </span>
@@ -172,38 +284,65 @@ export function GlobalHeaderShell({
             const isActive = tab.id === activeTab;
             const isHovered = hoveredTab === tab.id;
             const infoLabelId = `global-header-tab-${tab.id}-summary`;
+            const isBuildTab = tab.id === 'build';
+            const isResultsTab = tab.id === 'results';
+            const shouldShowModeMenu =
+              (isBuildTab || isResultsTab) && (isActive || modeMenuVisibleForTab === tab.id);
+
             return (
               // [3.9] shell-globalHeader · Subcontainer · "Tab Item Row"
               // Concern: Build · Parent: "Tab List Track" · Catalog: layout.row
-              // Notes: Couples tab button and info icon for a single concern.
-              <div key={tab.id} className="tab-list__item" data-anchor={`global-header.tab-${tab.id}`}>
-                <TabButton
-                  label={tab.label}
-                  isActive={isActive}
-                  isHovered={isHovered}
-                  onSelect={() => selectTab(tab.id)}
-                  onMouseEnter={() => hoverTab(tab.id)}
-                  onMouseLeave={() => hoverTab(null)}
-                  onFocus={() => hoverTab(tab.id)}
-                  onBlur={() => hoverTab(null)}
-                />
-                <InfoIcon
-                  label={tab.hoverSummary}
-                  docId={tab.docId}
-                  onMouseEnter={() => {
-                    hoverTab(tab.id);
-                  }}
-                  onMouseLeave={() => {
+              // Notes: Couples tab button, info icon, and mode menu per concern.
+              <div
+                key={tab.id}
+                className={`tab-list__item${shouldShowModeMenu ? ' tab-list__item--has-menu' : ''}`}
+                data-anchor={`global-header.tab-${tab.id}`}
+                onMouseEnter={() => hoverTab(tab.id)}
+                onMouseLeave={() => hoverTab(null)}
+                onFocus={() => hoverTab(tab.id)}
+                onBlur={event => {
+                  if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
                     hoverTab(null);
-                  }}
-                  onFocus={() => hoverTab(tab.id)}
-                  onBlur={() => hoverTab(null)}
-                  onClick={() => openDoc(tab.docId)}
-                  describedById={infoLabelId}
-                />
+                  }
+                }}
+              >
+                <div className="tab-list__button-row">
+                  <TabButton
+                    label={tab.label}
+                    isActive={isActive}
+                    isHovered={isHovered}
+                    onSelect={() => selectTab(tab.id)}
+                    onMouseEnter={() => hoverTab(tab.id)}
+                    onFocus={() => hoverTab(tab.id)}
+                  />
+                  <InfoIcon
+                    label={tab.hoverSummary}
+                    docId={tab.docId}
+                    onMouseEnter={() => hoverTab(tab.id)}
+                    onFocus={() => hoverTab(tab.id)}
+                    onClick={() => openDoc(tab.docId)}
+                    describedById={infoLabelId}
+                  />
+                </div>
                 <span id={infoLabelId} className="visually-hidden">
                   {tab.hoverSummary}
                 </span>
+                {isBuildTab && shouldShowModeMenu && (
+                  <BuildModeMenu
+                    activeMode={activeModeByTab.build}
+                    isPinned={isActive}
+                    selectMode={mode => selectTabMode('build', mode)}
+                    modes={buildModeItems}
+                  />
+                )}
+                {isResultsTab && shouldShowModeMenu && (
+                  <ResultsModeMenu
+                    activeMode={activeModeByTab.results}
+                    isPinned={isActive}
+                    selectMode={mode => selectTabMode('results', mode)}
+                    modes={resultsModeItems}
+                  />
+                )}
               </div>
             );
           })}
