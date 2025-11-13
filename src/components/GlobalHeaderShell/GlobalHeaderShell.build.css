@@ -162,10 +162,10 @@
 }
 
 .tab-button[data-active='true'][data-mode='style'] {
-  background: rgba(126, 158, 255, 0.28);
-  border-color: rgba(126, 158, 255, 0.72);
-  box-shadow: 0 0 0 1px rgba(126, 158, 255, 0.35);
-  color: #f8f9ff;
+  background: linear-gradient(135deg, rgba(120, 149, 255, 0.95), rgba(148, 204, 255, 0.9));
+  border-color: rgba(120, 149, 255, 0.95);
+  color: #0a0c12;
+  box-shadow: 0 6px 20px -8px rgba(90, 132, 255, 0.9), 0 0 0 1px rgba(143, 197, 255, 0.85);
 }
 
 /* [4.13] shell-globalHeader · Primitive · "Tab Button Hover State"
@@ -274,23 +274,19 @@
   color: #0a0c12;
 }
 
-.tab-mode-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.55rem;
+.tab-list__item[data-mode='style']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0.1rem;
+  transform: translateX(-50%);
+  width: 72%;
+  max-width: 8.5rem;
+  height: 0.35rem;
   border-radius: 999px;
-  background: rgba(126, 158, 255, 0.18);
-  color: rgba(230, 236, 255, 0.95);
-  box-shadow: 0 0 0 1px rgba(126, 158, 255, 0.35);
-}
-
-.tab-list__item[data-mode='style'] .tab-mode-indicator {
-  background: rgba(126, 158, 255, 0.26);
-  box-shadow: 0 0 0 1px rgba(126, 158, 255, 0.45);
+  background: linear-gradient(135deg, rgba(120, 149, 255, 0.8), rgba(148, 204, 255, 0.7));
+  box-shadow: 0 0 0 1px rgba(143, 197, 255, 0.6), 0 0 18px rgba(120, 149, 255, 0.55);
+  pointer-events: none;
 }
 
 /* [4.14] shell-globalHeader · Primitive · "Info Icon Baseline"
