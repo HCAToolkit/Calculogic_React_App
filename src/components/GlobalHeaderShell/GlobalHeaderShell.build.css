@@ -228,17 +228,32 @@
   z-index: 0;
 }
 
-/* mode menu items: make the text itself the primary touch target */
-.mode-menu[data-pinned='false'] .mode-menu__item {
+/* mode menu items: restore generous hit target with centered alignment and unified typography */
+.mode-menu__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+  padding: 0.35rem 0.65rem;
   border-radius: 0.5rem;
-  text-align: center;
-  padding: 0 0.15rem; /* minimal horizontal breathing — text is the main hit */
-  display: inline-block;
-  width: auto;
-  min-width: 0;
-  min-height: 0; /* remove enforced large vertical hit */
-  line-height: 1; /* let text determine height */
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
   box-sizing: border-box;
+  appearance: none;
+}
+
+.mode-menu[data-pinned='false'] .mode-menu__item {
+  text-align: center;
+  padding: 0.5rem 0.6rem; /* reinstated roomy spacing for confident taps */
+  min-width: 0;
+  min-height: 2.4rem; /* match original touch target height */
+  line-height: 1.1;
+  width: auto;
 }
 
 .mode-menu__item[data-active='true'] {
@@ -256,9 +271,20 @@
    Concern: BuildStyle · Catalog: action.icon
    Notes: Creates circular hit target and hover transition. */
 .info-icon {
-  padding: 0.2rem; /* restored original padding so info buttons are unchanged */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem; /* matches tab typography rhythm and gives consistent circle */
   border-radius: 50%;
-  transition: background 0.16s ease;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+  appearance: none;
 }
 
 /* [4.15] shell-globalHeader · Primitive · "Info Icon Focus/Hover"
