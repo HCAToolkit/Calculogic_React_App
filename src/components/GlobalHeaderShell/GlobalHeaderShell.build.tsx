@@ -21,20 +21,33 @@ function InfoIcon({
   label,
   onMouseEnter,
   onMouseLeave,
+  onFocus,
+  onBlur,
+  onClick,
+  describedById,
 }: {
   label: string;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
+  onClick: () => void;
+  describedById?: string;
 }) {
   return (
     <button
       type="button"
       className="info-icon"
       aria-label={label}
+      aria-haspopup="dialog"
+      aria-describedby={describedById}
       title={label}
       data-anchor="global-header.tab-info"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onClick={onClick}
     >
       ℹ️
     </button>
@@ -51,6 +64,8 @@ function TabButton({
   onSelect,
   onMouseEnter,
   onMouseLeave,
+  onFocus,
+  onBlur,
 }: {
   label: string;
   isActive: boolean;
@@ -58,6 +73,8 @@ function TabButton({
   onSelect: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
 }) {
   return (
     <button
@@ -71,6 +88,8 @@ function TabButton({
       onClick={onSelect}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
       {label}
     </button>
@@ -91,6 +110,7 @@ export function GlobalHeaderShell({
   triggerPublish,
   isMobile,
   isTablet,
+  openDoc,
 }: GlobalHeaderShellBuildBindings) {
   // [3.6] shell-globalHeader · Primitive · "Brand Tagline"
   // Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
@@ -148,6 +168,7 @@ export function GlobalHeaderShell({
           {tabs.map(tab => {
             const isActive = tab.id === activeTab;
             const isHovered = hoveredTab === tab.id;
+            const infoLabelId = `global-header-tab-${tab.id}-summary`;
             return (
               // [3.9] shell-globalHeader · Subcontainer · "Tab Item Row"
               // Concern: Build · Parent: "Tab List Track" · Catalog: layout.row
@@ -160,12 +181,25 @@ export function GlobalHeaderShell({
                   onSelect={() => selectTab(tab.id)}
                   onMouseEnter={() => hoverTab(tab.id)}
                   onMouseLeave={() => hoverTab(null)}
+                  onFocus={() => hoverTab(tab.id)}
+                  onBlur={() => hoverTab(null)}
                 />
                 <InfoIcon
                   label={tab.hoverSummary}
-                  onMouseEnter={() => hoverTab(tab.id)}
-                  onMouseLeave={() => hoverTab(null)}
+                  onMouseEnter={() => {
+                    hoverTab(tab.id);
+                  }}
+                  onMouseLeave={() => {
+                    hoverTab(null);
+                  }}
+                  onFocus={() => hoverTab(tab.id)}
+                  onBlur={() => hoverTab(null)}
+                  onClick={() => openDoc(tab.docId)}
+                  describedById={infoLabelId}
                 />
+                <span id={infoLabelId} className="visually-hidden">
+                  {tab.hoverSummary}
+                </span>
               </div>
             );
           })}
