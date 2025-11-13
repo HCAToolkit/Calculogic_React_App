@@ -168,34 +168,6 @@ export function BuildSurface({
   leftPanel,
   rightPanel,
 }: BuildSurfaceBindings) {
-  // [3.6.1] cfg-buildSurface · Subcontainer · "Header Chrome"
-  // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.header
-  // Notes: Provides builder title, navigation tabs, and publish CTA tied to header anchors.
-  const headerChrome = (
-    <header data-anchor={anchors.header}>
-      <h1>Calculogic Builder</h1>
-      <nav data-anchor={anchors.tabList} aria-label="Builder tabs">
-        <button
-          type="button"
-          data-anchor={anchors.tabButton('build')}
-          data-active="true"
-          aria-current="page"
-        >
-          Build
-        </button>
-        <button type="button" data-anchor={anchors.tabButton('logic')} aria-current={false}>
-          Logic
-        </button>
-        <button type="button" data-anchor={anchors.tabButton('knowledge')} aria-current={false}>
-          Knowledge
-        </button>
-      </nav>
-      <button type="button" className="publish">
-        Publish
-      </button>
-    </header>
-  );
-
   // [3.6.2] cfg-buildSurface · Subcontainer · "Catalog Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
   // Notes: Lists section panels in logic-supplied order with live resize affordances.
@@ -272,7 +244,6 @@ export function BuildSurface({
 
   return (
     <div data-anchor={anchors.root}>
-      {headerChrome}
       <div data-anchor={anchors.layout}>
         {catalogColumn}
         {catalogGrip}
