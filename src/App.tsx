@@ -6,8 +6,8 @@
  * Responsibility: Provide the top-level frame and theme toggle that hosts Calculogic tabs.
  * Invariants: Body class mirrors theme state, Build tab is always mounted.
  */
-import { useEffect, useState } from 'react';
 import BuildTab from './tabs/BuildTab';
+import GlobalHeaderShell from './components/GlobalHeaderShell';
 import { useAppFrameLogic } from './App.logic';
 import './App.css';
 
@@ -45,6 +45,7 @@ export default function App() {
   // Constraints: Theme toggle remains accessible, Build tab stays mounted for routing simplicity.
   return (
     <div data-anchor="app-frame">
+      <GlobalHeaderShell />
       {themeToggle}
       {buildTabMount}
     </div>

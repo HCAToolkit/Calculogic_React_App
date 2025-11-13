@@ -174,35 +174,7 @@ export function BuildSurface({
   leftPanel,
   rightPanel,
 }: BuildSurfaceBindings) {
-  // [3.6.1] cfg-buildSurface · Subcontainer · "Header Chrome"
-  // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.header
-  // Notes: Hosts title, primary nav tabs, and publish CTA with fixed anchor IDs.
-  const headerChrome = (
-    <header data-anchor={anchors.header}>
-      <h1>🔧 Calculogic Builder</h1>
-      <nav data-anchor={anchors.tabList} aria-label="Builder navigation">
-        {['Build', 'Calculogic', 'View', 'Knowledge', 'Results'].map(tab => (
-          <button
-            key={tab}
-            type="button"
-            data-anchor={anchors.tabButton(tab.toLowerCase())}
-            aria-current={tab === 'Build' ? 'page' : undefined}
-          >
-            {tab}
-          </button>
-        ))}
-        <button
-          type="button"
-          data-anchor={anchors.tabButton('publish')}
-          className="publish"
-        >
-          Publish
-        </button>
-      </nav>
-    </header>
-  );
-
-  // [3.6.2] cfg-buildSurface · Subcontainer · "Catalog Column"
+  // [3.6.1] cfg-buildSurface · Subcontainer · "Catalog Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
   // Notes: Lists section panels in logic-supplied order with live resize affordances.
   const catalogColumn = (
@@ -219,12 +191,12 @@ export function BuildSurface({
     </aside>
   );
 
-  // [3.6.3] cfg-buildSurface · Primitive · "Catalog Grip"
+  // [3.6.2] cfg-buildSurface · Primitive · "Catalog Grip"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Exposes left panel resize separator connected to logic grip props.
   const catalogGrip = <div data-anchor={anchors.leftGrip} {...leftPanel.gripProps} />;
 
-  // [3.6.4] cfg-buildSurface · Subcontainer · "Preview Stage"
+  // [3.6.3] cfg-buildSurface · Subcontainer · "Preview Stage"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.region
   // Notes: Placeholder canvas for future form preview anchored to center panel IDs.
   const previewStage = (
@@ -235,12 +207,12 @@ export function BuildSurface({
     </main>
   );
 
-  // [3.6.5] cfg-buildSurface · Primitive · "Inspector Grip"
+  // [3.6.4] cfg-buildSurface · Primitive · "Inspector Grip"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Provides resize handle between preview stage and inspector column.
   const inspectorGrip = <div data-anchor={anchors.rightGrip} {...rightPanel.gripProps} />;
 
-  // [3.6.6] cfg-buildSurface · Subcontainer · "Inspector Column"
+  // [3.6.5] cfg-buildSurface · Subcontainer · "Inspector Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
   // Notes: Collapsible inspector with settings placeholder anchored to logic-provided IDs.
   const inspectorColumn = (
@@ -278,7 +250,6 @@ export function BuildSurface({
 
   return (
     <div data-anchor={anchors.root}>
-      {headerChrome}
       <div data-anchor={anchors.layout}>
         {catalogColumn}
         {catalogGrip}
