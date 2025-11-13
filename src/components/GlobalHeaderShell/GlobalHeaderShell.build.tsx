@@ -229,8 +229,12 @@ export function GlobalHeaderShell({
   // Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
   // Notes: Controlled here to suppress tagline on mobile breakpoints.
   const showTagline = !isMobile;
-  const buildModeItems = modeSequence.build.map(modeId => modeMetadata.build[modeId]);
-  const resultsModeItems = modeSequence.results.map(modeId => modeMetadata.results[modeId]);
+  const buildModeItems = modeSequence.build
+    .map(modeId => modeMetadata.build[modeId])
+    .filter(mode => mode.id !== 'default');
+  const resultsModeItems = modeSequence.results
+    .map(modeId => modeMetadata.results[modeId])
+    .filter(mode => mode.id !== 'default');
 
   return (
     // [3.1] shell-globalHeader · Container · "Global Header Shell Frame"

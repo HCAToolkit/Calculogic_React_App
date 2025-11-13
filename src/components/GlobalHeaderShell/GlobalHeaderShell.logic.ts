@@ -163,18 +163,31 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   const selectTab = useCallback((tab: HeaderTabId) => {
     setState(prev => {
       const nextModeMenuVisibleForTab = isModeMenuTab(tab) ? tab : null;
+      const shouldResetMode =
+        isModeMenuTab(tab) && prev.activeModeByTab[tab] !== 'default';
+
       if (
         prev.activeTab === tab &&
         prev.hoveredTab === null &&
-        prev.modeMenuVisibleForTab === nextModeMenuVisibleForTab
+        prev.modeMenuVisibleForTab === nextModeMenuVisibleForTab &&
+        !shouldResetMode
       ) {
         return prev;
       }
+
+      const nextActiveModeByTab = shouldResetMode
+        ? {
+            ...prev.activeModeByTab,
+            [tab]: 'default',
+          }
+        : prev.activeModeByTab;
+
       return {
         ...prev,
         activeTab: tab,
         hoveredTab: null,
         modeMenuVisibleForTab: nextModeMenuVisibleForTab,
+        activeModeByTab: nextActiveModeByTab,
       };
     });
   }, []);
