@@ -141,7 +141,8 @@
    Concern: BuildStyle · Catalog: navigation.tab
    Notes: Neutral base to support active/hover state overlays. */
 .tab-button {
-  padding: 0.4rem 0.9rem;
+  /* larger touch target for tabs */
+  padding: 0.55rem 1rem; /* was 0.4rem 0.9rem */
   border-radius: 999px;
   border: 1px solid transparent;
   background: transparent;
@@ -188,22 +189,43 @@
 }
 
 .mode-menu[data-pinned='false'] {
+  /* moved upward so it slightly overlaps the tab edge, reducing the gap */
   position: absolute;
-  top: calc(100% - 0.1rem);
+  top: calc(100% - 0.35rem);
   left: 50%;
-  transform: translate(-50%, 0.35rem);
+  transform: translate(-50%, 0);
   flex-direction: column;
-  align-items: stretch;
+  align-items: center; /* center items so text is centered on the hit target */
   gap: 0.2rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.45rem 0.6rem;
   border-radius: 0.75rem;
   background: rgba(13, 16, 31, 0.95);
   box-shadow:
     0 16px 40px rgba(5, 8, 20, 0.35),
     0 0 0 1px rgba(255, 255, 255, 0.16);
-  min-width: 9rem;
-  z-index: 2;
+  min-width: 5.2rem; /* increased from 4.5rem */
+  width: auto; /* allow menu to fit content while honoring min-width */
+  z-index: 3; /* raise so it sits above adjacent UI */
   white-space: normal;
+
+  /* snappier transitions for hover appearance */
+  transition: background 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease, opacity 0.12s ease;
+  will-change: transform, opacity;
+  margin-top: -0.15rem; /* tiny overlap */
+}
+
+/* invisible bridge to keep pointer events active while moving between tab and menu */
+.mode-menu[data-pinned='false']::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -0.6rem; /* reach further toward the tab */
+  transform: translateX(-50%);
+  width: calc(100% + 0.6rem); /* wider bridge */
+  height: 0.6rem; /* taller bridge to improve hit handoff */
+  background: transparent;
+  pointer-events: auto; /* preserves hover while crossing the small area */
+  z-index: 0; /* keep it above background but below visible menu items */
 }
 
 /* [4.13.b] shell-globalHeader · Primitive · "Mode Menu Item"
@@ -223,8 +245,14 @@
 
 .mode-menu[data-pinned='false'] .mode-menu__item {
   border-radius: 0.5rem;
-  text-align: left;
-  padding: 0.45rem 0.65rem;
+  text-align: center; /* center the label inside the smaller menu */
+  padding: 0.5rem 0.6rem; /* increased padding for larger touch area */
+  width: auto;
+  min-width: 0;
+  display: inline-block;
+  min-height: 2.4rem; /* ensure a comfortable vertical hit size */
+  line-height: 1; /* keep text vertically centered */
+  box-sizing: border-box;
 }
 
 .mode-menu__item[data-active='true'] {
@@ -242,11 +270,7 @@
    Concern: BuildStyle · Catalog: action.icon
    Notes: Creates circular hit target and hover transition. */
 .info-icon {
-  border: none;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  padding: 0.2rem;
+  padding: 0.2rem; /* restored original padding so info buttons are unchanged */
   border-radius: 50%;
   transition: background 0.16s ease;
 }
