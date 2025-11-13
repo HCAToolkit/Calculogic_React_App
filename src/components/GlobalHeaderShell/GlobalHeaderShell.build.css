@@ -219,10 +219,10 @@
   content: "";
   position: absolute;
   left: 50%;
-  top: -0.35rem; /* reach just enough toward the tab */
+  top: -0.6rem; /* extend further to keep hover active when moving toward the menu */
   transform: translateX(-50%);
-  width: calc(100% + 0.25rem); /* smaller bridge so text remains the primary target */
-  height: 0.35rem;
+  width: calc(100% + 0.6rem); /* widen bridge so pointer can travel without exiting hover */
+  height: 0.6rem;
   background: transparent;
   pointer-events: auto;
   z-index: 0;
