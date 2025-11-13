@@ -1,22 +1,25 @@
 /**
- * Concern: BuildSurfaceStructure
- * Layer: Build
- * BuildIndex: 20.00
- * AttachesTo: builder-root
+ * Configuration: cfg-buildSurface (Build Surface Configuration)
+ * Concern File: Build
+ * Source NL: doc/nl-config/cfg-buildSurface.md
  * Responsibility: Render the Build tab's structural layout and anchor map.
- * Invariants: Section order aligns with logic bindings, resizable panes respect anchor contracts.
+ * Invariants: Section order mirrors logic bindings; resizable panes respect anchor contracts.
  */
 import type { ReactNode } from 'react';
 import { BUILD_ANCHORS } from './anchors';
 import type { BuildSurfaceBindings, SectionId, SectionLogicBinding } from './BuildSurface.logic';
 import { sectionTitle } from './BuildSurface.logic';
 
-// [Section 20.10] PanelChrome
-// Purpose: Provide reusable iconography for collapsible controls.
-// Inputs: Panel collapsed state
-// Outputs: Chevron icon components
-// Constraints: Icons remain accessible and purely presentational.
+// ─────────────────────────────────────────────
+// 3. Build – cfg-buildSurface (Build Surface Configuration)
+// NL Sections: §3.2–§3.6 in cfg-buildSurface.md
+// Purpose: Assemble Build surface structure, reusable chrome, and anchored layout.
+// Constraints: No styling or state mutations beyond structural composition.
+// ─────────────────────────────────────────────
 
+// [3.2] cfg-buildSurface · Primitive · "Chevron Left Icon"
+// Concern: Build · Parent: "Section Panel Template" · Catalog: chrome.icon
+// Notes: Points inward to signal an expanded panel state within catalog shells.
 function ChevronLeftIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
@@ -34,7 +37,7 @@ function ChevronLeftIcon() {
 
 // [3.3] cfg-buildSurface · Primitive · "Chevron Right Icon"
 // Concern: Build · Parent: "Section Panel Template" · Catalog: chrome.icon
-// Notes: Points outward to indicate collapsing behavior for section panels.
+// Notes: Points outward to communicate collapsed panel affordances.
 function ChevronRightIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
@@ -50,11 +53,6 @@ function ChevronRightIcon() {
   );
 }
 
-// [Section 20.20] SectionCatalog
-// Purpose: Describe left-panel sections and their structural anchors.
-// Inputs: SectionId order from logic bindings
-// Outputs: Structured React nodes bound to BUILD_ANCHORS
-// Constraints: Anchor names stay deterministic; placeholders preserve layout spacing.
 interface SectionContentConfig {
   id: SectionId;
   render: () => ReactNode;
@@ -62,7 +60,7 @@ interface SectionContentConfig {
 
 // [3.4] cfg-buildSurface · Primitive · "Section Content Catalog"
 // Concern: Build · Parent: "Section Panel Template" · Catalog: layout.catalog
-// Notes: Supplies placeholder markup for each section using deterministic anchors.
+// Notes: Maps section identifiers to anchored placeholder content for catalog panels.
 const SECTION_CONTENT: SectionContentConfig[] = [
   {
     id: 'configurations',
@@ -125,11 +123,9 @@ function renderSectionContent(id: SectionId) {
   return match ? match.render() : null;
 }
 
-// [Section 20.30] SectionPanels
-// Purpose: Render individual catalog panels with collapse and resize affordances.
-// Inputs: SectionLogicBinding from logic layer
-// Outputs: Section markup bound to anchors and ARIA contracts
-// Constraints: Header buttons stay accessible; grip hidden when logic disallows drag.
+// [3.5] cfg-buildSurface · Subcontainer · "Section Panel Template"
+// Concern: Build · Parent: "Catalog Column" · Catalog: layout.section
+// Notes: Wraps section headers, content, and grips with deterministic anchors and ARIA bindings.
 function SectionPanel({ binding }: { binding: SectionLogicBinding }) {
   const title = sectionTitle(binding.id);
   return (
@@ -162,11 +158,9 @@ function SectionPanel({ binding }: { binding: SectionLogicBinding }) {
   );
 }
 
-// [Section 20.40] SurfaceLayout
-// Purpose: Assemble the builder frame, navigation chrome, and pane layout.
-// Inputs: BuildSurfaceBindings including anchors, sections, and panel states
-// Outputs: Complete Build tab DOM structure
-// Constraints: Anchor contracts stay intact; layout transitions remain CSS-driven.
+// [3.6] cfg-buildSurface · Container · "Build Surface Layout"
+// Concern: Build · Parent: "Build Surface Composer" · Catalog: layout.shell
+// Notes: Coordinates header chrome, catalog panels, preview stage, and inspector anchors.
 export function BuildSurface({
   anchors,
   sectionOrder,
@@ -174,7 +168,35 @@ export function BuildSurface({
   leftPanel,
   rightPanel,
 }: BuildSurfaceBindings) {
-  // [3.6.1] cfg-buildSurface · Subcontainer · "Catalog Column"
+  // [3.6.1] cfg-buildSurface · Subcontainer · "Header Chrome"
+  // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.header
+  // Notes: Provides builder title, navigation tabs, and publish CTA tied to header anchors.
+  const headerChrome = (
+    <header data-anchor={anchors.header}>
+      <h1>Calculogic Builder</h1>
+      <nav data-anchor={anchors.tabList} aria-label="Builder tabs">
+        <button
+          type="button"
+          data-anchor={anchors.tabButton('build')}
+          data-active="true"
+          aria-current="page"
+        >
+          Build
+        </button>
+        <button type="button" data-anchor={anchors.tabButton('logic')} aria-current={false}>
+          Logic
+        </button>
+        <button type="button" data-anchor={anchors.tabButton('knowledge')} aria-current={false}>
+          Knowledge
+        </button>
+      </nav>
+      <button type="button" className="publish">
+        Publish
+      </button>
+    </header>
+  );
+
+  // [3.6.2] cfg-buildSurface · Subcontainer · "Catalog Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
   // Notes: Lists section panels in logic-supplied order with live resize affordances.
   const catalogColumn = (
@@ -191,12 +213,12 @@ export function BuildSurface({
     </aside>
   );
 
-  // [3.6.2] cfg-buildSurface · Primitive · "Catalog Grip"
+  // [3.6.3] cfg-buildSurface · Primitive · "Catalog Grip"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Exposes left panel resize separator connected to logic grip props.
   const catalogGrip = <div data-anchor={anchors.leftGrip} {...leftPanel.gripProps} />;
 
-  // [3.6.3] cfg-buildSurface · Subcontainer · "Preview Stage"
+  // [3.6.4] cfg-buildSurface · Subcontainer · "Preview Stage"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.region
   // Notes: Placeholder canvas for future form preview anchored to center panel IDs.
   const previewStage = (
@@ -207,12 +229,12 @@ export function BuildSurface({
     </main>
   );
 
-  // [3.6.4] cfg-buildSurface · Primitive · "Inspector Grip"
+  // [3.6.5] cfg-buildSurface · Primitive · "Inspector Grip"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Provides resize handle between preview stage and inspector column.
   const inspectorGrip = <div data-anchor={anchors.rightGrip} {...rightPanel.gripProps} />;
 
-  // [3.6.5] cfg-buildSurface · Subcontainer · "Inspector Column"
+  // [3.6.6] cfg-buildSurface · Subcontainer · "Inspector Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
   // Notes: Collapsible inspector with settings placeholder anchored to logic-provided IDs.
   const inspectorColumn = (
@@ -250,6 +272,7 @@ export function BuildSurface({
 
   return (
     <div data-anchor={anchors.root}>
+      {headerChrome}
       <div data-anchor={anchors.layout}>
         {catalogColumn}
         {catalogGrip}
