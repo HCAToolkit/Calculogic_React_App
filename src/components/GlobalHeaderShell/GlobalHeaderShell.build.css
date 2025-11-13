@@ -94,17 +94,34 @@
    Notes: Horizontal rail with overflow scroll support. */
 .tab-list {
   display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: flex-start;
+  gap: 0.75rem;
   overflow-x: auto;
+  overflow-y: visible;
   padding: 0.25rem 0;
   white-space: nowrap;
 }
 
 /* [4.10] shell-globalHeader · Subcontainer · "Tab Item Row Styling"
    Concern: BuildStyle · Catalog: layout.row
-   Notes: Aligns tab button and info icon inline. */
+   Notes: Stacks tab control row with optional mode menu beneath each concern. */
 .tab-list__item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  position: relative;
+}
+
+.tab-list__item--has-menu {
+  gap: 0.45rem;
+  padding-bottom: 0.75rem;
+}
+
+/* [4.10.a] shell-globalHeader · Primitive · "Tab Button Row"
+   Concern: BuildStyle · Catalog: layout.row
+   Notes: Keeps tab button and info icon aligned on a single horizontal track. */
+.tab-list__button-row {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -138,6 +155,77 @@
    Notes: Subtle highlight for hovered but inactive tabs. */
 .tab-button[data-hovered='true'][data-active='false'] {
   background: rgba(255, 255, 255, 0.08);
+}
+
+/* [4.13.a] shell-globalHeader · Subcontainer · "Mode Menu Baseline"
+   Concern: BuildStyle · Catalog: navigation.breadcrumb
+   Notes: Shared styling for Build/Results mode selectors. */
+.mode-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
+  transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.mode-menu[data-pinned='true'] {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+.mode-menu[data-pinned='false'] {
+  position: absolute;
+  top: calc(100% - 0.1rem);
+  left: 50%;
+  transform: translate(-50%, 0.35rem);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.2rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(13, 16, 31, 0.95);
+  box-shadow:
+    0 16px 40px rgba(5, 8, 20, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.16);
+  min-width: 9rem;
+  z-index: 2;
+  white-space: normal;
+}
+
+/* [4.13.b] shell-globalHeader · Primitive · "Mode Menu Item"
+   Concern: BuildStyle · Catalog: navigation.pill
+   Notes: Buttons toggling between Base and Style modes per tab. */
+.mode-menu__item {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.mode-menu[data-pinned='false'] .mode-menu__item {
+  border-radius: 0.5rem;
+  text-align: left;
+  padding: 0.45rem 0.65rem;
+}
+
+.mode-menu__item[data-active='true'] {
+  background: rgba(255, 255, 255, 0.24);
+  color: #0a0c12;
+}
+
+.mode-menu__item:hover,
+.mode-menu__item:focus-visible {
+  background: rgba(255, 255, 255, 0.32);
+  color: #0a0c12;
 }
 
 /* [4.14] shell-globalHeader · Primitive · "Info Icon Baseline"
@@ -210,6 +298,16 @@
   .brand-tagline {
     display: none;
   }
+
+  .mode-menu[data-pinned='true'] {
+    gap: 0.2rem;
+    padding: 0.2rem 0.45rem;
+  }
+
+  .mode-menu__item {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.55rem;
+  }
 }
 
 /* [4.19] shell-globalHeader · Variation · "Mobile Layout Adjustments"
@@ -227,6 +325,16 @@
 
   .tab-list {
     gap: 0.35rem;
+  }
+
+  .mode-menu[data-pinned='true'] {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mode-menu[data-pinned='true'] .mode-menu__item {
+    flex: 1 1 0;
+    text-align: center;
   }
 
   .publish-button {

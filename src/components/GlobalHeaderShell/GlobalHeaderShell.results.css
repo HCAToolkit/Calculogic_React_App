@@ -26,157 +26,17 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* [8.2] shell-globalHeader · Primitive · "Documentation Overlay"
-   Concern: ResultsStyle · Catalog: modal.overlay
-   Notes: Dimmed backdrop and scroll container for documentation modal. */
-.global-header-shell__doc-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 12, 18, 0.78);
-  backdrop-filter: blur(2px);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 4rem 1.5rem 2rem;
-  z-index: 1000;
-  overflow-y: auto;
-}
-
-/* [8.3] shell-globalHeader · Primitive · "Documentation Modal"
-   Concern: ResultsStyle · Catalog: modal.panel
-   Notes: Card-like panel with comfortable typography and spacing. */
-.global-header-shell__doc-modal {
-  position: relative;
-  width: min(640px, 100%);
-  background: #101322;
-  color: #f5f7ff;
-  border-radius: 1rem;
-  box-shadow: 0 24px 48px rgba(4, 6, 12, 0.45);
-  padding: 2.25rem 2.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* [8.4] shell-globalHeader · Primitive · "Documentation Header"
-   Concern: ResultsStyle · Catalog: modal.header
-   Notes: Typography hierarchy aligning concern label, title, and summary. */
-.global-header-shell__doc-header {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.global-header-shell__doc-concern {
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  color: rgba(245, 247, 255, 0.65);
-}
-
-.global-header-shell__doc-summary {
-  margin: 0;
-  color: rgba(245, 247, 255, 0.85);
-  line-height: 1.45;
-}
-
-/* [8.5] shell-globalHeader · Primitive · "Documentation Sections"
-   Concern: ResultsStyle · Catalog: modal.section
-   Notes: Ensures readable rhythm for section headings and paragraphs. */
-.global-header-shell__doc-section {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.global-header-shell__doc-section h3 {
-  margin: 0;
-  font-size: 1.05rem;
-}
-
-.global-header-shell__doc-section p {
-  margin: 0;
-  color: rgba(245, 247, 255, 0.78);
-  line-height: 1.6;
-}
-
-.global-header-shell__doc-section ul {
-  margin: 0;
-  padding-left: 1.2rem;
-  display: grid;
-  gap: 0.35rem;
-  color: rgba(245, 247, 255, 0.78);
-}
-
-/* [8.6] shell-globalHeader · Primitive · "Documentation Close Button"
-   Concern: ResultsStyle · Catalog: modal.close
-   Notes: Places close affordance without stealing focus from content. */
-.global-header-shell__doc-close {
+/* [8.2] shell-globalHeader · Primitive · "Live Region Anchor"
+   Concern: ResultsStyle · Catalog: accessibility.liveRegion
+   Notes: Ensures live region does not disrupt layout when rendered inline. */
+[data-anchor='global-header.aria-live'] {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  border: none;
-  background: rgba(245, 247, 255, 0.12);
-  color: #f5f7ff;
-  font-size: 1.25rem;
-  line-height: 1;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.16s ease, transform 0.16s ease;
-}
-
-.global-header-shell__doc-close:hover,
-.global-header-shell__doc-close:focus-visible {
-  background: rgba(245, 247, 255, 0.22);
-  transform: translateY(-1px);
-}
-
-/* [8.7] shell-globalHeader · Primitive · "Documentation Links"
-   Concern: ResultsStyle · Catalog: modal.links
-   Notes: Styled list of buttons allowing navigation to sibling docs. */
-.global-header-shell__doc-link-list {
-  margin: 0;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
   padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.global-header-shell__doc-link {
-  width: 100%;
-  text-align: left;
-  background: rgba(245, 247, 255, 0.08);
-  color: inherit;
-  border: 1px solid rgba(245, 247, 255, 0.12);
-  border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
-  display: grid;
-  gap: 0.2rem;
-  cursor: pointer;
-  transition: background 0.16s ease, border-color 0.16s ease;
-}
-
-.global-header-shell__doc-link:hover,
-.global-header-shell__doc-link:focus-visible {
-  background: rgba(245, 247, 255, 0.16);
-  border-color: rgba(245, 247, 255, 0.32);
-}
-
-.global-header-shell__doc-link-label {
-  font-weight: 600;
-}
-
-.global-header-shell__doc-link-desc {
-  font-size: 0.85rem;
-  color: rgba(245, 247, 255, 0.72);
-}
-
-@media (max-width: 767px) {
-  .global-header-shell__doc-modal {
-    padding: 1.75rem 1.5rem;
-    border-radius: 0.85rem;
-  }
-
-  .global-header-shell__doc-overlay {
-    padding-top: 3rem;
-  }
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
 }
