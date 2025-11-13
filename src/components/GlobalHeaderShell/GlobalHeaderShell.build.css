@@ -214,44 +214,30 @@
   margin-top: -0.15rem; /* tiny overlap */
 }
 
-/* invisible bridge to keep pointer events active while moving between tab and menu */
+/* invisible bridge tightened so it doesn't create a large hit area */
 .mode-menu[data-pinned='false']::before {
   content: "";
   position: absolute;
   left: 50%;
-  top: -0.6rem; /* reach further toward the tab */
+  top: -0.35rem; /* reach just enough toward the tab */
   transform: translateX(-50%);
-  width: calc(100% + 0.6rem); /* wider bridge */
-  height: 0.6rem; /* taller bridge to improve hit handoff */
+  width: calc(100% + 0.25rem); /* smaller bridge so text remains the primary target */
+  height: 0.35rem;
   background: transparent;
-  pointer-events: auto; /* preserves hover while crossing the small area */
-  z-index: 0; /* keep it above background but below visible menu items */
+  pointer-events: auto;
+  z-index: 0;
 }
 
-/* [4.13.b] shell-globalHeader · Primitive · "Mode Menu Item"
-   Concern: BuildStyle · Catalog: navigation.pill
-   Notes: Buttons toggling between Base and Style modes per tab. */
-.mode-menu__item {
-  border: none;
-  background: transparent;
-  color: inherit;
-  font-size: 0.85rem;
-  font-weight: 500;
-  padding: 0.2rem 0.65rem;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
-}
-
+/* mode menu items: make the text itself the primary touch target */
 .mode-menu[data-pinned='false'] .mode-menu__item {
   border-radius: 0.5rem;
-  text-align: center; /* center the label inside the smaller menu */
-  padding: 0.5rem 0.6rem; /* increased padding for larger touch area */
+  text-align: center;
+  padding: 0 0.15rem; /* minimal horizontal breathing — text is the main hit */
+  display: inline-block;
   width: auto;
   min-width: 0;
-  display: inline-block;
-  min-height: 2.4rem; /* ensure a comfortable vertical hit size */
-  line-height: 1; /* keep text vertically centered */
+  min-height: 0; /* remove enforced large vertical hit */
+  line-height: 1; /* let text determine height */
   box-sizing: border-box;
 }
 
