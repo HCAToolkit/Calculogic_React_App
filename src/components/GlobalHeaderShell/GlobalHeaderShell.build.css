@@ -73,6 +73,17 @@
   font-size: 1.05rem;
 }
 
+/* [4.6.a] shell-globalHeader · Primitive · "Brand Text Stack"
+   Concern: BuildStyle · Catalog: layout.stack
+   Notes: Stacks wordmark and tagline vertically within the brand link. */
+.brand-text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
+  gap: 0.15rem;
+}
+
 /* [4.7] shell-globalHeader · Primitive · "Brand Logo Scaling"
    Concern: BuildStyle · Catalog: content.icon
    Notes: Enlarges glyph for presence next to wordmark. */

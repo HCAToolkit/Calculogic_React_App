@@ -256,21 +256,23 @@ export function GlobalHeaderShell({
           <span aria-hidden="true" className="brand-logo" data-anchor="global-header.brand-logo">
             🧮
           </span>
-          {/* [3.5] shell-globalHeader · Primitive · "Brand Wordmark Label"
-              Concern: Build · Parent: "Brand Home Link" · Catalog: content.copy
-              Notes: Presents Calculogic brand name within anchor. */}
-          <span className="brand-wordmark" data-anchor="global-header.brand-wordmark">
-            {brand.wordmark}
+          <span className="brand-text" data-anchor="global-header.brand-text">
+            {/* [3.5] shell-globalHeader · Primitive · "Brand Wordmark Label"
+                Concern: Build · Parent: "Brand Home Link" · Catalog: content.copy
+                Notes: Presents Calculogic brand name within anchor. */}
+            <span className="brand-wordmark" data-anchor="global-header.brand-wordmark">
+              {brand.wordmark}
+            </span>
+            {showTagline && (
+              /* [3.6] shell-globalHeader · Primitive · "Brand Tagline"
+                 Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
+                 Notes: Optional supporting copy hidden on mobile breakpoints. */
+              <span className="brand-tagline" data-anchor="global-header.brand-tagline">
+                {brand.tagline}
+              </span>
+            )}
           </span>
         </a>
-        {showTagline && (
-          /* [3.6] shell-globalHeader · Primitive · "Brand Tagline"
-             Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
-             Notes: Optional supporting copy hidden on mobile breakpoints. */
-          <span className="brand-tagline" data-anchor="global-header.brand-tagline">
-            {brand.tagline}
-          </span>
-        )}
       </div>
       {/* [3.7] shell-globalHeader · Subcontainer · "Tab Navigation Zone"
           Concern: Build · Parent: "Global Header Shell Frame" · Catalog: layout.group
