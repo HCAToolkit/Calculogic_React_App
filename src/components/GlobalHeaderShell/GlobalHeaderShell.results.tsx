@@ -45,6 +45,9 @@ export function GlobalHeaderShellResults({ debugPanel }: GlobalHeaderShellResult
       <div>
         <strong>Hovered tab:</strong> {debugPanel.state.hoveredTab ?? 'none'}
       </div>
+      <div>
+        <strong>Active doc:</strong> {debugPanel.state.activeDocId ?? 'none'}
+      </div>
     </aside>
   );
 }

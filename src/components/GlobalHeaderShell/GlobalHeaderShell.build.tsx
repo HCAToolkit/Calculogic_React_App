@@ -19,12 +19,22 @@ import type { GlobalHeaderShellBuildBindings } from './GlobalHeaderShell.logic';
 // Notes: Shares hover state with tab button while exposing hover summary.
 function InfoIcon({
   label,
+  docId,
   onMouseEnter,
   onMouseLeave,
+  onFocus,
+  onBlur,
+  openDoc,
+  closeDoc,
 }: {
   label: string;
+  docId: string;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
+  openDoc: (docId: string) => void;
+  closeDoc: () => void;
 }) {
   return (
     <button
@@ -35,6 +45,14 @@ function InfoIcon({
       data-anchor="global-header.tab-info"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onFocus={() => {
+        onFocus();
+        openDoc(docId);
+      }}
+      onBlur={() => {
+        onBlur();
+        closeDoc();
+      }}
     >
       ℹ️
     </button>
@@ -51,6 +69,8 @@ function TabButton({
   onSelect,
   onMouseEnter,
   onMouseLeave,
+  onFocus,
+  onBlur,
 }: {
   label: string;
   isActive: boolean;
@@ -58,6 +78,8 @@ function TabButton({
   onSelect: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
 }) {
   return (
     <button
@@ -71,6 +93,8 @@ function TabButton({
       onClick={onSelect}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
       {label}
     </button>
@@ -91,6 +115,8 @@ export function GlobalHeaderShell({
   triggerPublish,
   isMobile,
   isTablet,
+  openDoc,
+  closeDoc,
 }: GlobalHeaderShellBuildBindings) {
   // [3.6] shell-globalHeader · Primitive · "Brand Tagline"
   // Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
@@ -160,11 +186,24 @@ export function GlobalHeaderShell({
                   onSelect={() => selectTab(tab.id)}
                   onMouseEnter={() => hoverTab(tab.id)}
                   onMouseLeave={() => hoverTab(null)}
+                  onFocus={() => hoverTab(tab.id)}
+                  onBlur={() => hoverTab(null)}
                 />
                 <InfoIcon
                   label={tab.hoverSummary}
-                  onMouseEnter={() => hoverTab(tab.id)}
-                  onMouseLeave={() => hoverTab(null)}
+                  docId={tab.docId}
+                  onMouseEnter={() => {
+                    hoverTab(tab.id);
+                    openDoc(tab.docId);
+                  }}
+                  onMouseLeave={() => {
+                    hoverTab(null);
+                    closeDoc();
+                  }}
+                  onFocus={() => hoverTab(tab.id)}
+                  onBlur={() => hoverTab(null)}
+                  openDoc={openDoc}
+                  closeDoc={closeDoc}
                 />
               </div>
             );

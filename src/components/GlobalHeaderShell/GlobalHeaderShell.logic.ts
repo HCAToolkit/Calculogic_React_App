@@ -64,7 +64,7 @@ export interface GlobalHeaderShellResultsBindings {
     visible: boolean;
     state: Pick<
       GlobalHeaderShellState,
-      'activeTab' | 'activeModeByTab' | 'viewportBreakpoint' | 'hoveredTab'
+      'activeTab' | 'activeModeByTab' | 'viewportBreakpoint' | 'hoveredTab' | 'activeDocId'
     >;
   };
 }
@@ -258,6 +258,7 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
         activeModeByTab: state.activeModeByTab,
         viewportBreakpoint: state.viewportBreakpoint,
         hoveredTab: state.hoveredTab,
+        activeDocId: state.activeDocId,
       },
     },
   };
