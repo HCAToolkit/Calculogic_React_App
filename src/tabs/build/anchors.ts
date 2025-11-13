@@ -1,17 +1,21 @@
 /**
- * Concern: BuildSurfaceAnchors
- * Layer: Build
- * BuildIndex: 20.00
- * AttachesTo: builder-root
+ * Configuration: cfg-buildSurface (Build Surface Configuration)
+ * Concern File: Knowledge
+ * Source NL: doc/nl-config/cfg-buildSurface.md
  * Responsibility: Centralize public anchor contracts shared across Build layers.
- * Invariants: Anchor names remain stable, builder-root stays the ordering source.
+ * Invariants: Anchor names remain stable; builder-root stays the ordering source.
  */
 
-// [Section 20.10] AnchorRegistry
-// Purpose: Define the canonical selectors that other layers attach to.
-// Inputs: Build surface structure requirements
-// Outputs: BUILD_ANCHORS constant map
-// Constraints: Only expose stable anchors; computed segments remain pure.
+// ─────────────────────────────────────────────
+// 6. Knowledge – cfg-buildSurface (Build Surface Configuration)
+// NL Sections: §6.1–§6.2 in cfg-buildSurface.md
+// Purpose: Publish anchor naming contracts for reuse across concerns.
+// Constraints: Anchor registry stays deterministic and pure.
+// ─────────────────────────────────────────────
+
+// [6.1] cfg-buildSurface · Primitive · "Anchor Registry"
+// Concern: Knowledge · Catalog: contract.anchor
+// Notes: Enumerates public anchor factories consumed by Build, BuildStyle, and Logic.
 export const BUILD_ANCHORS = {
   root: 'builder-root',
   header: 'builder-header',
@@ -33,9 +37,7 @@ export const BUILD_ANCHORS = {
   list: (id: string) => `builder-list-${id}`,
 } as const;
 
-// [Section 20.20] AnchorTypes
-// Purpose: Export a type union for downstream compile-time safety.
-// Inputs: BUILD_ANCHORS constant
-// Outputs: BuildAnchorId type alias
-// Constraints: Must stay in sync with anchor registry.
+// [6.2] cfg-buildSurface · Primitive · "Anchor Type Alias"
+// Concern: Knowledge · Parent: "Anchor Registry" · Catalog: contract.type
+// Notes: Provides union of anchor identifiers for compile-time validation.
 export type BuildAnchorId = typeof BUILD_ANCHORS[keyof typeof BUILD_ANCHORS];
