@@ -161,12 +161,6 @@
   border-color: rgba(255, 255, 255, 0.32);
 }
 
-.tab-button[data-active='true'][data-mode='style'] {
-  background: #7ba1ff;
-  border-color: #7ba1ff;
-  color: #0a0c12;
-}
-
 /* [4.13] shell-globalHeader · Primitive · "Tab Button Hover State"
    Concern: BuildStyle · Catalog: state.hover
    Notes: Subtle highlight for hovered but inactive tabs. */
@@ -263,12 +257,13 @@
 }
 
 .mode-menu__item[data-active='true'] {
-  background: rgba(255, 255, 255, 0.24);
+  background: #7ba1ff;
   color: #0a0c12;
+  box-shadow: 0 0 0 1px rgba(10, 12, 18, 0.1);
 }
 
-.mode-menu__item:hover,
-.mode-menu__item:focus-visible {
+.mode-menu__item[data-active='false']:hover,
+.mode-menu__item[data-active='false']:focus-visible {
   background: rgba(255, 255, 255, 0.32);
   color: #0a0c12;
 }
