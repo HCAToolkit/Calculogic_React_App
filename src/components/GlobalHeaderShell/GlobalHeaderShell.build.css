@@ -161,6 +161,13 @@
   border-color: rgba(255, 255, 255, 0.32);
 }
 
+.tab-button[data-active='true'][data-mode='style'] {
+  background: rgba(126, 158, 255, 0.28);
+  border-color: rgba(126, 158, 255, 0.72);
+  box-shadow: 0 0 0 1px rgba(126, 158, 255, 0.35);
+  color: #f8f9ff;
+}
+
 /* [4.13] shell-globalHeader · Primitive · "Tab Button Hover State"
    Concern: BuildStyle · Catalog: state.hover
    Notes: Subtle highlight for hovered but inactive tabs. */
@@ -265,6 +272,25 @@
 .mode-menu__item:focus-visible {
   background: rgba(255, 255, 255, 0.32);
   color: #0a0c12;
+}
+
+.tab-mode-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(126, 158, 255, 0.18);
+  color: rgba(230, 236, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(126, 158, 255, 0.35);
+}
+
+.tab-list__item[data-mode='style'] .tab-mode-indicator {
+  background: rgba(126, 158, 255, 0.26);
+  box-shadow: 0 0 0 1px rgba(126, 158, 255, 0.45);
 }
 
 /* [4.14] shell-globalHeader · Primitive · "Info Icon Baseline"

@@ -67,6 +67,7 @@ function TabButton({
   label,
   isActive,
   isHovered,
+  activeMode,
   onSelect,
   onMouseEnter,
   onMouseLeave,
@@ -76,6 +77,7 @@ function TabButton({
   label: string;
   isActive: boolean;
   isHovered: boolean;
+  activeMode: HeaderMode | null;
   onSelect: () => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
@@ -88,6 +90,7 @@ function TabButton({
       className="tab-button"
       data-active={isActive ? 'true' : 'false'}
       data-hovered={isHovered ? 'true' : 'false'}
+      data-mode={activeMode === 'style' ? 'style' : undefined}
       role="tab"
       aria-selected={isActive}
       aria-current={isActive ? 'page' : undefined}
@@ -294,6 +297,18 @@ export function GlobalHeaderShell({
             const isResultsTab = tab.id === 'results';
             const shouldShowModeMenu =
               (isBuildTab || isResultsTab) && (isActive || modeMenuVisibleForTab === tab.id);
+            const activeModeId = isBuildTab
+              ? activeModeByTab.build
+              : isResultsTab
+              ? activeModeByTab.results
+              : null;
+            const activeModeDefinition = isBuildTab
+              ? modeMetadata.build[activeModeId ?? 'default']
+              : isResultsTab
+              ? modeMetadata.results[activeModeId ?? 'default']
+              : null;
+            const shouldShowModeIndicator =
+              (isBuildTab || isResultsTab) && activeModeDefinition && activeModeId === 'style';
 
             return (
               // [3.9] shell-globalHeader · Subcontainer · "Tab Item Row"
@@ -303,6 +318,7 @@ export function GlobalHeaderShell({
                 key={tab.id}
                 className={`tab-list__item${shouldShowModeMenu ? ' tab-list__item--has-menu' : ''}`}
                 data-anchor={`global-header.tab-${tab.id}`}
+                data-mode={shouldShowModeIndicator ? activeModeDefinition.id : undefined}
                 onMouseEnter={() => hoverTab(tab.id)}
                 onMouseLeave={() => hoverTab(null)}
                 onFocus={() => hoverTab(tab.id)}
@@ -317,6 +333,7 @@ export function GlobalHeaderShell({
                     label={tab.label}
                     isActive={isActive}
                     isHovered={isHovered}
+                    activeMode={activeModeId}
                     onSelect={() => selectTab(tab.id)}
                     onMouseEnter={() => hoverTab(tab.id)}
                     onFocus={() => hoverTab(tab.id)}
@@ -333,6 +350,15 @@ export function GlobalHeaderShell({
                 <span id={infoLabelId} className="visually-hidden">
                   {tab.hoverSummary}
                 </span>
+                {shouldShowModeIndicator && activeModeDefinition && (
+                  <span
+                    className="tab-mode-indicator"
+                    data-anchor={`global-header.tab-${tab.id}.mode-indicator`}
+                    aria-live={isActive ? 'polite' : undefined}
+                  >
+                    {activeModeDefinition.label} mode active
+                  </span>
+                )}
                 {isBuildTab && shouldShowModeMenu && (
                   <BuildModeMenu
                     activeMode={activeModeByTab.build}
