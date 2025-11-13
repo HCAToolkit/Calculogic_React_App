@@ -1,17 +1,14 @@
 /*
- * Concern: AppFrameView
- * Layer: View
- * BuildIndex: 01.00
- * AttachesTo: [data-anchor="app-frame"]
- * Responsibility: Skin the global frame and expose accessible theming affordances.
- * Invariants: Frame fills viewport, theme toggle maintains focus treatment.
+ * Configuration: cfg-appFrame (App Frame)
+ * Concern File: BuildStyle
+ * Source NL: doc/nl-config/cfg-appFrame.md
+ * Responsibility: Skin the app frame container and expose accessible theming affordances.
+ * Invariants: Frame fills the viewport; theme toggle keeps a visible focus state; dark variables track theme state.
  */
 
-/* [Section 01.10] FrameSurface
- * Purpose: Establish full-viewport shell and default color variables.
- * Inputs: CSS custom properties, body theme variables
- * Outputs: App frame layout styling
- * Constraints: Maintain responsive fill and readable contrast.
+/* [4.1] cfg-appFrame · Container · "Frame Surface Styling"
+ * Concern: BuildStyle · Parent: "—" · Catalog: surface.container
+ * Notes: Fills the viewport and applies default surface/foreground tokens for the frame shell.
  */
 [data-anchor="app-frame"] {
   height: 100vh;
@@ -21,11 +18,9 @@
   position: relative;
 }
 
-/* [Section 01.20] ThemeToggle
- * Purpose: Position and style the theme toggle control.
- * Inputs: App frame positioning context
- * Outputs: Styled toggle button
- * Constraints: Keep focus ring visible and button discoverable.
+/* [4.2] cfg-appFrame · Primitive · "Theme Toggle Styling"
+ * Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: control.skin
+ * Notes: Positions the toggle and establishes baseline affordance styling within the frame.
  */
 [data-anchor="theme-toggle"] {
   position: absolute;
@@ -41,19 +36,17 @@
 }
 
 /* [4.2.1] cfg-appFrame · Primitive · "Theme Toggle Focus Ring"
-   Concern: BuildStyle · Parent: "Theme Toggle Styling" · Catalog: control.focus
-   Notes: Guarantees accessible focus outline for keyboard users.
+ * Concern: BuildStyle · Parent: "Theme Toggle Styling" · Catalog: control.focus
+ * Notes: Guarantees accessible focus outline for keyboard users.
  */
 [data-anchor="theme-toggle"]:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
 
-/* [Section 01.30] DarkThemeVariables
- * Purpose: Override design tokens when dark mode is active.
- * Inputs: body.dark class
- * Outputs: Alternate CSS custom property values
- * Constraints: Preserve adequate contrast with base text.
+/* [4.3] cfg-appFrame · Primitive · "Dark Theme Variables"
+ * Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: tokens.theme
+ * Notes: Overrides surface tokens when body.dark is applied to mirror dark-mode state.
  */
 body.dark {
   --app-surface: #0f172a;
