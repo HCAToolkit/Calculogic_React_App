@@ -1,3 +1,21 @@
+/*
+ * ProjectShell/Config: Global Header Shell (shell-globalHeader)
+ * Concern File: ResultsStyle
+ * Source NL: doc/nl-shell/shell-globalHeader.md
+ * Responsibility: Style debug panel to harmonize with header shell while preserving readability.
+ * Invariants: Maintain subdued palette, keep text legible, avoid layout interference with primary header.
+ */
+
+/* ─────────────────────────────────────────────
+   8. ResultsStyle – shell-globalHeader (Global Header Shell)
+   NL Sections: §8.1 in shell-globalHeader.md
+   Purpose: Provide styling for optional debug diagnostics panel.
+   Constraints: Visual weight stays secondary to main header shell.
+   ───────────────────────────────────────────── */
+
+/* [8.1] shell-globalHeader · Primitive · "Debug Panel Styling"
+   Concern: ResultsStyle · Catalog: diagnostics.panel
+   Notes: Applies subdued background, compact grid layout, and readable typography. */
 .global-header-shell__debug {
   background: rgba(16, 19, 34, 0.85);
   color: rgba(245, 247, 255, 0.85);

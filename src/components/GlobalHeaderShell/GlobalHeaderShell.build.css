@@ -1,3 +1,21 @@
+/*
+ * ProjectShell/Config: Global Header Shell (shell-globalHeader)
+ * Concern File: BuildStyle
+ * Source NL: doc/nl-shell/shell-globalHeader.md
+ * Responsibility: Style header frame, zones, and interactive affordances across breakpoints.
+ * Invariants: Maintain flex three-zone layout, preserve accessible contrast, keep responsive adjustments in sync with knowledge breakpoints.
+ */
+
+/* ─────────────────────────────────────────────
+   4. BuildStyle – shell-globalHeader (Global Header Shell)
+   NL Sections: §4.1–§4.19 in shell-globalHeader.md
+   Purpose: Provide visual system for header shell atoms and responsive behavior.
+   Constraints: Avoid overriding downstream theming; honor enumerated breakpoints only.
+   ───────────────────────────────────────────── */
+
+/* [4.1] shell-globalHeader · Container · "Shell Frame Layout"
+   Concern: BuildStyle · Catalog: layout.shell
+   Notes: Flex row baseline, spacing, and border definition. */
 .global-header-shell {
   display: flex;
   align-items: center;
@@ -9,6 +27,9 @@
   gap: 1rem;
 }
 
+/* [4.2] shell-globalHeader · Subcontainer · "Zone Layout Baseline"
+   Concern: BuildStyle · Catalog: layout.group
+   Notes: Shared flex alignment for brand, tabs, and publish zones. */
 .global-header-shell__zone {
   display: flex;
   align-items: center;
@@ -16,20 +37,32 @@
   min-width: 0;
 }
 
+/* [4.3] shell-globalHeader · Subcontainer · "Brand Zone Alignment"
+   Concern: BuildStyle · Catalog: layout.group
+   Notes: Prevents brand zone stretching beyond intrinsic width. */
 .global-header-shell__zone--brand {
   flex: 0 0 auto;
 }
 
+/* [4.4] shell-globalHeader · Subcontainer · "Tab Zone Alignment"
+   Concern: BuildStyle · Catalog: layout.group
+   Notes: Allows tab rail to flex and center align between zones. */
 .global-header-shell__zone--tabs {
   flex: 1 1 auto;
   justify-content: center;
 }
 
+/* [4.5] shell-globalHeader · Subcontainer · "Publish Zone Alignment"
+   Concern: BuildStyle · Catalog: layout.group
+   Notes: Keeps publish CTA anchored to the right edge. */
 .global-header-shell__zone--publish {
   flex: 0 0 auto;
   justify-content: flex-end;
 }
 
+/* [4.6] shell-globalHeader · Primitive · "Brand Link Styling"
+   Concern: BuildStyle · Catalog: content.link
+   Notes: Inline-flex anchor with elevated typography. */
 .brand-link {
   display: inline-flex;
   align-items: center;
@@ -40,16 +73,25 @@
   font-size: 1.05rem;
 }
 
+/* [4.7] shell-globalHeader · Primitive · "Brand Logo Scaling"
+   Concern: BuildStyle · Catalog: content.icon
+   Notes: Enlarges glyph for presence next to wordmark. */
 .brand-logo {
   font-size: 1.35rem;
 }
 
+/* [4.8] shell-globalHeader · Primitive · "Brand Tagline Styling"
+   Concern: BuildStyle · Catalog: content.copy
+   Notes: Light typography with nowrap to avoid wrapping. */
 .brand-tagline {
   font-size: 0.75rem;
   opacity: 0.8;
   white-space: nowrap;
 }
 
+/* [4.9] shell-globalHeader · Subcontainer · "Tab List Track Styling"
+   Concern: BuildStyle · Catalog: navigation.list
+   Notes: Horizontal rail with overflow scroll support. */
 .tab-list {
   display: inline-flex;
   align-items: center;
@@ -58,12 +100,18 @@
   padding: 0.25rem 0;
 }
 
+/* [4.10] shell-globalHeader · Subcontainer · "Tab Item Row Styling"
+   Concern: BuildStyle · Catalog: layout.row
+   Notes: Aligns tab button and info icon inline. */
 .tab-list__item {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
 }
 
+/* [4.11] shell-globalHeader · Primitive · "Tab Button Baseline"
+   Concern: BuildStyle · Catalog: navigation.tab
+   Notes: Neutral base to support active/hover state overlays. */
 .tab-button {
   padding: 0.4rem 0.9rem;
   border-radius: 999px;
@@ -76,15 +124,24 @@
   transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
 }
 
+/* [4.12] shell-globalHeader · Primitive · "Tab Button Active State"
+   Concern: BuildStyle · Catalog: state.active
+   Notes: Highlights selected tab with contrast background and border. */
 .tab-button[data-active='true'] {
   background: rgba(255, 255, 255, 0.16);
   border-color: rgba(255, 255, 255, 0.32);
 }
 
+/* [4.13] shell-globalHeader · Primitive · "Tab Button Hover State"
+   Concern: BuildStyle · Catalog: state.hover
+   Notes: Subtle highlight for hovered but inactive tabs. */
 .tab-button[data-hovered='true'][data-active='false'] {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* [4.14] shell-globalHeader · Primitive · "Info Icon Baseline"
+   Concern: BuildStyle · Catalog: action.icon
+   Notes: Creates circular hit target and hover transition. */
 .info-icon {
   border: none;
   background: none;
@@ -95,11 +152,17 @@
   transition: background 0.16s ease;
 }
 
+/* [4.15] shell-globalHeader · Primitive · "Info Icon Focus/Hover"
+   Concern: BuildStyle · Catalog: state.hover
+   Notes: Shared hover/focus-visible feedback for clarity. */
 .info-icon:hover,
 .info-icon:focus-visible {
   background: rgba(255, 255, 255, 0.12);
 }
 
+/* [4.16] shell-globalHeader · Primitive · "Publish Button Baseline"
+   Concern: BuildStyle · Catalog: action.button
+   Notes: Gradient CTA with strong typography and interaction affordance. */
 .publish-button {
   padding: 0.5rem 1.25rem;
   border-radius: 999px;
@@ -111,12 +174,18 @@
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 
+/* [4.17] shell-globalHeader · Primitive · "Publish Button Hover State"
+   Concern: BuildStyle · Catalog: state.hover
+   Notes: Adds lift and shadow to reinforce interactivity. */
 .publish-button:hover,
 .publish-button:focus-visible {
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 }
 
+/* [4.18] shell-globalHeader · Variation · "Tablet Layout Adjustments"
+   Concern: BuildStyle · Catalog: responsive.breakpoint
+   Notes: Tablet breakpoint syncs with knowledge catalog; hides tagline. */
 @media (max-width: 1023px) {
   .global-header-shell {
     padding: 0.65rem 1rem;
@@ -127,6 +196,9 @@
   }
 }
 
+/* [4.19] shell-globalHeader · Variation · "Mobile Layout Adjustments"
+   Concern: BuildStyle · Catalog: responsive.breakpoint
+   Notes: Tightens spacing and typography for narrower screens. */
 @media (max-width: 767px) {
   .global-header-shell {
     flex-wrap: nowrap;
