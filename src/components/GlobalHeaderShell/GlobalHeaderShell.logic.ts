@@ -16,6 +16,8 @@ import {
   type HeaderModeId,
   type HeaderTabDefinition,
   type HeaderTabId,
+  resolveHeaderDoc,
+  type HeaderDocDefinition,
 } from './GlobalHeaderShell.knowledge';
 
 // ─────────────────────────────────────────────
@@ -66,6 +68,12 @@ export interface GlobalHeaderShellResultsBindings {
       GlobalHeaderShellState,
       'activeTab' | 'activeModeByTab' | 'viewportBreakpoint' | 'hoveredTab' | 'activeDocId'
     >;
+  };
+  docModal: {
+    visible: boolean;
+    doc: HeaderDocDefinition | null;
+    openDoc: (docId: string) => void;
+    closeDoc: () => void;
   };
 }
 
@@ -216,6 +224,16 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   // Notes: Ensures deterministic tab order based on knowledge-defined ordering.
   const tabs = useMemo(() => [...HEADER_TAB_DEFINITIONS].sort((a, b) => a.order - b.order), []);
 
+  // [5.2.8.a] shell-globalHeader · Primitive · "Active Doc Resolver"
+  // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: state.derive
+  // Notes: Resolves documentation payload for current doc id or null when absent.
+  const activeDoc = useMemo<HeaderDocDefinition | null>(() => {
+    if (!state.activeDocId) {
+      return null;
+    }
+    return resolveHeaderDoc(state.activeDocId);
+  }, [state.activeDocId]);
+
   // [5.2.8] shell-globalHeader · Primitive · "Viewport Flag Derivation"
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: state.derive
   // Notes: Convenience booleans for downstream build concern to avoid repeated comparisons.
@@ -260,6 +278,12 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
         hoveredTab: state.hoveredTab,
         activeDocId: state.activeDocId,
       },
+    },
+    docModal: {
+      visible: Boolean(state.activeDocId && activeDoc),
+      doc: activeDoc,
+      openDoc,
+      closeDoc,
     },
   };
 

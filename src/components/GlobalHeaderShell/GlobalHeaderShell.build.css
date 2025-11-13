@@ -175,6 +175,21 @@
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 
+/* [4.16.a] shell-globalHeader · Utility · "Visually Hidden Text"
+   Concern: BuildStyle · Catalog: utility.accessibility
+   Notes: Preserves tooltip copy for assistive tech without affecting layout. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* [4.17] shell-globalHeader · Primitive · "Publish Button Hover State"
    Concern: BuildStyle · Catalog: state.hover
    Notes: Adds lift and shadow to reinforce interactivity. */

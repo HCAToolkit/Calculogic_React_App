@@ -24,8 +24,8 @@ function InfoIcon({
   onMouseLeave,
   onFocus,
   onBlur,
-  openDoc,
-  closeDoc,
+  onClick,
+  describedById,
 }: {
   label: string;
   docId: string;
@@ -33,26 +33,23 @@ function InfoIcon({
   onMouseLeave: () => void;
   onFocus: () => void;
   onBlur: () => void;
-  openDoc: (docId: string) => void;
-  closeDoc: () => void;
+  onClick: () => void;
+  describedById?: string;
 }) {
   return (
     <button
       type="button"
       className="info-icon"
       aria-label={label}
+      aria-haspopup="dialog"
+      aria-describedby={describedById}
       title={label}
       data-anchor="global-header.tab-info"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      onFocus={() => {
-        onFocus();
-        openDoc(docId);
-      }}
-      onBlur={() => {
-        onBlur();
-        closeDoc();
-      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      onClick={onClick}
     >
       ℹ️
     </button>
@@ -116,7 +113,6 @@ export function GlobalHeaderShell({
   isMobile,
   isTablet,
   openDoc,
-  closeDoc,
 }: GlobalHeaderShellBuildBindings) {
   // [3.6] shell-globalHeader · Primitive · "Brand Tagline"
   // Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
@@ -174,6 +170,7 @@ export function GlobalHeaderShell({
           {tabs.map(tab => {
             const isActive = tab.id === activeTab;
             const isHovered = hoveredTab === tab.id;
+            const infoLabelId = `global-header-tab-${tab.id}-summary`;
             return (
               // [3.9] shell-globalHeader · Subcontainer · "Tab Item Row"
               // Concern: Build · Parent: "Tab List Track" · Catalog: layout.row
@@ -191,20 +188,20 @@ export function GlobalHeaderShell({
                 />
                 <InfoIcon
                   label={tab.hoverSummary}
-                  docId={tab.docId}
                   onMouseEnter={() => {
                     hoverTab(tab.id);
-                    openDoc(tab.docId);
                   }}
                   onMouseLeave={() => {
                     hoverTab(null);
-                    closeDoc();
                   }}
                   onFocus={() => hoverTab(tab.id)}
                   onBlur={() => hoverTab(null)}
-                  openDoc={openDoc}
-                  closeDoc={closeDoc}
+                  onClick={() => openDoc(tab.docId)}
+                  describedById={infoLabelId}
                 />
+                <span id={infoLabelId} className="visually-hidden">
+                  {tab.hoverSummary}
+                </span>
               </div>
             );
           })}
