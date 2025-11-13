@@ -203,7 +203,7 @@
   box-shadow:
     0 16px 40px rgba(5, 8, 20, 0.35),
     0 0 0 1px rgba(255, 255, 255, 0.16);
-  min-width: 5.2rem; /* increased from 4.5rem */
+  min-width: 4.5rem; /* reduced from 5.2rem so dropdown matches tab width */
   width: auto; /* allow menu to fit content while honoring min-width */
   z-index: 3; /* raise so it sits above adjacent UI */
   white-space: normal;
