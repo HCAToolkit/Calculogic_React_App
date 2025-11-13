@@ -11,13 +11,15 @@ import {
   BRAND_TOOLTIP,
   BRAND_WORDMARK,
   BREAKPOINTS,
+  HEADER_MODE_DEFINITIONS,
+  HEADER_MODE_SEQUENCE,
   HEADER_TAB_DEFINITIONS,
   PUBLISH_LABEL,
+  type HeaderModeCatalog,
   type HeaderModeId,
+  type HeaderModeSequence,
   type HeaderTabDefinition,
   type HeaderTabId,
-  resolveHeaderDoc,
-  type HeaderDocDefinition,
 } from './GlobalHeaderShell.knowledge';
 
 // ─────────────────────────────────────────────
@@ -34,6 +36,7 @@ export interface GlobalHeaderShellState {
     results: HeaderModeId;
   };
   hoveredTab: HeaderTabId | null;
+  modeMenuVisibleForTab: HeaderTabId | null;
   viewportBreakpoint: 'desktop' | 'tablet' | 'mobile';
   activeDocId: string | null;
 }
@@ -47,6 +50,8 @@ export interface GlobalHeaderShellBuildBindings extends GlobalHeaderShellState {
   isDesktop: boolean;
   isTablet: boolean;
   isMobile: boolean;
+  modeMetadata: HeaderModeCatalog;
+  modeSequence: HeaderModeSequence;
   brand: {
     wordmark: string;
     tagline: string;
@@ -55,6 +60,7 @@ export interface GlobalHeaderShellBuildBindings extends GlobalHeaderShellState {
   };
   publishLabel: string;
   selectTab: (tab: HeaderTabId) => void;
+  selectTabMode: (tab: 'build' | 'results', mode: HeaderModeId) => void;
   hoverTab: (tab: HeaderTabId | null) => void;
   triggerPublish: () => void;
   openDoc: (docId: string) => void;
@@ -64,16 +70,13 @@ export interface GlobalHeaderShellBuildBindings extends GlobalHeaderShellState {
 export interface GlobalHeaderShellResultsBindings {
   debugPanel: {
     visible: boolean;
-    state: Pick<
-      GlobalHeaderShellState,
-      'activeTab' | 'activeModeByTab' | 'viewportBreakpoint' | 'hoveredTab' | 'activeDocId'
-    >;
-  };
-  docModal: {
-    visible: boolean;
-    doc: HeaderDocDefinition | null;
-    openDoc: (docId: string) => void;
-    closeDoc: () => void;
+    state: {
+      currentActiveTab: HeaderTabId;
+      currentBuildMode: HeaderModeId;
+      currentResultsMode: HeaderModeId;
+      modeMenuVisibleForTab: HeaderTabId | null;
+      viewportBreakpoint: 'desktop' | 'tablet' | 'mobile';
+    };
   };
 }
 
@@ -89,9 +92,19 @@ const DEFAULT_STATE: GlobalHeaderShellState = {
     results: 'default',
   },
   hoveredTab: null,
+  modeMenuVisibleForTab: 'build',
   viewportBreakpoint: 'desktop',
   activeDocId: null,
 };
+
+// [7.1.a] shell-globalHeader · Primitive · "Debug Panel Visibility Flag"
+// Concern: Logic · Catalog: diagnostics.flag
+// Notes: Enables results debug panel in non-production environments while remaining tree-shakeable.
+const DEBUG_PANEL_VISIBLE = !!import.meta.env?.DEV;
+
+function isModeMenuTab(tab: HeaderTabId | null): tab is 'build' | 'results' {
+  return tab === 'build' || tab === 'results';
+}
 
 // [5.1] shell-globalHeader · Primitive · "Viewport Breakpoint Heuristic"
 // Concern: Logic · Catalog: responsive.breakpoint
@@ -149,18 +162,19 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   // Notes: Resets hovered state and mode defaults when switching concerns.
   const selectTab = useCallback((tab: HeaderTabId) => {
     setState(prev => {
-      const nextActiveModeByTab = { ...prev.activeModeByTab };
-      if (tab === 'build') {
-        nextActiveModeByTab.build = 'default';
-      }
-      if (tab === 'results') {
-        nextActiveModeByTab.results = 'default';
+      const nextModeMenuVisibleForTab = isModeMenuTab(tab) ? tab : null;
+      if (
+        prev.activeTab === tab &&
+        prev.hoveredTab === null &&
+        prev.modeMenuVisibleForTab === nextModeMenuVisibleForTab
+      ) {
+        return prev;
       }
       return {
         ...prev,
         activeTab: tab,
         hoveredTab: null,
-        activeModeByTab: nextActiveModeByTab,
+        modeMenuVisibleForTab: nextModeMenuVisibleForTab,
       };
     });
   }, []);
@@ -170,12 +184,53 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   // Notes: Stores hovered tab id while skipping no-op updates.
   const hoverTab = useCallback((tab: HeaderTabId | null) => {
     setState(prev => {
-      if (prev.hoveredTab === tab) {
+      let nextModeMenuVisibleForTab = prev.modeMenuVisibleForTab;
+
+      if (isModeMenuTab(tab)) {
+        nextModeMenuVisibleForTab = tab;
+      } else {
+        const previouslyHovered = prev.hoveredTab;
+        if (isModeMenuTab(previouslyHovered) && prev.activeTab !== previouslyHovered) {
+          nextModeMenuVisibleForTab = isModeMenuTab(prev.activeTab) ? prev.activeTab : null;
+        }
+      }
+
+      if (prev.hoveredTab === tab && prev.modeMenuVisibleForTab === nextModeMenuVisibleForTab) {
         return prev;
       }
+
       return {
         ...prev,
         hoveredTab: tab,
+        modeMenuVisibleForTab: nextModeMenuVisibleForTab,
+      };
+    });
+  }, []);
+
+  // [5.2.4.a] shell-globalHeader · Primitive · "Tab Mode Selection Handler"
+  // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: interaction.handler
+  // Notes: Pins requested tab and updates mode selection while clearing hover state.
+  const selectTabMode = useCallback((tab: 'build' | 'results', mode: HeaderModeId) => {
+    setState(prev => {
+      const currentMode = prev.activeModeByTab[tab];
+      const shouldUpdateMode = currentMode !== mode;
+      const shouldUpdateTab = prev.activeTab !== tab;
+      const shouldClearHover = prev.hoveredTab !== null;
+      const shouldPinMenu = prev.modeMenuVisibleForTab !== tab;
+
+      if (!shouldUpdateMode && !shouldUpdateTab && !shouldClearHover && !shouldPinMenu) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        activeTab: tab,
+        hoveredTab: null,
+        modeMenuVisibleForTab: tab,
+        activeModeByTab: {
+          ...prev.activeModeByTab,
+          [tab]: mode,
+        },
       };
     });
   }, []);
@@ -187,7 +242,6 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
     if (onPublish) {
       onPublish();
     } else {
-      // eslint-disable-next-line no-console
       console.info('Publish triggered from GlobalHeaderShell.');
     }
   }, [onPublish]);
@@ -227,13 +281,6 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   // [5.2.8.a] shell-globalHeader · Primitive · "Active Doc Resolver"
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: state.derive
   // Notes: Resolves documentation payload for current doc id or null when absent.
-  const activeDoc = useMemo<HeaderDocDefinition | null>(() => {
-    if (!state.activeDocId) {
-      return null;
-    }
-    return resolveHeaderDoc(state.activeDocId);
-  }, [state.activeDocId]);
-
   // [5.2.8] shell-globalHeader · Primitive · "Viewport Flag Derivation"
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: state.derive
   // Notes: Convenience booleans for downstream build concern to avoid repeated comparisons.
@@ -251,6 +298,8 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
     isDesktop,
     isTablet,
     isMobile,
+    modeMetadata: HEADER_MODE_DEFINITIONS,
+    modeSequence: HEADER_MODE_SEQUENCE,
     brand: {
       wordmark: BRAND_WORDMARK,
       tagline: BRAND_TAGLINE,
@@ -259,6 +308,7 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
     },
     publishLabel: PUBLISH_LABEL,
     selectTab,
+    selectTabMode,
     hoverTab,
     triggerPublish,
     openDoc,
@@ -270,20 +320,14 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   // Notes: Exposes debug surface visibility plus current header state snapshot.
   const resultsBindings: GlobalHeaderShellResultsBindings = {
     debugPanel: {
-      visible: false,
+      visible: DEBUG_PANEL_VISIBLE,
       state: {
-        activeTab: state.activeTab,
-        activeModeByTab: state.activeModeByTab,
+        currentActiveTab: state.activeTab,
+        currentBuildMode: state.activeModeByTab.build,
+        currentResultsMode: state.activeModeByTab.results,
+        modeMenuVisibleForTab: state.modeMenuVisibleForTab,
         viewportBreakpoint: state.viewportBreakpoint,
-        hoveredTab: state.hoveredTab,
-        activeDocId: state.activeDocId,
       },
-    },
-    docModal: {
-      visible: Boolean(state.activeDocId && activeDoc),
-      doc: activeDoc,
-      openDoc,
-      closeDoc,
     },
   };
 

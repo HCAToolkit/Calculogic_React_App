@@ -30,7 +30,28 @@ export interface HeaderTabDefinition {
   hoverSummary: string;
 }
 
-// [6.2.a] shell-globalHeader · Primitive · "Header Documentation Link Schema"
+// [6.1.a] shell-globalHeader · Primitive · "Header Tab Map Entry"
+// Concern: Knowledge · Catalog: schema.definition
+// Notes: Stores per-tab metadata without repeating the identifier key.
+export type HeaderTabMapEntry = Omit<HeaderTabDefinition, 'id'>;
+
+// [6.2] shell-globalHeader · Primitive · "Header Mode Definition Schema"
+// Concern: Knowledge · Catalog: schema.definition
+// Notes: Encapsulates metadata for Build and Results mode selections.
+export interface HeaderModeDefinition {
+  id: HeaderModeId;
+  label: string;
+  description: string;
+  docId?: string;
+  hoverSummary?: string;
+}
+
+export type HeaderModeGroupId = 'build' | 'results';
+
+export type HeaderModeGroup = Record<HeaderModeId, HeaderModeDefinition>;
+export type HeaderModeCatalog = Record<HeaderModeGroupId, HeaderModeGroup>;
+
+// [6.5.a] shell-globalHeader · Primitive · "Header Documentation Link Schema"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Associates documentation links for cross-navigation inside modal output.
 export interface HeaderDocLink {
@@ -39,7 +60,7 @@ export interface HeaderDocLink {
   description?: string;
 }
 
-// [6.2.b] shell-globalHeader · Primitive · "Header Documentation Section Schema"
+// [6.5.b] shell-globalHeader · Primitive · "Header Documentation Section Schema"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Breaks documentation body into digestible headings and copy blocks.
 export interface HeaderDocSection {
@@ -47,7 +68,7 @@ export interface HeaderDocSection {
   body: string[];
 }
 
-// [6.2.c] shell-globalHeader · Primitive · "Header Documentation Definition"
+// [6.5.c] shell-globalHeader · Primitive · "Header Documentation Definition"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Source of truth for documentation payload consumed by results concern modal.
 export interface HeaderDocDefinition {
@@ -60,41 +81,89 @@ export interface HeaderDocDefinition {
   links?: HeaderDocLink[];
 }
 
-// [6.3] shell-globalHeader · Primitive · "Header Tab Knowledge Base"
+// [6.1.b] shell-globalHeader · Primitive · "Header Tab Knowledge Base"
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Canonical list of header tabs sorted by `order`.
-export const HEADER_TAB_DEFINITIONS: HeaderTabDefinition[] = [
-  {
-    id: 'build',
+export const HEADER_TAB_MAP: Record<HeaderTabId, HeaderTabMapEntry> = {
+  build: {
     label: 'Build',
     order: 1,
     docId: 'doc-build',
-    hoverSummary: 'Define and arrange containers, sub-containers, and atomic components.',
+    hoverSummary: 'Owns and arranges structure: containers, sub-containers, and atomic components.',
   },
-  {
-    id: 'logic',
+  logic: {
     label: 'Logic',
     order: 2,
     docId: 'doc-logic',
-    hoverSummary: 'Add calculations, conditions, and interaction rules.',
+    hoverSummary: 'Defines calculations, conditions, validation rules, and interactions.',
   },
-  {
-    id: 'knowledge',
+  knowledge: {
     label: 'Knowledge',
     order: 3,
     docId: 'doc-knowledge',
-    hoverSummary: 'Store reusable traits, constants, and reference schemas.',
+    hoverSummary: 'Stores reusable traits, constants, and reference schemas.',
   },
-  {
-    id: 'results',
+  results: {
     label: 'Results',
     order: 4,
     docId: 'doc-results',
-    hoverSummary: 'Design and inspect derived outputs, scores, and summaries.',
+    hoverSummary: 'Derived outputs and summaries produced from structure + logic + knowledge.',
   },
-];
+};
 
-// [6.4] shell-globalHeader · Primitive · "Breakpoint Definition Schema"
+export const HEADER_TAB_DEFINITIONS: HeaderTabDefinition[] = Object.entries(HEADER_TAB_MAP)
+  .map(([id, entry]) => ({ id: id as HeaderTabId, ...entry }))
+  .sort((a, b) => a.order - b.order);
+
+// [6.2.a] shell-globalHeader · Primitive · "Header Mode Metadata Catalog"
+// Concern: Knowledge · Catalog: data.collection
+// Notes: Provides labels and descriptions for Build and Results mode selectors.
+export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
+  build: {
+    default: {
+      id: 'default',
+      label: 'Build',
+      description: 'Define and arrange containers, sub-containers, and atomic components.',
+      docId: 'doc-build',
+      hoverSummary: 'Build mode focuses on the structural hierarchy and anchor placement.',
+    },
+    style: {
+      id: 'style',
+      label: 'Build /Style',
+      description: 'Configure layout-affecting style for Build outputs (grouping, alignment, sizing).',
+      docId: 'doc-build',
+      hoverSummary: 'Style the structural outputs without mutating the canonical container tree.',
+    },
+  },
+  results: {
+    default: {
+      id: 'default',
+      label: 'Results',
+      description: 'Design and inspect derived outputs, scores, and summaries.',
+      docId: 'doc-results',
+      hoverSummary: 'Review the derived outputs before sharing or publishing.',
+    },
+    style: {
+      id: 'style',
+      label: 'Results /Style',
+      description: 'Configure layout-affecting style for Results outputs (cards, grouping, highlight rules).',
+      docId: 'doc-results',
+      hoverSummary: 'Adjust the presentation for results without redefining calculations.',
+    },
+  },
+};
+
+// [6.2.b] shell-globalHeader · Primitive · "Header Mode Sequence"
+// Concern: Knowledge · Catalog: data.collection
+// Notes: Preserves canonical ordering when rendering mode options.
+export type HeaderModeSequence = Record<HeaderModeGroupId, HeaderModeId[]>;
+
+export const HEADER_MODE_SEQUENCE: HeaderModeSequence = {
+  build: ['default', 'style'],
+  results: ['default', 'style'],
+};
+
+// [6.3] shell-globalHeader · Primitive · "Breakpoint Definition Schema"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Structure for responsive breakpoint metadata.
 export interface BreakpointDefinition {
@@ -102,7 +171,7 @@ export interface BreakpointDefinition {
   minWidth: number;
 }
 
-// [6.5] shell-globalHeader · Primitive · "Responsive Breakpoint Catalog"
+// [6.3.a] shell-globalHeader · Primitive · "Responsive Breakpoint Catalog"
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Breakpoint ordering aligns with logic heuristic priority.
 export const BREAKPOINTS: BreakpointDefinition[] = [
@@ -111,27 +180,27 @@ export const BREAKPOINTS: BreakpointDefinition[] = [
   { name: 'mobile', minWidth: 0 },
 ];
 
-// [6.6] shell-globalHeader · Primitive · "Brand Wordmark Copy"
+// [6.4] shell-globalHeader · Primitive · "Brand Wordmark Copy"
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Brand name presented inside header link.
 export const BRAND_WORDMARK = 'Calculogic';
 
-// [6.7] shell-globalHeader · Primitive · "Brand Tagline Copy"
+// [6.4.a] shell-globalHeader · Primitive · "Brand Tagline Copy"
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Supportive phrase rendered conditionally in build concern.
 export const BRAND_TAGLINE = 'a system for creating systems';
 
-// [6.8] shell-globalHeader · Primitive · "Brand Tooltip Copy"
+// [6.4.b] shell-globalHeader · Primitive · "Brand Tooltip Copy"
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Tooltip content reinforcing link destination.
 export const BRAND_TOOLTIP = 'Return to Calculogic home / dashboard.';
 
-// [6.9] shell-globalHeader · Primitive · "Publish Label Copy"
+// [6.4.c] shell-globalHeader · Primitive · "Publish Label Copy"
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Publish CTA text consumed by build concern.
 export const PUBLISH_LABEL = 'Publish';
 
-// [6.10] shell-globalHeader · Primitive · "Header Documentation Definitions"
+// [6.5.d] shell-globalHeader · Primitive · "Header Documentation Definitions"
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Encodes contextual documentation surfaced via info icon modal per concern.
 export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
@@ -305,7 +374,7 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
   },
 };
 
-// [6.11] shell-globalHeader · Primitive · "Header Documentation Resolver"
+// [6.5.e] shell-globalHeader · Primitive · "Header Documentation Resolver"
 // Concern: Knowledge · Catalog: data.accessor
 // Notes: Provides safe lookup for modal consumption with null fallback when docId is unknown.
 export function resolveHeaderDoc(docId: string): HeaderDocDefinition | null {
