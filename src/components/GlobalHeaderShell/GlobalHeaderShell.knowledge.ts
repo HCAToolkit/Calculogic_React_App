@@ -129,7 +129,7 @@ export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
     },
     style: {
       id: 'style',
-      label: 'Build /Style',
+      label: 'Style',
       description: 'Configure layout-affecting style for Build outputs (grouping, alignment, sizing).',
       docId: 'doc-build',
       hoverSummary: 'Style the structural outputs without mutating the canonical container tree.',
@@ -145,7 +145,7 @@ export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
     },
     style: {
       id: 'style',
-      label: 'Results /Style',
+      label: 'Style',
       description: 'Configure layout-affecting style for Results outputs (cards, grouping, highlight rules).',
       docId: 'doc-results',
       hoverSummary: 'Adjust the presentation for results without redefining calculations.',
