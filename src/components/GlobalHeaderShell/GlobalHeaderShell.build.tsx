@@ -307,9 +307,6 @@ export function GlobalHeaderShell({
               : isResultsTab
               ? modeMetadata.results[activeModeId ?? 'default']
               : null;
-            const shouldShowModeIndicator =
-              (isBuildTab || isResultsTab) && activeModeDefinition && activeModeId === 'style';
-
             return (
               // [3.9] shell-globalHeader · Subcontainer · "Tab Item Row"
               // Concern: Build · Parent: "Tab List Track" · Catalog: layout.row
@@ -318,7 +315,11 @@ export function GlobalHeaderShell({
                 key={tab.id}
                 className={`tab-list__item${shouldShowModeMenu ? ' tab-list__item--has-menu' : ''}`}
                 data-anchor={`global-header.tab-${tab.id}`}
-                data-mode={shouldShowModeIndicator ? activeModeDefinition.id : undefined}
+                data-mode={
+                  (isBuildTab || isResultsTab) && activeModeDefinition?.id === 'style'
+                    ? activeModeDefinition.id
+                    : undefined
+                }
                 onMouseEnter={() => hoverTab(tab.id)}
                 onMouseLeave={() => hoverTab(null)}
                 onFocus={() => hoverTab(tab.id)}
@@ -350,15 +351,6 @@ export function GlobalHeaderShell({
                 <span id={infoLabelId} className="visually-hidden">
                   {tab.hoverSummary}
                 </span>
-                {shouldShowModeIndicator && activeModeDefinition && (
-                  <span
-                    className="tab-mode-indicator"
-                    data-anchor={`global-header.tab-${tab.id}.mode-indicator`}
-                    aria-live={isActive ? 'polite' : undefined}
-                  >
-                    {activeModeDefinition.label} mode active
-                  </span>
-                )}
                 {isBuildTab && shouldShowModeMenu && (
                   <BuildModeMenu
                     activeMode={activeModeByTab.build}
