@@ -43,6 +43,7 @@ function InfoIcon({
       aria-label={label}
       aria-haspopup="dialog"
       aria-describedby={describedById}
+      data-doc-id={docId}
       title={label}
       data-anchor="global-header.tab-info"
       onMouseEnter={onMouseEnter}
@@ -188,6 +189,7 @@ export function GlobalHeaderShell({
                 />
                 <InfoIcon
                   label={tab.hoverSummary}
+                  docId={tab.docId}
                   onMouseEnter={() => {
                     hoverTab(tab.id);
                   }}
