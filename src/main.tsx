@@ -1,22 +1,16 @@
 /**
- * Concern: ClientBootstrap
- * Layer: Build
- * BuildIndex: 00.00
- * AttachesTo: #root
- * Responsibility: Mount the Calculogic React tree with StrictMode safeguards.
- * Invariants: Root element exists before mount, StrictMode wraps the entire tree.
+ * CCPP: shell-spaHost
+ * Concern: Build
+ * Reference: doc/nl-shell/shell-spaHost.md
+ * Responsibility: Acquire the #root anchor and mount <App /> within <StrictMode>.
  */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// [Section 00.10] ReactRootMount
-// Purpose: Provide deterministic bootstrapping for the single-page app.
-// Inputs: document.getElementById('root')
-// Outputs: React root rendering of <App />
-// Constraints: Remains synchronous to satisfy Vite's client hydration.
-
+// [3] Build — shell-spaHost
+// [3.1] React Root Mount — Invoke createRoot on #root and render <App /> inside <StrictMode>.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
