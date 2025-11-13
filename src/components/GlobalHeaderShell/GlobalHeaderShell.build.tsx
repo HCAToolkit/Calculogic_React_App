@@ -19,6 +19,7 @@ import type { GlobalHeaderShellBuildBindings } from './GlobalHeaderShell.logic';
 // Notes: Shares hover state with tab button while exposing hover summary.
 function InfoIcon({
   label,
+  docId,
   onMouseEnter,
   onMouseLeave,
   onFocus,
@@ -27,6 +28,7 @@ function InfoIcon({
   describedById,
 }: {
   label: string;
+  docId: string;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onFocus: () => void;
