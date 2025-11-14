@@ -20,6 +20,7 @@ Calculogic delivers three experiences in parallel:
 - **Directional Dependencies** – Build feeds BuildStyle and Logic; Logic feeds Results; Knowledge informs every layer; Results in turn inform ResultsStyle; cycles are forbidden.
 - **Stable Anchors** – Every layer exposes deliberate anchors (names, classes, or data attributes) for downstream references.
 - **Layer Purity** – Build handles structure, BuildStyle handles appearance of configuration surfaces, Logic handles interaction/state, Knowledge handles reference content, Results handles derived feedback, and ResultsStyle handles presentation of those results.
+- **Implementation Mapping** – Build and Results concerns are implemented in `.tsx` structure files (for example `Something.build.tsx` or `Something.results.tsx`), BuildStyle and ResultsStyle live in CSS or CSS-Module files (for example `Something.build.module.css` or `Something.results.css`), Logic sits in `.ts`/`.tsx` logic files, and Knowledge resides in `.ts` static data modules. BuildStyle and ResultsStyle rely on class names and data attributes emitted by the React structure concerns.
 - **Locality & Monotonic Diffs** – Each concern is self-contained, and changes cascade predictably in a single direction.
 
 ## JSON-First Operation
@@ -32,11 +33,11 @@ Cloning behaves like Git branching. Users fork Build, BuildStyle, Logic, and Kno
 
 ## Practical Example: Enneagram Test
 - **Build Tab** – Assemble configurations (e.g., checkbox + slider) and validate identifiers and trait links.
-- **BuildStyle Tab** – Customize appearance of configuration surfaces via atomic CSS properties.
+- **BuildStyle Tab** – Customize appearance of configuration surfaces via atomic CSS properties maintained in CSS or CSS-Module files.
 - **Logic Tab** – Define conditionals, such as `slider-empathy.value > 7`.
 - **Knowledge Tab** – Centralize reference data and static instructional copy for the configuration.
 - **Results Tab** – Calculate personality outcomes from user responses.
-- **ResultsStyle Tab** – Present computed outcomes in a consistent, styled surface.
+- **ResultsStyle Tab** – Present computed outcomes in a consistent, styled surface by applying CSS or CSS-Module styling hooks exposed by the Results structures.
 
 ## Educational & Systemic Goals
 Calculogic transforms form building into a hands-on coding lesson. Each tab enforces separation of concerns while guaranteeing interoperability, supporting sharing, cloning, and officialization across the system.

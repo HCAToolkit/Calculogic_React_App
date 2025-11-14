@@ -53,6 +53,7 @@ Embeds the Build tab configuration via a mount anchor and coordinates with the g
 ## 4. BuildStyle Concern (Visual Styling of Structure)
 ### 4.0 Dependencies
 - Consumes project tokens for color, spacing, typography.
+- Implemented in CSS or CSS-Module files that target anchors emitted by the Build concern.
 
 ### 4.1 Atomic Components — Containers / Groups (BuildStyle)
 - **[4.1.1] Container – "Frame Surface Styling"**
@@ -132,14 +133,14 @@ Embeds the Build tab configuration via a mount anchor and coordinates with the g
 ## 9. Assembly Pattern
 ### 9.1 File Structure
 - src/configs/appFrame/AppFrame.build.tsx
-- src/configs/appFrame/AppFrame.buildStyle.tsx
+- src/configs/appFrame/AppFrame.build.module.css
 - src/configs/appFrame/AppFrame.logic.ts
 - src/configs/appFrame/AppFrame.knowledge.ts
 - (No Results/ResultsStyle files until required)
 - src/configs/appFrame/index.ts
 
 ### 9.2 Assembly Logic
-- `index.ts` re-exports the frame component assembled from Build + Logic and wires BuildStyle/Knowledge imports.
+- `index.ts` re-exports the frame component assembled from Build + Logic and wires BuildStyle CSS modules and Knowledge imports.
 
 ### 9.3 Integration
 - Mounted by shell-spaHost within the root application container; provides mount slot for cfg-buildSurface and other main-pane configs.

@@ -83,6 +83,8 @@ TS/TSX/JS: /** ... */ for file header; // ... for everything else.
 
 CSS: /* ... */ for file and atomic comments; still match NL numbers.
 
+Remember the concern-to-file mapping: Build/Results use `.tsx` structure files, BuildStyle/ResultsStyle are CSS or CSS-Module files that consume the anchors emitted by those structures, Logic lives in `.ts`/`.tsx` modules, and Knowledge is `.ts` data. Comment styles must match the host language.
+
 JSON: no comments; if needed, keep a .meta or .md doc instead.
 
 Markdown docs: NL skeletons themselves.

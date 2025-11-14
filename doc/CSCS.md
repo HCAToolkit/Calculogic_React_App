@@ -43,13 +43,13 @@ ResultsStyle – styling of results; no structure, no logic.
 Folder mapping
 
 - Build → files like src/configs/<configId>/<ConfigName>.build.tsx or src/shells/<shellId>/<ShellName>.build.tsx
-- BuildStyle → files like src/configs/<configId>/<ConfigName>.buildStyle.tsx
-- Logic → files like src/configs/<configId>/<ConfigName>.logic.ts
+- BuildStyle → CSS or CSS-Module files like src/configs/<configId>/<ConfigName>.build.module.css or src/shells/<shellId>/<ShellName>.build.css
+- Logic → files like src/configs/<configId>/<ConfigName>.logic.ts (or `.logic.tsx` when React hooks are required)
 - Knowledge → files like src/configs/<configId>/<ConfigName>.knowledge.ts
-- Results → files like src/configs/<configId>/<ConfigName>.results.ts
-- ResultsStyle → files like src/configs/<configId>/<ConfigName>.resultsStyle.tsx
+- Results → files like src/configs/<configId>/<ConfigName>.results.ts (or `.results.tsx` when JSX is emitted)
+- ResultsStyle → CSS or CSS-Module files like src/configs/<configId>/<ConfigName>.results.module.css or src/shells/<shellId>/<ShellName>.results.css
 
-Shells follow the same pattern within src/shells/<shellId>/, sharing the same base name across all concern files.
+Shells follow the same pattern within src/shells/<shellId>/, sharing the same base name across all concern files. BuildStyle and ResultsStyle are implemented as CSS/CSS-Module files; the corresponding Build and Results `.tsx` components expose the class names and data attributes that those styles consume.
 
 Structure source and fallbacks
 

@@ -32,6 +32,8 @@ Atomic Components (Containers, Subcontainers, Primitives) with numbering (3.1, 3
 
 Assembly pattern and implementation passes
 
+Implementation reminder: Build and Results concerns are authored in `.tsx` structure files, BuildStyle and ResultsStyle live in CSS or CSS-Module files, Logic occupies `.ts`/`.tsx` logic modules, and Knowledge resides in `.ts` static data modules. BuildStyle and ResultsStyle rely on the class names and data attributes emitted by their paired structure concerns.
+
 Only after the NL file exists and is filled in may the AI:
 
 Create or edit any concern files under src/builder/...

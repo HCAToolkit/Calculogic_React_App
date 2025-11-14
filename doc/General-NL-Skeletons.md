@@ -20,7 +20,7 @@ A Configuration is a semantic module, not a file.
 It spans up to six concerns: Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle.
 
 
-Per-configuration implementation files live under paths like src/configs/<configId>/<ConfigName>.build.tsx, src/configs/<configId>/<ConfigName>.buildStyle.tsx, and the other concern files with matching base names. The engine or build step may merge those into project-level bundles such as src/projects/<projectId>/Project.build.tsx.
+Per-configuration implementation files live under paths like src/configs/<configId>/<ConfigName>.build.tsx (structure), src/configs/<configId>/<ConfigName>.build.module.css (configuration styling), and the other concern files with matching base names. The engine or build step may merge those into project-level bundles such as src/projects/<projectId>/Project.build.tsx. BuildStyle and ResultsStyle are implemented as CSS/CSS-Module files that target the anchors emitted by the Build and Results `.tsx` concerns.
 
 
 All content of a configuration is expressed as Atomic Components.
@@ -291,11 +291,11 @@ Styling for debug overlays/panels.
 9.1 File Structure (implementation pattern; configuration still semantic)
 /src/configs/[config-id]/[ConfigName]/
   [ConfigName].build.tsx
-  [ConfigName].buildStyle.tsx
+  [ConfigName].build.module.css
   [ConfigName].logic.ts
   [ConfigName].knowledge.ts
   [ConfigName].results.ts
-  [ConfigName].resultsStyle.tsx
+  [ConfigName].results.module.css
   index.ts
 9.2 Assembly Logic
 index.tsx wires concerns together and exports a single component that implements this configuration.
@@ -486,11 +486,11 @@ Tab change messages, mode change messages.
 9.1 File Structure
 /src/shells/[shell-id]/[ShellName]/
   [ShellName].build.tsx
-  [ShellName].buildStyle.tsx
+  [ShellName].build.module.css
   [ShellName].logic.ts
   [ShellName].knowledge.ts
   [ShellName].results.tsx
-  [ShellName].resultsStyle.tsx
+  [ShellName].results.module.css
   index.ts
 9.2 Assembly Logic
 Hook for logic, build component for structure, knowledge/constants, optional results debug.

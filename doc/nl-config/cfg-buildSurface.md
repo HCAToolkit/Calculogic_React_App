@@ -92,6 +92,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 ## 4. BuildStyle Concern (Visual Styling of Structure)
 ### 4.0 Dependencies
 - Consumes project tokens for colors, typography, spacing, and border radii.
+- Implemented in CSS or CSS-Module files that target anchors emitted by the Build concern.
 
 ### 4.1 Atomic Components — Containers / Groups (BuildStyle)
 - **[4.1.1] Container – "Surface Chrome Styling"**
@@ -229,14 +230,14 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 ## 9. Assembly Pattern
 ### 9.1 File Structure
 - src/tabs/build/BuildSurface.build.tsx
-- src/tabs/build/BuildSurface.buildStyle.tsx
+- src/tabs/build/BuildSurface.build.module.css
 - src/tabs/build/BuildSurface.logic.ts
 - src/tabs/build/BuildSurface.knowledge.ts
 - (Results and ResultsStyle files will be added when outputs exist.)
 - src/tabs/build/index.ts
 
 ### 9.2 Assembly Logic
-- `src/tabs/build/index.tsx` composes Build with Logic bindings, imports BuildStyle for side effects, and re-exports the assembled component.
+- `src/tabs/build/index.tsx` composes Build with Logic bindings, imports BuildStyle CSS modules for side effects, and re-exports the assembled component.
 
 ### 9.3 Integration
 - Imported by cfg-appFrame via its `[3.3.2]` Build Tab Mount primitive and swapped by shell-globalHeader navigation.

@@ -42,6 +42,7 @@ Coordinates with build tooling to ensure hydration entry points, but delegates n
 ## 4. BuildStyle Concern (Visual Styling of Structure)
 ### 4.0 Dependencies
 - No theme tokens; uses neutral baseline values only.
+- Implemented in CSS or CSS-Module files that target document/root anchors emitted by the Build concern.
 
 ### 4.1 Atomic Components — Containers / Groups (BuildStyle)
 - None.
@@ -107,11 +108,11 @@ Coordinates with build tooling to ensure hydration entry points, but delegates n
 ## 9. Assembly Pattern
 ### 9.1 File Structure
 - src/shells/spaHost/SpaHost.build.tsx
-- src/shells/spaHost/SpaHost.buildStyle.ts
+- src/shells/spaHost/SpaHost.build.css
 - src/shells/spaHost/index.ts
 
 ### 9.2 Assembly Logic
-- `src/shells/spaHost/index.ts` calls the Build primitive to mount the React tree and imports BuildStyle for global baseline CSS.
+- `src/shells/spaHost/index.ts` calls the Build primitive to mount the React tree and imports the BuildStyle CSS file for global baseline rules.
 
 ### 9.3 Integration
 - Entry point referenced by src/main.tsx (or equivalent) to bootstrap the Calculogic application.

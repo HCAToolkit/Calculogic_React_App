@@ -83,6 +83,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
 ## 4. BuildStyle Concern (Visual Styling of Structure)
 ### 4.0 Dependencies
 - Consumes design tokens for spacing, typography, and color from cfg-appFrame knowledge exports.
+- Implemented in CSS or CSS-Module files that target anchors emitted by the Build concern.
 
 ### 4.1 Atomic Components — Containers / Groups (BuildStyle)
 - **[4.1.1] Container – "Shell Frame Layout"**
@@ -210,6 +211,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
 - Provide `aria-live="polite"` announcements when publish action completes (future extension).
 
 ## 8. ResultsStyle Concern (Output Styling)
+ResultsStyle styling lives in CSS or CSS-Module files that target the debug/result anchors emitted by the Results concern.
 ### 8.1 Results Layout Styles
 - **[8.1.1] Primitive – "Debug Panel Styling"**
   - Visual treatment for debug panel: background tint, typography, spacing.
@@ -220,15 +222,15 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
 ## 9. Assembly Pattern
 ### 9.1 File Structure
 - src/shells/globalHeader/GlobalHeader.build.tsx
-- src/shells/globalHeader/GlobalHeader.buildStyle.tsx
+- src/shells/globalHeader/GlobalHeader.build.module.css
 - src/shells/globalHeader/GlobalHeader.logic.ts
 - src/shells/globalHeader/GlobalHeader.knowledge.ts
 - src/shells/globalHeader/GlobalHeader.results.tsx
-- src/shells/globalHeader/GlobalHeader.resultsStyle.tsx
+- src/shells/globalHeader/GlobalHeader.results.module.css
 - src/shells/globalHeader/index.ts
 
 ### 9.2 Assembly Logic
-- `src/shells/globalHeader/index.ts` composes Build with Logic hook outputs, imports BuildStyle for side effects, and exports Results/ResultsStyle components for optional mounting.
+- `src/shells/globalHeader/index.ts` composes Build with Logic hook outputs, imports BuildStyle CSS modules for side effects, and exports Results components alongside optional ResultsStyle CSS modules.
 
 ### 9.3 Integration
 - Mounted inside shell-spaHost above cfg-appFrame; publishes selected concern id to cfg-appFrame for tab swapping.
