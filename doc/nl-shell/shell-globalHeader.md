@@ -1,137 +1,250 @@
 # shell-globalHeader – Global Header Shell
 
-## 1. Purpose
+This document is an instance of the ProjectShell-Level NL Skeleton defined in ../General-NL-Skeletons.md.
+
+## 1. Purpose and Scope
+### 1.1 Purpose
 Provide a reusable header shell that anchors Calculogic experiences with brand identity, primary concern navigation, and a publish action surface.
 
-## 2. Scope
-### In-Scope
-- Three-zone header frame covering brand, concern tabs, and publish action.
-- Responsive visibility and layout adjustments across desktop, tablet, and mobile breakpoints.
-- Debug surface exposing live header state when requested.
+### 1.2 Context
+Wraps the top of the single-page application hosted by shell-spaHost and appears above cfg-appFrame.
 
-### Out-of-Scope
-- Downstream concern bodies, configuration dashboards, or document modals triggered from header actions.
-- Theme token definitions beyond local CSS variables.
-- Global routing or application-level state beyond header interaction state.
+### 1.3 Interactions
+Coordinates with cfg-appFrame to mount the active configuration, routes publish actions to downstream handlers, and exposes navigation state to other shells.
 
-## 3. Concern Responsibilities
-- **Build**: Compose semantic DOM structure for the header frame, tab interactions, and publish CTA.
-- **BuildStyle**: Style the header shell, zones, and interactive affordances across breakpoints.
-- **Logic**: Manage active/hovered tabs, breakpoint detection, document toggles, and publish dispatching.
-- **Knowledge**: Define canonical tabs, copy, and breakpoint metadata consumed by the shell.
-- **Results**: Render optional debug panel reflecting the shell's live interaction state.
-- **ResultsStyle**: Style the debug panel to align with the shell's aesthetic without overpowering core UI.
+## 2. Configuration Contracts
+### 2.1 TypeScript Interfaces
+- `GlobalHeaderProps` – Props for supplying publish callbacks and optional debug toggles.
+- `GlobalHeaderState` – Shape describing active tab, hovered tab, breakpoint flags, and debug state.
 
-## 4. Anchors
-- `global-header` – root header shell wrapper.
-- `global-header.brand` – brand identity zone container.
-- `global-header.brand-logo` – brand glyph span for iconography.
-- `global-header.brand-wordmark` – textual brand label.
-- `global-header.brand-tagline` – optional supporting copy.
-- `global-header.tabs` – navigation zone for concern tabs.
-- `global-header.tab-{id}` – individual tab row wrapper.
-- `global-header.tab-info` – info icon exposing hover summary content.
-- `global-header.publish` – publish zone wrapper.
-- `global-header.publish-button` – actionable publish trigger.
-- `global-header.debug` – debug panel container (results concern).
+### 2.2 Global State Requirements
+- Consumes optional `onPublish` handler provided by parent shell or host.
+- Reads responsive breakpoint information derived from window size (local to this shell).
 
-## 5. Inputs
-- `HEADER_TAB_DEFINITIONS` knowledge constants describing concern tabs.
-- Breakpoint definitions for desktop, tablet, and mobile widths.
-- Brand copy constants for wordmark, tagline, tooltip, and home route.
-- Optional `onPublish` callback supplied by downstream host.
+### 2.3 Routing & Context
+- Relies on shell-spaHost for SPA routing; does not manipulate URLs directly.
+- Exposes selected concern id for cfg-appFrame to mount the matching configuration.
 
-## 6. Outputs
-- Header DOM structure with correctly annotated anchors and ARIA roles.
-- Responsive CSS ensuring header readability and interaction affordances.
-- Publish handler invocation or console notice when callback absent.
-- Debug panel surface (when enabled) presenting active header state.
+## 3. Build Concern (Structure)
+### 3.0 Dependencies & Hierarchy Notes
+- Mounts within shell-spaHost and sits above cfg-appFrame.
+- Provides anchors `global-header.*` for styling, logic, and Results concerns.
 
-## 7. Invariants
-- Tab order always matches knowledge definitions after sort by `order`.
-- Exactly one tab is marked active; hovered tab resets on selection and close events.
-- Publish button remains accessible with semantic `<button>` element.
-- Breakpoint detection relies exclusively on viewport width and updates on resize.
-- Debug panel remains hidden by default and mirrors build concern state when shown.
+### 3.1 Atomic Components — Containers (Build)
+- **[3.1.1] Container – "Global Header Shell Frame"**
+  - Element: `<header>`
+  - Anchor: `data-anchor="global-header"`
+  - Children: `[3.2.1] Brand Identity Zone`, `[3.2.2] Tab Navigation Zone`, `[3.2.3] Publish Action Zone`.
+- **[3.1.2] Container – "Tab List Track"**
+  - Element: `<div role="tablist">`
+  - Anchor: `data-anchor="global-header.tabs"`
+  - Children: `[3.2.4] Tab Item Row` instances.
 
-## 8. Dependencies
-- React with hooks (`useState`, `useEffect`, `useCallback`, `useMemo`).
-- Browser `window` API for resize events (guarded for SSR).
-- CSS custom properties supplied by host theme (fallbacks included).
+### 3.2 Atomic Components — Subcontainers (Build)
+- **[3.2.1] Subcontainer – "Brand Identity Zone"**
+  - Anchor: `data-anchor="global-header.brand"`
+  - Children: `[3.3.1] Brand Home Link`, `[3.3.2] Brand Logo Glyph`, `[3.3.3] Brand Wordmark`, `[3.3.4] Brand Tagline`.
+- **[3.2.2] Subcontainer – "Tab Navigation Zone"**
+  - Anchor: `data-anchor="global-header.tabs-zone"`
+  - Purpose: Flex wrapper aligning tab list between brand and publish zones.
+- **[3.2.3] Subcontainer – "Publish Action Zone"**
+  - Anchor: `data-anchor="global-header.publish"`
+  - Children: `[3.3.8] Publish Button`.
+- **[3.2.4] Subcontainer – "Tab Item Row"**
+  - Anchor pattern: `data-anchor="global-header.tab-{id}"`
+  - Children: `[3.3.5] Primary Tab Button`, `[3.3.6] Tab Info Icon`.
+- **[3.2.5] Subcontainer – "Debug Panel Container"**
+  - Anchor: `data-anchor="global-header.debug"`
+  - Purpose: Hosts Results concern output when enabled.
 
-## 9. Atomic Components
-### 3. Build – shell-globalHeader
-- **[3.1] Container – "Global Header Shell Frame"**: `<header>` root establishing shell anchors and landmark semantics.
-- **[3.2] Subcontainer – "Brand Identity Zone"**: Brand zone wrapper balancing glyph, wordmark, and optional tagline.
-- **[3.3] Primitive – "Brand Home Link"**: Anchor routing to home with tooltip and accessible labeling.
-- **[3.4] Primitive – "Brand Logo Glyph"**: Emoji span providing recognizable glyph, hidden from assistive tech.
-- **[3.5] Primitive – "Brand Wordmark Label"**: Text span presenting the Calculogic name.
-- **[3.6] Primitive – "Brand Tagline"**: Optional supporting copy hidden on constrained breakpoints.
-- **[3.7] Subcontainer – "Tab Navigation Zone"**: Wrapper aligning tab list centrally while flexing between brand/publish zones.
-- **[3.8] Subcontainer – "Tab List Track"**: `role="tablist"` container enabling keyboard navigation semantics.
-- **[3.9] Subcontainer – "Tab Item Row"**: Wrapper combining tab button and info icon per concern.
-- **[3.10] Primitive – "Primary Tab Button"**: `role="tab"` button toggling active concern.
-- **[3.11] Primitive – "Tab Info Icon"**: Button exposing hover summary and reinforcing accessible labeling.
-- **[3.12] Subcontainer – "Publish Action Zone"**: Right-aligned zone holding the publish CTA.
-- **[3.13] Primitive – "Publish Button"**: High-contrast CTA dispatching publish intent.
+### 3.3 Atomic Components — Primitives (Build)
+- **[3.3.1] Primitive – "Brand Home Link"**
+  - Element: `<a>`
+  - Attributes: `href="/"`, `aria-label` from Knowledge.
+- **[3.3.2] Primitive – "Brand Logo Glyph"**
+  - Element: `<span aria-hidden="true">`
+  - Content: Emoji or SVG glyph.
+- **[3.3.3] Primitive – "Brand Wordmark Label"**
+  - Element: `<span>` with accessible text.
+- **[3.3.4] Primitive – "Brand Tagline"**
+  - Element: `<span>` optional supporting copy with `data-anchor="global-header.brand-tagline"`.
+- **[3.3.5] Primitive – "Primary Tab Button"**
+  - Element: `<button role="tab">`
+  - Data attributes: `data-tab-id`.
+- **[3.3.6] Primitive – "Tab Info Icon"**
+  - Element: `<button>`
+  - Purpose: Displays hover tooltip and additional info.
+- **[3.3.7] Primitive – "Tab Tooltip Portal"**
+  - Optional structure for richer hover content anchored near the info icon.
+- **[3.3.8] Primitive – "Publish Button"**
+  - Element: `<button>`
+  - Attributes: `type="button"`, `data-anchor="global-header.publish-button"`.
 
-### 4. BuildStyle – shell-globalHeader
-- **[4.1] Container – "Shell Frame Layout"**: Flex alignment, spacing, and baseline border for header frame.
-- **[4.2] Subcontainer – "Zone Layout Baseline"**: Shared flex alignment and spacing for each zone.
-- **[4.3] Subcontainer – "Brand Zone Alignment"**: Prevents brand zone from stretching while preserving layout stability.
-- **[4.4] Subcontainer – "Tab Zone Alignment"**: Centers tab navigation and allows it to flex.
-- **[4.5] Subcontainer – "Publish Zone Alignment"**: Right-justifies publish zone without flex bleed.
-- **[4.6] Primitive – "Brand Link Styling"**: Typography and spacing for brand anchor and inline content.
-- **[4.7] Primitive – "Brand Logo Scaling"**: Enlarges glyph for legibility.
-- **[4.8] Primitive – "Brand Tagline Styling"**: Lightweight typography and truncation safeguards.
-- **[4.9] Subcontainer – "Tab List Track Styling"**: Horizontal scrollable rail for tab buttons.
-- **[4.10] Subcontainer – "Tab Item Row Styling"**: Inline alignment for button + info icon pair.
-- **[4.11] Primitive – "Tab Button Baseline"**: Neutral button visuals supporting active/hover modifiers.
-- **[4.12] Primitive – "Tab Button Active State"**: Elevates selected tab via background and border.
-- **[4.13] Primitive – "Tab Button Hover State"**: Soft highlight for hovered but inactive tabs.
-- **[4.14] Primitive – "Info Icon Baseline"**: Icon button hit target and hover transition.
-- **[4.15] Primitive – "Info Icon Focus/Hover"**: Visual affordance on hover or keyboard focus.
-- **[4.16] Primitive – "Publish Button Baseline"**: Gradient CTA styling with weighty typography.
-- **[4.17] Primitive – "Publish Button Hover State"**: Lift and shadow feedback on interaction.
-- **[4.18] Variation – "Tablet Layout Adjustments"**: Reduces padding and hides tagline on <=1023px widths.
-- **[4.19] Variation – "Mobile Layout Adjustments"**: Tightens spacing and font sizing for <=767px widths.
+## 4. BuildStyle Concern (Visual Styling of Structure)
+### 4.0 Dependencies
+- Consumes design tokens for spacing, typography, and color from cfg-appFrame knowledge exports.
 
-### 5. Logic – shell-globalHeader
-- **[5.1] Primitive – "Viewport Breakpoint Heuristic"**: Helper mapping viewport widths to named breakpoints.
-- **[5.2] Container – "Global Header Logic Hook"**: Primary hook producing build/results bindings.
-  - **[5.2.1] Primitive – "State Initialization & Bootstrapping"**: `useState` initialization with SSR-safe defaults.
-  - **[5.2.2] Primitive – "Viewport Resize Subscription"**: `useEffect` listener updating breakpoints responsively.
-  - **[5.2.3] Primitive – "Tab Selection Handler"**: Callback resetting hovered tab and active modes on selection.
-  - **[5.2.4] Primitive – "Tab Hover Handler"**: Callback storing hovered tab id while avoiding redundant updates.
-  - **[5.2.5] Primitive – "Publish Trigger Handler"**: Callback invoking provided `onPublish` or logging fallback.
-  - **[5.2.6] Primitive – "Doc Visibility Controls"**: Callbacks controlling contextual document panel visibility.
-  - **[5.2.7] Primitive – "Tab Definition Ordering"**: Memo ensuring deterministic order from knowledge definitions.
-  - **[5.2.8] Primitive – "Viewport Flag Derivation"**: Booleans for desktop/tablet/mobile convenience.
-  - **[5.2.9] Primitive – "Build Bindings Assembly"**: Bundles build concern data and handlers.
-  - **[5.2.10] Primitive – "Results Bindings Assembly"**: Packages results concern state snapshot.
-  - **[5.2.11] Primitive – "Hook Return Envelope"**: Returns build/results bundles for shell consumption.
+### 4.1 Atomic Components — Containers / Groups (BuildStyle)
+- **[4.1.1] Container – "Shell Frame Layout"**
+  - Selector: `[data-anchor="global-header"]`
+  - Layout: Flex row with baseline border.
+- **[4.1.2] Container – "Zone Alignment Baseline"**
+  - Selector: `[data-anchor="global-header.brand"], [data-anchor="global-header.tabs-zone"], [data-anchor="global-header.publish"]`
+  - Purpose: Shared alignment system for zones.
+- **[4.1.3] Container – "Tab List Track Styling"**
+  - Selector: `[data-anchor="global-header.tabs"]`
+  - Behavior: Horizontal scroll with overflow guards.
+- **[4.1.4] Container – "Debug Panel Styling"**
+  - Selector: `[data-anchor="global-header.debug"]`
+  - Layout: Inline status banner.
 
-### 6. Knowledge – shell-globalHeader
-- **[6.1] Primitive – "Header Tab Identifier Types"**: Type aliases enumerating valid tab and mode ids.
-- **[6.2] Primitive – "Header Tab Definition Schema"**: Interface describing tab definition payloads.
-- **[6.3] Primitive – "Header Tab Knowledge Base"**: Ordered array of concern tab definitions with hover summaries.
-- **[6.4] Primitive – "Breakpoint Definition Schema"**: Interface describing breakpoint metadata.
-- **[6.5] Primitive – "Responsive Breakpoint Catalog"**: Array describing desktop/tablet/mobile breakpoints.
-- **[6.6] Primitive – "Brand Wordmark Copy"**: Constant providing Calculogic wordmark.
-- **[6.7] Primitive – "Brand Tagline Copy"**: Constant providing supporting tagline text.
-- **[6.8] Primitive – "Brand Tooltip Copy"**: Constant for brand link tooltip.
-- **[6.9] Primitive – "Publish Label Copy"**: Constant for publish button text.
+### 4.2 Atomic Components — Primitives (BuildStyle)
+- **[4.2.1] Primitive – "Brand Link Styling"**
+  - Typography, spacing, and inline alignment for brand anchor.
+- **[4.2.2] Primitive – "Brand Logo Scaling"**
+  - Sets font size and baseline alignment for glyph.
+- **[4.2.3] Primitive – "Brand Tagline Styling"**
+  - Lightweight typography and truncation safeguards.
+- **[4.2.4] Primitive – "Tab Button Baseline"**
+  - Neutral button visuals supporting focus/active modifiers.
+- **[4.2.5] Primitive – "Tab Button Active State"**
+  - Underline and background adjustments for selected tab.
+- **[4.2.6] Primitive – "Tab Button Hover State"**
+  - Soft highlight for hovered but inactive tabs.
+- **[4.2.7] Primitive – "Info Icon Baseline"**
+  - Icon size, padding, and hit target.
+- **[4.2.8] Primitive – "Info Icon Focus/Hover"**
+  - Outline and color adjustments on interaction.
+- **[4.2.9] Primitive – "Publish Button Baseline"**
+  - Gradient CTA styling with strong contrast.
+- **[4.2.10] Primitive – "Publish Button Hover State"**
+  - Lift and shadow feedback for pointer/keyboard interaction.
+- **[4.2.11] Primitive – "Debug Panel Typography"**
+  - Text treatment for debug readouts.
 
-### 7. Results – shell-globalHeader
-- **[7.1] Container – "Global Header Debug Panel"**: Results component rendering diagnostic grid.
-- **[7.2] Primitive – "Debug Visibility Gate"**: Guard preventing render unless debug is enabled.
-- **[7.3] Primitive – "Debug State Rows"**: Structured rows exposing live header state fields.
+### 4.3 Responsive Rules
+- Tablet breakpoint (≤1023px): Reduce padding, hide tagline, compress tab spacing.
+- Mobile breakpoint (≤767px): Stack zones vertically and convert tab list to horizontal scroll chips.
 
-### 8. ResultsStyle – shell-globalHeader
-- **[8.1] Primitive – "Debug Panel Styling"**: Visual treatment for debug surface including background, typography, and spacing.
+### 4.4 Interaction Styles
+- Focus outlines use Knowledge-provided tokens; ensure visible contrast.
+- Hover states align with Build-defined anchors only.
 
-## 10. Assembly & Implementation Notes
-- `info` buttons and publish CTA remain `<button>` elements for keyboard accessibility; avoid replacing with anchors.
-- Hover summaries rely on JS-driven hover state to support both icon and button interactions.
-- Debug panel remains opt-in; expose toggles through higher-level configurations when required.
-- Breakpoint thresholds should stay synchronized with broader design system tokens before release.
+## 5. Logic Concern (Workflow)
+### 5.0 Dependencies
+- Uses React hooks for state management and window resize listeners (SSR guarded).
+
+### 5.1 Atomic Components — Containers (Logic)
+- **[5.1.1] Container – "Global Header Logic Hook"**
+  - `useGlobalHeader` producing Build and Results bindings.
+
+### 5.2 Atomic Components — Primitives (Logic)
+- **[5.2.1] Primitive – "State Initialization"**
+  - Sets default active tab based on Knowledge order.
+- **[5.2.2] Primitive – "Viewport Resize Subscription"**
+  - Listens for window resize to update breakpoint flags.
+- **[5.2.3] Primitive – "Tab Selection Handler"**
+  - Updates active tab and resets hover state.
+- **[5.2.4] Primitive – "Tab Hover Handler"**
+  - Stores hovered tab id while avoiding redundant updates.
+- **[5.2.5] Primitive – "Publish Trigger Handler"**
+  - Invokes `onPublish` or logs fallback notice.
+- **[5.2.6] Primitive – "Debug Toggle Handler"**
+  - Enables/disables Results concern display.
+- **[5.2.7] Primitive – "Knowledge Ordering Memo"**
+  - Memoizes sorted tab definitions for Build consumption.
+- **[5.2.8] Primitive – "Breakpoint Flag Derivation"**
+  - Derives desktop/tablet/mobile booleans from viewport width.
+- **[5.2.9] Primitive – "Build Bindings Assembly"**
+  - Maps Knowledge definitions and handlers into Build-ready props.
+- **[5.2.10] Primitive – "Results Snapshot Assembly"**
+  - Packages state summary for Results concern.
+
+### 5.2.3 Derived Values
+- Derived booleans for viewport categories and debug enablement.
+
+### 5.2.4 Side Effects
+- Window resize listener attaches/detaches on mount/unmount.
+- Console warning emitted when publish callback is absent.
+
+### 5.2.5 Workflows
+- Tab switch: `[5.2.3]` updates active tab → `[5.2.7]` ensures deterministic ordering → `[5.2.9]` provides Build bindings → Build updates selected state.
+- Publish action: `[5.2.5]` triggers callback → Results snapshot logs latest timestamp when debug enabled.
+
+## 6. Knowledge Concern (Reference Data)
+### 6.1 Maps / Dictionaries
+- **[6.1.1] Primitive – "Header Tab Identifier Types"**
+  - Type aliases enumerating valid tab ids (build, logic, knowledge, results, resultsStyle).
+- **[6.1.2] Primitive – "Breakpoint Definition Schema"**
+  - Interface describing breakpoint metadata for responsive logic.
+
+### 6.2 Constants
+- **[6.2.1] Primitive – "Header Tab Knowledge Base"**
+  - Ordered array of concern tab definitions with hover summaries.
+- **[6.2.2] Primitive – "Brand Wordmark Copy"**
+  - Display string for Calculogic wordmark.
+- **[6.2.3] Primitive – "Brand Tagline Copy"**
+  - Optional supporting copy string.
+- **[6.2.4] Primitive – "Brand Tooltip Copy"**
+  - Tooltip text for brand home link.
+- **[6.2.5] Primitive – "Publish Label Copy"**
+  - Label for publish button.
+- **[6.2.6] Primitive – "Breakpoint Catalog"**
+  - Array of desktop/tablet/mobile breakpoint definitions.
+
+### 6.3 Shared / Global Reference
+- Exposes tab ordering and copy for cfg-appFrame to reference when rendering nested surfaces.
+
+## 7. Results Concern (Outputs)
+### 7.1 User-Facing Outputs
+- **[7.1.1] Container – "Global Header Debug Panel"**
+  - Displays live header state when debug mode enabled.
+
+### 7.2 Dev / Debug Outputs
+- **[7.2.1] Primitive – "Debug Visibility Gate"**
+  - Guards render until debug toggle is true.
+- **[7.2.2] Primitive – "Debug State Rows"**
+  - Lists active tab, hovered tab, breakpoint flags, and publish readiness.
+
+### 7.3 Accessibility Outputs
+- Provide `aria-live="polite"` announcements when publish action completes (future extension).
+
+## 8. ResultsStyle Concern (Output Styling)
+### 8.1 Results Layout Styles
+- **[8.1.1] Primitive – "Debug Panel Styling"**
+  - Visual treatment for debug panel: background tint, typography, spacing.
+
+### 8.2 Debug Display Styles
+- Additional states not yet required.
+
+## 9. Assembly Pattern
+### 9.1 File Structure
+- src/shells/globalHeader/GlobalHeader.build.tsx
+- src/shells/globalHeader/GlobalHeader.buildStyle.tsx
+- src/shells/globalHeader/GlobalHeader.logic.ts
+- src/shells/globalHeader/GlobalHeader.knowledge.ts
+- src/shells/globalHeader/GlobalHeader.results.tsx
+- src/shells/globalHeader/GlobalHeader.resultsStyle.tsx
+- src/shells/globalHeader/index.ts
+
+### 9.2 Assembly Logic
+- `src/shells/globalHeader/index.ts` composes Build with Logic hook outputs, imports BuildStyle for side effects, and exports Results/ResultsStyle components for optional mounting.
+
+### 9.3 Integration
+- Mounted inside shell-spaHost above cfg-appFrame; publishes selected concern id to cfg-appFrame for tab swapping.
+
+## 10. Implementation Passes
+### 10.1 Pass Mapping
+- Pass 0: Author NL skeleton and stub Build anchors.
+- Pass 1: Implement Build containers and primitives.
+- Pass 2: Apply BuildStyle responsive rules.
+- Pass 3: Implement Logic hook and knowledge constants.
+- Pass 4: Implement Results panel and styling.
+- Pass 5+: Extend Knowledge/Results when new tabs or diagnostics emerge.
+
+### 10.2 Export Checklist
+- Build anchors align with Knowledge definitions and BuildStyle selectors.
+- Logic hook guards window access for SSR and cleans up listeners.
+- Results panel renders only when debug is enabled.
+- BuildStyle references tokens from Knowledge or cfg-appFrame as needed.
+- Publish actions bubble through provided callback or log fallback message.

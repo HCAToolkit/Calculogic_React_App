@@ -1,3 +1,11 @@
+Purpose / Usage
+
+This doc defines the canonical NL skeleton templates used by all configuration (doc/nl-config/*.md) and shell (doc/nl-shell/*.md) documents. Section numbers (1–10) and concern ordering are considered stable contracts.
+
+Changing this doc
+
+If you change top-level sections or numbering here, you must also update NL-First-Workflow.md, CSCS.md, and CCPP.md to keep the system consistent.
+
 1) General NL Skeleton – Configuration-Level
 Use this for things like “Motivations question,” individual sections, etc.
 Configuration: [Config Name] ([config-id])
@@ -12,7 +20,7 @@ A Configuration is a semantic module, not a file.
 It spans up to six concerns: Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle.
 
 
-At export, its atomic components are merged with other configurations into the six project-level files (project.build.tsx, project.logic.ts, etc.).
+Per-configuration implementation files live under paths like src/configs/<configId>/<ConfigName>.build.tsx, src/configs/<configId>/<ConfigName>.buildStyle.tsx, and the other concern files with matching base names. The engine or build step may merge those into project-level bundles such as src/projects/<projectId>/Project.build.tsx.
 
 
 All content of a configuration is expressed as Atomic Components.
@@ -281,14 +289,14 @@ Styling for debug overlays/panels.
 
 9. Assembly Pattern
 9.1 File Structure (implementation pattern; configuration still semantic)
-/[feature]/[ConfigName]/
+/src/configs/[config-id]/[ConfigName]/
   [ConfigName].build.tsx
-  [ConfigName].build.css
+  [ConfigName].buildStyle.tsx
   [ConfigName].logic.ts
   [ConfigName].knowledge.ts
-  [ConfigName].results.tsx
-  [ConfigName].results.css
-  index.tsx
+  [ConfigName].results.ts
+  [ConfigName].resultsStyle.tsx
+  index.ts
 9.2 Assembly Logic
 index.tsx wires concerns together and exports a single component that implements this configuration.
 
@@ -476,14 +484,14 @@ Tab change messages, mode change messages.
 
 9. Assembly Pattern
 9.1 File Structure
-/src/components/[ShellName]/
+/src/shells/[shell-id]/[ShellName]/
   [ShellName].build.tsx
-  [ShellName].build.css
+  [ShellName].buildStyle.tsx
   [ShellName].logic.ts
   [ShellName].knowledge.ts
   [ShellName].results.tsx
-  [ShellName].results.css
-  index.tsx
+  [ShellName].resultsStyle.tsx
+  index.ts
 9.2 Assembly Logic
 Hook for logic, build component for structure, knowledge/constants, optional results debug.
 
