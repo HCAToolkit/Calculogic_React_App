@@ -6,7 +6,7 @@ A Configuration is a semantic module (e.g. “Global Header Shell”, “Tab Nav
 
 It spans up to six concerns: Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle.
 
-Code lives in six concern files; the configuration is defined by its NL skeleton, not its file layout.
+Code lives in six concern files; the configuration is defined by its NL skeleton, not its file layout. The canonical section layout and numbering for NL skeletons is defined in General-NL-Skeletons.md and every configuration or shell document must follow it exactly.
 
 NL Skeleton as the ordering source
 
@@ -39,6 +39,17 @@ Knowledge – copy, constants, reference tables; no state mutation, no layout, n
 Results – derived outputs / readouts; no structure creation beyond what Build defines.
 
 ResultsStyle – styling of results; no structure, no logic.
+
+Folder mapping
+
+- Build → files like src/configs/<configId>/<ConfigName>.build.tsx or src/shells/<shellId>/<ShellName>.build.tsx
+- BuildStyle → CSS or CSS-Module files like src/configs/<configId>/<ConfigName>.build.module.css or src/shells/<shellId>/<ShellName>.build.css
+- Logic → files like src/configs/<configId>/<ConfigName>.logic.ts (or `.logic.tsx` when React hooks are required)
+- Knowledge → files like src/configs/<configId>/<ConfigName>.knowledge.ts
+- Results → files like src/configs/<configId>/<ConfigName>.results.ts (or `.results.tsx` when JSX is emitted)
+- ResultsStyle → CSS or CSS-Module files like src/configs/<configId>/<ConfigName>.results.module.css or src/shells/<shellId>/<ShellName>.results.css
+
+Shells follow the same pattern within src/shells/<shellId>/, sharing the same base name across all concern files. BuildStyle and ResultsStyle are implemented as CSS/CSS-Module files; the corresponding Build and Results `.tsx` components expose the class names and data attributes that those styles consume.
 
 Structure source and fallbacks
 
@@ -167,11 +178,15 @@ It cannot operate meaningfully without that parent structure.
 
 It never reorders or replaces the parent’s anchors.
 
+Example: The global header shell includes a nested tab-strip configuration that mounts directly into the header’s Build anchors.
+
 Sibling configuration otherwise:
 
 It uses the same frame (shell) but defines its own Build structure and anchors.
 
 Promote from nested → sibling when a feature gains its own structure, reuse, or lifecycle.
+
+Example: cfg-intro, cfg-q-motivations, and cfg-buildSurface coexist as siblings that the spa host shell swaps within the same main-pane frame.
 
 6. Change Management
 When you change a configuration:
