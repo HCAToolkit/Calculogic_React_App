@@ -68,6 +68,7 @@ Use sparingly, only when the reason is not obvious.
 // Choice: Use CSS hover for previews instead of JS listeners
 // Consequence: Less JS complexity; no previews on touch devices
 // ADR: header-hover-001   // optional
+Promote a Decision note to a standalone ADR when the rationale spans multiple paragraphs, introduces cross-team dependencies, or affects more than one configuration. Longer decisions live alongside other records in doc/decisions/*.md; reference the ADR id from the inline note once it exists.
 3.6 TODO with expiry
 // TODO(@owner, 2025-12-01): Wire openDoc(docId) to docs modal shell
 Must always have owner and date.
@@ -141,13 +142,13 @@ Build file:
 // Concern: Build · Catalog: layout.shell
 export function GlobalHeaderShell() { ... }
 BuildStyle file:
-/* 
+/*
  * Configuration: cfg-tabNavigation (Tab Navigation)
  * Concern File: BuildStyle
  * Source NL: doc/nl-config/cfg-tabNavigation.md
  * Responsibility: Visual styling of header tab strip (no structure)
  * Invariants: Tabs remain single-line; scroll instead of wrap
- */
+*/
 
 /* [4.2.1] cfg-tabNavigation · Primitive · "Tab Item Base Rule"
    Matches Build primitive [3.3.4–3.3.7] (tab buttons)
@@ -155,6 +156,17 @@ BuildStyle file:
 .globalHeader__tab {
   /* ... */
 }
+
+Bad vs. good atomic comments
+
+- Bad:
+  - `// handles tab click`
+  - `const handleClick = () => setActive(tabId);`
+  (Narrates the obvious and lacks NL reference.)
+- Good:
+  - `// [5.2.2] cfg-tabNavigation · Primitive · "handleTabSelect"`
+  - `// Concern: Logic · Parent: "Tab Navigation Logic" · Notes: syncs active tab state`
+  - `const handleTabSelect = (tabId: string) => setActiveTab(tabId);`
 
 8. Maintenance Rules
 On every structural change:

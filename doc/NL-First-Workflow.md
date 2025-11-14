@@ -1,5 +1,5 @@
 NL-First Workflow (What the AI Does First)
-Golden rule: Before generating or editing any code for a configuration or shell, the AI must create or update the NL skeleton text file for it.
+Golden rule: Before generating or editing any code for a configuration or shell, instantiate the appropriate NL skeleton template from General-NL-Skeletons.md (Configuration-Level or ProjectShell-Level) and create or update the NL skeleton text file for it.
 0. NL Skeleton Step (Mandatory First Step)
 When starting work on a feature, configuration, or shell:
 Decide the type:
@@ -14,9 +14,9 @@ doc/nl-shell/shell-[name].md
 
 Create (or update) the NL skeleton file using the correct template:
 
-Configuration-Level → “General NL Skeleton – Configuration-Level”
-
-ProjectShell-Level → “General NL Skeleton – ProjectShell-Level”
+- Skeleton templates:
+  - General-NL-Skeletons.md → Section 1.x–10.x under “General NL Skeleton – Configuration-Level” for configurations
+  - General-NL-Skeletons.md → Section 1.x–10.x under “General NL Skeleton – ProjectShell-Level” for shells
 
 Fill it out in prose:
 
@@ -68,3 +68,19 @@ The change to code is reflected in NL, and the numbering matches.
 All new functions/components/blocks have the correct [sectionNumber] cfg-id · type · name comments.
 
 No concern file contains “orphan” code that isn’t mentioned in the NL skeleton.
+
+Example alignment
+
+- NL excerpt:
+  - [3.2.1] Subcontainer “Center Zone – Tab Strip” (Build)
+  - [5.2.2] Handler “handleTabSelect” (Logic)
+- Code comments:
+  - `// [3.2.1] cfg-buildSurface · Subcontainer · "Center Zone – Tab Strip"`
+  - `// [5.2.2] cfg-buildSurface · Primitive · "handleTabSelect"`
+- Code stub:
+  - ```ts
+    // [5.2.2] cfg-buildSurface · Primitive · "handleTabSelect"
+    const handleTabSelect = (tabId: string) => {
+      setActiveTab(tabId);
+    };
+    ```
