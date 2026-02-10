@@ -1,8 +1,27 @@
+/**
+ * Configuration: cfg-contentDrawer (Content Drawer Configuration)
+ * Concern File: Build
+ * Source NL: doc/nl-doc-engine/cfg-contentDrawer.md
+ * Responsibility: Render the content drawer shell, header, and body structure for resolved content nodes.
+ * Invariants: Drawer anchor remains stable, header always exposes close control, body sections use deterministic anchors.
+ * Notes: Includes anchor-jump orchestration colocated with structure.
+ */
+
 import { useEffect, useMemo, useRef } from 'react';
 import { resolveContent } from '../../content/contentProviders';
 import { useContentState } from '../../content/ContentContext';
 import './ContentDrawer.css';
 
+// ─────────────────────────────────────────────
+// 3. Build – cfg-contentDrawer (Content Drawer Configuration)
+// NL Sections: §3.1–§3.4 in cfg-contentDrawer.md
+// Purpose: Provide shell, header, body, and anchor-target structure for drawer content.
+// Constraints: Keep anchor identifiers deterministic and preserve right-side shell wrapper.
+// ─────────────────────────────────────────────
+
+// [3.4] cfg-contentDrawer · Primitive · "Anchor Jump Target"
+// Concern: Build · Parent: "Drawer Body" · Catalog: navigation.anchor
+// Notes: Mirrors section headings into deterministic ids for hash-like in-drawer jumps.
 function toAnchorId(value: string) {
   return value
     .toLowerCase()
@@ -11,14 +30,28 @@ function toAnchorId(value: string) {
     .replace(/\s+/g, '-');
 }
 
+// ─────────────────────────────────────────────
+// 5. Logic – cfg-contentDrawer (Content Drawer Configuration)
+// NL Sections: §5.2–§5.3 in cfg-contentDrawer.md
+// Purpose: Resolve content by namespace and scroll to requested anchor on open.
+// Constraints: Resolution remains deterministic; anchor scrolling only runs when target exists.
+// ─────────────────────────────────────────────
+
 export default function ContentDrawer() {
   const { activeContentId, activeContentAnchorId, closeContent, openContent } = useContentState();
   const drawerRef = useRef<HTMLDivElement | null>(null);
+
+  // [5.2] cfg-contentDrawer · Subcontainer · "Resolver Pipeline"
+  // Concern: Logic · Parent: "Drawer State Orchestrator" · Catalog: resolver.pipeline
+  // Notes: Active content id is resolved lazily and memoized per id transition.
   const resolution = useMemo(
     () => (activeContentId ? resolveContent(activeContentId) : null),
     [activeContentId],
   );
 
+  // [5.3] cfg-contentDrawer · Primitive · "Anchor Scroll Handler"
+  // Concern: Logic · Parent: "Resolver Pipeline" · Catalog: navigation.scroll
+  // Notes: Scrolls only after content/anchor settle and a concrete HTMLElement target is found.
   useEffect(() => {
     if (!activeContentAnchorId || !drawerRef.current) {
       return;
@@ -37,7 +70,13 @@ export default function ContentDrawer() {
 
   if (!resolution) {
     return (
+      // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
+      // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
+      // Notes: Fallback shell preserves placement when no provider can resolve the id.
       <aside className="content-drawer" data-anchor="content-drawer">
+        {/* [3.2] cfg-contentDrawer · Subcontainer · "Drawer Header"
+            Concern: Build · Parent: "Content Drawer Shell" · Catalog: layout.header
+            Notes: Announces unavailable state while keeping close affordance visible. */}
         <div className="content-drawer__header">
           <div>
             <p className="content-drawer__eyebrow">Content</p>
@@ -56,7 +95,13 @@ export default function ContentDrawer() {
 
   if (resolution.kind === 'missing') {
     return (
+      // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
+      // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
+      // Notes: Missing-resolution shell mirrors standard framing for predictable UX.
       <aside className="content-drawer" data-anchor="content-drawer">
+        {/* [3.2] cfg-contentDrawer · Subcontainer · "Drawer Header"
+            Concern: Build · Parent: "Content Drawer Shell" · Catalog: layout.header
+            Notes: Shows not-found summary and recovery control. */}
         <div className="content-drawer__header">
           <div>
             <p className="content-drawer__eyebrow">Content</p>
@@ -76,8 +121,17 @@ export default function ContentDrawer() {
   if (resolution.kind === 'doc') {
     const doc = resolution.doc;
     return (
+      // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
+      // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
+      // Notes: Primary shell path for successfully resolved documentation payloads.
       <aside className="content-drawer" data-anchor="content-drawer">
+        {/* [3.3] cfg-contentDrawer · Subcontainer · "Drawer Body"
+            Concern: Build · Parent: "Content Drawer Shell" · Catalog: content.body
+            Notes: Hosts scrollable content card and section anchors. */}
         <div className="content-drawer__card" ref={drawerRef}>
+          {/* [3.2] cfg-contentDrawer · Subcontainer · "Drawer Header"
+              Concern: Build · Parent: "Content Drawer Shell" · Catalog: layout.header
+              Notes: Renders concern context, title, and close action. */}
           <div className="content-drawer__header">
             <div>
               <p className="content-drawer__eyebrow">{doc.concern} documentation</p>
