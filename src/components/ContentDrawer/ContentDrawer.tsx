@@ -1,147 +1,149 @@
 import { useEffect, useMemo, useRef } from 'react';
-import type { ReactNode } from 'react';
+import { resolveContent } from '../../content/contentProviders';
+import { useContentState } from '../../content/ContentContext';
 import './ContentDrawer.css';
 
-const FOCUSABLE_SELECTOR =
-  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-export interface ContentNode {
-  id?: string;
-  title: string;
-  summary?: string;
-  blocks: ReactNode[];
+function toAnchorId(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
 }
 
-export interface ContentDrawerProps {
-  open: boolean;
-  content?: ContentNode | null;
-  contentId?: string;
-  anchorId?: string;
-  onClose: () => void;
-  onResolveContent?: (contentId: string) => ContentNode | null | undefined;
-}
-
-export function ContentDrawer({
-  open,
-  content,
-  contentId,
-  anchorId,
-  onClose,
-  onResolveContent,
-}: ContentDrawerProps) {
+export default function ContentDrawer() {
+  const { activeContentId, activeContentAnchorId, closeContent, openContent } = useContentState();
   const drawerRef = useRef<HTMLDivElement | null>(null);
-
-  const resolvedContent = useMemo(() => {
-    if (content) return content;
-    if (contentId && onResolveContent) {
-      return onResolveContent(contentId) ?? null;
-    }
-    return null;
-  }, [content, contentId, onResolveContent]);
-
-  useEffect(() => {
-    if (!open) return;
-    const drawer = drawerRef.current;
-    if (!drawer) return;
-
-    const previousActive = document.activeElement as HTMLElement | null;
-    const focusable = Array.from(drawer.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
-    const focusTarget = focusable[0] ?? drawer;
-    focusTarget.focus();
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        onClose();
-        return;
-      }
-
-      if (event.key !== 'Tab' || focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      const active = document.activeElement as HTMLElement | null;
-
-      if (event.shiftKey && active === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      previousActive?.focus();
-    };
-  }, [onClose, open]);
-
-  useEffect(() => {
-    if (!open || !anchorId) return;
-    const drawer = drawerRef.current;
-    if (!drawer) return;
-
-    const anchorTarget =
-      drawer.querySelector<HTMLElement>(`#${CSS.escape(anchorId)}`) ??
-      drawer.querySelector<HTMLElement>(`[data-anchor="${anchorId}"]`);
-
-    anchorTarget?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  }, [anchorId, open, resolvedContent]);
-
-  if (!open) return null;
-
-  const titleId = resolvedContent?.id ? `${resolvedContent.id}-title` : 'content-drawer-title';
-  const summaryId = resolvedContent?.id
-    ? `${resolvedContent.id}-summary`
-    : 'content-drawer-summary';
-
-  return (
-    <aside
-      className="content-drawer"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-      aria-describedby={resolvedContent?.summary ? summaryId : undefined}
-      ref={drawerRef}
-      tabIndex={-1}
-    >
-      <header className="content-drawer__header">
-        <div>
-          <p className="content-drawer__eyebrow">Content Detail</p>
-          <h2 id={titleId} className="content-drawer__title">
-            {resolvedContent?.title ?? 'Content'}
-          </h2>
-          {resolvedContent?.summary && (
-            <p id={summaryId} className="content-drawer__summary">
-              {resolvedContent.summary}
-            </p>
-          )}
-        </div>
-        <button
-          type="button"
-          className="content-drawer__close"
-          onClick={onClose}
-          aria-label="Close content drawer"
-        >
-          ✕
-        </button>
-      </header>
-      <div className="content-drawer__body">
-        {resolvedContent ? (
-          resolvedContent.blocks.map((block, index) => (
-            <section key={`${resolvedContent.id ?? 'block'}-${index}`} className="content-drawer__block">
-              {block}
-            </section>
-          ))
-        ) : (
-          <div className="content-drawer__empty">
-            Select a content item to review its details.
-          </div>
-        )}
-      </div>
-    </aside>
+  const resolution = useMemo(
+    () => (activeContentId ? resolveContent(activeContentId) : null),
+    [activeContentId],
   );
+
+  useEffect(() => {
+    if (!activeContentAnchorId || !drawerRef.current) {
+      return;
+    }
+    const anchorTarget = drawerRef.current.querySelector(
+      `[data-content-anchor="${activeContentAnchorId}"], #${activeContentAnchorId}`,
+    );
+    if (anchorTarget instanceof HTMLElement) {
+      anchorTarget.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+  }, [activeContentAnchorId, activeContentId]);
+
+  if (!activeContentId) {
+    return null;
+  }
+
+  if (!resolution) {
+    return (
+      <aside className="content-drawer" data-anchor="content-drawer">
+        <div className="content-drawer__header">
+          <div>
+            <p className="content-drawer__eyebrow">Content</p>
+            <h2 className="content-drawer__title">Unavailable content</h2>
+            <p className="content-drawer__summary">
+              No provider could resolve <strong>{activeContentId}</strong>.
+            </p>
+          </div>
+          <button type="button" className="content-drawer__close" onClick={closeContent}>
+            Close
+          </button>
+        </div>
+      </aside>
+    );
+  }
+
+  if (resolution.kind === 'missing') {
+    return (
+      <aside className="content-drawer" data-anchor="content-drawer">
+        <div className="content-drawer__header">
+          <div>
+            <p className="content-drawer__eyebrow">Content</p>
+            <h2 className="content-drawer__title">Content not found</h2>
+            <p className="content-drawer__summary">
+              The provider could not resolve <strong>{resolution.contentId}</strong>.
+            </p>
+          </div>
+          <button type="button" className="content-drawer__close" onClick={closeContent}>
+            Close
+          </button>
+        </div>
+      </aside>
+    );
+  }
+
+  if (resolution.kind === 'doc') {
+    const doc = resolution.doc;
+    return (
+      <aside className="content-drawer" data-anchor="content-drawer">
+        <div className="content-drawer__card" ref={drawerRef}>
+          <div className="content-drawer__header">
+            <div>
+              <p className="content-drawer__eyebrow">{doc.concern} documentation</p>
+              <h2 className="content-drawer__title">{doc.title}</h2>
+              <p className="content-drawer__summary">{doc.summary}</p>
+            </div>
+            <button type="button" className="content-drawer__close" onClick={closeContent}>
+              Close
+            </button>
+          </div>
+          {doc.recommendedWorkflows && doc.recommendedWorkflows.length > 0 ? (
+            <div className="content-drawer__section" data-content-anchor="recommended-workflows">
+              <h3 className="content-drawer__section-title">Recommended workflows</h3>
+              <ul>
+                {doc.recommendedWorkflows.map(item => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {doc.sections.map(section => {
+            const sectionAnchor = toAnchorId(section.heading);
+            return (
+              <div
+                key={section.heading}
+                className="content-drawer__section"
+                data-content-anchor={sectionAnchor}
+              >
+                <h3 className="content-drawer__section-title" id={sectionAnchor}>
+                  {section.heading}
+                </h3>
+                {section.body.map((paragraph, index) => (
+                  <p key={`${section.heading}-${index}`}>{paragraph}</p>
+                ))}
+              </div>
+            );
+          })}
+          {doc.links && doc.links.length > 0 ? (
+            <div className="content-drawer__section" data-content-anchor="related-links">
+              <h3 className="content-drawer__section-title">Related content</h3>
+              <ul>
+                {doc.links.map(link => (
+                  <li key={link.label}>
+                    <button
+                      type="button"
+                      className="content-drawer__link"
+                      onClick={() =>
+                        openContent({
+                          contentId: `docs:${link.docId}`,
+                        })
+                      }
+                    >
+                      {link.label}
+                    </button>
+                    {link.description ? (
+                      <p className="content-drawer__link-description">{link.description}</p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      </aside>
+    );
+  }
+
+  return null;
 }
