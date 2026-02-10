@@ -183,3 +183,14 @@ Keep atomic comments synchronized with NL numbers.
 Remove or update any Decision notes that no longer apply (add new ones instead of rewriting history).
 
 Clean up or close TODOs on each release cut.
+
+
+9. Pre-Merge CCPP Review Checklist
+Before merging, confirm each touched concern file passes all checks:
+
+- [ ] File header uses `Configuration:` or `ProjectShell/Config:` (as applicable), includes `Concern File`, `Source NL`, `Responsibility`, and `Invariants`.
+- [ ] Section headers exist for each implemented concern and follow NL concern order/numbering.
+- [ ] Every Container/Subcontainer/Primitive in code has an atomic comment immediately above it with NL section id.
+- [ ] Atomic comment lines include Concern, Parent (if applicable), and Catalog id.
+- [ ] NL numbering in comments matches the current NL skeleton document.
+- [ ] Any TODOs include owner + expiry date; any external references use provenance-only blocks.

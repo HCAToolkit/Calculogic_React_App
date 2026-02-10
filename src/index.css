@@ -1,11 +1,22 @@
 /*
- * CCPP: shell-spaHost
- * Concern: BuildStyle
- * Reference: doc/nl-shell/shell-spaHost.md
+ * ProjectShell/Config: SPA Host Shell (shell-spaHost)
+ * Concern File: BuildStyle
+ * Source NL: doc/nl-shell/shell-spaHost.md
  * Responsibility: Normalize document-level layout primitives for the shell host.
+ * Invariants: html/body baseline stays reset; #root remains full-height flex column.
  */
 
-/* [4.1] Document Baseline Reset — Apply zero margins, border-box sizing, and typography defaults to html and body. */
+/* ─────────────────────────────────────────────
+ * 4. BuildStyle – shell-spaHost (SPA Host Shell)
+ * NL Sections: §4.1–§4.4 in shell-spaHost.md
+ * Purpose: Establish baseline document and root layout styling for nested shells.
+ * Constraints: Keep selectors global-only and side-effect free.
+ * ───────────────────────────────────────────── */
+
+/* [4.2.1] shell-spaHost · Primitive · "Document Baseline Reset"
+ * Concern: BuildStyle · Parent: "SPA Host Shell" · Catalog: foundation.reset
+ * Notes: Applies zero margins, border-box sizing, and typography defaults to html/body.
+ */
 body, html {
   margin: 0;
   padding: 0;
@@ -14,7 +25,10 @@ body, html {
   font-family: sans-serif;
 }
 
-/* [4.2] Root Flex Column — Ensure #root occupies full height and exposes a flex column container for downstream shells. */
+/* [4.2.2] shell-spaHost · Primitive · "Root Flex Column"
+ * Concern: BuildStyle · Parent: "SPA Host Shell" · Catalog: layout.root
+ * Notes: Keeps #root full-height and flex-column for downstream shell composition.
+ */
 #root {
   height: 100%;
   display: flex;
