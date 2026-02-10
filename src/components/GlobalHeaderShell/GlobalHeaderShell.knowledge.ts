@@ -68,6 +68,21 @@ export interface HeaderDocSection {
   body: string[];
 }
 
+// [6.5.c.a] shell-globalHeader · Primitive · "Content Metadata Contract"
+// Concern: Knowledge · Catalog: schema.definition
+// Notes: Defines baseline metadata fields expected on all documentation payloads.
+export interface ContentMeta {
+  sourceTier: string;
+  visibility: string;
+  status: string;
+  scope: string;
+  version: string;
+  conceptIds: string[];
+  intentTags: string[];
+  keywords: string[];
+  tags: string[];
+}
+
 // [6.5.c] shell-globalHeader · Primitive · "Header Documentation Definition"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Source of truth for documentation payload consumed by results concern modal.
@@ -76,9 +91,32 @@ export interface HeaderDocDefinition {
   concern: 'Build' | 'Logic' | 'Knowledge' | 'Results';
   title: string;
   summary: string;
+  contentMeta: ContentMeta;
   recommendedWorkflows?: string[];
   sections: HeaderDocSection[];
   links?: HeaderDocLink[];
+}
+
+const DEFAULT_CONTENT_META: ContentMeta = {
+  sourceTier: 'app-docs',
+  visibility: 'internal',
+  status: 'active',
+  scope: 'global-header-shell',
+  version: '1.0.0',
+  conceptIds: [],
+  intentTags: [],
+  keywords: [],
+  tags: [],
+};
+
+function withDefaultContentMeta(definition: Omit<HeaderDocDefinition, 'contentMeta'>): HeaderDocDefinition {
+  return {
+    ...definition,
+    contentMeta: {
+      ...DEFAULT_CONTENT_META,
+      scope: `${DEFAULT_CONTENT_META.scope}:${definition.id}`,
+    },
+  };
 }
 
 // [6.1.b] shell-globalHeader · Primitive · "Header Tab Knowledge Base"
@@ -204,7 +242,7 @@ export const PUBLISH_LABEL = 'Publish';
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Encodes contextual documentation surfaced via info icon modal per concern.
 export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
-  'doc-build': {
+  'doc-build': withDefaultContentMeta({
     id: 'doc-build',
     concern: 'Build',
     title: 'Build Concern Overview',
@@ -249,8 +287,8 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
         description: 'Confirm derived data and presentation targets before publishing.',
       },
     ],
-  },
-  'doc-logic': {
+  }),
+  'doc-logic': withDefaultContentMeta({
     id: 'doc-logic',
     concern: 'Logic',
     title: 'Logic Concern Overview',
@@ -288,8 +326,8 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
         description: 'Understand how shared schemas and traits feed your logic flows.',
       },
     ],
-  },
-  'doc-knowledge': {
+  }),
+  'doc-knowledge': withDefaultContentMeta({
     id: 'doc-knowledge',
     concern: 'Knowledge',
     title: 'Knowledge Concern Overview',
@@ -326,8 +364,8 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
         description: 'Confirm how Knowledge data feeds final reporting.',
       },
     ],
-  },
-  'doc-results': {
+  }),
+  'doc-results': withDefaultContentMeta({
     id: 'doc-results',
     concern: 'Results',
     title: 'Results Concern Overview',
@@ -371,7 +409,7 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
         description: 'Ensure shared traits and constants align with your reporting.',
       },
     ],
-  },
+  }),
 };
 
 // [6.5.e] shell-globalHeader · Primitive · "Header Documentation Resolver"
