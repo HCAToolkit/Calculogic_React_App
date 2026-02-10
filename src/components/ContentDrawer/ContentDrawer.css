@@ -1,0 +1,119 @@
+/*
+ * ProjectShell/Config: Content Drawer (content-drawer)
+ * Concern File: BuildStyle
+ * Responsibility: Provide visual styling for the shared content drawer surface.
+ * Invariants: Styles remain scoped to data-anchor hooks and component class names.
+ */
+
+.content-drawer {
+  position: fixed;
+  right: 1.5rem;
+  top: 6.5rem;
+  width: min(420px, calc(100vw - 3rem));
+  max-height: calc(100vh - 8rem);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+
+.content-drawer__card,
+.content-drawer__header {
+  background: var(--surface-card, #ffffff);
+  border-radius: 16px;
+  box-shadow: 0 22px 40px rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.content-drawer__card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow: auto;
+}
+
+.content-drawer__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.content-drawer__eyebrow {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+}
+
+.content-drawer__title {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #0f172a;
+}
+
+.content-drawer__summary {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.content-drawer__close {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #0f172a;
+}
+
+.content-drawer__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.content-drawer__section-title {
+  font-size: 0.95rem;
+  margin: 0;
+  color: #0f172a;
+}
+
+.content-drawer__section ul {
+  padding-left: 1.2rem;
+  margin: 0;
+  color: #475569;
+}
+
+.content-drawer__section p {
+  margin: 0;
+  color: #475569;
+}
+
+.content-drawer__link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #2563eb;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.content-drawer__link-description {
+  margin-top: 0.35rem;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .content-drawer {
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+  }
+}

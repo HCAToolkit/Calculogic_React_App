@@ -49,3 +49,10 @@ Calculogic transforms form building into a hands-on coding lesson. Each tab enfo
 4. NL-First-Workflow.md (Authoring workflow)
 5. CCPP.md (Comment and provenance protocol)
 6. doc/nl-config/*.md and doc/nl-shell/*.md (Per-configuration and shell specifications built from the skeletons)
+
+## Doc-Engine Standards Pack: Workflow Note
+- Update the NL skeleton first.
+- Then update code + CCPP comments to match.
+- Reject changes that add structure not present in NL.
+
+This ensures doc-engine changes stay in lockstep with NL standards.

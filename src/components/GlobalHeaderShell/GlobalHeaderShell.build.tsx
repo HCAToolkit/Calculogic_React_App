@@ -226,7 +226,7 @@ export function GlobalHeaderShell({
   hoverTab,
   triggerPublish,
   isMobile,
-  openDoc,
+  openContent,
 }: GlobalHeaderShellBuildBindings) {
   // [3.6] shell-globalHeader · Primitive · "Brand Tagline"
   // Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
@@ -342,7 +342,7 @@ export function GlobalHeaderShell({
                     docId={tab.docId}
                     onMouseEnter={() => hoverTab(tab.id)}
                     onFocus={() => hoverTab(tab.id)}
-                    onClick={() => openDoc(tab.docId)}
+                    onClick={() => openContent({ contentId: `docs:${tab.docId}` })}
                     describedById={infoLabelId}
                   />
                 </div>
