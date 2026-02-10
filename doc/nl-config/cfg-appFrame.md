@@ -132,15 +132,14 @@ Embeds the Build tab configuration via a mount anchor and coordinates with the g
 
 ## 9. Assembly Pattern
 ### 9.1 File Structure
-- src/configs/appFrame/AppFrame.build.tsx
-- src/configs/appFrame/AppFrame.build.module.css
-- src/configs/appFrame/AppFrame.logic.ts
-- src/configs/appFrame/AppFrame.knowledge.ts
+- src/App.tsx
+- src/App.css
+- src/App.logic.ts
+- src/App.knowledge.ts
 - (No Results/ResultsStyle files until required)
-- src/configs/appFrame/index.ts
 
 ### 9.2 Assembly Logic
-- `index.ts` re-exports the frame component assembled from Build + Logic and wires BuildStyle CSS modules and Knowledge imports.
+- `App.tsx` assembles Build with Logic and Knowledge imports, and wires `App.css` as BuildStyle.
 
 ### 9.3 Integration
 - Mounted by shell-spaHost within the root application container; provides mount slot for cfg-buildSurface and other main-pane configs.
