@@ -32,7 +32,7 @@
 ### Key architecture observations
 1. The codebase follows a clear concern split (Build/Logic/Knowledge/Results) and consistent naming, which improves local discoverability.
 2. **God modules exist** in `BuildSurface.logic.ts` (566 LOC) and `GlobalHeaderShell.knowledge.ts` (420 LOC); each carries multiple reasons to change.
-3. There are **duplicate content-resolution architectures** (`contentProviders.ts` and `ContentProviderRegistry.ts`) with overlapping intent and inconsistent outputs.
+3. There are **parallel content-resolution paths** (`contentProviders.ts` and `ContentProviderRegistry.ts`) that are intentionally split during extraction; convergence is still needed on one normalized runtime API.
 4. Boundary ownership is mostly clear, but `ContentDrawer` currently imports the simpler resolver path directly, bypassing the registry abstraction.
 5. No obvious circular imports detected in sampled files; dependency direction is mostly downward (shell → feature logic → knowledge/constants).
 6. State and side effects are mostly localized in hooks, but event listener logic is repeated in multiple resizing hooks.
@@ -50,8 +50,8 @@
 - **Overloaded modules**:
   - `BuildSurface.logic.ts` contains section logic + left/right panel logic + persistence + keyboard/drag handlers.
   - `GlobalHeaderShell.knowledge.ts` mixes types, tab metadata, mode metadata, and full documentation corpus.
-- **Duplicate abstractions**:
-  - `resolveContent(...)` pipeline and `ContentProviderRegistry` implement similar provider concerns with divergent result contracts.
+- **Transitional dual-path abstraction**:
+  - `resolveContent(...)` currently acts as an in-repo convenience adapter while `ContentProviderRegistry` is the extraction-ready canonical design; contract convergence is still required at the UI boundary.
 - **Inconsistent public API contracts**:
   - `src/components/ContentDrawer/index.tsx` re-exports named symbols not present in default-exported `ContentDrawer` file.
 - **Error reporting gaps**:
@@ -67,7 +67,7 @@
 
 ### Medium-risk findings
 3. Silent fallbacks in localStorage parsing/writes across panel/section hooks can mask corrupted persisted state.
-4. Two separate content-resolution mechanisms increase drift risk (e.g., one might gain behavior the other lacks).
+4. Registry + adapter split is intentional for MVP iteration, but still creates short-term convergence risk until both paths share one normalized contract.
 5. Large stateful hooks increase regression risk when extending drag/resize behaviors.
 
 ### Boundary handling observations
@@ -145,7 +145,7 @@
 1. **High** — Build fails due to invalid `ContentDrawer` barrel exports (`src/components/ContentDrawer/index.tsx`).
 2. **High** — Lint fails due to repeated `any` casts in drag listener registration (`src/tabs/build/BuildSurface.logic.ts`).
 3. **High** — No automated tests or test script; critical interaction logic is unguarded (`package.json`, `src/tabs/build/*`, `src/components/*`).
-4. **Medium** — Duplicate resolver architectures increase drift and ambiguity (`src/content/contentProviders.ts`, `src/content/ContentProviderRegistry.ts`).
+4. **Medium** — Transitional resolver split (canonical registry + temporary adapter) needs a defined convergence checkpoint to avoid contract drift (`src/content/contentProviders.ts`, `src/content/ContentProviderRegistry.ts`).
 5. **Medium** — God-module size in `BuildSurface.logic.ts` increases change risk and cognitive load.
 6. **Medium** — Knowledge file mixes schemas and large content corpus (`GlobalHeaderShell.knowledge.ts`).
 7. **Medium** — Silent catch blocks reduce operational visibility for storage/parsing failures (`App.logic.ts`, `BuildSurface.logic.ts`, `ContentProviderRegistry.ts`).
@@ -163,7 +163,7 @@
 
 ### Near-term (1–2 weeks)
 1. Add tests for content resolution, breakpoint derivation, and resizing logic.
-2. Consolidate on one content resolver API and remove duplicate pipeline.
+2. Converge UI calls onto the canonical provider-registry API; keep adapter delegation only as an explicit transition step.
 3. Split oversized logic modules into focused hooks/helpers.
 4. Add CI checks for lint/build/test on pull requests.
 
@@ -180,10 +180,17 @@
 5. Hoist storage keys into constants enum/object.
 6. Replace repeated fallback `<aside>` markup in drawer with a tiny reusable subcomponent.
 7. Add debug logging utility for caught storage parse/write failures (DEV-only).
-8. Document which resolver is canonical in `doc/doc-engine/README.md`.
+8. Document registry-as-canonical plus adapter transition policy in `doc/doc-engine/README.md`.
 
-## 10) Open questions
-1. Is `ContentProviderRegistry` intended to replace `resolveContent` soon, or is it experimental?
-2. Should docs payload live in code (`GlobalHeaderShell.knowledge.ts`) or external content files?
-3. Is SSR a target (beyond defensive checks), affecting current direct `window`/`document` usage patterns?
-4. Should Publish action integrate a backend/API soon (vs local callback/log)?
+## 10) Open questions — clarifications + answers
+1. **Is `ContentProviderRegistry` intended to replace `resolveContent` soon, or is it experimental?**  
+   **Answer/decision:** `ContentProviderRegistry` is the canonical extraction-ready design for doc-engine content resolution (including plugin/user/official sources). `resolveContent(...)` is a transitional in-repo adapter for UI iteration and should delegate to the registry during convergence, then be removed once the normalized API boundary is fully adopted.
+
+2. **Should docs payload live in code (`GlobalHeaderShell.knowledge.ts`) or external content files?**  
+   **Answer/decision:** In-code docs are temporary for iteration speed. Target state is provider-backed resolution by `docId`; UI/engine should not import doc blobs directly. Storage format (TS/JSON/MD/MDX) is secondary to maintaining the provider boundary.
+
+3. **Is SSR a target (beyond defensive checks), affecting current direct `window`/`document` usage patterns?**  
+   **Answer/decision:** SSR is not a doc-engine MVP target. Keep modules reasonably import-safe where practical, but runtime can assume browser execution for now.
+
+4. **Should Publish action integrate a backend/API soon (vs local callback/log)?**  
+   **Answer/decision:** Keep Publish as a host-provided callback/adapter in MVP. Backend/API integration can be introduced later without making Publish a doc-engine concern.
