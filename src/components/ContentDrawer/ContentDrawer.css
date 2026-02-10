@@ -1,10 +1,22 @@
 /*
- * ProjectShell/Config: Content Drawer (content-drawer)
+ * Configuration: cfg-contentDrawer (Content Drawer Configuration)
  * Concern File: BuildStyle
- * Responsibility: Provide visual styling for the shared content drawer surface.
- * Invariants: Styles remain scoped to data-anchor hooks and component class names.
+ * Source NL: doc/nl-doc-engine/cfg-contentDrawer.md
+ * Responsibility: Style drawer shell, header, and body presentation while preserving build anchors.
+ * Invariants: Drawer remains fixed on right desktop edge, body remains scrollable, selectors stay component-scoped.
  */
 
+/* ─────────────────────────────────────────────
+   4. BuildStyle – cfg-contentDrawer (Content Drawer Configuration)
+   NL Sections: §4.1–§4.2 in cfg-contentDrawer.md
+   Purpose: Apply visual shell and typography/overflow styling for content drawer presentation.
+   Constraints: Keep style-only concern boundaries; do not introduce structural coupling.
+   ───────────────────────────────────────────── */
+
+/* [4.1] cfg-contentDrawer · Container · "Drawer Visual Shell"
+   Concern: BuildStyle · Parent: "Content Drawer Configuration" · Catalog: layout.surface
+   Notes: Fixed-position shell reserves right-side panel placement.
+*/
 .content-drawer {
   position: fixed;
   right: 1.5rem;
@@ -17,6 +29,10 @@
   pointer-events: auto;
 }
 
+/* [4.2] cfg-contentDrawer · Primitive · "Header + Body Styling"
+   Concern: BuildStyle · Parent: "Drawer Visual Shell" · Catalog: visual.card
+   Notes: Shared card chrome across header and body card regions.
+*/
 .content-drawer__card,
 .content-drawer__header {
   background: var(--surface-card, #ffffff);

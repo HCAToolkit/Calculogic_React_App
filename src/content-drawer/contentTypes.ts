@@ -1,3 +1,21 @@
+/**
+ * Configuration: cfg-contentDrawer (Content Drawer Configuration)
+ * Concern File: Knowledge
+ * Source NL: doc/nl-doc-engine/cfg-contentDrawer.md
+ * Responsibility: Define normalized content node schemas and block primitives consumed by drawer concerns.
+ * Invariants: Every content node includes metadata and either top-level blocks or section collections.
+ */
+
+// ─────────────────────────────────────────────
+// 6. Knowledge – cfg-contentDrawer (Content Drawer Configuration)
+// NL Sections: §6.1 in cfg-contentDrawer.md
+// Purpose: Capture shared type contracts for content payload normalization.
+// Constraints: Keep schema framework-agnostic and serializable.
+// ─────────────────────────────────────────────
+
+// [6.1] cfg-contentDrawer · Container · "ContentNode Schema"
+// Concern: Knowledge · Parent: "Content Drawer Configuration" · Catalog: schema.metadata
+// Notes: Metadata model enables retrieval, ranking, and governance attributes.
 export type ContentMeta = {
   tags: string[];
   keywords: string[];
