@@ -8,7 +8,8 @@
 import BuildTab from './tabs/BuildTab';
 import GlobalHeaderShell from './components/GlobalHeaderShell';
 import { useAppFrameLogic } from './App.logic';
-import { THEME_TOGGLE_COPY } from './App.knowledge';
+import { ContentProvider } from './content/ContentContext';
+import ContentDrawer from './components/ContentDrawer/ContentDrawer';
 import './App.css';
 
 export default function App() {
@@ -44,10 +45,13 @@ export default function App() {
   // Concern: Build · Parent: "—" · Catalog: layout.container
   // Notes: Hosts the global header, theme toggle, and persistent Build tab mount.
   return (
-    <div data-anchor="app-frame">
-      <GlobalHeaderShell />
-      {themeToggle}
-      {buildTabMount}
-    </div>
+    <ContentProvider>
+      <div data-anchor="app-frame">
+        <GlobalHeaderShell />
+        {themeToggle}
+        {buildTabMount}
+      </div>
+      <ContentDrawer />
+    </ContentProvider>
   );
 }

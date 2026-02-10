@@ -92,6 +92,12 @@ export function GlobalHeaderShellResults({ debugPanel }: GlobalHeaderShellResult
       <div>
         <strong>Viewport breakpoint:</strong> {debugPanel.state.viewportBreakpoint}
       </div>
+      <div>
+        <strong>Active content:</strong> {debugPanel.state.activeContentId ?? 'none'}
+      </div>
+      <div>
+        <strong>Content anchor:</strong> {debugPanel.state.activeContentAnchorId ?? 'none'}
+      </div>
     </aside>
   ) : null;
 

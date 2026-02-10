@@ -175,6 +175,8 @@ It guarantees architectural purity and predictable diffs across the codebase.
 
 📘 See [`docs/CSCS.md`](docs/CSCS.md) for the full rubric.
 
+For doc-engine modules, use [`doc/DocEngine-CSCS-Mapping.md`](doc/DocEngine-CSCS-Mapping.md) as the concern mapping + naming checklist.
+
 ---
 
 ## **Comment & Provenance Protocol (CCPP)**
