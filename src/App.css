@@ -6,7 +6,7 @@
  * Invariants: Frame fills the viewport; theme toggle keeps a visible focus state; dark variables track theme state.
  */
 
-/* [4.1.1] cfg-appFrame · Container · "Frame Surface Styling"
+/* [4.1] cfg-appFrame · Container · "Frame Surface Styling"
  * Concern: BuildStyle · Parent: "—" · Catalog: surface.container
  * Notes: Fills the viewport and applies default surface/foreground tokens for the frame shell.
  */
@@ -18,7 +18,7 @@
   position: relative;
 }
 
-/* [4.2.1] cfg-appFrame · Primitive · "Theme Toggle Styling"
+/* [4.2] cfg-appFrame · Primitive · "Theme Toggle Styling"
  * Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: control.skin
  * Notes: Positions the toggle and establishes baseline affordance styling within the frame.
  */
@@ -44,7 +44,7 @@
   outline-offset: 2px;
 }
 
-/* [4.2.2] cfg-appFrame · Primitive · "Dark Theme Variables"
+/* [4.3] cfg-appFrame · Primitive · "Dark Theme Variables"
  * Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: tokens.theme
  * Notes: Overrides surface tokens when body.dark is applied to mirror dark-mode state.
  */

@@ -208,7 +208,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Lists active tab, hovered tab, breakpoint flags, and publish readiness.
 
 ### 7.3 Accessibility Outputs
-- Provide `aria-live="polite"` announcements when tab/mode selections change.
+- Provide `aria-live="polite"` announcements when publish action completes (future extension).
 
 ## 8. ResultsStyle Concern (Output Styling)
 ResultsStyle styling lives in CSS or CSS-Module files that target the debug/result anchors emitted by the Results concern.
@@ -217,21 +217,20 @@ ResultsStyle styling lives in CSS or CSS-Module files that target the debug/resu
   - Visual treatment for debug panel: background tint, typography, spacing.
 
 ### 8.2 Debug Display Styles
-- **[8.2.1] Primitive – "Live Region Anchor"**
-  - Hides inline live-region output visually while preserving assistive announcements.
+- Additional states not yet required.
 
 ## 9. Assembly Pattern
 ### 9.1 File Structure
-- src/components/GlobalHeaderShell/GlobalHeaderShell.build.tsx
-- src/components/GlobalHeaderShell/GlobalHeaderShell.build.css
-- src/components/GlobalHeaderShell/GlobalHeaderShell.logic.ts
-- src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts
-- src/components/GlobalHeaderShell/GlobalHeaderShell.results.tsx
-- src/components/GlobalHeaderShell/GlobalHeaderShell.results.css
-- src/components/GlobalHeaderShell/index.tsx
+- src/shells/globalHeader/GlobalHeader.build.tsx
+- src/shells/globalHeader/GlobalHeader.build.module.css
+- src/shells/globalHeader/GlobalHeader.logic.ts
+- src/shells/globalHeader/GlobalHeader.knowledge.ts
+- src/shells/globalHeader/GlobalHeader.results.tsx
+- src/shells/globalHeader/GlobalHeader.results.module.css
+- src/shells/globalHeader/index.ts
 
 ### 9.2 Assembly Logic
-- `src/components/GlobalHeaderShell/index.tsx` composes Build with Logic hook outputs, imports BuildStyle/ResultsStyle CSS side effects, and renders Results diagnostics alongside Build output.
+- `src/shells/globalHeader/index.ts` composes Build with Logic hook outputs, imports BuildStyle CSS modules for side effects, and exports Results components alongside optional ResultsStyle CSS modules.
 
 ### 9.3 Integration
 - Mounted inside shell-spaHost above cfg-appFrame; publishes selected concern id to cfg-appFrame for tab swapping.

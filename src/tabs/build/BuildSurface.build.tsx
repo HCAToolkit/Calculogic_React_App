@@ -9,7 +9,6 @@ import type { ReactNode } from 'react';
 import { BUILD_ANCHORS } from './anchors';
 import type { BuildSurfaceBindings, SectionId, SectionLogicBinding } from './BuildSurface.logic';
 import { sectionTitle } from './BuildSurface.logic';
-import { BUILD_PLACEHOLDER_COPY } from './BuildSurface.knowledge';
 
 // ─────────────────────────────────────────────
 // 3. Build – cfg-buildSurface (Build Surface Configuration)
@@ -197,7 +196,7 @@ export function BuildSurface({
   const previewStage = (
     <main data-anchor={anchors.centerPanel}>
       <div data-anchor={anchors.centerInner}>
-        <p>{BUILD_PLACEHOLDER_COPY.preview}</p>
+        <p>Form preview placeholder</p>
       </div>
     </main>
   );
@@ -237,7 +236,7 @@ export function BuildSurface({
         hidden={rightPanel.collapsed}
       >
         <div data-anchor={BUILD_ANCHORS.placeholder('settings')}>
-          {BUILD_PLACEHOLDER_COPY.settings}
+          Select a field on the canvas to edit its settings.
         </div>
       </div>
     </aside>

@@ -8,7 +8,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, MouseEvent, TouchEvent, RefObject } from 'react';
 import { BUILD_ANCHORS } from './anchors';
-import { BUILD_GRIP_ARIA_LABELS, BUILD_SECTION_LABELS } from './BuildSurface.knowledge';
 
 // ─────────────────────────────────────────────
 // 5. Logic – cfg-buildSurface (Build Surface Configuration)
@@ -113,7 +112,16 @@ function clamp(value: number, min: number, max: number) {
 }
 
 export function sectionTitle(id: SectionId) {
-  return BUILD_SECTION_LABELS[id];
+  switch (id) {
+    case 'configurations':
+      return 'Configurations';
+    case 'atomic-components':
+      return 'Atomic Components';
+    case 'search-configurations':
+      return 'Search Configurations';
+    default:
+      return id;
+  }
 }
 
 // [5.2] cfg-buildSurface · Container · "Section Logic Hook"
@@ -265,7 +273,7 @@ function useSectionLogic(
       role: 'separator',
       tabIndex: 0,
       'aria-orientation': 'horizontal',
-      'aria-label': BUILD_GRIP_ARIA_LABELS.section(sectionTitle(id)),
+      'aria-label': `Resize ${sectionTitle(id)}`,
       onMouseDown,
       onTouchStart,
       onKeyDown,
@@ -377,7 +385,7 @@ function useLeftPanelLogic(): LeftPanelLogic {
       role: 'separator',
       tabIndex: 0,
       'aria-orientation': 'vertical',
-      'aria-label': BUILD_GRIP_ARIA_LABELS.leftPanel,
+      'aria-label': 'Resize left panel',
       onMouseDown,
       onTouchStart,
       onKeyDown,
@@ -511,7 +519,7 @@ function useRightPanelLogic(): RightPanelLogic {
       role: 'separator',
       tabIndex: 0,
       'aria-orientation': 'vertical',
-      'aria-label': BUILD_GRIP_ARIA_LABELS.rightPanel,
+      'aria-label': 'Resize right panel',
       onMouseDown,
       onTouchStart,
       onKeyDown,
