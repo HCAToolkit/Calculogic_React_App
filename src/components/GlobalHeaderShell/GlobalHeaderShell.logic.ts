@@ -6,6 +6,7 @@
  * Invariants: Breakpoints derive solely from knowledge catalog; callbacks stay referentially stable; publish handler always resolves.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useContentState } from '../../content/ContentContext';
 import {
   BRAND_TAGLINE,
   BRAND_TOOLTIP,
@@ -38,7 +39,6 @@ export interface GlobalHeaderShellState {
   hoveredTab: HeaderTabId | null;
   modeMenuVisibleForTab: HeaderTabId | null;
   viewportBreakpoint: 'desktop' | 'tablet' | 'mobile';
-  activeDocId: string | null;
 }
 
 export interface GlobalHeaderShellProps {
@@ -63,8 +63,10 @@ export interface GlobalHeaderShellBuildBindings extends GlobalHeaderShellState {
   selectTabMode: (tab: 'build' | 'results', mode: HeaderModeId) => void;
   hoverTab: (tab: HeaderTabId | null) => void;
   triggerPublish: () => void;
-  openDoc: (docId: string) => void;
-  closeDoc: () => void;
+  openContent: (payload: { contentId: string; anchorId?: string }) => void;
+  closeContent: () => void;
+  activeContentId: string | null;
+  activeContentAnchorId: string | null;
 }
 
 export interface GlobalHeaderShellResultsBindings {
@@ -76,6 +78,8 @@ export interface GlobalHeaderShellResultsBindings {
       currentResultsMode: HeaderModeId;
       modeMenuVisibleForTab: HeaderTabId | null;
       viewportBreakpoint: 'desktop' | 'tablet' | 'mobile';
+      activeContentId: string | null;
+      activeContentAnchorId: string | null;
     };
   };
 }
@@ -94,7 +98,6 @@ const DEFAULT_STATE: GlobalHeaderShellState = {
   hoveredTab: null,
   modeMenuVisibleForTab: 'build',
   viewportBreakpoint: 'desktop',
-  activeDocId: null,
 };
 
 // [7.1.a] shell-globalHeader · Primitive · "Debug Panel Visibility Flag"
@@ -131,6 +134,7 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
       viewportBreakpoint: determineBreakpoint(window.innerWidth),
     };
   });
+  const { openContent, closeContent, activeContentId, activeContentAnchorId } = useContentState();
 
   // [5.2.2] shell-globalHeader · Primitive · "Viewport Resize Subscription"
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: responsive.listener
@@ -259,33 +263,6 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
     }
   }, [onPublish]);
 
-  // [5.2.6] shell-globalHeader · Primitive · "Doc Visibility Controls"
-  // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: interaction.handler
-  // Notes: Manages doc modal activation while preventing redundant updates.
-  const openDoc = useCallback((docId: string) => {
-    setState(prev => {
-      if (prev.activeDocId === docId) {
-        return prev;
-      }
-      return {
-        ...prev,
-        activeDocId: docId,
-      };
-    });
-  }, []);
-
-  const closeDoc = useCallback(() => {
-    setState(prev => {
-      if (!prev.activeDocId) {
-        return prev;
-      }
-      return {
-        ...prev,
-        activeDocId: null,
-      };
-    });
-  }, []);
-
   // [5.2.7] shell-globalHeader · Primitive · "Tab Definition Ordering"
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: data.transform
   // Notes: Ensures deterministic tab order based on knowledge-defined ordering.
@@ -324,8 +301,10 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
     selectTabMode,
     hoverTab,
     triggerPublish,
-    openDoc,
-    closeDoc,
+    openContent,
+    closeContent,
+    activeContentId,
+    activeContentAnchorId,
   };
 
   // [5.2.10] shell-globalHeader · Primitive · "Results Bindings Assembly"
@@ -340,6 +319,8 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
         currentResultsMode: state.activeModeByTab.results,
         modeMenuVisibleForTab: state.modeMenuVisibleForTab,
         viewportBreakpoint: state.viewportBreakpoint,
+        activeContentId,
+        activeContentAnchorId,
       },
     },
   };
