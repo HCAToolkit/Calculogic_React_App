@@ -22,26 +22,25 @@ export default function App() {
   // Constraints: Keep the Build tab mounted and expose the toggle within the frame shell.
   // ─────────────────────────────────────────────
 
-  // [3.3.1] cfg-appFrame · Primitive · "Theme Toggle Control"
+  // [3.2] cfg-appFrame · Primitive · "Theme Toggle Control"
   // Concern: Build · Parent: "App Frame Shell" · Catalog: control.toggle
   // Notes: Surface-level button that flips between dark and light modes.
   const themeToggle = (
     <button
       data-anchor="theme-toggle"
       onClick={toggleDark}
-      aria-label={THEME_TOGGLE_COPY.ariaLabel}
-      aria-pressed={dark}
+      aria-label="Toggle dark mode"
     >
-      {dark ? THEME_TOGGLE_COPY.dark : THEME_TOGGLE_COPY.light}
+      {dark ? '🌙 Dark' : '☀️ Light'}
     </button>
   );
 
-  // [3.3.2] cfg-appFrame · Primitive · "Build Tab Mount"
+  // [3.3] cfg-appFrame · Primitive · "Build Tab Mount"
   // Concern: Build · Parent: "App Frame Shell" · Catalog: layout.mount
   // Notes: Always renders the Build tab to keep routing simple and anchors stable.
   const buildTabMount = <BuildTab />;
 
-  // [3.1.1] cfg-appFrame · Container · "App Frame Shell"
+  // [3.1] cfg-appFrame · Container · "App Frame Shell"
   // Concern: Build · Parent: "—" · Catalog: layout.container
   // Notes: Hosts the global header, theme toggle, and persistent Build tab mount.
   return (

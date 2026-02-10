@@ -41,12 +41,14 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - **[3.1.2] Container – "Build Surface Layout"**
   - Catalog base: layout.split
   - Anchor: `data-anchor="builder-root"`
-  - Children: `[3.2.1] Build Surface Composer`, `[3.2.3] Catalog Column`, `[3.2.4] Preview Stage`, `[3.2.5] Inspector Column`.
+  - Children: `[3.2.1] Build Surface Composer`, `[3.2.2] Header Chrome`, `[3.2.3] Catalog Column`, `[3.2.4] Preview Stage`, `[3.2.5] Inspector Column`.
 
 ### 3.2 Atomic Components — Subcontainers (Build)
 - **[3.2.1] Subcontainer – "Build Surface Composer"**
   - Location: src/tabs/build/index.tsx
   - Purpose: Default export binding Logic to Build surface view.
+- **[3.2.2] Subcontainer – "Header Chrome"**
+  - Anchor: `data-anchor="builder-header"`
   - Children: tab list, publish CTA, header title.
 - **[3.2.3] Subcontainer – "Catalog Column"**
   - Anchor: `data-anchor="builder-left-panel"`
@@ -110,9 +112,11 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - **[4.2.1] Primitive – "Root Surface"**
   - Applies base background, typography, and gap rules.
 - **[4.2.2] Primitive – "Header Bar"**
+  - Styles `[data-anchor="builder-header"]` with border and alignment.
 - **[4.2.3] Primitive – "Header Title"**
   - Typography treatment for builder title element.
 - **[4.2.4] Primitive – "Tab List Container"**
+  - Flex layout and spacing for `[data-anchor="builder-tabs"]`.
 - **[4.2.5] Primitive – "Tab Button Base"**
   - Base button styles shared across tab anchors.
 - **[4.2.6] Primitive – "Active Tab"**

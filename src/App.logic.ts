@@ -14,14 +14,14 @@ import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } 
 // Constraints: Only mutate body class; avoid introducing DOM structure.
 // ─────────────────────────────────────────────
 
-// [5.2.1] cfg-appFrame · Primitive · "Theme Preference State"
+// [5.1] cfg-appFrame · Primitive · "Theme Preference State"
 // Concern: Logic · Parent: "—" · Catalog: state.preference
 // Notes: Initializes dark-mode boolean from prefers-color-scheme media query.
 function useInitialDarkPreference() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
-// [5.2.3] cfg-appFrame · Primitive · "Body Class Synchronization"
+// [5.2] cfg-appFrame · Primitive · "Body Class Synchronization"
 // Concern: Logic · Parent: "Theme Preference State" · Catalog: effect.domSideEffect
 // Notes: Mirrors the dark-mode flag onto document.body without cleanup needs.
 function useBodyClass(dark: boolean) {
@@ -30,7 +30,7 @@ function useBodyClass(dark: boolean) {
   }, [dark]);
 }
 
-// [5.2.2] cfg-appFrame · Primitive · "Toggle Handler"
+// [5.3] cfg-appFrame · Primitive · "Toggle Handler"
 // Concern: Logic · Parent: "Theme Preference State" · Catalog: action.toggle
 // Notes: Provides a stable callback that flips the dark-mode boolean.
 function useDarkToggle(setDark: Dispatch<SetStateAction<boolean>>) {

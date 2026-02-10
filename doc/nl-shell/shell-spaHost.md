@@ -107,11 +107,12 @@ Coordinates with build tooling to ensure hydration entry points, but delegates n
 
 ## 9. Assembly Pattern
 ### 9.1 File Structure
-- src/main.tsx
-- src/index.css
+- src/shells/spaHost/SpaHost.build.tsx
+- src/shells/spaHost/SpaHost.build.css
+- src/shells/spaHost/index.ts
 
 ### 9.2 Assembly Logic
-- `src/main.tsx` performs the Build mount primitive and imports `src/index.css` for BuildStyle baseline rules.
+- `src/shells/spaHost/index.ts` calls the Build primitive to mount the React tree and imports the BuildStyle CSS file for global baseline rules.
 
 ### 9.3 Integration
 - Entry point referenced by src/main.tsx (or equivalent) to bootstrap the Calculogic application.
