@@ -11,7 +11,7 @@
 - Scrollable content region.
 
 ### §3.4 Primitive — "Anchor Jump Target"
-- Deterministic anchor alignment for `anchorId` navigation.
+- Deterministic anchor alignment for `anchorId` navigation; utility remains pure and exportable for edge-case tests.
 
 ## 4. BuildStyle
 ### §4.1 Container — "Drawer Visual Shell"

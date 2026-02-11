@@ -7,7 +7,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, MouseEvent, TouchEvent, RefObject } from 'react';
-import { BUILD_ANCHORS } from './anchors';
+import { BUILD_ANCHORS } from './anchors.ts';
 
 // ─────────────────────────────────────────────
 // 5. Logic – cfg-buildSurface (Build Surface Configuration)
@@ -107,7 +107,7 @@ const SECTION_ORDER: SectionId[] = [
   'search-configurations',
 ];
 
-function clamp(value: number, min: number, max: number) {
+export function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
@@ -185,8 +185,8 @@ function useSectionLogic(
   }, []);
 
   const stopDrag = useCallback(() => {
-    window.removeEventListener('mousemove', onMove as any);
-    window.removeEventListener('touchmove', onMove as any);
+    window.removeEventListener('mousemove', onMove as unknown as EventListener);
+    window.removeEventListener('touchmove', onMove as unknown as EventListener);
     window.removeEventListener('mouseup', stopDrag);
     window.removeEventListener('touchend', stopDrag);
     lastY.current = null;
@@ -199,8 +199,8 @@ function useSectionLogic(
       lastY.current = clientY;
       setDragging(true);
       document.body.style.userSelect = 'none';
-      window.addEventListener('mousemove', onMove as any, { passive: true });
-      window.addEventListener('touchmove', onMove as any, { passive: true });
+      window.addEventListener('mousemove', onMove as unknown as EventListener, { passive: true });
+      window.addEventListener('touchmove', onMove as unknown as EventListener, { passive: true });
       window.addEventListener('mouseup', stopDrag);
       window.addEventListener('touchend', stopDrag);
     },
@@ -326,8 +326,8 @@ function useLeftPanelLogic(): LeftPanelLogic {
   }, []);
 
   const stopDrag = useCallback(() => {
-    window.removeEventListener('mousemove', onMove as any);
-    window.removeEventListener('touchmove', onMove as any);
+    window.removeEventListener('mousemove', onMove as unknown as EventListener);
+    window.removeEventListener('touchmove', onMove as unknown as EventListener);
     window.removeEventListener('mouseup', stopDrag);
     window.removeEventListener('touchend', stopDrag);
     lastX.current = null;
@@ -340,8 +340,8 @@ function useLeftPanelLogic(): LeftPanelLogic {
       lastX.current = clientX;
       setDragging(true);
       document.body.style.userSelect = 'none';
-      window.addEventListener('mousemove', onMove as any, { passive: true });
-      window.addEventListener('touchmove', onMove as any, { passive: true });
+      window.addEventListener('mousemove', onMove as unknown as EventListener, { passive: true });
+      window.addEventListener('touchmove', onMove as unknown as EventListener, { passive: true });
       window.addEventListener('mouseup', stopDrag);
       window.addEventListener('touchend', stopDrag);
     },
@@ -445,8 +445,8 @@ function useRightPanelLogic(): RightPanelLogic {
   }, []);
 
   const stopDrag = useCallback(() => {
-    window.removeEventListener('mousemove', onMove as any);
-    window.removeEventListener('touchmove', onMove as any);
+    window.removeEventListener('mousemove', onMove as unknown as EventListener);
+    window.removeEventListener('touchmove', onMove as unknown as EventListener);
     window.removeEventListener('mouseup', stopDrag);
     window.removeEventListener('touchend', stopDrag);
     lastX.current = null;
@@ -459,8 +459,8 @@ function useRightPanelLogic(): RightPanelLogic {
       lastX.current = clientX;
       setDragging(true);
       document.body.style.userSelect = 'none';
-      window.addEventListener('mousemove', onMove as any, { passive: true });
-      window.addEventListener('touchmove', onMove as any, { passive: true });
+      window.addEventListener('mousemove', onMove as unknown as EventListener, { passive: true });
+      window.addEventListener('touchmove', onMove as unknown as EventListener, { passive: true });
       window.addEventListener('mouseup', stopDrag);
       window.addEventListener('touchend', stopDrag);
     },

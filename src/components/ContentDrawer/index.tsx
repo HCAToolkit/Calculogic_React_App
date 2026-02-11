@@ -1,2 +1,2 @@
-export { ContentDrawer } from './ContentDrawer';
-export type { ContentDrawerProps, ContentNode } from './ContentDrawer';
+export { default as ContentDrawer } from './ContentDrawer';
+export { toAnchorId } from './ContentDrawer.anchor';

@@ -9,6 +9,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import { resolveContent } from '../../content/contentProviders';
+import { toAnchorId } from './ContentDrawer.anchor';
 import { useContentState } from '../../content/ContentContext';
 import './ContentDrawer.css';
 
@@ -18,17 +19,6 @@ import './ContentDrawer.css';
 // Purpose: Provide shell, header, body, and anchor-target structure for drawer content.
 // Constraints: Keep anchor identifiers deterministic and preserve right-side shell wrapper.
 // ─────────────────────────────────────────────
-
-// [3.4] cfg-contentDrawer · Primitive · "Anchor Jump Target"
-// Concern: Build · Parent: "Drawer Body" · Catalog: navigation.anchor
-// Notes: Mirrors section headings into deterministic ids for hash-like in-drawer jumps.
-function toAnchorId(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
-}
 
 // ─────────────────────────────────────────────
 // 5. Logic – cfg-contentDrawer (Content Drawer Configuration)
