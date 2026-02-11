@@ -50,6 +50,7 @@ Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conf
 ### 3.3 Atomic Components — Primitives (Build)
 - **[3.3.1] Primitive – "Request Guard"**
 - **[3.3.2] Primitive – "Scope Parser"**
+  - Split namespace parser is exported for contract tests covering valid/invalid `contentId` formats.
 - **[3.3.3] Primitive – "Adapter Lookup"**
 - **[3.3.4] Primitive – "Adapter Execute"**
 - **[3.3.5] Primitive – "Raw Node Mapper"**

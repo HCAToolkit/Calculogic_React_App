@@ -173,11 +173,11 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 
 ### 5.2 Atomic Components — Primitives (Logic)
 - **[5.2.1] Primitive – "Clamp Utility"**
-  - Helper ensuring panel sizes stay within min/max bounds.
+  - Helper ensuring panel sizes stay within min/max bounds and exported for boundary-value unit tests.
 - **[5.2.2] Primitive – "Keyboard Resize Handler"**
   - Responds to arrow keys on grips for accessible resizing.
 - **[5.2.3] Primitive – "Pointer Resize Handler"**
-  - Manages pointerdown/move/up events across grips.
+  - Manages pointerdown/move/up events across grips with typed listener registration to avoid `any` casts.
 - **[5.2.4] Primitive – "Persistence Effect"**
   - Syncs panel dimensions and collapse state to `localStorage`.
 - **[5.2.5] Primitive – "Bindings Memo"**

@@ -6,7 +6,7 @@
  * Invariants: Content ids must include namespace prefix, registered providers are keyed by namespace, unresolved ids return NotFound.
  */
 
-import { HEADER_DOC_DEFINITIONS } from '../components/GlobalHeaderShell/GlobalHeaderShell.knowledge';
+import { HEADER_DOC_DEFINITIONS } from '../components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts';
 
 export interface ContentResolutionRequest<Context = unknown> {
   contentId: string;
@@ -121,7 +121,7 @@ contentProviderRegistry.registerProvider('docs', DOCS_PROVIDER);
 // [3.3.2] cfg-contentResolver · Primitive · "Scope Parser"
 // Concern: Build · Parent: "Request Intake" · Catalog: resolver.parse
 // Notes: Splits content id into namespace and provider-local identifier.
-function splitNamespace(contentId: string): { namespace: string | null; resolvedId: string | null } {
+export function splitNamespace(contentId: string): { namespace: string | null; resolvedId: string | null } {
   const [namespace, ...rest] = contentId.split(':');
   const resolvedId = rest.join(':');
 
