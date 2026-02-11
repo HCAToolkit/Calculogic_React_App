@@ -4,10 +4,10 @@ This folder provides quick-start guidance for doc-engine work and points to the 
 
 ## Canonical Standards
 
-- **CCPP (Calculogic Comment & Provenance Protocol)**: `doc/CCPP.md`
-- **CSCS (Calculogic Concern System, NL-Aligned)**: `doc/CSCS.md`
-- **General NL Skeletons**: `doc/General-NL-Skeletons.md`
-- **NL-First Workflow**: `doc/NL-First-Workflow.md`
+- **CCPP (Calculogic Comment & Provenance Protocol)**: `doc/ConventionRoutines/CCPP.md`
+- **CSCS (Calculogic Concern System, NL-Aligned)**: `doc/ConventionRoutines/CSCS.md`
+- **General NL Skeletons**: `doc/ConventionRoutines/General-NL-Skeletons.md`
+- **NL-First Workflow**: `doc/ConventionRoutines/NL-First-Workflow.md`
 
 ## Local Companion Docs
 

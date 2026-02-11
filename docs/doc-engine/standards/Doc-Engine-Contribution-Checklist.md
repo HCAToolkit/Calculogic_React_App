@@ -4,10 +4,10 @@ Use this checklist before opening or approving a doc-engine PR.
 
 ## Linked Standards (Required)
 
-- [ ] **CCPP** reviewed and applied: `doc/CCPP.md`
-- [ ] **CSCS** reviewed and applied: `doc/CSCS.md`
-- [ ] **General NL Skeletons** template/numbering followed: `doc/General-NL-Skeletons.md`
-- [ ] **NL-First Workflow** enforced (NL updated before code): `doc/NL-First-Workflow.md`
+- [ ] **CCPP** reviewed and applied: `doc/ConventionRoutines/CCPP.md`
+- [ ] **CSCS** reviewed and applied: `doc/ConventionRoutines/CSCS.md`
+- [ ] **General NL Skeletons** template/numbering followed: `doc/ConventionRoutines/General-NL-Skeletons.md`
+- [ ] **NL-First Workflow** enforced (NL updated before code): `doc/ConventionRoutines/NL-First-Workflow.md`
 
 ## NL-First and Ordering
 

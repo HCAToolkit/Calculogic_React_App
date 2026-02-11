@@ -4,10 +4,10 @@ Date: 2026-02-10
 Scope: recently changed configurations/shells identified from git history and mapped to current project paths.
 
 ## Inputs reviewed
-- `doc/CSCS.md`
-- `doc/CCPP.md`
-- `doc/General-NL-Skeletons.md`
-- `doc/NL-First-Workflow.md`
+- `doc/ConventionRoutines/CSCS.md`
+- `doc/ConventionRoutines/CCPP.md`
+- `doc/ConventionRoutines/General-NL-Skeletons.md`
+- `doc/ConventionRoutines/NL-First-Workflow.md`
 - `doc/nl-config/cfg-appFrame.md`
 - `doc/nl-config/cfg-buildSurface.md`
 - `doc/nl-shell/shell-globalHeader.md`
