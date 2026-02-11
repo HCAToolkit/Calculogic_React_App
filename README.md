@@ -119,17 +119,17 @@ npm run preview  # Preview the built app locally
 ## Configuration Architecture
 
 - External architecture document: <https://docs.google.com/document/d/1UNlEDQTqWKbuq2QIFNIhYWxzMzj_opopgXu4QIScZKA/edit>
-- Local summary: `doc/ConfigurationArchitectureSummary.md`
+- Local summary: `doc/Architecture/ConfigurationArchitectureSummary.md`
 
 ## Calculogic-Style Concern System (CSCS)
 
 The CSCS defines concern boundaries and dependency direction across Build / BuildStyle / Logic / Knowledge / Results.
 
-- Spec: `doc/CSCS.md`
-- Doc-engine mapping: `doc/DocEngine-CSCS-Mapping.md`
+- Spec: `doc/ConventionRoutines/CSCS.md`
+- Doc-engine mapping: `doc/Architecture/DocEngine-CSCS-Mapping.md`
 
 ## Comment & Provenance Protocol (CCPP)
 
 CCPP defines file headers, section/atomic comments, decision notes, and provenance annotations.
 
-- Spec: `doc/CCPP.md`
+- Spec: `doc/ConventionRoutines/CCPP.md`

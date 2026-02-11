@@ -1,6 +1,6 @@
 # shell-spaHost – SPA Host Shell
 
-This document is an instance of the ProjectShell-Level NL Skeleton defined in ../General-NL-Skeletons.md.
+This document is an instance of the ProjectShell-Level NL Skeleton defined in ../ConventionRoutines/General-NL-Skeletons.md.
 
 ## 1. Purpose and Scope
 ### 1.1 Purpose

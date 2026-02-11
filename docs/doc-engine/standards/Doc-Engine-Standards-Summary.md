@@ -1,6 +1,6 @@
 # Doc-Engine Standards Summary
 
-This summary restates required conventions for doc-engine implementation work. It is a local, practical restatement of the canonical standards in `doc/CCPP.md`, `doc/CSCS.md`, `doc/General-NL-Skeletons.md`, and `doc/NL-First-Workflow.md`.
+This summary restates required conventions for doc-engine implementation work. It is a local, practical restatement of the canonical standards in `doc/ConventionRoutines/CCPP.md`, `doc/ConventionRoutines/CSCS.md`, `doc/ConventionRoutines/General-NL-Skeletons.md`, and `doc/ConventionRoutines/NL-First-Workflow.md`.
 
 ## 1) Required File Header (CCPP)
 
