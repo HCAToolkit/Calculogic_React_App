@@ -25,7 +25,7 @@
 - Open/close state and focus return.
 
 ### §5.2 Subcontainer — "Resolver Pipeline"
-- Namespace routing and deterministic provider resolution.
+- Namespace routing and deterministic provider resolution through `contentProviderRegistry` from doc-engine.
 
 ### §5.3 Primitive — "Anchor Scroll Handler"
 - Scroll to anchor when content resolves.
@@ -35,7 +35,7 @@
 - Normalized node shape and metadata contract.
 
 ### §6.2 Subcontainer — "Static Docs Registry"
-- Initial in-memory doc provider entries.
+- Drawer-local docs registries are removed; docs payloads are sourced only through doc-engine providers backed by `header-docs.catalog`.
 
 ## 7. Results
 ### §7.1 Container — "Drawer Diagnostics"
