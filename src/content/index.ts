@@ -1,6 +1,8 @@
-export { contentProviderRegistry } from './contentEngine.ts';
-
-export { ContentProviderRegistry, splitNamespace, DOCS_PROVIDER } from '../doc-engine/index.ts';
+export {
+  ContentProviderRegistry,
+  splitNamespace,
+  DOCS_PROVIDER,
+} from '../doc-engine/index.ts';
 export type {
   ContentNode,
   ContentProvider,

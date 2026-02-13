@@ -126,8 +126,8 @@ Map/set operations, validation guards, optional event emitter for registry chang
 - Factory initializes defaults, then merges extension providers with policy checks.
 
 ### 9.3 Integration
-- Instantiated before resolver boot so adapter lookup is available at runtime.
-- Content layer re-exports the singleton so app code consumes provider registration from `src/content/index.ts`.
+- Instantiated at the application composition root before resolver boot so adapter lookup is available at runtime.
+- Module exports remain side-effect free; provider registration is performed explicitly by the consumer/composition layer.
 
 ## 10. Implementation Passes
 ### 10.1 Pass Mapping
