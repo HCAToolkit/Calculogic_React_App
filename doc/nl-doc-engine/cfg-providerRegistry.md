@@ -119,6 +119,7 @@ Map/set operations, validation guards, optional event emitter for registry chang
 - `src/docEngine/providerRegistry/ProviderRegistry.logic.ts`
 - `src/docEngine/providerRegistry/ProviderRegistry.knowledge.ts`
 - `src/docEngine/providerRegistry/ProviderRegistry.results.ts`
+- `src/content/contentEngine.ts` (app-level facade export for registry instance consumption)
 
 ### 9.2 Assembly Logic
 - Factory initializes defaults, then merges extension providers with policy checks.
