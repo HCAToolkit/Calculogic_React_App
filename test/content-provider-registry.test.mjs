@@ -1,6 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { contentProviderRegistry, splitNamespace } from '../src/doc-engine/index.ts';
+import {
+  ContentProviderRegistry,
+  DOCS_PROVIDER,
+  splitNamespace,
+} from '../src/doc-engine/index.ts';
+
+const createRegistry = () => {
+  const registry = new ContentProviderRegistry();
+  registry.registerProvider('docs', DOCS_PROVIDER);
+  return registry;
+};
 
 test('splitNamespace parses namespaced ids', () => {
   assert.deepEqual(splitNamespace('docs:doc-build'), {
@@ -15,6 +25,7 @@ test('splitNamespace rejects ids without a namespace payload', () => {
 });
 
 test('contentProviderRegistry resolves registered docs content', () => {
+  const contentProviderRegistry = createRegistry();
   const resolved = contentProviderRegistry.resolveContent({ contentId: 'docs:doc-build' });
   assert.equal(resolved.type, 'content');
   if (resolved.type === 'content') {
@@ -24,6 +35,7 @@ test('contentProviderRegistry resolves registered docs content', () => {
 });
 
 test('contentProviderRegistry returns not_found for missing docs content', () => {
+  const contentProviderRegistry = createRegistry();
   const missing = contentProviderRegistry.resolveContent({ contentId: 'docs:not-real' });
   assert.deepEqual(missing, {
     type: 'not_found',

@@ -25,7 +25,9 @@
 - Open/close state and focus return.
 
 ### §5.2 Subcontainer — "Resolver Pipeline"
-- Namespace routing and deterministic provider resolution through `contentProviderRegistry` from doc-engine.
+- Resolve through app-level content provider registry using request `{ contentId, anchorId }`.
+- Map normalized doc-engine resolver outputs into drawer-local render shapes via a thin adapter.
+- Keep unresolved namespace/invalid ids deterministic (`null` or existing missing fallback) so UI behavior remains stable.
 
 ### §5.3 Primitive — "Anchor Scroll Handler"
 - Scroll to anchor when content resolves.
