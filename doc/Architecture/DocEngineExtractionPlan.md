@@ -27,6 +27,10 @@ This document maps the current documentation engine signals in the builder UI an
 
 ## Extraction Boundary (Proposed)
 
+### Extraction staging area (implemented)
+- `src/doc-engine/*` is now the in-repo staging area for future package extraction.
+- Runtime rule: doc-engine runtime modules must not import UI feature code from `src/components/*` or `src/tabs/*`.
+
 ### 1) New doc-engine package responsibilities
 Create a dedicated package/repo that owns the following:
 - Doc content model and types (definitions, sections, links).

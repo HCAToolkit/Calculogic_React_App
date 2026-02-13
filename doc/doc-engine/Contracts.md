@@ -29,3 +29,9 @@ Used for analytics and routing without changing content identity.
   "mode": "edit"
 }
 ```
+
+
+## Extraction staging contract (current)
+- Runtime implementation is staged in `src/doc-engine/*` as the future package lift boundary.
+- Runtime modules in this boundary must not import from `src/components/*` or `src/tabs/*`.
+- Default app wiring registers a `docs` provider so existing ids (for example `docs:doc-build`) remain valid.
