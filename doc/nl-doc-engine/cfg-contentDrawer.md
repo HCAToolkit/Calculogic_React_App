@@ -25,7 +25,7 @@
 - Open/close state and focus return.
 
 ### §5.2 Subcontainer — "Resolver Pipeline"
-- Namespace routing and deterministic provider resolution.
+- Resolve through app-owned `contentProviderRegistry.resolveContent({ contentId, anchorId, context })` and map to drawer render model via thin adapter.
 
 ### §5.3 Primitive — "Anchor Scroll Handler"
 - Scroll to anchor when content resolves.
@@ -34,8 +34,8 @@
 ### §6.1 Container — "ContentNode Schema"
 - Normalized node shape and metadata contract.
 
-### §6.2 Subcontainer — "Static Docs Registry"
-- Initial in-memory doc provider entries.
+### §6.2 Subcontainer — "Content Resolution Adapter"
+- Thin deterministic adapter maps doc-engine `ContentNode | NotFound` responses into drawer render model (`doc` or `missing`) without rebuilding docs registries in UI layer.
 
 ## 7. Results
 ### §7.1 Container — "Drawer Diagnostics"

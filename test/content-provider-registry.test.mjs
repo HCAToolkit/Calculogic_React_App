@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { contentProviderRegistry, splitNamespace } from '../src/doc-engine/index.ts';
+import { splitNamespace } from '../src/doc-engine/index.ts';
+import { contentProviderRegistry } from '../src/content/contentEngine.ts';
 
 test('splitNamespace parses namespaced ids', () => {
   assert.deepEqual(splitNamespace('docs:doc-build'), {

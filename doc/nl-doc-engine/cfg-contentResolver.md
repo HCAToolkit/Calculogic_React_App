@@ -10,7 +10,7 @@ Define how raw provider payloads are resolved into normalized `ContentNode` obje
 Runs as a core domain service behind authoring and navigation components.
 
 ### 1.3 Interactions
-Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conforming to `cfg-contentNodeSchema`, and serves filtered results to `cfg-contentDrawer`.
+Accepts provider adapters registered by app composition (via `src/content/contentEngine.ts`), emits nodes conforming to `cfg-contentNodeSchema`, and serves results to `cfg-contentDrawer`.
 
 ### 1.4 In-Repo Staging Boundary
 - Runtime resolver/registry implementation is staged under `src/doc-engine/*` for future package extraction.
@@ -132,10 +132,12 @@ Promises, abortable operations, schema validation hooks.
 - `src/doc-engine/registry.ts`
 - `src/doc-engine/providers/docs.provider.ts`
 - `src/doc-engine/catalogs/header-docs.catalog.ts`
-- `src/doc-engine/index.ts`
+- `src/doc-engine/index.ts` (exports registry primitives/providers only; no side-effect registration)
+- `src/content/contentEngine.ts` (app composition root for provider registration)
 
 ### 9.2 Assembly Logic
-- Expose resolver factory that wires adapter registry, schema validator, and cache provider.
+- Expose registry class + providers from doc-engine core.
+- App layer creates singleton registry and registers providers explicitly (no doc-engine side effects).
 
 ### 9.3 Integration
 - Consumed by UI configs and backend-facing orchestration points.

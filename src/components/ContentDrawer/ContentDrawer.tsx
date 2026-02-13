@@ -35,8 +35,8 @@ export default function ContentDrawer() {
   // Concern: Logic · Parent: "Drawer State Orchestrator" · Catalog: resolver.pipeline
   // Notes: Active content id is resolved lazily and memoized per id transition.
   const resolution = useMemo(
-    () => (activeContentId ? resolveContent(activeContentId) : null),
-    [activeContentId],
+    () => (activeContentId ? resolveContent(activeContentId, activeContentAnchorId) : null),
+    [activeContentAnchorId, activeContentId],
   );
 
   // [5.3] cfg-contentDrawer · Primitive · "Anchor Scroll Handler"
