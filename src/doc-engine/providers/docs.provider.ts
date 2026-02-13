@@ -6,10 +6,10 @@
  * Invariants: Missing docs return deterministic not_found payloads matching existing runtime behavior.
  */
 
-import { HEADER_DOC_DEFINITIONS } from '../catalogs/header-docs.catalog.ts';
+import { HEADER_DOC_DEFINITIONS, type HeaderDocDefinition } from '../catalogs/header-docs.catalog.ts';
 import type { ContentProvider } from '../types.ts';
 
-export const DOCS_PROVIDER: ContentProvider = {
+export const DOCS_PROVIDER: ContentProvider<unknown, HeaderDocDefinition> = {
   resolveContent: ({ contentId, anchorId }) => {
     const doc = HEADER_DOC_DEFINITIONS[contentId];
 

@@ -37,7 +37,7 @@
 - Normalized node shape and metadata contract.
 
 ### §6.2 Subcontainer — "Static Docs Registry"
-- Initial in-memory doc provider entries.
+- Drawer-local docs registries are removed; docs payloads are sourced only through doc-engine providers backed by `header-docs.catalog`.
 
 ## 7. Results
 ### §7.1 Container — "Drawer Diagnostics"
