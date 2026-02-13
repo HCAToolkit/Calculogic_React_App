@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useMemo, useRef } from 'react';
-import { resolveContent } from '../../content/contentProviders';
+import { resolveDrawerContent } from '../../content/contentResolutionAdapter';
 import { toAnchorId } from './ContentDrawer.anchor';
 import { useContentState } from '../../content/ContentContext';
 import './ContentDrawer.css';
@@ -35,8 +35,11 @@ export default function ContentDrawer() {
   // Concern: Logic · Parent: "Drawer State Orchestrator" · Catalog: resolver.pipeline
   // Notes: Active content id is resolved lazily and memoized per id transition.
   const resolution = useMemo(
-    () => (activeContentId ? resolveContent(activeContentId) : null),
-    [activeContentId],
+    () =>
+      activeContentId
+        ? resolveDrawerContent(activeContentId, activeContentAnchorId ?? undefined)
+        : null,
+    [activeContentAnchorId, activeContentId],
   );
 
   // [5.3] cfg-contentDrawer · Primitive · "Anchor Scroll Handler"
