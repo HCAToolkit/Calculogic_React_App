@@ -8,7 +8,7 @@
  */
 
 import { useEffect, useMemo, useRef } from 'react';
-import { resolveContent } from '../../content/contentProviders';
+import { resolveDrawerContent } from '../../content/contentResolutionAdapter';
 import { toAnchorId } from './ContentDrawer.anchor';
 import { useContentState } from '../../content/ContentContext';
 import './ContentDrawer.css';
@@ -35,8 +35,11 @@ export default function ContentDrawer() {
   // Concern: Logic · Parent: "Drawer State Orchestrator" · Catalog: resolver.pipeline
   // Notes: Active content id is resolved lazily and memoized per id transition.
   const resolution = useMemo(
-    () => (activeContentId ? resolveContent(activeContentId) : null),
-    [activeContentId],
+    () =>
+      activeContentId
+        ? resolveDrawerContent(activeContentId, activeContentAnchorId ?? undefined)
+        : null,
+    [activeContentAnchorId, activeContentId],
   );
 
   // [5.3] cfg-contentDrawer · Primitive · "Anchor Scroll Handler"
@@ -58,32 +61,7 @@ export default function ContentDrawer() {
     return null;
   }
 
-  if (!resolution) {
-    return (
-      // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
-      // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
-      // Notes: Fallback shell preserves placement when no provider can resolve the id.
-      <aside className="content-drawer" data-anchor="content-drawer">
-        {/* [3.2] cfg-contentDrawer · Subcontainer · "Drawer Header"
-            Concern: Build · Parent: "Content Drawer Shell" · Catalog: layout.header
-            Notes: Announces unavailable state while keeping close affordance visible. */}
-        <div className="content-drawer__header">
-          <div>
-            <p className="content-drawer__eyebrow">Content</p>
-            <h2 className="content-drawer__title">Unavailable content</h2>
-            <p className="content-drawer__summary">
-              No provider could resolve <strong>{activeContentId}</strong>.
-            </p>
-          </div>
-          <button type="button" className="content-drawer__close" onClick={closeContent}>
-            Close
-          </button>
-        </div>
-      </aside>
-    );
-  }
-
-  if (resolution.kind === 'missing') {
+  if (!resolution || resolution.type === 'not_found') {
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
       // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
@@ -97,7 +75,8 @@ export default function ContentDrawer() {
             <p className="content-drawer__eyebrow">Content</p>
             <h2 className="content-drawer__title">Content not found</h2>
             <p className="content-drawer__summary">
-              The provider could not resolve <strong>{resolution.contentId}</strong>.
+              The provider could not resolve{' '}
+              <strong>{resolution?.contentId ? `${resolution.namespace ? `${resolution.namespace}:` : ''}${resolution.contentId}` : activeContentId}</strong>.
             </p>
           </div>
           <button type="button" className="content-drawer__close" onClick={closeContent}>
@@ -108,8 +87,8 @@ export default function ContentDrawer() {
     );
   }
 
-  if (resolution.kind === 'doc') {
-    const doc = resolution.doc;
+  if (resolution.type === 'content' && resolution.namespace === 'docs') {
+    const doc = resolution.payload as HeaderDocDefinition;
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
       // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell

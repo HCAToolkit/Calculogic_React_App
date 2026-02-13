@@ -92,6 +92,7 @@ Map/set operations, validation guards, optional event emitter for registry chang
 
 ### 6.2 Constants
 - Registry event names, default provider list, compatibility policy version.
+- App-level singleton registry initialized in `src/content/contentEngine.ts` with explicit `docs` namespace registration.
 
 ### 6.3 Shared / Global Reference
 - Exports provider metadata used by resolver and drawer.
@@ -119,13 +120,14 @@ Map/set operations, validation guards, optional event emitter for registry chang
 - `src/docEngine/providerRegistry/ProviderRegistry.logic.ts`
 - `src/docEngine/providerRegistry/ProviderRegistry.knowledge.ts`
 - `src/docEngine/providerRegistry/ProviderRegistry.results.ts`
-- `src/content/contentEngine.ts` (app-level facade export for registry instance consumption)
+- `src/content/contentEngine.ts`
 
 ### 9.2 Assembly Logic
 - Factory initializes defaults, then merges extension providers with policy checks.
 
 ### 9.3 Integration
-- Instantiated before resolver boot so adapter lookup is available at runtime.
+- Instantiated at the application composition root before resolver boot so adapter lookup is available at runtime.
+- Module exports remain side-effect free; provider registration is performed explicitly by the consumer/composition layer.
 
 ## 10. Implementation Passes
 ### 10.1 Pass Mapping

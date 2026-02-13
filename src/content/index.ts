@@ -1,6 +1,5 @@
 export {
   ContentProviderRegistry,
-  contentProviderRegistry,
   splitNamespace,
   DOCS_PROVIDER,
 } from '../doc-engine/index.ts';
