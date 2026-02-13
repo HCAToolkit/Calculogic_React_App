@@ -12,6 +12,10 @@ Runs as a core domain service behind authoring and navigation components.
 ### 1.3 Interactions
 Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conforming to `cfg-contentNodeSchema`, and serves filtered results to `cfg-contentDrawer`.
 
+### 1.4 In-Repo Staging Boundary
+- Runtime resolver/registry implementation is staged under `src/doc-engine/*` for future package extraction.
+- Resolver runtime modules must not import from UI feature directories (`src/components/*`, `src/tabs/*`).
+
 ## 2. Configuration Contracts
 ### 2.1 TypeScript Interfaces
 - `ContentResolverRequest` – provider key, scope descriptor, optional query/filter options.
@@ -124,10 +128,11 @@ Promises, abortable operations, schema validation hooks.
 
 ## 9. Assembly Pattern
 ### 9.1 File Structure
-- `src/docEngine/contentResolver/ContentResolver.build.ts`
-- `src/docEngine/contentResolver/ContentResolver.logic.ts`
-- `src/docEngine/contentResolver/ContentResolver.knowledge.ts`
-- `src/docEngine/contentResolver/ContentResolver.results.ts`
+- `src/doc-engine/types.ts`
+- `src/doc-engine/registry.ts`
+- `src/doc-engine/providers/docs.provider.ts`
+- `src/doc-engine/catalogs/header-docs.catalog.ts`
+- `src/doc-engine/index.ts`
 
 ### 9.2 Assembly Logic
 - Expose resolver factory that wires adapter registry, schema validator, and cache provider.

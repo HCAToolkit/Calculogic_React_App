@@ -1,10 +1,16 @@
 export {
   ContentProviderRegistry,
   contentProviderRegistry,
-} from './ContentProviderRegistry';
+  splitNamespace,
+  DOCS_PROVIDER,
+} from '../doc-engine/index.ts';
 export type {
   ContentNode,
   ContentProvider,
   ContentResolutionRequest,
   NotFound,
-} from './ContentProviderRegistry';
+  ContentMeta,
+  HeaderDocDefinition,
+  HeaderDocLink,
+  HeaderDocSection,
+} from '../doc-engine/index.ts';
