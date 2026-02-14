@@ -6,12 +6,6 @@
  * Invariants: Tab identifiers remain stable; breakpoint ordering matches logic heuristic; brand copy stays synced with marketing voice.
  */
 
-import {
-  HEADER_DOC_DEFINITIONS,
-  resolveHeaderDoc,
-  type HeaderDocDefinition,
-} from '../../doc-engine/catalogs/header-docs.catalog.ts';
-
 // ─────────────────────────────────────────────
 // 6. Knowledge – shell-globalHeader (Global Header Shell)
 // NL Sections: §6.1–§6.9 in shell-globalHeader.md
@@ -176,8 +170,3 @@ export const BRAND_TOOLTIP = 'Return to Calculogic home / dashboard.';
 // Notes: Publish CTA text consumed by build concern.
 export const PUBLISH_LABEL = 'Publish';
 
-// [6.5.d] shell-globalHeader · Primitive · "Header Documentation Definitions"
-// Concern: Knowledge · Catalog: data.collection
-// Notes: Encodes contextual documentation surfaced via info icon modal per concern via doc-engine catalog import.
-export { HEADER_DOC_DEFINITIONS, resolveHeaderDoc };
-export type { HeaderDocDefinition };

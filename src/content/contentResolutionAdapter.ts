@@ -6,12 +6,8 @@
  * Invariants: Docs payloads map to drawer doc shape, docs not_found maps to drawer missing shape, invalid or unsupported ids map to null.
  */
 
-import {
-  contentProviderRegistry,
-  type ContentNode,
-  type HeaderDocDefinition,
-  type NotFound,
-} from './index';
+import { type ContentNode, type HeaderDocDefinition, type NotFound } from './index';
+import { contentProviderRegistry } from './contentEngine';
 
 export type DrawerContentResolution =
   | {

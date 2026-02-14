@@ -61,7 +61,7 @@ export default function ContentDrawer() {
     return null;
   }
 
-  if (!resolution || resolution.type === 'not_found') {
+  if (!resolution || resolution.kind === 'missing') {
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
       // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
@@ -75,8 +75,7 @@ export default function ContentDrawer() {
             <p className="content-drawer__eyebrow">Content</p>
             <h2 className="content-drawer__title">Content not found</h2>
             <p className="content-drawer__summary">
-              The provider could not resolve{' '}
-              <strong>{resolution?.contentId ? `${resolution.namespace ? `${resolution.namespace}:` : ''}${resolution.contentId}` : activeContentId}</strong>.
+              The provider could not resolve <strong>{resolution?.contentId ?? activeContentId}</strong>.
             </p>
           </div>
           <button type="button" className="content-drawer__close" onClick={closeContent}>
@@ -87,8 +86,8 @@ export default function ContentDrawer() {
     );
   }
 
-  if (resolution.type === 'content' && resolution.namespace === 'docs') {
-    const doc = resolution.payload as HeaderDocDefinition;
+  if (resolution.kind === 'doc') {
+    const { doc } = resolution;
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
       // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
