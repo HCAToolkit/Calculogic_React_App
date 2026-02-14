@@ -8,6 +8,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, MouseEvent, TouchEvent, RefObject } from 'react';
 import { BUILD_ANCHORS } from './anchors.ts';
+import {
+  defaultBuildSurfacePersistenceReporter,
+  readBuildSurfaceStorage,
+  writeBuildSurfaceStorage,
+} from './buildSurfacePersistence.ts';
 
 // ─────────────────────────────────────────────
 // 5. Logic – cfg-buildSurface (Build Surface Configuration)
@@ -135,33 +140,40 @@ function useSectionLogic(
   const lastY = useRef<number | null>(null);
   const previousHeight = useRef<number | null>(null);
   const [isDragging, setDragging] = useState(false);
-  const [state, setState] = useState<SectionState>(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (!raw) return { height: initialHeight, collapsed: false };
-      const parsed = JSON.parse(raw) as Partial<SectionState>;
-      if (
-        typeof parsed.height === 'number' &&
-        Number.isFinite(parsed.height) &&
-        typeof parsed.collapsed === 'boolean'
-      ) {
-        return {
-          height: parsed.height,
-          collapsed: parsed.collapsed,
-        };
-      }
-    } catch {
-      // ignore storage errors
-    }
-    return { height: initialHeight, collapsed: false };
-  });
+  const [state, setState] = useState<SectionState>(() =>
+    readBuildSurfaceStorage(
+      storageKey,
+      () => {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return { height: initialHeight, collapsed: false };
+        const parsed = JSON.parse(raw) as Partial<SectionState>;
+        if (
+          typeof parsed.height === 'number' &&
+          Number.isFinite(parsed.height) &&
+          typeof parsed.collapsed === 'boolean'
+        ) {
+          return {
+            height: parsed.height,
+            collapsed: parsed.collapsed,
+          };
+        }
+
+        defaultBuildSurfacePersistenceReporter({
+          operation: 'read',
+          storageKey,
+          error: new Error('Malformed persisted section state payload'),
+        });
+
+        return { height: initialHeight, collapsed: false };
+      },
+      { height: initialHeight, collapsed: false }
+    )
+  );
 
   useEffect(() => {
-    try {
+    writeBuildSurfaceStorage(storageKey, () => {
       localStorage.setItem(storageKey, JSON.stringify(state));
-    } catch {
-      // ignore storage errors
-    }
+    });
   }, [state, storageKey]);
 
   const onMove = useCallback((event: MouseEvent | TouchEvent) => {
@@ -286,28 +298,35 @@ function useSectionLogic(
 // Notes: Persists catalog column width and exposes accessible grip bindings.
 function useLeftPanelLogic(): LeftPanelLogic {
   const STORAGE_KEY = 'left-panel-width';
-  const [width, setWidth] = useState(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return 320;
-      const parsed = Number(raw);
-      if (Number.isFinite(parsed)) {
-        return clamp(parsed, 160, Math.max(160, window.innerWidth - 320));
-      }
-    } catch {
-      // ignore storage errors
-    }
-    return 320;
-  });
+  const [width, setWidth] = useState(() =>
+    readBuildSurfaceStorage(
+      STORAGE_KEY,
+      () => {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return 320;
+        const parsed = Number(raw);
+        if (Number.isFinite(parsed)) {
+          return clamp(parsed, 160, Math.max(160, window.innerWidth - 320));
+        }
+
+        defaultBuildSurfacePersistenceReporter({
+          operation: 'read',
+          storageKey: STORAGE_KEY,
+          error: new Error('Malformed persisted left panel width payload'),
+        });
+
+        return 320;
+      },
+      320
+    )
+  );
   const [isDragging, setDragging] = useState(false);
   const lastX = useRef<number | null>(null);
 
   useEffect(() => {
-    try {
+    writeBuildSurfaceStorage(STORAGE_KEY, () => {
       localStorage.setItem(STORAGE_KEY, String(width));
-    } catch {
-      // ignore
-    }
+    });
   }, [width]);
 
   const onMove = useCallback((event: MouseEvent | TouchEvent) => {
@@ -398,34 +417,41 @@ function useLeftPanelLogic(): LeftPanelLogic {
 // Notes: Manages inspector width persistence, collapse toggles, and grip bindings.
 function useRightPanelLogic(): RightPanelLogic {
   const STORAGE_KEY = 'right-panel-state';
-  const [state, setState] = useState<RightPanelState>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<RightPanelState>;
-        if (
-          typeof parsed.width === 'number' &&
-          Number.isFinite(parsed.width) &&
-          typeof parsed.collapsed === 'boolean'
-        ) {
-          return parsed as RightPanelState;
+  const [state, setState] = useState<RightPanelState>(() =>
+    readBuildSurfaceStorage(
+      STORAGE_KEY,
+      () => {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as Partial<RightPanelState>;
+          if (
+            typeof parsed.width === 'number' &&
+            Number.isFinite(parsed.width) &&
+            typeof parsed.collapsed === 'boolean'
+          ) {
+            return parsed as RightPanelState;
+          }
         }
-      }
-    } catch {
-      // ignore storage errors
-    }
-    return { width: 320, collapsed: false };
-  });
+
+        defaultBuildSurfacePersistenceReporter({
+          operation: 'read',
+          storageKey: STORAGE_KEY,
+          error: new Error('Malformed persisted right panel state payload'),
+        });
+
+        return { width: 320, collapsed: false };
+      },
+      { width: 320, collapsed: false }
+    )
+  );
   const [isDragging, setDragging] = useState(false);
   const lastX = useRef<number | null>(null);
   const previousWidth = useRef<number | null>(null);
 
   useEffect(() => {
-    try {
+    writeBuildSurfaceStorage(STORAGE_KEY, () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      // ignore
-    }
+    });
   }, [state]);
 
   const onMove = useCallback((event: MouseEvent | TouchEvent) => {
