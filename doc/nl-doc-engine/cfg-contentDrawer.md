@@ -26,8 +26,8 @@
 
 ### §5.2 Subcontainer — "Resolver Pipeline"
 - Resolve through app-level content provider registry using request `{ contentId, anchorId }`.
-- Route content resolution through one authoritative chain only: `contentProviderRegistry -> docs.provider -> header-docs.catalog`.
-- Map normalized doc-engine resolver outputs into drawer-local render shapes via a thin adapter (doc|missing) and remove competing resolver branches from the runtime drawer path.
+- Keep doc-engine resolver outputs in their canonical discriminated union (`type: 'content' | 'not_found'`) for drawer rendering.
+- Use adapter narrowing only for docs namespace eligibility (unsupported namespaces still return `null`).
 - Keep unresolved namespace/invalid ids deterministic (`null` or existing missing fallback) so UI behavior remains stable.
 
 ### §5.3 Primitive — "Anchor Scroll Handler"

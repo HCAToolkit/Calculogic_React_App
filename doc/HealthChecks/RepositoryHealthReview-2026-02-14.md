@@ -241,6 +241,8 @@
 ---
 
 ## 10) Open questions
-1. Should drawer consumers use a doc-engine-native response union (`type`) directly, or should UI-facing adapters keep a dedicated union (`kind`) boundary?
-2. Is `docs/` intended to mirror `doc/` permanently, or is one directory legacy?
-3. Should localStorage failures be user-silent in production, or surfaced via telemetry/logging hooks?
+1. **Answer/decision:** The engine contract is canonical and reusable; UI adapters may wrap it for view-model shaping, but must not introduce a competing discriminant union.
+2. **Answer/decision:** `doc/ConventionRoutines/*` is canonical in this repository; `docs/` is non-canonical and should be treated as legacy/non-authoritative.
+3. **Answer/decision:** Persistence failures are user-silent and system-loud: recover safely for the user while emitting non-fatal diagnostics through a reporting hook.
+
+Implementation note: enforce these decisions via follow-up tasks that (a) lock a single discriminant contract at the adapter boundary, (b) codify canonical docs ownership in `doc/README.md` and deprecate `docs/`, and (c) add a shared persistence helper with a non-fatal reporting callback.
