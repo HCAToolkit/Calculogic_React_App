@@ -13,3 +13,6 @@ export type {
   HeaderDocLink,
   HeaderDocSection,
 } from '../doc-engine/index.ts';
+
+// NOTE: contentProviderRegistry is intentionally not re-exported from this barrel.
+// Import it from ./contentEngine to keep a single canonical ownership path.
