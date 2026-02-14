@@ -7,11 +7,12 @@
  */
 
 import {
-  contentProviderRegistry,
   type ContentNode,
   type HeaderDocDefinition,
   type NotFound,
 } from './index';
+// Canonical source: contentProviderRegistry lives in contentEngine.ts (owner module).
+import { contentProviderRegistry } from './contentEngine';
 
 export type DrawerContentResolution =
   | {
