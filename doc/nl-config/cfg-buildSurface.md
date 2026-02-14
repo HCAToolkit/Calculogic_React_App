@@ -182,6 +182,8 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Syncs panel dimensions and collapse state to `localStorage`.
 - **[5.2.5] Primitive – "Bindings Memo"**
   - Memoized object mapping anchors to handlers/aria attributes consumed by Build.
+- **[5.2.6] Primitive – "Persistence Failure Reporter"**
+  - Shared non-fatal reporting hook used by persistence reads/writes to emit diagnosable storage operation failures.
 
 ### 5.2.3 Derived Values
 - Derived booleans for collapsed states, computed widths/heights.
@@ -232,6 +234,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - src/tabs/build/BuildSurface.build.tsx
 - src/tabs/build/BuildSurface.build.module.css
 - src/tabs/build/BuildSurface.logic.ts
+- src/tabs/build/buildSurfacePersistence.ts
 - src/tabs/build/BuildSurface.knowledge.ts
 - (Results and ResultsStyle files will be added when outputs exist.)
 - src/tabs/build/index.ts
