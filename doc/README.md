@@ -10,6 +10,7 @@
 - [Repository Health Review — 2026-02-10](./HealthChecks/RepositoryHealthReview-2026-02-10.md)
 - [Repository Health Review — 2026-02-11](./HealthChecks/RepositoryHealthReview-2026-02-11.md)
 - [Repository Health Review — 2026-02-14](./HealthChecks/RepositoryHealthReview-2026-02-14.md)
+- [Repository Health Review — 2026-02-14 (Deep Dive)](./HealthChecks/RepositoryHealthReview-2026-02-14-DeepDive.md)
 
 ## Compliance Audits
 - [Compliance Audit — 2026-02-10](./ComplianceAudits/ComplianceAudit-2026-02-10.md)
