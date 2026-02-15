@@ -1,10 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  ContentProviderRegistry,
-  DOCS_PROVIDER,
-  splitNamespace,
-} from '../src/doc-engine/index.ts';
+import { ContentProviderRegistry, splitNamespace } from '../src/doc-engine/index.ts';
+import { DOCS_PROVIDER } from '../src/content/providers/docs.provider.ts';
 
 const createRegistry = () => {
   const registry = new ContentProviderRegistry();

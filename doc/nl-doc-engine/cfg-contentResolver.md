@@ -130,12 +130,13 @@ Promises, abortable operations, schema validation hooks.
 ### 9.1 File Structure
 - `src/doc-engine/types.ts`
 - `src/doc-engine/registry.ts`
-- `src/doc-engine/providers/docs.provider.ts`
-- `src/doc-engine/catalogs/header-docs.catalog.ts`
+- `src/content/providers/docs.provider.ts`
+- `src/content/packs/header-docs/header-docs.catalog.ts`
 - `src/doc-engine/index.ts`
 
 ### 9.2 Assembly Logic
 - Expose resolver factory that wires adapter registry, schema validator, and cache provider.
+- App-owned docs catalog and provider are composed from `src/content/*`; doc-engine exports core resolver contracts only.
 
 ### 9.3 Integration
 - Consumed by UI configs and backend-facing orchestration points.
