@@ -7,11 +7,12 @@
  */
 
 import { HEADER_DOC_DEFINITIONS, type HeaderDocDefinition } from '../packs/header-docs/header-docs.catalog.ts';
+import { isHeaderDocId } from '../packs/header-docs/header-doc.ids.ts';
 import type { ContentProvider } from '../../doc-engine/types.ts';
 
 export const DOCS_PROVIDER: ContentProvider<unknown, HeaderDocDefinition> = {
   resolveContent: ({ contentId, anchorId }) => {
-    const doc = HEADER_DOC_DEFINITIONS[contentId];
+    const doc = isHeaderDocId(contentId) ? HEADER_DOC_DEFINITIONS[contentId] : null;
 
     if (!doc) {
       return {

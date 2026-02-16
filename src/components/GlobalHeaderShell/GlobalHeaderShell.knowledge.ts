@@ -13,6 +13,8 @@
 // Constraints: Values must remain serializable and environment-agnostic.
 // ─────────────────────────────────────────────
 
+import { HEADER_DOC_IDS, type HeaderDocId } from '../../content/packs/header-docs/header-doc.ids.ts';
+
 // [6.1] shell-globalHeader · Primitive · "Header Tab Identifier Types"
 // Concern: Knowledge · Catalog: types.identifier
 // Notes: Enumerates supported tab and mode identifiers shared across concerns.
@@ -26,7 +28,7 @@ export interface HeaderTabDefinition {
   id: HeaderTabId;
   label: string;
   order: number;
-  docId: string;
+  docId: HeaderDocId;
   hoverSummary: string;
 }
 
@@ -42,7 +44,7 @@ export interface HeaderModeDefinition {
   id: HeaderModeId;
   label: string;
   description: string;
-  docId?: string;
+  docId?: HeaderDocId;
   hoverSummary?: string;
 }
 
@@ -58,25 +60,25 @@ export const HEADER_TAB_MAP: Record<HeaderTabId, HeaderTabMapEntry> = {
   build: {
     label: 'Build',
     order: 1,
-    docId: 'doc-build',
+    docId: HEADER_DOC_IDS.build,
     hoverSummary: 'Owns and arranges structure: containers, sub-containers, and atomic components.',
   },
   logic: {
     label: 'Logic',
     order: 2,
-    docId: 'doc-logic',
+    docId: HEADER_DOC_IDS.logic,
     hoverSummary: 'Defines calculations, conditions, validation rules, and interactions.',
   },
   knowledge: {
     label: 'Knowledge',
     order: 3,
-    docId: 'doc-knowledge',
+    docId: HEADER_DOC_IDS.knowledge,
     hoverSummary: 'Stores reusable traits, constants, and reference schemas.',
   },
   results: {
     label: 'Results',
     order: 4,
-    docId: 'doc-results',
+    docId: HEADER_DOC_IDS.results,
     hoverSummary: 'Derived outputs and summaries produced from structure + logic + knowledge.',
   },
 };
@@ -94,14 +96,14 @@ export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
       id: 'default',
       label: 'Build',
       description: 'Define and arrange containers, sub-containers, and atomic components.',
-      docId: 'doc-build',
+      docId: HEADER_DOC_IDS.build,
       hoverSummary: 'Build mode focuses on the structural hierarchy and anchor placement.',
     },
     style: {
       id: 'style',
       label: 'Style',
       description: 'Configure layout-affecting style for Build outputs (grouping, alignment, sizing).',
-      docId: 'doc-build',
+      docId: HEADER_DOC_IDS.build,
       hoverSummary: 'Style the structural outputs without mutating the canonical container tree.',
     },
   },
@@ -110,14 +112,14 @@ export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
       id: 'default',
       label: 'Results',
       description: 'Design and inspect derived outputs, scores, and summaries.',
-      docId: 'doc-results',
+      docId: HEADER_DOC_IDS.results,
       hoverSummary: 'Review the derived outputs before sharing or publishing.',
     },
     style: {
       id: 'style',
       label: 'Style',
       description: 'Configure layout-affecting style for Results outputs (cards, grouping, highlight rules).',
-      docId: 'doc-results',
+      docId: HEADER_DOC_IDS.results,
       hoverSummary: 'Adjust the presentation for results without redefining calculations.',
     },
   },

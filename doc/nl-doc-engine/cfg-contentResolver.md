@@ -102,12 +102,15 @@ Promises, abortable operations, schema validation hooks.
 ## 6. Knowledge Concern (Reference Data)
 ### 6.1 Maps / Dictionaries
 - Provider-to-adapter map and node-type normalization map.
+- Header docs catalog keyed by pack-owned `HeaderDocId` constants from `header-doc.ids.ts`.
 
 ### 6.2 Constants
 - Cache TTL defaults, retry limits, resolver error codes.
+- Canonical header doc identifiers (`doc-build`, `doc-logic`, `doc-knowledge`, `doc-results`) exported from pack-owned ids module.
 
 ### 6.3 Shared / Global Reference
 - Shares schema version and provider capability constants with sibling configs.
+- Exposes docs namespace formatting helper (`toDocsContentId`) at the pack/provider boundary so shell components avoid inline id encoding details.
 
 ## 7. Results Concern (Outputs)
 ### 7.1 User-Facing Outputs
@@ -131,6 +134,7 @@ Promises, abortable operations, schema validation hooks.
 - `src/doc-engine/types.ts`
 - `src/doc-engine/registry.ts`
 - `src/content/providers/docs.provider.ts`
+- `src/content/packs/header-docs/header-doc.ids.ts`
 - `src/content/packs/header-docs/header-docs.catalog.ts`
 - `src/doc-engine/index.ts`
 
