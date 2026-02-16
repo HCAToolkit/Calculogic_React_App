@@ -56,9 +56,9 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
    - Path: `src/content/index.ts`  
    - Outcome: entrypoint ownership is explicit (`src/doc-engine` for engine runtime, `src/content` for app content).
 
-3. **Medium — shell knowledge still leaks doc/content identifiers into UI feature layer**  
-   - Paths: `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`, `src/components/GlobalHeaderShell/index.tsx`  
-   - Risk: keeping doc-id semantics in header knowledge is fine short term, but it tangles future reusable content packs with a specific UI shell vocabulary.
+3. **Resolved — shell knowledge now consumes canonical header-doc IDs from content pack module**  
+   - Paths: `src/content/packs/header-docs/header-doc.ids.ts`, `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`  
+   - Outcome: `src/content/packs/header-docs/header-doc.ids.ts` is now the canonical ID source, and `GlobalHeaderShell.knowledge.ts` consumes pack-provided IDs instead of hardcoding values.
 
 4. **Resolved — doc-engine documentation roots consolidated**  
    - Path: `doc/doc-engine/` (canonical)  
