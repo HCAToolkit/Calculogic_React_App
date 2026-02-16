@@ -6,7 +6,9 @@
  * Invariants: Anchor usage mirrors Build structure; persisted dimensions stay within safe bounds.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { KeyboardEvent, MouseEvent, TouchEvent, RefObject } from 'react';
+import type { KeyboardEvent, PointerEvent, RefObject } from 'react';
+import { clampNumber } from '../../shared/interaction/pointerDrag.ts';
+import { usePointerDrag } from '../../shared/interaction/usePointerDrag.ts';
 import { BUILD_ANCHORS } from './anchors.ts';
 import {
   defaultBuildSurfacePersistenceReporter,
@@ -56,8 +58,7 @@ export interface SectionLogicBinding {
     tabIndex: number;
     'aria-orientation': 'horizontal';
     'aria-label': string;
-    onMouseDown: (event: MouseEvent<HTMLDivElement>) => void;
-    onTouchStart: (event: TouchEvent<HTMLDivElement>) => void;
+    onPointerDown: (event: PointerEvent<HTMLDivElement>) => void;
     onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
   };
 }
@@ -70,8 +71,7 @@ interface LeftPanelLogic {
     tabIndex: number;
     'aria-orientation': 'vertical';
     'aria-label': string;
-    onMouseDown: (event: MouseEvent<HTMLDivElement>) => void;
-    onTouchStart: (event: TouchEvent<HTMLDivElement>) => void;
+    onPointerDown: (event: PointerEvent<HTMLDivElement>) => void;
     onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
   };
 }
@@ -92,8 +92,7 @@ interface RightPanelLogic {
     tabIndex: number;
     'aria-orientation': 'vertical';
     'aria-label': string;
-    onMouseDown: (event: MouseEvent<HTMLDivElement>) => void;
-    onTouchStart: (event: TouchEvent<HTMLDivElement>) => void;
+    onPointerDown: (event: PointerEvent<HTMLDivElement>) => void;
     onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
   };
 }
@@ -113,7 +112,7 @@ const SECTION_ORDER: SectionId[] = [
 ];
 
 export function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
+  return clampNumber(value, min, max);
 }
 
 export function sectionTitle(id: SectionId) {
@@ -137,9 +136,7 @@ function useSectionLogic(
   { initialHeight, storageKey, gripVisible = true }: SectionLogicOptions
 ): SectionLogicBinding {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const lastY = useRef<number | null>(null);
   const previousHeight = useRef<number | null>(null);
-  const [isDragging, setDragging] = useState(false);
   const [state, setState] = useState<SectionState>(() =>
     readBuildSurfaceStorage(
       storageKey,
@@ -176,65 +173,21 @@ function useSectionLogic(
     });
   }, [state, storageKey]);
 
-  const onMove = useCallback((event: MouseEvent | TouchEvent) => {
-    const client =
-      'touches' in event && event.touches.length
-        ? event.touches[0].clientY
-        : (event as MouseEvent).clientY;
-    const previousClient = lastY.current ?? client;
-    const delta = client - previousClient;
-    lastY.current = client;
-    setState(previous => {
-      const min = 32;
-      const parent = containerRef.current?.parentElement;
-      const parentHeight = parent
-        ? parent.getBoundingClientRect().height
-        : window.innerHeight;
-      const max = Math.max(min, parentHeight - 2 * min);
-      const height = clamp(Math.round(previous.height + delta), min, max);
-      return { ...previous, height, collapsed: height <= min };
-    });
-  }, []);
-
-  const stopDrag = useCallback(() => {
-    window.removeEventListener('mousemove', onMove as unknown as EventListener);
-    window.removeEventListener('touchmove', onMove as unknown as EventListener);
-    window.removeEventListener('mouseup', stopDrag);
-    window.removeEventListener('touchend', stopDrag);
-    lastY.current = null;
-    setDragging(false);
-    document.body.style.userSelect = '';
-  }, [onMove]);
-
-  const startDrag = useCallback(
-    (clientY: number) => {
-      lastY.current = clientY;
-      setDragging(true);
-      document.body.style.userSelect = 'none';
-      window.addEventListener('mousemove', onMove as unknown as EventListener, { passive: true });
-      window.addEventListener('touchmove', onMove as unknown as EventListener, { passive: true });
-      window.addEventListener('mouseup', stopDrag);
-      window.addEventListener('touchend', stopDrag);
+  const sectionPointerDrag = usePointerDrag({
+    axis: 'y',
+    onMove: ({ dy }) => {
+      setState(previous => {
+        const min = 32;
+        const parent = containerRef.current?.parentElement;
+        const parentHeight = parent
+          ? parent.getBoundingClientRect().height
+          : window.innerHeight;
+        const max = Math.max(min, parentHeight - 2 * min);
+        const height = clamp(Math.round(previous.height + dy), min, max);
+        return { ...previous, height, collapsed: height <= min };
+      });
     },
-    [onMove, stopDrag]
-  );
-
-  useEffect(() => () => stopDrag(), [stopDrag]);
-
-  const onMouseDown = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      startDrag(event.clientY);
-    },
-    [startDrag]
-  );
-
-  const onTouchStart = useCallback(
-    (event: TouchEvent<HTMLDivElement>) => {
-      if (event.touches.length) startDrag(event.touches[0].clientY);
-    },
-    [startDrag]
-  );
+  });
 
   const onKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     const step = event.shiftKey ? 24 : 8;
@@ -270,7 +223,7 @@ function useSectionLogic(
     containerRef,
     height: state.height,
     collapsed: state.collapsed,
-    isDragging,
+    isDragging: sectionPointerDrag.isDragging,
     gripVisible,
     headerButtonProps: {
       onClick: toggle,
@@ -286,8 +239,7 @@ function useSectionLogic(
       tabIndex: 0,
       'aria-orientation': 'horizontal',
       'aria-label': `Resize ${sectionTitle(id)}`,
-      onMouseDown,
-      onTouchStart,
+      onPointerDown: sectionPointerDrag.onPointerDown,
       onKeyDown,
     },
   };
@@ -320,69 +272,22 @@ function useLeftPanelLogic(): LeftPanelLogic {
       320
     )
   );
-  const [isDragging, setDragging] = useState(false);
-  const lastX = useRef<number | null>(null);
-
   useEffect(() => {
     writeBuildSurfaceStorage(STORAGE_KEY, () => {
       localStorage.setItem(STORAGE_KEY, String(width));
     });
   }, [width]);
 
-  const onMove = useCallback((event: MouseEvent | TouchEvent) => {
-    const client =
-      'touches' in event && event.touches.length
-        ? event.touches[0].clientX
-        : (event as MouseEvent).clientX;
-    const previous = lastX.current ?? client;
-    const delta = client - previous;
-    lastX.current = client;
-    setWidth(previousWidth => {
-      const min = 160;
-      const max = Math.max(min, window.innerWidth - 320);
-      return clamp(Math.round(previousWidth + delta), min, max);
-    });
-  }, []);
-
-  const stopDrag = useCallback(() => {
-    window.removeEventListener('mousemove', onMove as unknown as EventListener);
-    window.removeEventListener('touchmove', onMove as unknown as EventListener);
-    window.removeEventListener('mouseup', stopDrag);
-    window.removeEventListener('touchend', stopDrag);
-    lastX.current = null;
-    setDragging(false);
-    document.body.style.userSelect = '';
-  }, [onMove]);
-
-  const startDrag = useCallback(
-    (clientX: number) => {
-      lastX.current = clientX;
-      setDragging(true);
-      document.body.style.userSelect = 'none';
-      window.addEventListener('mousemove', onMove as unknown as EventListener, { passive: true });
-      window.addEventListener('touchmove', onMove as unknown as EventListener, { passive: true });
-      window.addEventListener('mouseup', stopDrag);
-      window.addEventListener('touchend', stopDrag);
+  const leftPointerDrag = usePointerDrag({
+    axis: 'x',
+    onMove: ({ dx }) => {
+      setWidth(previousWidth => {
+        const min = 160;
+        const max = Math.max(min, window.innerWidth - 320);
+        return clamp(Math.round(previousWidth + dx), min, max);
+      });
     },
-    [onMove, stopDrag]
-  );
-
-  useEffect(() => () => stopDrag(), [stopDrag]);
-
-  const onMouseDown = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      startDrag(event.clientX);
-    },
-    [startDrag]
-  );
-
-  const onTouchStart = useCallback(
-    (event: TouchEvent<HTMLDivElement>) => {
-      if (event.touches.length) startDrag(event.touches[0].clientX);
-    },
-    [startDrag]
-  );
+  });
 
   const onKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     const step = event.shiftKey ? 32 : 8;
@@ -399,14 +304,13 @@ function useLeftPanelLogic(): LeftPanelLogic {
 
   return {
     width,
-    isDragging,
+    isDragging: leftPointerDrag.isDragging,
     gripProps: {
       role: 'separator',
       tabIndex: 0,
       'aria-orientation': 'vertical',
       'aria-label': 'Resize left panel',
-      onMouseDown,
-      onTouchStart,
+      onPointerDown: leftPointerDrag.onPointerDown,
       onKeyDown,
     },
   };
@@ -444,8 +348,6 @@ function useRightPanelLogic(): RightPanelLogic {
       { width: 320, collapsed: false }
     )
   );
-  const [isDragging, setDragging] = useState(false);
-  const lastX = useRef<number | null>(null);
   const previousWidth = useRef<number | null>(null);
 
   useEffect(() => {
@@ -454,61 +356,17 @@ function useRightPanelLogic(): RightPanelLogic {
     });
   }, [state]);
 
-  const onMove = useCallback((event: MouseEvent | TouchEvent) => {
-    const client =
-      'touches' in event && event.touches.length
-        ? event.touches[0].clientX
-        : (event as MouseEvent).clientX;
-    const previous = lastX.current ?? client;
-    const delta = previous - client;
-    lastX.current = client;
-    setState(previousState => {
-      const min = 40;
-      const max = Math.max(160, window.innerWidth - 320);
-      const width = clamp(Math.round(previousState.width + delta), min, max);
-      return { ...previousState, width };
-    });
-  }, []);
-
-  const stopDrag = useCallback(() => {
-    window.removeEventListener('mousemove', onMove as unknown as EventListener);
-    window.removeEventListener('touchmove', onMove as unknown as EventListener);
-    window.removeEventListener('mouseup', stopDrag);
-    window.removeEventListener('touchend', stopDrag);
-    lastX.current = null;
-    setDragging(false);
-    document.body.style.userSelect = '';
-  }, [onMove]);
-
-  const startDrag = useCallback(
-    (clientX: number) => {
-      lastX.current = clientX;
-      setDragging(true);
-      document.body.style.userSelect = 'none';
-      window.addEventListener('mousemove', onMove as unknown as EventListener, { passive: true });
-      window.addEventListener('touchmove', onMove as unknown as EventListener, { passive: true });
-      window.addEventListener('mouseup', stopDrag);
-      window.addEventListener('touchend', stopDrag);
+  const rightPointerDrag = usePointerDrag({
+    axis: 'x',
+    onMove: ({ dx }) => {
+      setState(previousState => {
+        const min = 40;
+        const max = Math.max(160, window.innerWidth - 320);
+        const width = clamp(Math.round(previousState.width - dx), min, max);
+        return { ...previousState, width };
+      });
     },
-    [onMove, stopDrag]
-  );
-
-  useEffect(() => () => stopDrag(), [stopDrag]);
-
-  const onMouseDown = useCallback(
-    (event: MouseEvent<HTMLDivElement>) => {
-      event.preventDefault();
-      startDrag(event.clientX);
-    },
-    [startDrag]
-  );
-
-  const onTouchStart = useCallback(
-    (event: TouchEvent<HTMLDivElement>) => {
-      if (event.touches.length) startDrag(event.touches[0].clientX);
-    },
-    [startDrag]
-  );
+  });
 
   const onKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     const step = event.shiftKey ? 32 : 8;
@@ -538,7 +396,7 @@ function useRightPanelLogic(): RightPanelLogic {
   return {
     width: state.width,
     collapsed: state.collapsed,
-    isDragging,
+    isDragging: rightPointerDrag.isDragging,
     toggle,
     contentAnchor: BUILD_ANCHORS.rightContent,
     gripProps: {
@@ -546,8 +404,7 @@ function useRightPanelLogic(): RightPanelLogic {
       tabIndex: 0,
       'aria-orientation': 'vertical',
       'aria-label': 'Resize right panel',
-      onMouseDown,
-      onTouchStart,
+      onPointerDown: rightPointerDrag.onPointerDown,
       onKeyDown,
     },
   };

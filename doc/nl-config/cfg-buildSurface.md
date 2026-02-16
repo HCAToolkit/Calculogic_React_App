@@ -26,7 +26,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 ### 2.3 Dependencies
 - UI libs: React, including `useState`, `useEffect`, and refs for DOM measurements.
 - Routing: shell-globalHeader tab state (read-only).
-- Shared hooks / utilities: Utility functions for clamp logic and keyboard handling.
+- Shared hooks / utilities: `src/shared/interaction/usePointerDrag.ts` for pointer drag lifecycle + capture and `src/shared/interaction/pointerDrag.ts` clamp helpers for panel bounds.
 
 ## 3. Build Concern (Structure)
 ### 3.0 Dependencies & Hierarchy Notes
@@ -151,7 +151,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - At max-width 960px collapse inspector column by default while keeping anchors present.
 
 ### 4.4 Interaction Styles
-- Hover/focus states for grips reuse `[4.2.15]` pseudo-elements.
+- Hover/focus states for grips reuse `[4.2.15]` pseudo-elements and include `touch-action: none` so touch drags do not scroll the page.
 - Tabs and buttons use focus outlines sourced from Knowledge-defined tokens.
 
 ## 5. Logic Concern (Workflow)
@@ -177,7 +177,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - **[5.2.2] Primitive – "Keyboard Resize Handler"**
   - Responds to arrow keys on grips for accessible resizing.
 - **[5.2.3] Primitive – "Pointer Resize Handler"**
-  - Manages pointerdown/move/up events across grips with typed listener registration to avoid `any` casts.
+  - Uses shared `usePointerDrag` with incremental deltas (`dx/dy` from last pointer position), pointer capture for section and side-panel grips, guarded capture release, and a shared cleanup path for `pointerup`/`pointercancel`/capture-loss; no window-level mouse/touch listener scaffolding remains in BuildSurface logic hooks.
 - **[5.2.4] Primitive – "Persistence Effect"**
   - Syncs panel dimensions and collapse state to `localStorage`.
 - **[5.2.5] Primitive – "Bindings Memo"**
@@ -189,11 +189,11 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - Derived booleans for collapsed states, computed widths/heights.
 
 ### 5.2.4 Side Effects
-- Global pointer event subscription for resizing, cleaned up on unmount.
+- Pointer capture lifecycle inside `usePointerDrag`, including unmount cleanup and temporary `document.body.style.userSelect` suppression during active drag.
 - `localStorage` updates triggered by state changes.
 
 ### 5.2.5 Workflows
-- Resize workflow: Grip interaction → `[5.2.3]` updates dimensions → `[5.2.4]` persists values → Build re-renders with new sizes.
+- Resize workflow: Grip `onPointerDown` (touch-action disabled on handle) → `[5.2.3]` computes deltas and updates dimensions → `[5.2.4]` persists values → Build re-renders with new sizes.
 - Collapse workflow: Toggle click → Section state updates → `[5.2.5]` memo recalculates bindings for Build.
 
 ## 6. Knowledge Concern (Reference Data)

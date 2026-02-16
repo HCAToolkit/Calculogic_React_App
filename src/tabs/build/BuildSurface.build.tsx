@@ -152,7 +152,11 @@ function SectionPanel({ binding }: { binding: SectionLogicBinding }) {
         {renderSectionContent(binding.id)}
       </div>
       {binding.gripVisible && (
-        <div data-anchor={BUILD_ANCHORS.sectionGrip(binding.id)} {...binding.gripProps} />
+        <div
+          data-anchor={BUILD_ANCHORS.sectionGrip(binding.id)}
+          style={{ touchAction: 'none' }}
+          {...binding.gripProps}
+        />
       )}
     </section>
   );
@@ -188,7 +192,13 @@ export function BuildSurface({
   // [3.6.3] cfg-buildSurface · Primitive · "Catalog Grip"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Exposes left panel resize separator connected to logic grip props.
-  const catalogGrip = <div data-anchor={anchors.leftGrip} {...leftPanel.gripProps} />;
+  const catalogGrip = (
+    <div
+      data-anchor={anchors.leftGrip}
+      style={{ touchAction: 'none' }}
+      {...leftPanel.gripProps}
+    />
+  );
 
   // [3.6.4] cfg-buildSurface · Subcontainer · "Preview Stage"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.region
@@ -204,7 +214,13 @@ export function BuildSurface({
   // [3.6.5] cfg-buildSurface · Primitive · "Inspector Grip"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Provides resize handle between preview stage and inspector column.
-  const inspectorGrip = <div data-anchor={anchors.rightGrip} {...rightPanel.gripProps} />;
+  const inspectorGrip = (
+    <div
+      data-anchor={anchors.rightGrip}
+      style={{ touchAction: 'none' }}
+      {...rightPanel.gripProps}
+    />
+  );
 
   // [3.6.6] cfg-buildSurface · Subcontainer · "Inspector Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
