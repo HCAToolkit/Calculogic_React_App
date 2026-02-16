@@ -6,6 +6,7 @@
 - ✅ Change 2 completed (provider moved to `src/content/providers/docs.provider.ts`).
 - ✅ Change 3 completed (engine barrel narrowed to core contracts/orchestrator).
 - ✅ Barrel boundary tightening completed (`src/content/index.ts` no longer re-exports engine types/registry).
+- ✅ Change 4 completed (doc-engine docs consolidated into canonical `doc/doc-engine/`).
 
 Repository: `HCAToolkit/Calculogic_React_App`
 Goal: assess folder boundaries for future doc-engine split with minimal churn.
@@ -23,7 +24,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 
 ### `doc/` major folders
 - `doc/ConventionRoutines/` — binding conventions (CCPP/CSCS/NL-first templates/workflow).
-- `doc/doc-engine/` and `doc/DocEngine/` — architecture/contracts/MVP docs for doc-engine.
+- `doc/doc-engine/` — canonical architecture/contracts/MVP docs for doc-engine.
 - `doc/nl-doc-engine/` — NL skeletons for doc-engine configs.
 - `doc/nl-config/` and `doc/nl-shell/` — app configuration/shell NL skeletons.
 - `doc/Architecture/` — extraction plan and architecture summaries.
@@ -59,9 +60,9 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
    - Paths: `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`, `src/components/GlobalHeaderShell/index.tsx`  
    - Risk: keeping doc-id semantics in header knowledge is fine short term, but it tangles future reusable content packs with a specific UI shell vocabulary.
 
-4. **Low — duplicate doc-engine documentation roots (`doc/DocEngine` and `doc/doc-engine`)**  
-   - Paths: `doc/DocEngine/`, `doc/doc-engine/`  
-   - Risk: convention drift and confusion about canonical docs location during extraction handoff.
+4. **Resolved — doc-engine documentation roots consolidated**  
+   - Path: `doc/doc-engine/` (canonical)  
+   - Outcome: duplicate root removed to reduce convention drift during extraction handoff.
 
 ## D) Minimal incremental re-org plan
 
@@ -106,15 +107,14 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
   - Downstream callers using engine barrel for app-only concerns.
   - Mitigation: add explicit app entrypoints under `src/content/` and codemod imports in one commit.
 
-### Change 4 — optional docs consolidation (non-blocking)
+### Change 4 — docs consolidation (completed)
 - **Before → After**
   - `doc/DocEngine/*` + `doc/doc-engine/*`
-  - → canonical single directory (prefer lowercase `doc/doc-engine/`)
+  - → canonical single directory `doc/doc-engine/`
 - **Import updates**
-  - update links in `doc/README.md` and extraction plan references.
-- **Risks**
-  - Broken relative links in markdown.
-  - Mitigation: run link check or targeted `rg` for stale paths.
+  - `doc/README.md` now links only to canonical `doc/doc-engine/README.md`.
+- **Validation**
+  - Targeted stale-link search executed for `doc/DocEngine` references.
 
 ## E) Safe migration sequence (minimal churn)
 

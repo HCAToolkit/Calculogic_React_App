@@ -21,6 +21,5 @@
 - [Doc Engine Extraction Plan](./Architecture/DocEngineExtractionPlan.md)
 
 ## Engine Documentation
-- [DocEngine (PascalCase directory)](./DocEngine/README.md)
-- [doc-engine (kebab-case directory)](./doc-engine/README.md)
+- [doc-engine (canonical directory)](./doc-engine/README.md)
 - [Doc-engine standards pack in `docs/`](../docs/doc-engine/standards/README.md)

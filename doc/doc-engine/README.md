@@ -20,3 +20,10 @@ This hub defines the in-repo standards and architecture for the Interface/Builde
 - `Architecture.md`
 - `Contracts.md`
 - `ContentDrawerMVP.md`
+
+## Legacy portable documents (consolidated from `doc/DocEngine`)
+- `Overview-Architecture.md`
+- `Provider-Resolver-Contract.md`
+- `ContentNode-Schema.md`
+- `Content-Drawer-MVP-Spec.md`
+- `Standards-Pack-Links.md`
