@@ -6,7 +6,7 @@
  * Invariants: Singleton instance is created once per module load, docs provider is registered under the `docs` namespace.
  */
 
-import { ContentProviderRegistry } from '../doc-engine';
+import { ContentProviderRegistry } from '../doc-engine/index.ts';
 import { DOCS_PROVIDER } from './providers/docs.provider.ts';
 
 // ─────────────────────────────────────────────

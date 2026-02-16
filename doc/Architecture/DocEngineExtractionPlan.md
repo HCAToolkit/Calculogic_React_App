@@ -4,26 +4,27 @@ This document maps the current documentation engine signals in the builder UI an
 
 ## Inventory: Current Doc Engine Touchpoints
 
-### Knowledge layer (content model + source of truth)
-- `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`
+### Packs layer (source of truth for docs payload)
+- `src/content/packs/header-docs/header-docs.catalog.ts`
   - Structured doc content model (`HeaderDocDefinition`, sections, links).
   - Tab definitions include `docId` and `hoverSummary`.
   - `resolveHeaderDoc` provides a lookup accessor.
 
-### Logic layer (state + orchestration)
-- `src/components/GlobalHeaderShell/GlobalHeaderShell.logic.ts`
-  - `activeDocId` tracked in state.
-  - `openDoc` and `closeDoc` handlers exposed via bindings.
-  - Doc state is already decoupled from rendering.
+### Provider layer (docs namespace adapter)
+- `src/content/providers/docs.provider.ts`
+  - Owns `docs` namespace resolution.
+  - Resolves ids against pack content and returns canonical engine unions (`content` / `not_found`).
 
-### Build layer (UI entry points)
-- `src/components/GlobalHeaderShell/GlobalHeaderShell.build.tsx`
-  - `InfoIcon` triggers `openDoc(tab.docId)`.
-  - Tab metadata surfaces `hoverSummary`.
+### Composition root (registry singleton + registration)
+- `src/content/contentEngine.ts`
+  - Creates the app-level `ContentProviderRegistry` singleton.
+  - Registers the docs provider under namespace `docs`.
 
-### Results layer (diagnostics)
-- `src/components/GlobalHeaderShell/GlobalHeaderShell.results.tsx`
-  - Debug panel + live region uses the same shell state; can optionally surface doc state later.
+### UI triggers + rendering remain app-side
+- `src/components/GlobalHeaderShell/*`
+  - Header interactions trigger drawer open/close and pass doc ids.
+- `src/components/ContentDrawer/*`
+  - Drawer resolves and renders payload returned by registry/provider pipeline.
 
 ## Extraction Boundary (Proposed)
 

@@ -6,7 +6,8 @@
  * Invariants: Resolver outputs preserve type tags, docs namespace is required, invalid or unsupported ids map to null.
  */
 
-import type { ContentNode, HeaderDocDefinition, NotFound } from './index';
+import type { ContentNode, NotFound } from '../doc-engine/index.ts';
+import type { HeaderDocDefinition } from './packs/header-docs/header-docs.catalog.ts';
 import { contentProviderRegistry } from './contentEngine';
 
 export type DrawerContentResolution = ContentNode<HeaderDocDefinition> | NotFound;
