@@ -1,14 +1,20 @@
 # Folder Organization Health Check (Doc-Engine Extraction Prep)
 
 ## Scope
+## Status (2026-02-16 update)
+- ✅ Change 1 completed (catalog moved to `src/content/packs/header-docs/header-docs.catalog.ts`).
+- ✅ Change 2 completed (provider moved to `src/content/providers/docs.provider.ts`).
+- ✅ Change 3 completed (engine barrel narrowed to core contracts/orchestrator).
+- ✅ Barrel boundary tightening completed (`src/content/index.ts` no longer re-exports engine types/registry).
+
 Repository: `HCAToolkit/Calculogic_React_App`
 Goal: assess folder boundaries for future doc-engine split with minimal churn.
 
 ## A) Current structure map (short)
 
 ### `src/` major folders
-- `src/doc-engine/` — staged doc-engine runtime boundary (types, registry, providers, catalogs, package-style exports).
-- `src/content/` — app composition + adapter layer (registry singleton wiring, drawer-specific resolver adapter, context provider/barrel).
+- `src/doc-engine/` — staged doc-engine runtime boundary (types, registry, package-style exports).
+- `src/content/` — app composition + adapter layer (packs, provider wiring, drawer-specific resolver adapter, context provider/barrel).
 - `src/components/GlobalHeaderShell/` — app shell UI and shell knowledge/logic/results composition.
 - `src/components/ContentDrawer/` — drawer UI adapter/presenter + anchor helper + styles.
 - `src/tabs/` — tab-level app UI features (currently Build tab).
@@ -30,8 +36,8 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 | `src/doc-engine/types.ts` | Engine Core | Canonical content contracts should be package-owned. |
 | `src/doc-engine/registry.ts` | Engine Core | Namespace parsing + provider registry orchestration are reusable core runtime primitives. |
 | `src/doc-engine/index.ts` | Engine Core (boundary candidate) | Public API surface for future package extraction. |
-| `src/doc-engine/providers/docs.provider.ts` | Provider (app-specific today) | Provider implementations are not required to live in engine core; this one is tied to header docs content and is a candidate to move app-side. |
-| `src/doc-engine/catalogs/header-docs.catalog.ts` | Content Pack (currently coupled) | App/header-specific docs payload; should not remain in long-term engine core. |
+| `src/content/providers/docs.provider.ts` | Provider (app-specific) | Docs namespace adapter is app-owned and intentionally outside engine core for extraction readiness. |
+| `src/content/packs/header-docs/header-docs.catalog.ts` | Content Pack (app-owned) | Header docs payload source of truth, owned by app content layer. |
 | `src/content/contentEngine.ts` | App Composition | Correct host-owned provider registration singleton location. |
 | `src/content/contentResolutionAdapter.ts` | UI Adapter (app layer) | Drawer-specific narrowing and mapping to docs payload should remain app-side. |
 | `src/content/ContentContext.tsx` | App Composition | UI state orchestration for drawer open/close belongs to app shell. |
@@ -41,13 +47,13 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 
 ## C) Top folder-organization issues (ranked)
 
-1. **High — content pack co-located in `src/doc-engine/catalogs/`**  
-   - Paths: `src/doc-engine/catalogs/header-docs.catalog.ts`, `src/doc-engine/providers/docs.provider.ts`  
-   - Risk: app/header-specific docs are packaged with core boundary, encouraging accidental coupling and making core extraction include content payloads by default.
+1. **Resolved — content pack/provider moved out of `src/doc-engine/`**  
+   - Paths: `src/content/packs/header-docs/header-docs.catalog.ts`, `src/content/providers/docs.provider.ts`  
+   - Outcome: app/header-specific docs payload and provider now live in app content layer, keeping core extractable.
 
-2. **Medium — app barrel re-exports engine internals under `src/content/`**  
+2. **Resolved — app barrel no longer re-exports engine internals**  
    - Path: `src/content/index.ts`  
-   - Risk: mixed import entrypoints (`../doc-engine` vs `../content`) can blur ownership over time and increase import churn during package cutover.
+   - Outcome: entrypoint ownership is explicit (`src/doc-engine` for engine runtime, `src/content` for app content).
 
 3. **Medium — shell knowledge still leaks doc/content identifiers into UI feature layer**  
    - Paths: `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`, `src/components/GlobalHeaderShell/index.tsx`  
