@@ -182,6 +182,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
 ### 6.2 Constants
 - **[6.2.1] Primitive – "Header Tab Knowledge Base"**
   - Ordered array of concern tab definitions with hover summaries.
+  - Tab-to-doc bindings reference pack-owned doc ids (header-doc.ids) instead of inline literals.
 - **[6.2.2] Primitive – "Brand Wordmark Copy"**
   - Display string for Calculogic wordmark.
 - **[6.2.3] Primitive – "Brand Tagline Copy"**
@@ -195,6 +196,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
 
 ### 6.3 Shared / Global Reference
 - Exposes tab ordering and copy for cfg-appFrame to reference when rendering nested surfaces.
+- Defers doc-id semantics (identifier constants and optional `docs:` namespacing helper) to the header docs pack/provider boundary.
 
 ## 7. Results Concern (Outputs)
 ### 7.1 User-Facing Outputs

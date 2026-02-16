@@ -6,12 +6,14 @@
  * Invariants: Doc ids remain stable, default content metadata is deterministic, unknown doc ids resolve to null.
  */
 
+import { HEADER_DOC_IDS, isHeaderDocId, type HeaderDocId } from './header-doc.ids.ts';
+
 // [6.5.a] shell-globalHeader · Primitive · "Header Documentation Link Schema"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Associates documentation links for cross-navigation inside modal output.
 export interface HeaderDocLink {
   label: string;
-  docId: string;
+  docId: HeaderDocId;
   description?: string;
 }
 
@@ -42,7 +44,7 @@ export interface ContentMeta {
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Source of truth for documentation payload consumed by results concern modal.
 export interface HeaderDocDefinition {
-  id: string;
+  id: HeaderDocId;
   concern: 'Build' | 'Logic' | 'Knowledge' | 'Results';
   title: string;
   summary: string;
@@ -77,9 +79,9 @@ function withDefaultContentMeta(definition: Omit<HeaderDocDefinition, 'contentMe
 // [6.5.d] shell-globalHeader · Primitive · "Header Documentation Definitions"
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Encodes contextual documentation surfaced via info icon modal per concern.
-export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
-  'doc-build': withDefaultContentMeta({
-    id: 'doc-build',
+export const HEADER_DOC_DEFINITIONS: Record<HeaderDocId, HeaderDocDefinition> = {
+  [HEADER_DOC_IDS.build]: withDefaultContentMeta({
+    id: HEADER_DOC_IDS.build,
     concern: 'Build',
     title: 'Build Concern Overview',
     summary:
@@ -114,18 +116,18 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
     links: [
       {
         label: 'Jump to Logic guidance',
-        docId: 'doc-logic',
+        docId: HEADER_DOC_IDS.logic,
         description: 'Add state handling and conditional rules once structure is in place.',
       },
       {
         label: 'Review Results outputs',
-        docId: 'doc-results',
+        docId: HEADER_DOC_IDS.results,
         description: 'Confirm derived data and presentation targets before publishing.',
       },
     ],
   }),
-  'doc-logic': withDefaultContentMeta({
-    id: 'doc-logic',
+  [HEADER_DOC_IDS.logic]: withDefaultContentMeta({
+    id: HEADER_DOC_IDS.logic,
     concern: 'Logic',
     title: 'Logic Concern Overview',
     summary: 'Add calculations, conditions, and interaction rules. Keep heavy math in helpers and orchestrate workflows here.',
@@ -158,13 +160,13 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
     links: [
       {
         label: 'See Knowledge reference',
-        docId: 'doc-knowledge',
+        docId: HEADER_DOC_IDS.knowledge,
         description: 'Understand how shared schemas and traits feed your logic flows.',
       },
     ],
   }),
-  'doc-knowledge': withDefaultContentMeta({
-    id: 'doc-knowledge',
+  [HEADER_DOC_IDS.knowledge]: withDefaultContentMeta({
+    id: HEADER_DOC_IDS.knowledge,
     concern: 'Knowledge',
     title: 'Knowledge Concern Overview',
     summary: 'Store reusable traits, constants, and reference schemas to keep builds consistent.',
@@ -191,18 +193,18 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
     links: [
       {
         label: 'Review Build structure',
-        docId: 'doc-build',
+        docId: HEADER_DOC_IDS.build,
         description: 'See how Knowledge summaries surface within the structural concern.',
       },
       {
         label: 'Inspect Results outputs',
-        docId: 'doc-results',
+        docId: HEADER_DOC_IDS.results,
         description: 'Confirm how Knowledge data feeds final reporting.',
       },
     ],
   }),
-  'doc-results': withDefaultContentMeta({
-    id: 'doc-results',
+  [HEADER_DOC_IDS.results]: withDefaultContentMeta({
+    id: HEADER_DOC_IDS.results,
     concern: 'Results',
     title: 'Results Concern Overview',
     summary: 'Design and inspect derived outputs, scores, and summaries. Results/Style/ fine-tunes their presentation.',
@@ -236,12 +238,12 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
     links: [
       {
         label: 'Open Build guidance',
-        docId: 'doc-build',
+        docId: HEADER_DOC_IDS.build,
         description: 'Verify structural anchors before styling outcomes.',
       },
       {
         label: 'Reference Knowledge data',
-        docId: 'doc-knowledge',
+        docId: HEADER_DOC_IDS.knowledge,
         description: 'Ensure shared traits and constants align with your reporting.',
       },
     ],
@@ -252,5 +254,9 @@ export const HEADER_DOC_DEFINITIONS: Record<string, HeaderDocDefinition> = {
 // Concern: Knowledge · Catalog: data.accessor
 // Notes: Provides safe lookup for modal consumption with null fallback when docId is unknown.
 export function resolveHeaderDoc(docId: string): HeaderDocDefinition | null {
-  return HEADER_DOC_DEFINITIONS[docId] ?? null;
+  if (!isHeaderDocId(docId)) {
+    return null;
+  }
+
+  return HEADER_DOC_DEFINITIONS[docId];
 }
