@@ -19,14 +19,17 @@ export type UsePointerDragOptions = {
   setPointerCapture?: boolean;
 };
 
+type DragListenerHost = HTMLElement | Window;
+
 type DragState = {
   pointerId: number;
   lastX: number;
   lastY: number;
   target: HTMLElement;
-  moveListener: (event: PointerEvent) => void;
-  upListener: (event: PointerEvent) => void;
-  cancelListener: (event: PointerEvent) => void;
+  listenerHost: DragListenerHost;
+  moveListener: EventListener;
+  upListener: EventListener;
+  cancelListener: EventListener;
   lostCaptureListener: (event: PointerEvent) => void;
 };
 
@@ -66,9 +69,9 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
       const dragState = dragStateRef.current;
       if (!dragState || dragState.pointerId !== pointerId) return;
 
-      dragState.target.removeEventListener('pointermove', dragState.moveListener);
-      dragState.target.removeEventListener('pointerup', dragState.upListener);
-      dragState.target.removeEventListener('pointercancel', dragState.cancelListener);
+      dragState.listenerHost.removeEventListener('pointermove', dragState.moveListener);
+      dragState.listenerHost.removeEventListener('pointerup', dragState.upListener);
+      dragState.listenerHost.removeEventListener('pointercancel', dragState.cancelListener);
       dragState.target.removeEventListener('lostpointercapture', dragState.lostCaptureListener);
 
       safeReleasePointerCapture(dragState.target, pointerId);
@@ -104,9 +107,11 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
         finishDrag(dragStateRef.current.pointerId);
       }
 
+      let captureActive = false;
       if (setPointerCapture) {
         try {
           target.setPointerCapture(pointerId);
+          captureActive = target.hasPointerCapture(pointerId);
         } catch {
           // WHY: Fallback path keeps drag active even if capture is unavailable.
         }
@@ -122,7 +127,10 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
         pointerId,
       });
 
-      const moveListener = (pointerMoveEvent: PointerEvent) => {
+      const moveListener: EventListener = event => {
+        if (!(event instanceof PointerEvent)) return;
+
+        const pointerMoveEvent = event;
         const activeDrag = dragStateRef.current;
         if (!activeDrag || pointerMoveEvent.pointerId !== activeDrag.pointerId) return;
 
@@ -144,12 +152,18 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
         });
       };
 
-      const upListener = (pointerUpEvent: PointerEvent) => {
+      const upListener: EventListener = event => {
+        if (!(event instanceof PointerEvent)) return;
+
+        const pointerUpEvent = event;
         if (pointerUpEvent.pointerId !== pointerId) return;
         finishDrag(pointerId);
       };
 
-      const cancelListener = (pointerCancelEvent: PointerEvent) => {
+      const cancelListener: EventListener = event => {
+        if (!(event instanceof PointerEvent)) return;
+
+        const pointerCancelEvent = event;
         if (pointerCancelEvent.pointerId !== pointerId) return;
         finishDrag(pointerId);
       };
@@ -159,11 +173,14 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
         finishDrag(pointerId);
       };
 
+      const listenerHost: DragListenerHost = captureActive ? target : window;
+
       dragStateRef.current = {
         pointerId,
         lastX: event.clientX,
         lastY: event.clientY,
         target,
+        listenerHost,
         moveListener,
         upListener,
         cancelListener,
@@ -171,9 +188,9 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
       };
       setIsDragging(true);
 
-      target.addEventListener('pointermove', moveListener);
-      target.addEventListener('pointerup', upListener);
-      target.addEventListener('pointercancel', cancelListener);
+      listenerHost.addEventListener('pointermove', moveListener);
+      listenerHost.addEventListener('pointerup', upListener);
+      listenerHost.addEventListener('pointercancel', cancelListener);
       target.addEventListener('lostpointercapture', lostCaptureListener);
     },
     [axis, disableUserSelectDuringDrag, finishDrag, onMove, onStart, setPointerCapture]

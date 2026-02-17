@@ -7,8 +7,8 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, PointerEvent, RefObject } from 'react';
-import { clampNumber } from '../../shared/interaction/pointerDrag.ts';
-import { usePointerDrag } from '../../shared/interaction/usePointerDrag.ts';
+import { clampNumber } from '../../shared/interaction/pointerDrag';
+import { usePointerDrag } from '../../shared/interaction/usePointerDrag';
 import { BUILD_ANCHORS } from './anchors.ts';
 import {
   defaultBuildSurfacePersistenceReporter,
