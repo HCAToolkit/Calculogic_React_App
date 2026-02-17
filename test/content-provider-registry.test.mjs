@@ -1,11 +1,30 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ContentProviderRegistry, splitNamespace } from '../src/doc-engine/index.ts';
-import { DOCS_PROVIDER } from '../src/content/providers/docs.provider.ts';
+const createMockDocsProvider = () => ({
+  resolveContent: ({ contentId, anchorId }) => {
+    if (contentId !== 'doc-build') {
+      return {
+        type: 'not_found',
+        namespace: 'docs',
+        contentId,
+        reason: 'Documentation entry was not found.',
+      };
+    }
+
+    return {
+      type: 'content',
+      namespace: 'docs',
+      contentId,
+      anchorId,
+      payload: { title: 'Build Docs' },
+    };
+  },
+});
 
 const createRegistry = () => {
   const registry = new ContentProviderRegistry();
-  registry.registerProvider('docs', DOCS_PROVIDER);
+  registry.registerProvider('docs', createMockDocsProvider());
   return registry;
 };
 
