@@ -8,7 +8,7 @@
 
 import { HEADER_DOC_DEFINITIONS, type HeaderDocDefinition } from '../packs/header-docs/header-docs.catalog.ts';
 import { isHeaderDocId } from '../packs/header-docs/header-doc.ids.ts';
-import type { ContentProvider } from '../../doc-engine/types.ts';
+import type { ContentProvider } from '../../doc-engine/index.ts';
 
 export const DOCS_PROVIDER: ContentProvider<unknown, HeaderDocDefinition> = {
   resolveContent: ({ contentId, anchorId }) => {

@@ -93,6 +93,7 @@ Map/set operations, validation guards, optional event emitter for registry chang
 ### 6.2 Constants
 - Registry event names, default provider list, compatibility policy version.
 - App-level singleton registry initialized in `src/content/contentEngine.ts` with explicit `docs` namespace registration.
+- Public API boundary for host consumers is `src/doc-engine/index.ts` only; host files should not deep-import `registry.ts` or `types.ts`.
 
 ### 6.3 Shared / Global Reference
 - Exports provider metadata used by resolver and drawer.
@@ -128,6 +129,7 @@ Map/set operations, validation guards, optional event emitter for registry chang
 ### 9.3 Integration
 - Instantiated at the application composition root before resolver boot so adapter lookup is available at runtime.
 - Module exports remain side-effect free; provider registration is performed explicitly by the consumer/composition layer.
+- Registry behavior tests use local mock providers and depend only on `src/doc-engine/*` so package extraction does not pull app providers.
 
 ## 10. Implementation Passes
 ### 10.1 Pass Mapping
@@ -139,3 +141,4 @@ Map/set operations, validation guards, optional event emitter for registry chang
 ### 10.2 Export Checklist
 - Atomic hierarchy is explicit for CCPP annotation mapping.
 - Provider definitions include schema compatibility metadata.
+- Extraction checklist is documented next to `src/doc-engine` to guide repointing host imports to `@calculogic/doc-engine`.
