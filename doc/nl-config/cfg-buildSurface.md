@@ -177,7 +177,8 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - **[5.2.2] Primitive – "Keyboard Resize Handler"**
   - Responds to arrow keys on grips for accessible resizing.
 - **[5.2.3] Primitive – "Pointer Resize Handler"**
-  - Uses shared `usePointerDrag` with incremental deltas (`dx/dy` from last pointer position), pointer capture for section and side-panel grips, guarded capture release, and a shared cleanup path for `pointerup`/`pointercancel`/capture-loss; no window-level mouse/touch listener scaffolding remains in BuildSurface logic hooks.
+  - Uses shared `usePointerDrag` with incremental deltas (`dx/dy` from last pointer position), pointer capture for section and side-panel grips, guarded capture release, and a shared cleanup path for `pointerup`/`pointercancel`/capture-loss.
+  - When pointer capture is unavailable or fails to activate, `usePointerDrag` temporarily attaches move/up/cancel listeners to `window` so drag lifecycles stay active after the pointer exits the handle.
 - **[5.2.4] Primitive – "Persistence Effect"**
   - Syncs panel dimensions and collapse state to `localStorage`.
 - **[5.2.5] Primitive – "Bindings Memo"**
