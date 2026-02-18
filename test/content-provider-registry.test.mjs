@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ContentProviderRegistry, splitNamespace } from '../src/doc-engine/index.ts';
+import { ContentProviderRegistry, parseContentRef, splitNamespace } from '../src/doc-engine/index.ts';
+
 const createMockDocsProvider = () => ({
   resolveContent: ({ contentId, anchorId }) => {
     if (contentId !== 'doc-build') {
@@ -13,7 +14,7 @@ const createMockDocsProvider = () => ({
     }
 
     return {
-      type: 'content',
+      type: 'found',
       namespace: 'docs',
       contentId,
       anchorId,
@@ -28,29 +29,23 @@ const createRegistry = () => {
   return registry;
 };
 
-test('splitNamespace parses namespaced ids', () => {
-  assert.deepEqual(splitNamespace('docs:doc-build'), {
+test('parseContentRef parses docs:abc as valid', () => {
+  assert.deepEqual(parseContentRef('docs:abc'), {
+    type: 'valid',
     namespace: 'docs',
-    resolvedId: 'doc-build',
+    resolvedId: 'abc',
   });
 });
 
-test('splitNamespace rejects ids without a namespace payload', () => {
-  assert.deepEqual(splitNamespace('docs:'), { namespace: null, resolvedId: null });
-  assert.deepEqual(splitNamespace('doc-build'), { namespace: null, resolvedId: null });
+test('parseContentRef returns invalid_ref for abc', () => {
+  assert.deepEqual(parseContentRef('abc'), {
+    type: 'invalid_ref',
+    contentId: 'abc',
+    reason: 'Content id must include a namespace prefix and payload (namespace:id).',
+  });
 });
 
-test('contentProviderRegistry resolves registered docs content', () => {
-  const contentProviderRegistry = createRegistry();
-  const resolved = contentProviderRegistry.resolveContent({ contentId: 'docs:doc-build' });
-  assert.equal(resolved.type, 'content');
-  if (resolved.type === 'content') {
-    assert.equal(resolved.namespace, 'docs');
-    assert.equal(resolved.contentId, 'doc-build');
-  }
-});
-
-test('contentProviderRegistry returns not_found for missing docs content', () => {
+test('contentProviderRegistry resolves unknown id in docs to not_found', () => {
   const contentProviderRegistry = createRegistry();
   const missing = contentProviderRegistry.resolveContent({ contentId: 'docs:not-real' });
   assert.deepEqual(missing, {
@@ -59,4 +54,23 @@ test('contentProviderRegistry returns not_found for missing docs content', () =>
     contentId: 'not-real',
     reason: 'Documentation entry was not found.',
   });
+});
+
+test('contentProviderRegistry resolves otherns:x to unsupported_namespace when only docs provider exists', () => {
+  const contentProviderRegistry = createRegistry();
+  const unsupported = contentProviderRegistry.resolveContent({ contentId: 'otherns:x' });
+  assert.deepEqual(unsupported, {
+    type: 'unsupported_namespace',
+    namespace: 'otherns',
+    contentId: 'x',
+    reason: 'No content provider registered for namespace: otherns.',
+  });
+});
+
+test('splitNamespace preserves backward-compatible parsing shape', () => {
+  assert.deepEqual(splitNamespace('docs:doc-build'), {
+    namespace: 'docs',
+    resolvedId: 'doc-build',
+  });
+  assert.deepEqual(splitNamespace('docs:'), { namespace: null, resolvedId: null });
 });

@@ -1,4 +1,13 @@
-import { ContentProviderRegistry, splitNamespace } from './registry.ts';
+import { ContentProviderRegistry, parseContentRef, splitNamespace } from './registry.ts';
 
-export { ContentProviderRegistry, splitNamespace };
-export type { ContentNode, ContentProvider, ContentResolutionRequest, NotFound } from './types.ts';
+export { ContentProviderRegistry, parseContentRef, splitNamespace };
+export type {
+  ContentProvider,
+  ContentResolutionRequest,
+  ContentResolutionResult,
+  FoundContent,
+  InvalidRef,
+  NotFound,
+  ParsedContentRef,
+  UnsupportedNamespace,
+} from './types.ts';

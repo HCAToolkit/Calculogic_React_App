@@ -24,7 +24,7 @@ export const DOCS_PROVIDER: ContentProvider<unknown, HeaderDocDefinition> = {
     }
 
     return {
-      type: 'content',
+      type: 'found',
       namespace: 'docs',
       contentId,
       anchorId,
