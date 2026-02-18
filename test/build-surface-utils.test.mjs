@@ -1,4 +1,6 @@
 import test from 'node:test';
+// NOTE: Under `node --test --experimental-strip-types`, ESM resolution still requires
+// fully qualified relative specifiers (including `.ts`) for TypeScript source imports.
 import assert from 'node:assert/strict';
 import {
   readBuildSurfaceStorage,
