@@ -19,11 +19,9 @@ Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conf
 ## 2. Configuration Contracts
 ### 2.1 TypeScript Interfaces
 - `ContentResolutionRequest` – namespaced content reference (`namespace:id`), optional anchor, optional context.
-- `ContentResolutionResult` – discriminated union with exactly four outcomes:
+- `ContentResolutionResult` – discriminated union with exactly two top-level branches:
   - `found`
-  - `not_found`
-  - `unsupported_namespace`
-  - `invalid_ref`
+  - `NotFound` (`invalid_ref | no_provider | missing_content`)
 - `ParsedContentRef` – namespace parser result (`valid` vs `invalid_ref`) used by resolver guards and contract tests.
 
 ### 2.2 Data & State Requirements
@@ -101,7 +99,7 @@ Promises, abortable operations, schema validation hooks.
 - **[5.3.3] Primitive – "Normalization Execution"**
 - **[5.3.4] Primitive – "Validation Gate"**
 - **[5.3.5] Primitive – "Fallback Resolution"**
-  - Resolver preserves semantic failure causes: malformed IDs return `invalid_ref`, unknown namespaces return `unsupported_namespace`, known namespace misses return `not_found`.
+  - Resolver preserves semantic failure causes as explicit discriminants: malformed IDs return `invalid_ref`, unknown namespaces return `no_provider`, known namespace misses return `missing_content`.
 - **[5.3.6] Primitive – "Response Emit"**
 
 ## 6. Knowledge Concern (Reference Data)
@@ -161,3 +159,4 @@ Promises, abortable operations, schema validation hooks.
 ### 10.2 Export Checklist
 - Containers/subcontainers/primitives are explicitly enumerated for CCPP mapping.
 - Resolver exports a single `ContentResolutionResult` union so consumers never branch on `null` for resolution outcomes.
+- `NotFound` remains the failure branch but carries explicit discriminants (`invalid_ref | no_provider | missing_content`) to scale namespace/provider composition without ambiguous reason strings.

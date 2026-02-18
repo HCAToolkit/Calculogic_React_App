@@ -9,6 +9,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import { resolveDrawerContent } from '../../content/contentResolutionAdapter';
+import type { HeaderDocDefinition } from '../../content';
 import { toAnchorId } from './ContentDrawer.anchor';
 import { useContentState } from '../../content/ContentContext';
 import './ContentDrawer.css';
@@ -34,6 +35,7 @@ export default function ContentDrawer() {
   // [5.2] cfg-contentDrawer · Subcontainer · "Resolver Pipeline"
   // Concern: Logic · Parent: "Drawer State Orchestrator" · Catalog: resolver.pipeline
   // Notes: Active content id is resolved lazily and memoized per id transition.
+
   const resolution = useMemo(
     () =>
       activeContentId
@@ -57,27 +59,12 @@ export default function ContentDrawer() {
     }
   }, [activeContentAnchorId, activeContentId]);
 
-  if (!activeContentId) {
+  if (!activeContentId || !resolution) {
     return null;
   }
 
-  if (resolution && resolution.type !== 'found') {
-    const fallback =
-      resolution.type === 'not_found'
-        ? {
-            title: 'Missing content',
-            summary: `The provider could not resolve ${resolution.namespace}:${resolution.contentId}.`,
-          }
-        : resolution.type === 'unsupported_namespace'
-          ? {
-              title: 'Not supported in this drawer yet',
-              summary: `Namespace ${resolution.namespace} is not supported in this drawer yet.`,
-            }
-          : {
-              title: 'Bad link / malformed id',
-              summary: `The requested content reference (${resolution.contentId}) is malformed.`,
-            };
 
+  if (resolution.type === 'invalid_ref') {
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
       // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
@@ -89,8 +76,8 @@ export default function ContentDrawer() {
         <div className="content-drawer__header">
           <div>
             <p className="content-drawer__eyebrow">Content</p>
-            <h2 className="content-drawer__title">{fallback.title}</h2>
-            <p className="content-drawer__summary">{fallback.summary}</p>
+            <h2 className="content-drawer__title">Bad link / malformed id</h2>
+            <p className="content-drawer__summary">The requested content reference ({resolution.contentId}) is malformed.</p>
           </div>
           <button type="button" className="content-drawer__close" onClick={closeContent}>
             Close
@@ -100,8 +87,42 @@ export default function ContentDrawer() {
     );
   }
 
-  if (resolution && resolution.type === 'found' && resolution.namespace === 'docs') {
-    const doc = resolution.payload;
+  if (resolution.type === 'unsupported_namespace' || resolution.type === 'no_provider') {
+    return (
+      <aside className="content-drawer" data-anchor="content-drawer">
+        <div className="content-drawer__header">
+          <div>
+            <p className="content-drawer__eyebrow">Content</p>
+            <h2 className="content-drawer__title">Not supported in this drawer yet</h2>
+            <p className="content-drawer__summary">Namespace {resolution.namespace} is not supported in this drawer yet.</p>
+          </div>
+          <button type="button" className="content-drawer__close" onClick={closeContent}>
+            Close
+          </button>
+        </div>
+      </aside>
+    );
+  }
+
+  if (resolution.type === 'missing_content') {
+    return (
+      <aside className="content-drawer" data-anchor="content-drawer">
+        <div className="content-drawer__header">
+          <div>
+            <p className="content-drawer__eyebrow">Content</p>
+            <h2 className="content-drawer__title">Content not found</h2>
+            <p className="content-drawer__summary">The provider could not resolve {resolution.namespace}:{resolution.contentId}.</p>
+          </div>
+          <button type="button" className="content-drawer__close" onClick={closeContent}>
+            Close
+          </button>
+        </div>
+      </aside>
+    );
+  }
+
+  if (resolution.type === 'found' && resolution.namespace === 'docs') {
+    const doc = resolution.payload as HeaderDocDefinition;
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
       // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
@@ -181,5 +202,18 @@ export default function ContentDrawer() {
     );
   }
 
-  return null;
+  return (
+    <aside className="content-drawer" data-anchor="content-drawer">
+      <div className="content-drawer__header">
+        <div>
+          <p className="content-drawer__eyebrow">Content</p>
+          <h2 className="content-drawer__title">Not supported in this drawer yet</h2>
+          <p className="content-drawer__summary">Namespace {resolution.namespace} is not supported in this drawer yet.</p>
+        </div>
+        <button type="button" className="content-drawer__close" onClick={closeContent}>
+          Close
+        </button>
+      </div>
+    </aside>
+  );
 }

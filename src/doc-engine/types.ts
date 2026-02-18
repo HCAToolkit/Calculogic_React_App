@@ -20,12 +20,27 @@ export interface FoundContent<Payload = unknown> {
   payload: Payload;
 }
 
-export interface NotFound {
-  type: 'not_found';
+export interface InvalidRef {
+  type: 'invalid_ref';
+  contentId: string;
+  reason: string;
+}
+
+export interface NoProvider {
+  type: 'no_provider';
   namespace: string;
   contentId: string;
   reason: string;
 }
+
+export interface MissingContent {
+  type: 'missing_content';
+  namespace: string;
+  contentId: string;
+  reason: string;
+}
+
+export type NotFound = InvalidRef | NoProvider | MissingContent;
 
 export interface UnsupportedNamespace {
   type: 'unsupported_namespace';
@@ -34,17 +49,7 @@ export interface UnsupportedNamespace {
   reason: string;
 }
 
-export interface InvalidRef {
-  type: 'invalid_ref';
-  contentId: string;
-  reason: string;
-}
-
-export type ContentResolutionResult<Payload = unknown> =
-  | FoundContent<Payload>
-  | NotFound
-  | UnsupportedNamespace
-  | InvalidRef;
+export type ContentResolutionResult<Payload = unknown> = FoundContent<Payload> | NotFound;
 
 export interface ParsedContentRefValid {
   type: 'valid';
@@ -63,5 +68,5 @@ export type ParsedContentRef = ParsedContentRefValid | ParsedContentRefInvalid;
 export interface ContentProvider<Context = unknown, Payload = unknown> {
   resolveContent: (
     request: ContentResolutionRequest<Context>,
-  ) => FoundContent<Payload> | NotFound;
+  ) => FoundContent<Payload> | MissingContent;
 }

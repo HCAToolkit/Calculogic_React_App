@@ -7,7 +7,8 @@ export type {
   ContentResolutionResult,
   FoundContent,
   InvalidRef,
+  MissingContent,
+  NoProvider,
   NotFound,
   ParsedContentRef,
-  UnsupportedNamespace,
 } from './types.ts';
