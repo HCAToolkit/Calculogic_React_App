@@ -6,7 +6,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { disableDocumentUserSelect } from './pointerDrag';
+import { disableDocumentUserSelect } from './pointerDrag.ts';
 
 export type PointerDragAxis = 'x' | 'y' | 'both';
 
