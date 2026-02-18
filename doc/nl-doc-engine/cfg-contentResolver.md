@@ -18,9 +18,13 @@ Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conf
 
 ## 2. Configuration Contracts
 ### 2.1 TypeScript Interfaces
-- `ContentResolverRequest` – provider key, scope descriptor, optional query/filter options.
-- `ContentResolverResponse` – resolved node collection, diagnostics, and cursor data.
-- `ContentResolverState` – cache slots, in-flight status, and error envelope.
+- `ContentResolutionRequest` – namespaced content reference (`namespace:id`), optional anchor, optional context.
+- `ContentResolutionResult` – discriminated union with exactly four outcomes:
+  - `found`
+  - `not_found`
+  - `unsupported_namespace`
+  - `invalid_ref`
+- `ParsedContentRef` – namespace parser result (`valid` vs `invalid_ref`) used by resolver guards and contract tests.
 
 ### 2.2 Data & State Requirements
 - Local state: per-request lifecycle state and cache index.
@@ -97,6 +101,7 @@ Promises, abortable operations, schema validation hooks.
 - **[5.3.3] Primitive – "Normalization Execution"**
 - **[5.3.4] Primitive – "Validation Gate"**
 - **[5.3.5] Primitive – "Fallback Resolution"**
+  - Resolver preserves semantic failure causes: malformed IDs return `invalid_ref`, unknown namespaces return `unsupported_namespace`, known namespace misses return `not_found`.
 - **[5.3.6] Primitive – "Response Emit"**
 
 ## 6. Knowledge Concern (Reference Data)
@@ -155,4 +160,4 @@ Promises, abortable operations, schema validation hooks.
 
 ### 10.2 Export Checklist
 - Containers/subcontainers/primitives are explicitly enumerated for CCPP mapping.
-- All resolver outputs reference `ContentNode` schema contract.
+- Resolver exports a single `ContentResolutionResult` union so consumers never branch on `null` for resolution outcomes.

@@ -61,27 +61,36 @@ export default function ContentDrawer() {
     return null;
   }
 
-  if (!resolution || resolution.type === 'not_found') {
-    const missingLabel = resolution
-      ? `${resolution.namespace ? `${resolution.namespace}:` : ''}${resolution.contentId}`
-      : activeContentId;
+  if (resolution && resolution.type !== 'found') {
+    const fallback =
+      resolution.type === 'not_found'
+        ? {
+            title: 'Missing content',
+            summary: `The provider could not resolve ${resolution.namespace}:${resolution.contentId}.`,
+          }
+        : resolution.type === 'unsupported_namespace'
+          ? {
+              title: 'Not supported in this drawer yet',
+              summary: `Namespace ${resolution.namespace} is not supported in this drawer yet.`,
+            }
+          : {
+              title: 'Bad link / malformed id',
+              summary: `The requested content reference (${resolution.contentId}) is malformed.`,
+            };
 
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
       // Concern: Build · Parent: "Content Drawer Configuration" · Catalog: layout.shell
-      // Notes: Missing-resolution shell mirrors standard framing for predictable UX.
+      // Notes: Error-resolution shell mirrors standard framing for predictable UX.
       <aside className="content-drawer" data-anchor="content-drawer">
         {/* [3.2] cfg-contentDrawer · Subcontainer · "Drawer Header"
             Concern: Build · Parent: "Content Drawer Shell" · Catalog: layout.header
-            Notes: Shows not-found summary and recovery control. */}
+            Notes: Shows typed resolution summary and recovery control. */}
         <div className="content-drawer__header">
           <div>
             <p className="content-drawer__eyebrow">Content</p>
-            <h2 className="content-drawer__title">Content not found</h2>
-            <p className="content-drawer__summary">
-              The provider could not resolve{' '}
-              <strong>{missingLabel}</strong>.
-            </p>
+            <h2 className="content-drawer__title">{fallback.title}</h2>
+            <p className="content-drawer__summary">{fallback.summary}</p>
           </div>
           <button type="button" className="content-drawer__close" onClick={closeContent}>
             Close
@@ -91,7 +100,7 @@ export default function ContentDrawer() {
     );
   }
 
-  if (resolution.type === 'content' && resolution.namespace === 'docs') {
+  if (resolution && resolution.type === 'found' && resolution.namespace === 'docs') {
     const doc = resolution.payload;
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
