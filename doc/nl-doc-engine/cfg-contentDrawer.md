@@ -26,13 +26,14 @@
 
 ### §5.2 Subcontainer — "Resolver Pipeline"
 - Resolve through app-level content provider registry using request `{ contentId, anchorId }`.
-- Keep doc-engine resolver outputs in a single canonical discriminated union (`found | not_found | unsupported_namespace | invalid_ref`) for drawer rendering.
-- `resolveDrawerContent` must never return `null`; it maps/forwards resolver outcomes 1:1.
+- Keep resolver outputs explicit for drawer rendering (`found | invalid_ref | no_provider | missing_content | unsupported_namespace`).
+- `resolveDrawerContent` never returns `null`; it always emits a typed outcome.
+- Drawer adapter maps non-doc namespaces to `unsupported_namespace` while preserving doc-engine outcomes for docs refs.
 - Drawer UI copy is explicit per outcome:
   - `found` → render resolved docs content.
-  - `not_found` → show missing content message.
-  - `unsupported_namespace` → show namespace not yet supported in drawer.
   - `invalid_ref` → show malformed/bad link message.
+  - `unsupported_namespace` / `no_provider` → show not supported here yet message.
+  - `missing_content` → show content not found message.
 
 ### §5.3 Primitive — "Anchor Scroll Handler"
 - Scroll to anchor when content resolves.

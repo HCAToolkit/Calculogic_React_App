@@ -36,7 +36,7 @@ export class ContentProviderRegistry {
 
     if (!provider) {
       return {
-        type: 'unsupported_namespace',
+        type: 'no_provider',
         namespace,
         contentId: resolvedId,
         reason: `No content provider registered for namespace: ${namespace}.`,

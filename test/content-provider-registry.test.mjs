@@ -6,7 +6,7 @@ const createMockDocsProvider = () => ({
   resolveContent: ({ contentId, anchorId }) => {
     if (contentId !== 'doc-build') {
       return {
-        type: 'not_found',
+        type: 'missing_content',
         namespace: 'docs',
         contentId,
         reason: 'Documentation entry was not found.',
@@ -45,22 +45,22 @@ test('parseContentRef returns invalid_ref for abc', () => {
   });
 });
 
-test('contentProviderRegistry resolves unknown id in docs to not_found', () => {
+test('contentProviderRegistry resolves unknown id in docs to missing_content', () => {
   const contentProviderRegistry = createRegistry();
   const missing = contentProviderRegistry.resolveContent({ contentId: 'docs:not-real' });
   assert.deepEqual(missing, {
-    type: 'not_found',
+    type: 'missing_content',
     namespace: 'docs',
     contentId: 'not-real',
     reason: 'Documentation entry was not found.',
   });
 });
 
-test('contentProviderRegistry resolves otherns:x to unsupported_namespace when only docs provider exists', () => {
+test('contentProviderRegistry resolves otherns:x to no_provider when only docs provider exists', () => {
   const contentProviderRegistry = createRegistry();
   const unsupported = contentProviderRegistry.resolveContent({ contentId: 'otherns:x' });
   assert.deepEqual(unsupported, {
-    type: 'unsupported_namespace',
+    type: 'no_provider',
     namespace: 'otherns',
     contentId: 'x',
     reason: 'No content provider registered for namespace: otherns.',
