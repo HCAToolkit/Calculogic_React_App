@@ -22,7 +22,8 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - Local state: Panel widths/heights, collapse states per section, hover/focus state for grips.
 - Global context: Theme tokens inherited from cfg-appFrame; routing context determines active tab.
 - External data sources: `localStorage` for persistence of dimensions and collapse preferences.
-- Persistence payload contract: JSON payloads include a numeric `version` field (`v1`) while readers continue to accept legacy unversioned payloads during migration.
+- Persistence payload contract: section/right-panel state uses versioned JSON payloads (`{ version: 1, ... }`) while readers continue to accept legacy unversioned JSON during migration.
+- Left panel width intentionally remains the legacy primitive numeric string contract (`"<width>"`) to avoid unnecessary migration churn for a single scalar value; migrate to versioned JSON only when left-panel persistence needs additional fields/metadata.
 
 ### 2.3 Dependencies
 - UI libs: React, including `useState`, `useEffect`, and refs for DOM measurements.
@@ -159,7 +160,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 ### 5.0 Dependencies
 - Relies on browser pointer and keyboard events for resizing.
 - Uses `localStorage` to persist panel states.
-- Uses shared payload parser/serializer helpers so each storage key enforces a stable versioned schema.
+- Uses shared payload parser/serializer helpers from `buildSurfacePersistence.contracts.ts` so section/right-panel keys enforce a stable versioned schema while left-panel width stays primitive.
 
 ### 5.1 Atomic Components — Containers (Logic)
 - **[5.1.1] Container – "Section Contracts"**
@@ -188,7 +189,9 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - **[5.2.6] Primitive – "Persistence Failure Reporter"**
   - Shared non-fatal reporting hook used by persistence reads/writes to emit diagnosable storage operation failures.
 - **[5.2.7] Primitive – "Versioned Payload Contract"**
-  - Normalizes persisted section and side-panel payloads to `{ version: 1, ...state }` on writes while accepting prior unversioned shapes on reads.
+  - Centralized in `src/tabs/build/buildSurfacePersistence.contracts.ts`.
+  - Normalizes persisted section and right-panel payloads to `{ version: 1, ...state }` on writes while accepting prior unversioned JSON shapes on reads.
+  - Left-panel width intentionally remains a primitive numeric string contract until the payload requires additional structured fields.
 
 ### 5.2.3 Derived Values
 - Derived booleans for collapsed states, computed widths/heights.
@@ -240,6 +243,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - src/tabs/build/BuildSurface.build.module.css
 - src/tabs/build/BuildSurface.logic.ts
 - src/tabs/build/buildSurfacePersistence.ts
+- src/tabs/build/buildSurfacePersistence.contracts.ts
 - src/tabs/build/BuildSurface.knowledge.ts
 - (Results and ResultsStyle files will be added when outputs exist.)
 - src/tabs/build/index.ts
