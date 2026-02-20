@@ -8,9 +8,12 @@ import {
 } from '../src/tabs/build/buildSurfacePersistence.ts';
 import {
   clamp,
+} from '../src/tabs/build/BuildSurface.logic.ts';
+import {
   parseRightPanelStatePayload,
   parseSectionStatePayload,
-} from '../src/tabs/build/BuildSurface.logic.ts';
+  serializeSectionStatePayload,
+} from '../src/tabs/build/buildSurfacePersistence.contracts.ts';
 
 test('clamp enforces lower and upper boundaries', () => {
   assert.equal(clamp(100, 120, 240), 120);
@@ -63,9 +66,33 @@ test('parseSectionStatePayload falls back to versioned defaults on malformed pay
   const parsed = parseSectionStatePayload('{"height":"bad","collapsed":false}', fallback);
 
   assert.deepEqual(parsed, {
-    version: 1,
-    height: 180,
-    collapsed: false,
+    state: {
+      version: 1,
+      height: 180,
+      collapsed: false,
+    },
+    wasFallback: true,
+    reason: 'Malformed persisted section state payload',
+  });
+});
+
+
+
+test('parseSectionStatePayload handles malformed JSON syntax via non-fatal fallback metadata', () => {
+  const fallback = { height: 180, collapsed: false };
+
+  assert.doesNotThrow(() => {
+    const parsed = parseSectionStatePayload('{"height":180,', fallback);
+
+    assert.deepEqual(parsed, {
+      state: {
+        version: 1,
+        height: 180,
+        collapsed: false,
+      },
+      wasFallback: true,
+      reason: 'Malformed persisted section state payload',
+    });
   });
 });
 
@@ -74,8 +101,24 @@ test('parseRightPanelStatePayload upgrades legacy payloads without version', () 
   const parsed = parseRightPanelStatePayload('{"width":280,"collapsed":true}', fallback);
 
   assert.deepEqual(parsed, {
-    version: 1,
-    width: 280,
-    collapsed: true,
+    state: {
+      version: 1,
+      width: 280,
+      collapsed: true,
+    },
+    wasFallback: false,
+  });
+});
+
+test('section payload round-trips through serializer and parser', () => {
+  const serialized = serializeSectionStatePayload({ height: 222, collapsed: true });
+  const parsed = parseSectionStatePayload(JSON.stringify(serialized), {
+    height: 180,
+    collapsed: false,
+  });
+
+  assert.deepEqual(parsed, {
+    state: serialized,
+    wasFallback: false,
   });
 });
