@@ -22,6 +22,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - Local state: Panel widths/heights, collapse states per section, hover/focus state for grips.
 - Global context: Theme tokens inherited from cfg-appFrame; routing context determines active tab.
 - External data sources: `localStorage` for persistence of dimensions and collapse preferences.
+- Persistence payload contract: JSON payloads include a numeric `version` field (`v1`) while readers continue to accept legacy unversioned payloads during migration.
 
 ### 2.3 Dependencies
 - UI libs: React, including `useState`, `useEffect`, and refs for DOM measurements.
@@ -158,6 +159,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 ### 5.0 Dependencies
 - Relies on browser pointer and keyboard events for resizing.
 - Uses `localStorage` to persist panel states.
+- Uses shared payload parser/serializer helpers so each storage key enforces a stable versioned schema.
 
 ### 5.1 Atomic Components — Containers (Logic)
 - **[5.1.1] Container – "Section Contracts"**
@@ -185,6 +187,8 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Memoized object mapping anchors to handlers/aria attributes consumed by Build.
 - **[5.2.6] Primitive – "Persistence Failure Reporter"**
   - Shared non-fatal reporting hook used by persistence reads/writes to emit diagnosable storage operation failures.
+- **[5.2.7] Primitive – "Versioned Payload Contract"**
+  - Normalizes persisted section and side-panel payloads to `{ version: 1, ...state }` on writes while accepting prior unversioned shapes on reads.
 
 ### 5.2.3 Derived Values
 - Derived booleans for collapsed states, computed widths/heights.

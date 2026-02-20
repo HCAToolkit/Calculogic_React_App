@@ -45,6 +45,19 @@ test('parseContentRef returns invalid_ref for abc', () => {
   });
 });
 
+
+test('contentProviderRegistry resolves docs:doc-build to found payload', () => {
+  const contentProviderRegistry = createRegistry();
+  const found = contentProviderRegistry.resolveContent({ contentId: 'docs:doc-build', anchorId: 'intro' });
+  assert.deepEqual(found, {
+    type: 'found',
+    namespace: 'docs',
+    contentId: 'doc-build',
+    anchorId: 'intro',
+    payload: { title: 'Build Docs' },
+  });
+});
+
 test('contentProviderRegistry resolves unknown id in docs to missing_content', () => {
   const contentProviderRegistry = createRegistry();
   const missing = contentProviderRegistry.resolveContent({ contentId: 'docs:not-real' });
