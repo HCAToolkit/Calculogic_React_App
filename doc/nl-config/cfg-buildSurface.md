@@ -191,6 +191,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - **[5.2.7] Primitive – "Versioned Payload Contract"**
   - Centralized in `src/tabs/build/buildSurfacePersistence.contracts.ts`.
   - Normalizes persisted section and right-panel payloads to `{ version: 1, ...state }` on writes while accepting prior unversioned JSON shapes on reads.
+  - Handles malformed JSON syntax in parser helpers by returning versioned fallback state with `{ wasFallback: true, reason }` so read-path wrappers can report non-fatal diagnostics consistently.
   - Left-panel width intentionally remains a primitive numeric string contract until the payload requires additional structured fields.
 
 ### 5.2.3 Derived Values

@@ -76,6 +76,26 @@ test('parseSectionStatePayload falls back to versioned defaults on malformed pay
   });
 });
 
+
+
+test('parseSectionStatePayload handles malformed JSON syntax via non-fatal fallback metadata', () => {
+  const fallback = { height: 180, collapsed: false };
+
+  assert.doesNotThrow(() => {
+    const parsed = parseSectionStatePayload('{"height":180,', fallback);
+
+    assert.deepEqual(parsed, {
+      state: {
+        version: 1,
+        height: 180,
+        collapsed: false,
+      },
+      wasFallback: true,
+      reason: 'Malformed persisted section state payload',
+    });
+  });
+});
+
 test('parseRightPanelStatePayload upgrades legacy payloads without version', () => {
   const fallback = { width: 320, collapsed: false };
   const parsed = parseRightPanelStatePayload('{"width":280,"collapsed":true}', fallback);

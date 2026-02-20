@@ -34,6 +34,33 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
+function parsePayloadContract<TVersionedPayload, TLegacyPayload>(
+  raw: string,
+  fallback: TVersionedPayload,
+  reason: string,
+  isVersionedPayload: (value: unknown) => value is TVersionedPayload,
+  isLegacyPayload: (value: unknown) => value is TLegacyPayload,
+  upgradeLegacyPayload: (legacyPayload: TLegacyPayload) => TVersionedPayload,
+): BuildSurfacePersistenceParseResult<TVersionedPayload> {
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return { state: fallback, wasFallback: true, reason };
+  }
+
+  if (isVersionedPayload(parsed)) {
+    return { state: parsed, wasFallback: false };
+  }
+
+  if (isLegacyPayload(parsed)) {
+    return { state: upgradeLegacyPayload(parsed), wasFallback: false };
+  }
+
+  return { state: fallback, wasFallback: true, reason };
+}
+
 export function serializeSectionStatePayload(
   state: Omit<VersionedSectionStatePayload, 'version'>,
 ): VersionedSectionStatePayload {
@@ -44,39 +71,36 @@ export function serializeSectionStatePayload(
   };
 }
 
+function isVersionedSectionStatePayload(value: unknown): value is VersionedSectionStatePayload {
+  const parsed = value as Partial<VersionedSectionStatePayload>;
+  return (
+    parsed?.version === BUILD_SURFACE_PERSISTENCE_VERSION
+    && isFiniteNumber(parsed.height)
+    && typeof parsed.collapsed === 'boolean'
+  );
+}
+
+function isLegacySectionStatePayload(value: unknown): value is Omit<VersionedSectionStatePayload, 'version'> {
+  const parsed = value as Partial<VersionedSectionStatePayload>;
+  return (
+    parsed?.version === undefined
+    && isFiniteNumber(parsed.height)
+    && typeof parsed.collapsed === 'boolean'
+  );
+}
+
 export function parseSectionStatePayload(
   raw: string,
   fallback: Omit<VersionedSectionStatePayload, 'version'>,
 ): BuildSurfacePersistenceParseResult<VersionedSectionStatePayload> {
-  const parsed = JSON.parse(raw) as Partial<VersionedSectionStatePayload>;
-
-  if (
-    parsed.version === BUILD_SURFACE_PERSISTENCE_VERSION
-    && isFiniteNumber(parsed.height)
-    && typeof parsed.collapsed === 'boolean'
-  ) {
-    return { state: parsed as VersionedSectionStatePayload, wasFallback: false };
-  }
-
-  if (
-    parsed.version === undefined
-    && isFiniteNumber(parsed.height)
-    && typeof parsed.collapsed === 'boolean'
-  ) {
-    return {
-      state: serializeSectionStatePayload({
-        height: parsed.height,
-        collapsed: parsed.collapsed,
-      }),
-      wasFallback: false,
-    };
-  }
-
-  return {
-    state: serializeSectionStatePayload(fallback),
-    wasFallback: true,
-    reason: 'Malformed persisted section state payload',
-  };
+  return parsePayloadContract(
+    raw,
+    serializeSectionStatePayload(fallback),
+    'Malformed persisted section state payload',
+    isVersionedSectionStatePayload,
+    isLegacySectionStatePayload,
+    serializeSectionStatePayload,
+  );
 }
 
 export function serializeRightPanelStatePayload(
@@ -89,37 +113,36 @@ export function serializeRightPanelStatePayload(
   };
 }
 
+function isVersionedRightPanelStatePayload(value: unknown): value is VersionedRightPanelStatePayload {
+  const parsed = value as Partial<VersionedRightPanelStatePayload>;
+  return (
+    parsed?.version === BUILD_SURFACE_PERSISTENCE_VERSION
+    && isFiniteNumber(parsed.width)
+    && typeof parsed.collapsed === 'boolean'
+  );
+}
+
+function isLegacyRightPanelStatePayload(
+  value: unknown,
+): value is Omit<VersionedRightPanelStatePayload, 'version'> {
+  const parsed = value as Partial<VersionedRightPanelStatePayload>;
+  return (
+    parsed?.version === undefined
+    && isFiniteNumber(parsed.width)
+    && typeof parsed.collapsed === 'boolean'
+  );
+}
+
 export function parseRightPanelStatePayload(
   raw: string,
   fallback: Omit<VersionedRightPanelStatePayload, 'version'>,
 ): BuildSurfacePersistenceParseResult<VersionedRightPanelStatePayload> {
-  const parsed = JSON.parse(raw) as Partial<VersionedRightPanelStatePayload>;
-
-  if (
-    parsed.version === BUILD_SURFACE_PERSISTENCE_VERSION
-    && isFiniteNumber(parsed.width)
-    && typeof parsed.collapsed === 'boolean'
-  ) {
-    return { state: parsed as VersionedRightPanelStatePayload, wasFallback: false };
-  }
-
-  if (
-    parsed.version === undefined
-    && isFiniteNumber(parsed.width)
-    && typeof parsed.collapsed === 'boolean'
-  ) {
-    return {
-      state: serializeRightPanelStatePayload({
-        width: parsed.width,
-        collapsed: parsed.collapsed,
-      }),
-      wasFallback: false,
-    };
-  }
-
-  return {
-    state: serializeRightPanelStatePayload(fallback),
-    wasFallback: true,
-    reason: 'Malformed persisted right panel state payload',
-  };
+  return parsePayloadContract(
+    raw,
+    serializeRightPanelStatePayload(fallback),
+    'Malformed persisted right panel state payload',
+    isVersionedRightPanelStatePayload,
+    isLegacyRightPanelStatePayload,
+    serializeRightPanelStatePayload,
+  );
 }
