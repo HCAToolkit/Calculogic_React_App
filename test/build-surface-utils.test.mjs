@@ -6,7 +6,11 @@ import {
   readBuildSurfaceStorage,
   writeBuildSurfaceStorage,
 } from '../src/tabs/build/buildSurfacePersistence.ts';
-import { clamp } from '../src/tabs/build/BuildSurface.logic.ts';
+import {
+  clamp,
+  parseRightPanelStatePayload,
+  parseSectionStatePayload,
+} from '../src/tabs/build/BuildSurface.logic.ts';
 
 test('clamp enforces lower and upper boundaries', () => {
   assert.equal(clamp(100, 120, 240), 120);
@@ -51,4 +55,27 @@ test('writeBuildSurfaceStorage reports on write failure without throwing', () =>
   assert.equal(reports[0].operation, 'write');
   assert.equal(reports[0].storageKey, 'left-panel-width');
   assert.match(String(reports[0].error), /quota exceeded/);
+});
+
+
+test('parseSectionStatePayload falls back to versioned defaults on malformed payload', () => {
+  const fallback = { height: 180, collapsed: false };
+  const parsed = parseSectionStatePayload('{"height":"bad","collapsed":false}', fallback);
+
+  assert.deepEqual(parsed, {
+    version: 1,
+    height: 180,
+    collapsed: false,
+  });
+});
+
+test('parseRightPanelStatePayload upgrades legacy payloads without version', () => {
+  const fallback = { width: 320, collapsed: false };
+  const parsed = parseRightPanelStatePayload('{"width":280,"collapsed":true}', fallback);
+
+  assert.deepEqual(parsed, {
+    version: 1,
+    width: 280,
+    collapsed: true,
+  });
 });

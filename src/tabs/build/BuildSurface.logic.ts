@@ -29,6 +29,7 @@ import {
 export type SectionId = 'configurations' | 'atomic-components' | 'search-configurations';
 
 interface SectionState {
+  version: 1;
   height: number;
   collapsed: boolean;
 }
@@ -77,6 +78,7 @@ interface LeftPanelLogic {
 }
 
 interface RightPanelState {
+  version: 1;
   width: number;
   collapsed: boolean;
 }
@@ -115,6 +117,78 @@ export function clamp(value: number, min: number, max: number) {
   return clampNumber(value, min, max);
 }
 
+
+
+// [5.2.7] cfg-buildSurface · Primitive · "Versioned Payload Contract"
+// Concern: Logic · Parent: "Section Contracts" · Catalog: contract.persistence
+// Notes: Keeps localStorage payloads forward-compatible by writing versioned state and accepting legacy unversioned payloads.
+const BUILD_SURFACE_PERSISTENCE_VERSION = 1 as const;
+
+function toVersionedSectionState(state: Omit<SectionState, 'version'>): SectionState {
+  return {
+    version: BUILD_SURFACE_PERSISTENCE_VERSION,
+    height: state.height,
+    collapsed: state.collapsed,
+  };
+}
+
+export function parseSectionStatePayload(raw: string, fallback: Omit<SectionState, 'version'>): SectionState {
+  const parsed = JSON.parse(raw) as Partial<SectionState>;
+  if (
+    parsed.version === BUILD_SURFACE_PERSISTENCE_VERSION &&
+    typeof parsed.height === 'number' &&
+    Number.isFinite(parsed.height) &&
+    typeof parsed.collapsed === 'boolean'
+  ) {
+    return parsed as SectionState;
+  }
+
+  if (
+    parsed.version === undefined &&
+    typeof parsed.height === 'number' &&
+    Number.isFinite(parsed.height) &&
+    typeof parsed.collapsed === 'boolean'
+  ) {
+    return toVersionedSectionState({
+      height: parsed.height,
+      collapsed: parsed.collapsed,
+    });
+  }
+
+  return toVersionedSectionState(fallback);
+}
+
+export function parseRightPanelStatePayload(raw: string, fallback: Omit<RightPanelState, 'version'>): RightPanelState {
+  const parsed = JSON.parse(raw) as Partial<RightPanelState>;
+  if (
+    parsed.version === BUILD_SURFACE_PERSISTENCE_VERSION &&
+    typeof parsed.width === 'number' &&
+    Number.isFinite(parsed.width) &&
+    typeof parsed.collapsed === 'boolean'
+  ) {
+    return parsed as RightPanelState;
+  }
+
+  if (
+    parsed.version === undefined &&
+    typeof parsed.width === 'number' &&
+    Number.isFinite(parsed.width) &&
+    typeof parsed.collapsed === 'boolean'
+  ) {
+    return {
+      version: BUILD_SURFACE_PERSISTENCE_VERSION,
+      width: parsed.width,
+      collapsed: parsed.collapsed,
+    };
+  }
+
+  return {
+    version: BUILD_SURFACE_PERSISTENCE_VERSION,
+    width: fallback.width,
+    collapsed: fallback.collapsed,
+  };
+}
+
 export function sectionTitle(id: SectionId) {
   switch (id) {
     case 'configurations':
@@ -142,17 +216,15 @@ function useSectionLogic(
       storageKey,
       () => {
         const raw = localStorage.getItem(storageKey);
-        if (!raw) return { height: initialHeight, collapsed: false };
+        if (!raw) return toVersionedSectionState({ height: initialHeight, collapsed: false });
         const parsed = JSON.parse(raw) as Partial<SectionState>;
         if (
+          (parsed.version === BUILD_SURFACE_PERSISTENCE_VERSION || parsed.version === undefined) &&
           typeof parsed.height === 'number' &&
           Number.isFinite(parsed.height) &&
           typeof parsed.collapsed === 'boolean'
         ) {
-          return {
-            height: parsed.height,
-            collapsed: parsed.collapsed,
-          };
+          return parseSectionStatePayload(raw, { height: initialHeight, collapsed: false });
         }
 
         defaultBuildSurfacePersistenceReporter({
@@ -161,15 +233,15 @@ function useSectionLogic(
           error: new Error('Malformed persisted section state payload'),
         });
 
-        return { height: initialHeight, collapsed: false };
+        return toVersionedSectionState({ height: initialHeight, collapsed: false });
       },
-      { height: initialHeight, collapsed: false }
+      toVersionedSectionState({ height: initialHeight, collapsed: false })
     )
   );
 
   useEffect(() => {
     writeBuildSurfaceStorage(storageKey, () => {
-      localStorage.setItem(storageKey, JSON.stringify(state));
+      localStorage.setItem(storageKey, JSON.stringify(toVersionedSectionState(state)));
     });
   }, [state, storageKey]);
 
@@ -329,11 +401,12 @@ function useRightPanelLogic(): RightPanelLogic {
         if (raw) {
           const parsed = JSON.parse(raw) as Partial<RightPanelState>;
           if (
+            (parsed.version === BUILD_SURFACE_PERSISTENCE_VERSION || parsed.version === undefined) &&
             typeof parsed.width === 'number' &&
             Number.isFinite(parsed.width) &&
             typeof parsed.collapsed === 'boolean'
           ) {
-            return parsed as RightPanelState;
+            return parseRightPanelStatePayload(raw, { width: 320, collapsed: false });
           }
         }
 
@@ -343,16 +416,20 @@ function useRightPanelLogic(): RightPanelLogic {
           error: new Error('Malformed persisted right panel state payload'),
         });
 
-        return { width: 320, collapsed: false };
+        return { version: BUILD_SURFACE_PERSISTENCE_VERSION, width: 320, collapsed: false };
       },
-      { width: 320, collapsed: false }
+      { version: BUILD_SURFACE_PERSISTENCE_VERSION, width: 320, collapsed: false }
     )
   );
   const previousWidth = useRef<number | null>(null);
 
   useEffect(() => {
     writeBuildSurfaceStorage(STORAGE_KEY, () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        version: BUILD_SURFACE_PERSISTENCE_VERSION,
+        width: state.width,
+        collapsed: state.collapsed,
+      }));
     });
   }, [state]);
 
@@ -363,7 +440,7 @@ function useRightPanelLogic(): RightPanelLogic {
         const min = 40;
         const max = Math.max(160, window.innerWidth - 320);
         const width = clamp(Math.round(previousState.width - dx), min, max);
-        return { ...previousState, width };
+        return { ...previousState, version: BUILD_SURFACE_PERSISTENCE_VERSION, width };
       });
     },
   });
@@ -386,10 +463,10 @@ function useRightPanelLogic(): RightPanelLogic {
     setState(previous => {
       if (!previous.collapsed) {
         previousWidth.current = previous.width;
-        return { ...previous, collapsed: true, width: 40 };
+        return { ...previous, version: BUILD_SURFACE_PERSISTENCE_VERSION, collapsed: true, width: 40 };
       }
       const restored = Math.max(previousWidth.current ?? 320, 200);
-      return { ...previous, collapsed: false, width: restored };
+      return { ...previous, version: BUILD_SURFACE_PERSISTENCE_VERSION, collapsed: false, width: restored };
     });
   }, []);
 
