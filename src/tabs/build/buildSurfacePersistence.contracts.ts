@@ -24,9 +24,16 @@ export interface VersionedRightPanelStatePayload {
   collapsed: boolean;
 }
 
+export type BuildSurfacePersistenceFallbackReasonCode =
+  | 'malformed-json'
+  | 'unsupported-version'
+  | 'invalid-shape';
+
 export interface BuildSurfacePersistenceParseResult<TPayload> {
   state: TPayload;
   wasFallback: boolean;
+  wasMigrated: boolean;
+  reasonCode?: BuildSurfacePersistenceFallbackReasonCode;
   reason?: string;
 }
 
@@ -34,10 +41,19 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
 }
 
+function hasUnsupportedVersion(value: unknown): boolean {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const parsed = value as { version?: unknown };
+  return typeof parsed.version === 'number' && parsed.version !== BUILD_SURFACE_PERSISTENCE_VERSION;
+}
+
 function parsePayloadContract<TVersionedPayload, TLegacyPayload>(
   raw: string,
   fallback: TVersionedPayload,
-  reason: string,
+  fallbackLabel: string,
   isVersionedPayload: (value: unknown) => value is TVersionedPayload,
   isLegacyPayload: (value: unknown) => value is TLegacyPayload,
   upgradeLegacyPayload: (legacyPayload: TLegacyPayload) => TVersionedPayload,
@@ -47,18 +63,44 @@ function parsePayloadContract<TVersionedPayload, TLegacyPayload>(
   try {
     parsed = JSON.parse(raw);
   } catch {
-    return { state: fallback, wasFallback: true, reason };
+    return {
+      state: fallback,
+      wasFallback: true,
+      wasMigrated: false,
+      reasonCode: 'malformed-json',
+      reason: `${fallbackLabel}: malformed-json`,
+    };
   }
 
   if (isVersionedPayload(parsed)) {
-    return { state: parsed, wasFallback: false };
+    return { state: parsed, wasFallback: false, wasMigrated: false };
   }
 
   if (isLegacyPayload(parsed)) {
-    return { state: upgradeLegacyPayload(parsed), wasFallback: false };
+    return {
+      state: upgradeLegacyPayload(parsed),
+      wasFallback: false,
+      wasMigrated: true,
+    };
   }
 
-  return { state: fallback, wasFallback: true, reason };
+  if (hasUnsupportedVersion(parsed)) {
+    return {
+      state: fallback,
+      wasFallback: true,
+      wasMigrated: false,
+      reasonCode: 'unsupported-version',
+      reason: `${fallbackLabel}: unsupported-version`,
+    };
+  }
+
+  return {
+    state: fallback,
+    wasFallback: true,
+    wasMigrated: false,
+    reasonCode: 'invalid-shape',
+    reason: `${fallbackLabel}: invalid-shape`,
+  };
 }
 
 export function serializeSectionStatePayload(

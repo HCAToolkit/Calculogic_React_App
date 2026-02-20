@@ -23,6 +23,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - Global context: Theme tokens inherited from cfg-appFrame; routing context determines active tab.
 - External data sources: `localStorage` for persistence of dimensions and collapse preferences.
 - Persistence payload contract: section/right-panel state uses versioned JSON payloads (`{ version: 1, ... }`) while readers continue to accept legacy unversioned JSON during migration.
+- Parser diagnostics contract: section/right-panel parsers emit explicit fallback reasons (`malformed-json`, `unsupported-version`, `invalid-shape`) so read wrappers can report non-fatal, diagnosable reset paths.
 - Left panel width intentionally remains the legacy primitive numeric string contract (`"<width>"`) to avoid unnecessary migration churn for a single scalar value; migrate to versioned JSON only when left-panel persistence needs additional fields/metadata.
 
 ### 2.3 Dependencies
@@ -191,7 +192,9 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - **[5.2.7] Primitive – "Versioned Payload Contract"**
   - Centralized in `src/tabs/build/buildSurfacePersistence.contracts.ts`.
   - Normalizes persisted section and right-panel payloads to `{ version: 1, ...state }` on writes while accepting prior unversioned JSON shapes on reads.
-  - Handles malformed JSON syntax in parser helpers by returning versioned fallback state with `{ wasFallback: true, reason }` so read-path wrappers can report non-fatal diagnostics consistently.
+  - Handles malformed JSON syntax in parser helpers by returning versioned fallback state with `{ wasFallback: true, reasonCode, reason }` so read-path wrappers can report non-fatal diagnostics consistently.
+  - Distinguishes unsupported version mismatches from malformed/invalid-shape payloads and resets to safe defaults for unsupported/malformed payloads.
+  - Marks successful legacy upgrades via `wasMigrated: true` so the persisted contract can be rewritten as versioned JSON by existing write effects.
   - Left-panel width intentionally remains a primitive numeric string contract until the payload requires additional structured fields.
 
 ### 5.2.3 Derived Values

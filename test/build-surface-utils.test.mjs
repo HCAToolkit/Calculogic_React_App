@@ -72,7 +72,9 @@ test('parseSectionStatePayload falls back to versioned defaults on malformed pay
       collapsed: false,
     },
     wasFallback: true,
-    reason: 'Malformed persisted section state payload',
+    wasMigrated: false,
+    reasonCode: 'invalid-shape',
+    reason: 'Malformed persisted section state payload: invalid-shape',
   });
 });
 
@@ -91,7 +93,9 @@ test('parseSectionStatePayload handles malformed JSON syntax via non-fatal fallb
         collapsed: false,
       },
       wasFallback: true,
-      reason: 'Malformed persisted section state payload',
+      wasMigrated: false,
+      reasonCode: 'malformed-json',
+      reason: 'Malformed persisted section state payload: malformed-json',
     });
   });
 });
@@ -107,6 +111,26 @@ test('parseRightPanelStatePayload upgrades legacy payloads without version', () 
       collapsed: true,
     },
     wasFallback: false,
+    wasMigrated: true,
+  });
+});
+
+
+
+test('parseRightPanelStatePayload resets unsupported versions with diagnosable reason', () => {
+  const fallback = { width: 320, collapsed: false };
+  const parsed = parseRightPanelStatePayload('{"version":2,"width":500,"collapsed":false}', fallback);
+
+  assert.deepEqual(parsed, {
+    state: {
+      version: 1,
+      width: 320,
+      collapsed: false,
+    },
+    wasFallback: true,
+    wasMigrated: false,
+    reasonCode: 'unsupported-version',
+    reason: 'Malformed persisted right panel state payload: unsupported-version',
   });
 });
 
@@ -120,5 +144,6 @@ test('section payload round-trips through serializer and parser', () => {
   assert.deepEqual(parsed, {
     state: serialized,
     wasFallback: false,
+    wasMigrated: false,
   });
 });
