@@ -5,7 +5,7 @@
  * Responsibility: Compose semantic header frame with brand identity, tab navigation, and publish CTA anchors.
  * Invariants: Preserve tab order, retain ARIA roles, keep publish CTA as button element.
  */
-import { toDocsContentId } from '../../content/packs/header-docs/header-doc.ids.ts';
+import { toDocsContentId } from '../../content';
 import type { GlobalHeaderShellBuildBindings } from './GlobalHeaderShell.logic';
 
 type HeaderMode = GlobalHeaderShellBuildBindings['activeModeByTab']['build'];

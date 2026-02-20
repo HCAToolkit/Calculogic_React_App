@@ -13,7 +13,7 @@
 // Constraints: Values must remain serializable and environment-agnostic.
 // ─────────────────────────────────────────────
 
-import { HEADER_DOC_IDS, type HeaderDocId } from '../../content/packs/header-docs/header-doc.ids.ts';
+import { HEADER_DOC_IDS, type HeaderDocId } from '../../content';
 
 // [6.1] shell-globalHeader · Primitive · "Header Tab Identifier Types"
 // Concern: Knowledge · Catalog: types.identifier
