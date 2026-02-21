@@ -178,4 +178,6 @@ A dedicated in-repo documentation hub now exists for standards alignment and imp
 - `doc/doc-engine/ContentDrawerMVP.md`
 - `doc/nl-doc-engine/cfg-contentDrawer.md`
 
-## Cross-reference Doc doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md (host stabilization + integration sequencing pre-extraction)
+## Related Architecture Plans
+
+- [`doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md`](doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md) (host stabilization + integration sequencing pre-extraction)
