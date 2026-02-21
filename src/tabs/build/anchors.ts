@@ -13,7 +13,7 @@
 // Constraints: Anchor registry stays deterministic and pure.
 // ─────────────────────────────────────────────
 
-// [6.1] cfg-buildSurface · Primitive · "Anchor Registry"
+// [6.1.1] cfg-buildSurface · Primitive · "Anchor Registry"
 // Concern: Knowledge · Catalog: contract.anchor
 // Notes: Enumerates public anchor factories consumed by Build, BuildStyle, and Logic.
 export const BUILD_ANCHORS = {
@@ -37,7 +37,7 @@ export const BUILD_ANCHORS = {
   list: (id: string) => `builder-list-${id}`,
 } as const;
 
-// [6.2] cfg-buildSurface · Primitive · "Anchor Type Alias"
+// [6.2.1] cfg-buildSurface · Primitive · "Anchor Type Alias"
 // Concern: Knowledge · Parent: "Anchor Registry" · Catalog: contract.type
 // Notes: Provides union of anchor identifiers for compile-time validation.
 export type BuildAnchorId = typeof BUILD_ANCHORS[keyof typeof BUILD_ANCHORS];

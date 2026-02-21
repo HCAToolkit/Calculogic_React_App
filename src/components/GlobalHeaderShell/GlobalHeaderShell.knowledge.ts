@@ -15,13 +15,13 @@
 
 import { HEADER_DOC_IDS, type HeaderDocId } from '../../content';
 
-// [6.1] shell-globalHeader · Primitive · "Header Tab Identifier Types"
+// [6.1.1] shell-globalHeader · Primitive · "Header Tab Identifier Types"
 // Concern: Knowledge · Catalog: types.identifier
 // Notes: Enumerates supported tab and mode identifiers shared across concerns.
 export type HeaderTabId = 'build' | 'logic' | 'knowledge' | 'results';
 export type HeaderModeId = 'default' | 'style';
 
-// [6.2] shell-globalHeader · Primitive · "Header Tab Definition Schema"
+// [6.1.2] shell-globalHeader · Primitive · "Header Tab Definition Schema"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Shapes tab configuration consumed by build concern.
 export interface HeaderTabDefinition {
@@ -32,12 +32,12 @@ export interface HeaderTabDefinition {
   hoverSummary: string;
 }
 
-// [6.1.a] shell-globalHeader · Primitive · "Header Tab Map Entry"
+// [6.1.2.a] shell-globalHeader · Primitive · "Header Tab Map Entry"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Stores per-tab metadata without repeating the identifier key.
 export type HeaderTabMapEntry = Omit<HeaderTabDefinition, 'id'>;
 
-// [6.2] shell-globalHeader · Primitive · "Header Mode Definition Schema"
+// [6.1.3] shell-globalHeader · Primitive · "Header Mode Definition Schema"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Encapsulates metadata for Build and Results mode selections.
 export interface HeaderModeDefinition {
@@ -53,7 +53,7 @@ export type HeaderModeGroupId = 'build' | 'results';
 export type HeaderModeGroup = Record<HeaderModeId, HeaderModeDefinition>;
 export type HeaderModeCatalog = Record<HeaderModeGroupId, HeaderModeGroup>;
 
-// [6.1.b] shell-globalHeader · Primitive · "Header Tab Knowledge Base"
+// [6.2.1] shell-globalHeader · Primitive · "Header Tab Knowledge Base"
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Canonical list of header tabs sorted by `order`.
 export const HEADER_TAB_MAP: Record<HeaderTabId, HeaderTabMapEntry> = {
@@ -87,7 +87,7 @@ export const HEADER_TAB_DEFINITIONS: HeaderTabDefinition[] = Object.entries(HEAD
   .map(([id, entry]) => ({ id: id as HeaderTabId, ...entry }))
   .sort((a, b) => a.order - b.order);
 
-// [6.2.a] shell-globalHeader · Primitive · "Header Mode Metadata Catalog"
+// [6.2.6] shell-globalHeader · Primitive · "Header Mode Metadata Catalog"
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Provides labels and descriptions for Build and Results mode selectors.
 export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
@@ -125,7 +125,7 @@ export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
   },
 };
 
-// [6.2.b] shell-globalHeader · Primitive · "Header Mode Sequence"
+// [6.2.7] shell-globalHeader · Primitive · "Header Mode Sequence"
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Preserves canonical ordering when rendering mode options.
 export type HeaderModeSequence = Record<HeaderModeGroupId, HeaderModeId[]>;
@@ -135,7 +135,7 @@ export const HEADER_MODE_SEQUENCE: HeaderModeSequence = {
   results: ['default', 'style'],
 };
 
-// [6.3] shell-globalHeader · Primitive · "Breakpoint Definition Schema"
+// [6.1.4] shell-globalHeader · Primitive · "Breakpoint Definition Schema"
 // Concern: Knowledge · Catalog: schema.definition
 // Notes: Structure for responsive breakpoint metadata.
 export interface BreakpointDefinition {
@@ -143,7 +143,7 @@ export interface BreakpointDefinition {
   minWidth: number;
 }
 
-// [6.3.a] shell-globalHeader · Primitive · "Responsive Breakpoint Catalog"
+// [6.2.8] shell-globalHeader · Primitive · "Breakpoint Catalog"
 // Concern: Knowledge · Catalog: data.collection
 // Notes: Breakpoint ordering aligns with logic heuristic priority.
 export const BREAKPOINTS: BreakpointDefinition[] = [
@@ -152,22 +152,22 @@ export const BREAKPOINTS: BreakpointDefinition[] = [
   { name: 'mobile', minWidth: 0 },
 ];
 
-// [6.4] shell-globalHeader · Primitive · "Brand Wordmark Copy"
+// [6.2.2] shell-globalHeader · Primitive · "Brand Wordmark Copy"
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Brand name presented inside header link.
 export const BRAND_WORDMARK = 'Calculogic';
 
-// [6.4.a] shell-globalHeader · Primitive · "Brand Tagline Copy"
+// [6.2.3] shell-globalHeader · Primitive · "Brand Tagline Copy"
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Supportive phrase rendered conditionally in build concern.
 export const BRAND_TAGLINE = 'a system for creating systems';
 
-// [6.4.b] shell-globalHeader · Primitive · "Brand Tooltip Copy"
+// [6.2.4] shell-globalHeader · Primitive · "Brand Tooltip Copy"
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Tooltip content reinforcing link destination.
 export const BRAND_TOOLTIP = 'Return to Calculogic home / dashboard.';
 
-// [6.4.c] shell-globalHeader · Primitive · "Publish Label Copy"
+// [6.2.5] shell-globalHeader · Primitive · "Publish Label Copy"
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Publish CTA text consumed by build concern.
 export const PUBLISH_LABEL = 'Publish';

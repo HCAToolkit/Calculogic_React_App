@@ -13,7 +13,7 @@
 // Constraints: Barrel stays stateless and transparent.
 // ─────────────────────────────────────────────
 
-// [3.1] cfg-buildSurface · Container · "Build Tab Forwarder"
+// [3.1.1] cfg-buildSurface · Container · "Build Tab Forwarder"
 // Concern: Build · Catalog: composition.forwarder
 // Notes: Re-exports the build assembly to preserve the App router contract.
 export { default } from './build';

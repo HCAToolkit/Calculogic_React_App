@@ -17,7 +17,7 @@ import { sectionTitle } from './BuildSurface.logic';
 // Constraints: No styling or state mutations beyond structural composition.
 // ─────────────────────────────────────────────
 
-// [3.2] cfg-buildSurface · Primitive · "Chevron Left Icon"
+// [3.3.1] cfg-buildSurface · Primitive · "Chevron Left Icon"
 // Concern: Build · Parent: "Section Panel Template" · Catalog: chrome.icon
 // Notes: Points inward to signal an expanded panel state within catalog shells.
 function ChevronLeftIcon() {
@@ -35,7 +35,7 @@ function ChevronLeftIcon() {
   );
 }
 
-// [3.3] cfg-buildSurface · Primitive · "Chevron Right Icon"
+// [3.3.2] cfg-buildSurface · Primitive · "Chevron Right Icon"
 // Concern: Build · Parent: "Section Panel Template" · Catalog: chrome.icon
 // Notes: Points outward to communicate collapsed panel affordances.
 function ChevronRightIcon() {
@@ -58,7 +58,7 @@ interface SectionContentConfig {
   render: () => ReactNode;
 }
 
-// [3.4] cfg-buildSurface · Primitive · "Section Content Catalog"
+// [3.3.3] cfg-buildSurface · Primitive · "Section Content Catalog"
 // Concern: Build · Parent: "Section Panel Template" · Catalog: layout.catalog
 // Notes: Maps section identifiers to anchored placeholder content for catalog panels.
 const SECTION_CONTENT: SectionContentConfig[] = [
@@ -123,7 +123,7 @@ function renderSectionContent(id: SectionId) {
   return match ? match.render() : null;
 }
 
-// [3.5] cfg-buildSurface · Subcontainer · "Section Panel Template"
+// [3.2.6] cfg-buildSurface · Subcontainer · "Section Panel Template"
 // Concern: Build · Parent: "Catalog Column" · Catalog: layout.section
 // Notes: Wraps section headers, content, and grips with deterministic anchors and ARIA bindings.
 function SectionPanel({ binding }: { binding: SectionLogicBinding }) {
@@ -162,7 +162,7 @@ function SectionPanel({ binding }: { binding: SectionLogicBinding }) {
   );
 }
 
-// [3.6] cfg-buildSurface · Container · "Build Surface Layout"
+// [3.1.2] cfg-buildSurface · Container · "Build Surface Layout"
 // Concern: Build · Parent: "Build Surface Composer" · Catalog: layout.shell
 // Notes: Coordinates header chrome, catalog panels, preview stage, and inspector anchors.
 export function BuildSurface({
@@ -172,7 +172,7 @@ export function BuildSurface({
   leftPanel,
   rightPanel,
 }: BuildSurfaceBindings) {
-  // [3.6.2] cfg-buildSurface · Subcontainer · "Catalog Column"
+  // [3.2.3] cfg-buildSurface · Subcontainer · "Catalog Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
   // Notes: Lists section panels in logic-supplied order with live resize affordances.
   const catalogColumn = (
@@ -189,7 +189,7 @@ export function BuildSurface({
     </aside>
   );
 
-  // [3.6.3] cfg-buildSurface · Primitive · "Catalog Grip"
+  // [3.3.5] cfg-buildSurface · Primitive · "Catalog Grip"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Exposes left panel resize separator connected to logic grip props.
   const catalogGrip = (
@@ -200,7 +200,7 @@ export function BuildSurface({
     />
   );
 
-  // [3.6.4] cfg-buildSurface · Subcontainer · "Preview Stage"
+  // [3.2.4] cfg-buildSurface · Subcontainer · "Preview Stage"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.region
   // Notes: Placeholder canvas for future form preview anchored to center panel IDs.
   const previewStage = (
@@ -211,7 +211,7 @@ export function BuildSurface({
     </main>
   );
 
-  // [3.6.5] cfg-buildSurface · Primitive · "Inspector Grip"
+  // [3.3.7] cfg-buildSurface · Primitive · "Inspector Grip"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Provides resize handle between preview stage and inspector column.
   const inspectorGrip = (
@@ -222,7 +222,7 @@ export function BuildSurface({
     />
   );
 
-  // [3.6.6] cfg-buildSurface · Subcontainer · "Inspector Column"
+  // [3.2.5] cfg-buildSurface · Subcontainer · "Inspector Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
   // Notes: Collapsible inspector with settings placeholder anchored to logic-provided IDs.
   const inspectorColumn = (

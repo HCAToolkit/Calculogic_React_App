@@ -18,7 +18,7 @@ type ModeDefinition = GlobalHeaderShellBuildBindings['modeMetadata']['build'][He
 // Constraints: No additional wrappers beyond enumerated atoms; maintain anchor consistency.
 // ─────────────────────────────────────────────
 
-// [3.11] shell-globalHeader · Primitive · "Tab Info Icon"
+// [3.3.6] shell-globalHeader · Primitive · "Tab Info Icon"
 // Concern: Build · Parent: "Tab Item Row" · Catalog: action.icon
 // Notes: Shares hover state with tab button while exposing hover summary.
 function InfoIcon({
@@ -61,7 +61,7 @@ function InfoIcon({
   );
 }
 
-// [3.10] shell-globalHeader · Primitive · "Primary Tab Button"
+// [3.3.5] shell-globalHeader · Primitive · "Primary Tab Button"
 // Concern: Build · Parent: "Tab Item Row" · Catalog: navigation.tab
 // Notes: Role `tab` exposes active state and click handler per concern.
 function TabButton({
@@ -106,7 +106,7 @@ function TabButton({
   );
 }
 
-// [3.14] shell-globalHeader · Primitive · "Mode Menu Item Baseline"
+// [3.3.9] shell-globalHeader · Primitive · "Mode Menu Item Baseline"
 // Concern: Build · Parent: "Build/Results Mode Menu" · Catalog: navigation.pill
 // Notes: Shared renderer for Build/Results mode selectors with active state styling.
 function ModeMenuItem({
@@ -139,7 +139,7 @@ function ModeMenuItem({
   );
 }
 
-// [3.10.a] shell-globalHeader · Subcontainer · "Build Tab – Mode Menu"
+// [3.2.6] shell-globalHeader · Subcontainer · "Build Tab – Mode Menu"
 // Concern: Build · Parent: "Tab Item Row" · Catalog: navigation.breadcrumb
 // Notes: Presents inline Build modes when tab active or hovered.
 function BuildModeMenu({
@@ -174,7 +174,7 @@ function BuildModeMenu({
   );
 }
 
-// [3.10.b] shell-globalHeader · Subcontainer · "Results Tab – Mode Menu"
+// [3.2.7] shell-globalHeader · Subcontainer · "Results Tab – Mode Menu"
 // Concern: Build · Parent: "Tab Item Row" · Catalog: navigation.breadcrumb
 // Notes: Presents inline Results modes when tab active or hovered.
 function ResultsModeMenu({
@@ -209,7 +209,7 @@ function ResultsModeMenu({
   );
 }
 
-// [3.1] shell-globalHeader · Container · "Global Header Shell Frame"
+// [3.1.1] shell-globalHeader · Container · "Global Header Shell Frame"
 // Concern: Build · Catalog: layout.shell
 // Notes: Header landmark orchestrating all header zones and anchors.
 export function GlobalHeaderShell({
@@ -229,7 +229,7 @@ export function GlobalHeaderShell({
   isMobile,
   openContent,
 }: GlobalHeaderShellBuildBindings) {
-  // [3.6] shell-globalHeader · Primitive · "Brand Tagline"
+  // [3.3.4] shell-globalHeader · Primitive · "Brand Tagline"
   // Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
   // Notes: Controlled here to suppress tagline on mobile breakpoints.
   const showTagline = !isMobile;
@@ -239,7 +239,7 @@ export function GlobalHeaderShell({
   );
 
   return (
-    // [3.1] shell-globalHeader · Container · "Global Header Shell Frame"
+    // [3.1.1] shell-globalHeader · Container · "Global Header Shell Frame"
     // Concern: Build · Catalog: layout.shell
     // Notes: Landmark wrapper distributing three primary header zones.
     <header data-anchor="global-header" className="global-header-shell">
@@ -307,7 +307,7 @@ export function GlobalHeaderShell({
               ? modeMetadata.results[activeModeId ?? 'default']
               : null;
             return (
-              // [3.9] shell-globalHeader · Subcontainer · "Tab Item Row"
+              // [3.2.4] shell-globalHeader · Subcontainer · "Tab Item Row"
               // Concern: Build · Parent: "Tab List Track" · Catalog: layout.row
               // Notes: Couples tab button, info icon, and mode menu per concern.
               <div

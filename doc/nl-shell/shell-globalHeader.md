@@ -52,10 +52,16 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Children: `[3.3.8] Publish Button`.
 - **[3.2.4] Subcontainer – "Tab Item Row"**
   - Anchor pattern: `data-anchor="global-header.tab-{id}"`
-  - Children: `[3.3.5] Primary Tab Button`, `[3.3.6] Tab Info Icon`.
+  - Children: `[3.3.5] Primary Tab Button`, `[3.3.6] Tab Info Icon`, optional mode menus `[3.2.6] Build Tab – Mode Menu` and `[3.2.7] Results Tab – Mode Menu`.
 - **[3.2.5] Subcontainer – "Debug Panel Container"**
   - Anchor: `data-anchor="global-header.debug"`
   - Purpose: Hosts Results concern output when enabled.
+- **[3.2.6] Subcontainer – "Build Tab – Mode Menu"**
+  - Anchor: `data-anchor="global-header.mode-menu-build"`
+  - Purpose: Inline mode picker rendered adjacent to the Build tab while active/hovered.
+- **[3.2.7] Subcontainer – "Results Tab – Mode Menu"**
+  - Anchor: `data-anchor="global-header.mode-menu-results"`
+  - Purpose: Inline mode picker rendered adjacent to the Results tab while active/hovered.
 
 ### 3.3 Atomic Components — Primitives (Build)
 - **[3.3.1] Primitive – "Brand Home Link"**
@@ -79,6 +85,9 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
 - **[3.3.8] Primitive – "Publish Button"**
   - Element: `<button>`
   - Attributes: `type="button"`, `data-anchor="global-header.publish-button"`.
+- **[3.3.9] Primitive – "Mode Menu Item Baseline"**
+  - Element: `<button>`
+  - Purpose: Shared mode-item renderer used by both Build and Results mode menus.
 
 ## 4. BuildStyle Concern (Visual Styling of Structure)
 ### 4.0 Dependencies
@@ -176,7 +185,13 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
 ### 6.1 Maps / Dictionaries
 - **[6.1.1] Primitive – "Header Tab Identifier Types"**
   - Type aliases enumerating valid tab ids (build, logic, knowledge, results, resultsStyle).
-- **[6.1.2] Primitive – "Breakpoint Definition Schema"**
+- **[6.1.2] Primitive – "Header Tab Definition Schema"**
+  - Interface describing tab metadata consumed by Build and Logic concerns.
+- **[6.1.2.a] Primitive – "Header Tab Map Entry"**
+  - Utility type that stores per-tab metadata without repeating identifier keys.
+- **[6.1.3] Primitive – "Header Mode Definition Schema"**
+  - Interface describing mode metadata consumed by Build mode menus.
+- **[6.1.4] Primitive – "Breakpoint Definition Schema"**
   - Interface describing breakpoint metadata for responsive logic.
 
 ### 6.2 Constants
@@ -191,7 +206,11 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Tooltip text for brand home link.
 - **[6.2.5] Primitive – "Publish Label Copy"**
   - Label for publish button.
-- **[6.2.6] Primitive – "Breakpoint Catalog"**
+- **[6.2.6] Primitive – "Header Mode Metadata Catalog"**
+  - Build/results mode metadata including labels, descriptions, and documentation ids.
+- **[6.2.7] Primitive – "Header Mode Sequence"**
+  - Canonical mode-order arrays used by mode menu renderers.
+- **[6.2.8] Primitive – "Breakpoint Catalog"**
   - Array of desktop/tablet/mobile breakpoint definitions.
 
 ### 6.3 Shared / Global Reference
@@ -219,7 +238,8 @@ ResultsStyle styling lives in CSS or CSS-Module files that target the debug/resu
   - Visual treatment for debug panel: background tint, typography, spacing.
 
 ### 8.2 Debug Display Styles
-- Additional states not yet required.
+- **[8.2.1] Primitive – "Live Region Anchor"**
+  - Selector targets `data-anchor="global-header.aria-live"` to keep announcements visually hidden.
 
 ## 9. Assembly Pattern
 ### 9.1 File Structure

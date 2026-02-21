@@ -26,7 +26,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* [8.2] shell-globalHeader · Primitive · "Live Region Anchor"
+/* [8.2.1] shell-globalHeader · Primitive · "Live Region Anchor"
    Concern: ResultsStyle · Catalog: accessibility.liveRegion
    Notes: Ensures live region does not disrupt layout when rendered inline. */
 [data-anchor='global-header.aria-live'] {
