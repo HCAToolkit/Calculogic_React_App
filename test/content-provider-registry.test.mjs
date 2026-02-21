@@ -45,6 +45,15 @@ test('parseContentRef returns invalid_ref for abc', () => {
   });
 });
 
+test('parseContentRef treats additional colon segments as part of resolved payload id', () => {
+  // Contract: only the first colon splits namespace from provider-owned id payload.
+  assert.deepEqual(parseContentRef('docs:guides:getting-started'), {
+    type: 'valid',
+    namespace: 'docs',
+    resolvedId: 'guides:getting-started',
+  });
+});
+
 
 test('contentProviderRegistry resolves docs:doc-build to found payload', () => {
   const contentProviderRegistry = createRegistry();
@@ -77,6 +86,44 @@ test('contentProviderRegistry resolves otherns:x to no_provider when only docs p
     namespace: 'otherns',
     contentId: 'x',
     reason: 'No content provider registered for namespace: otherns.',
+  });
+});
+
+test('contentProviderRegistry forwards anchor and context to provider with namespace-stripped content id', () => {
+  const capturedRequests = [];
+  const contentProviderRegistry = new ContentProviderRegistry();
+
+  contentProviderRegistry.registerProvider('docs', {
+    resolveContent: request => {
+      capturedRequests.push(request);
+      return {
+        type: 'found',
+        namespace: 'docs',
+        contentId: request.contentId,
+        anchorId: request.anchorId,
+        payload: request.context,
+      };
+    },
+  });
+
+  const resolved = contentProviderRegistry.resolveContent({
+    contentId: 'docs:build:intro',
+    anchorId: 'overview',
+    context: { locale: 'en-US' },
+  });
+
+  assert.deepEqual(capturedRequests, [{
+    contentId: 'build:intro',
+    anchorId: 'overview',
+    context: { locale: 'en-US' },
+  }]);
+
+  assert.deepEqual(resolved, {
+    type: 'found',
+    namespace: 'docs',
+    contentId: 'build:intro',
+    anchorId: 'overview',
+    payload: { locale: 'en-US' },
   });
 });
 
