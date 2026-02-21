@@ -31,7 +31,7 @@ import {
 // Constraints: Hooks stay local to the Build tab and clean up global listeners.
 // ─────────────────────────────────────────────
 
-// [5.1] cfg-buildSurface · Container · "Section Contracts"
+// [5.1.1] cfg-buildSurface · Container · "Section Contracts"
 // Concern: Logic · Catalog: contract.section
 // Notes: Declares section identifiers, binding shapes, order, and helpers shared with Build.
 export type SectionId = 'configurations' | 'atomic-components' | 'search-configurations';
@@ -130,7 +130,7 @@ export function sectionTitle(id: SectionId) {
   }
 }
 
-// [5.2] cfg-buildSurface · Container · "Section Logic Hook"
+// [5.1.2] cfg-buildSurface · Container · "Section Logic Hook"
 // Concern: Logic · Parent: "Section Contracts" · Catalog: hook.section
 // Notes: Persists section height/collapse state and emits ARIA-aware bindings.
 function useSectionLogic(
@@ -237,7 +237,7 @@ function useSectionLogic(
   };
 }
 
-// [5.3] cfg-buildSurface · Container · "Left Panel Logic"
+// [5.1.3] cfg-buildSurface · Container · "Left Panel Logic"
 // Concern: Logic · Parent: "Section Logic Hook" · Catalog: hook.panel
 // Notes: Persists catalog column width and exposes accessible grip bindings.
 function useLeftPanelLogic(): LeftPanelLogic {
@@ -308,7 +308,7 @@ function useLeftPanelLogic(): LeftPanelLogic {
   };
 }
 
-// [5.4] cfg-buildSurface · Container · "Right Panel Logic"
+// [5.1.4] cfg-buildSurface · Container · "Right Panel Logic"
 // Concern: Logic · Parent: "Left Panel Logic" · Catalog: hook.panel
 // Notes: Manages inspector width persistence, collapse toggles, and grip bindings.
 function useRightPanelLogic(): RightPanelLogic {
@@ -396,7 +396,7 @@ function useRightPanelLogic(): RightPanelLogic {
   };
 }
 
-// [5.5] cfg-buildSurface · Container · "Surface Bindings"
+// [5.1.5] cfg-buildSurface · Container · "Surface Bindings"
 // Concern: Logic · Parent: "Right Panel Logic" · Catalog: hook.aggregator
 // Notes: Bundles anchor map, ordered sections, and panel bindings for the Build layout.
 export function useBuildSurfaceLogic(): BuildSurfaceBindings {
