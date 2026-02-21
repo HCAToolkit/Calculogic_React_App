@@ -56,34 +56,34 @@ The Build Surface will evolve into a **global host surface** where:
 
 ## Work Order (Required Sequence)
 
-## Phase 1 — Build Surface Host Stability Pass
+### Phase 1 — Build Surface Host Stability Pass
 
-### Goal
+#### Goal
 Fix host-surface correctness issues before architecture-level refactors.
 
-### Scope
+#### Scope
 Address:
 - breakpoint preview controls (mobile/tablet/desktop) that currently do not meaningfully change the preview/host experience
 - light/dark mode styling inconsistencies across Build Surface regions (panels, canvas, shell areas)
 
-### Objectives
+#### Objectives
 - Make breakpoint state changes produce visible and deterministic behavior (or explicitly align UI controls to their current intended scope if they are preview-state-only)
 - Achieve theme parity/coherence across Build Surface host regions
 - Reduce visual/debugging ambiguity before refactoring host structure
 
-### Non-goals
+#### Non-goals
 - No global host surface conversion yet
 - No tab-driven plugin source architecture refactor in this phase
 - No publish workflow implementation
 - No Doc Engine extraction work
 - No unrelated visual redesign
 
-### Deliverables
+#### Deliverables
 - Code fixes for breakpoint and theme correctness
 - Verification notes (what changed + how verified)
 - NL/CCPP updates only if file ownership/responsibility/order changes
 
-### Verification (minimum)
+#### Verification (minimum)
 - `npm run lint`
 - `npm run build`
 - Manual checks:
@@ -92,20 +92,20 @@ Address:
 
 ---
 
-## Phase 2 — Global Host Surface Refactor Prep
+### Phase 2 — Global Host Surface Refactor Prep
 
-### Goal
+#### Goal
 Prepare the Build Surface to become a shared/global host surface while preserving existing Build functionality.
 
-### Scope
+#### Scope
 Refactor the current surface so generic host behavior can be reused while tab-specific sources/composition can vary by active concern tab.
 
-### Objectives
+#### Objectives
 - Separate host-generic surface concerns from Build-specific source composition
 - Preserve deterministic UI structure/order and stable panel behavior
 - Create clean seams for tab-driven plugin-provided atoms/configurations/primitives
 
-### Expected boundary direction (conceptual)
+#### Expected boundary direction (conceptual)
 Split toward:
 - **host surface shell logic**
   - pane widths
@@ -120,17 +120,17 @@ Split toward:
   - active tab determines source providers
   - plugin architecture can supply concern-specific catalogs/primitives
 
-### Non-goals
+#### Non-goals
 - No requirement to fully implement all tab source providers in one pass
 - No Doc Engine repo extraction in this phase
 - No full publish implementation
 
-### Deliverables
+#### Deliverables
 - Refactor changes and/or architecture prep changes
 - Boundary notes documenting host-generic vs Build-specific responsibilities
 - Updated NL documents to maintain deterministic 1:1 ordering where affected
 
-### Verification (minimum)
+#### Verification (minimum)
 - `npm run lint`
 - `npm run build`
 - Existing Build tab behavior still works
@@ -138,33 +138,33 @@ Split toward:
 
 ---
 
-## Phase 3 — Doc Engine Integration Proof in Host App (Pre-Extraction)
+### Phase 3 — Doc Engine Integration Proof in Host App (Pre-Extraction)
 
-### Goal
+#### Goal
 Prove that Doc Engine integration works through the host app’s real UI seams before splitting the Doc Engine into a separate repository.
 
-### Scope
+#### Scope
 Validate host-app integration points such as:
 - Build surface insert-browser info/docs invocation
 - Global header doc/publish-adjacent invocation
 - Content resolution/rendering through existing composition root/provider wiring
 
-### Objectives
+#### Objectives
 - Confirm stable invocation from host surface and global header contexts
 - Verify deterministic content/not-found behavior at integration boundaries
 - Identify any interface changes needed before extraction
 
-### Non-goals
+#### Non-goals
 - No full publish pipeline implementation
 - No mandatory DB-backed publish logic unless specifically needed for proof
 - No Doc Engine repo extraction in the same pass
 
-### Deliverables
+#### Deliverables
 - Working integration proof(s) in current repo
 - Boundary notes for extraction readiness
 - Interface/contract adjustments discovered during proof (if any)
 
-### Verification (minimum)
+#### Verification (minimum)
 - Known doc content resolves and renders successfully
 - Missing content path resolves to deterministic `not_found` behavior
 - Host surface interactions remain stable after integration changes
@@ -173,15 +173,15 @@ Validate host-app integration points such as:
 
 ---
 
-## Phase 4 — Publish Contract Planning (Lightweight)
+### Phase 4 — Publish Contract Planning (Lightweight)
 
-### Goal
+#### Goal
 Define publish orchestration contracts and Doc Engine participation points before full publish implementation.
 
-### Scope
+#### Scope
 Plan the interfaces and responsibilities for publish-related flows without implementing final DB-backed publishing.
 
-### Objectives
+#### Objectives
 Define/clarify:
 - global header publish trigger contract (`onPublish` seam)
 - publish flow stages (draft sequence)
@@ -189,32 +189,32 @@ Define/clarify:
 - validation result envelope(s)
 - responsibility boundaries between header shell, publish orchestrator, Doc Engine, and data layer
 
-### Non-goals
+#### Non-goals
 - No full publish wizard UI
 - No final DB transaction/persistence implementation
 - No role/permission system implementation
 - No production publish API implementation
 
-### Deliverables
+#### Deliverables
 - Architecture plan and/or interface definitions for publish orchestration
 - Responsibility mapping across subsystems
 - Follow-up implementation task list (later phase)
 
 ---
 
-## Phase 5 — Doc Engine Extraction Execution
+### Phase 5 — Doc Engine Extraction Execution
 
-### Goal
+#### Goal
 Extract the Doc Engine into its own repository/package after host-app seams are proven and boundaries are stable.
 
-### Preconditions
+#### Preconditions
 - Host-app integration proof completed
 - Doc Engine responsibilities confirmed
 - Import repoint strategy clear
 - At least one host-app integration test retained for engine/app boundary behavior
 - Findings from Phases 2–4 reflected in extraction plan
 
-### Execution
+#### Execution
 Follow and update:
 - `doc/Architecture/DocEngineExtractionPlan.md`
 
@@ -225,12 +225,12 @@ Use extraction findings to keep:
 
 ---
 
-## Phase 6 — Full Publish Implementation (Later)
+### Phase 6 — Full Publish Implementation (Later)
 
-### Goal
+#### Goal
 Implement DB-backed publish flows after host surface and Doc Engine boundaries are stable.
 
-### Scope (future)
+#### Scope (future)
 - publish orchestration UI/flow
 - DB persistence + transactions
 - lineage/provenance writes
@@ -238,7 +238,7 @@ Implement DB-backed publish flows after host surface and Doc Engine boundaries a
 - visibility/permissions integration
 - governance/trust metadata (as applicable)
 
-### Note
+#### Note
 This phase is intentionally deferred to avoid coupling publish implementation to unstable host or extraction boundaries.
 
 ---
