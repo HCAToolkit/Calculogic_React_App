@@ -179,7 +179,7 @@ Within same host (or same no-host artifact), sort by numeric segment tuple.
 5. Concern numbering semantics are shared across codebase and future program/engine scopes (same foundation, different scope).
 6. This spec does not redefine concern purity or dependency rules; it only fixes concern-slot position in structural addresses.
 
-> Clarifying note: concern numbering may begin at a non-`1` slot because earlier segments represent structural scope (`HostLetter` + host-local structure in host-present mode, or artifact-local root structure in no-host mode). This preserves CSCS/CCS canonical concern ordering while keeping scope identity explicit.
+> Clarifying note: concern slots are `3`–`8` (not `1`-based) because earlier positions are reserved for structural scope/placement segments (`HostLetter` + host-local structure index in host-present mode, vs artifact-local root structure index in no-host mode). Canonical CSCS/CCS concern numbering is preserved across both layouts rather than renumbered per mode.
 
 ## 8. Deep Nesting Rules (Required)
 
@@ -207,8 +207,8 @@ Within same host (or same no-host artifact), sort by numeric segment tuple.
 
 #### Top-level host with local structures
 
-- `A.1.3` => Host `A`, local structure `1`, concern Build
-- `A.2.5` => Host `A`, local structure `2`, concern Logic
+- `A.1.3` => Host `A`, host-local structure `1`, concern Build
+- `A.2.5` => Host `A`, host-local structure `2`, concern Logic
 
 #### Nested host context
 
@@ -232,7 +232,7 @@ Within same host (or same no-host artifact), sort by numeric segment tuple.
 
 ### 9.2 Non-Examples / Invalid or Ambiguous
 
-- `A.3` (invalid: host-present mode missing required concern slot)
+- `A.3` (invalid: host-present mode requires at least 3 segments: `HostLetter.HostLocalIndex.ConcernIndex`)
 - `1` (invalid: no-host mode missing concern slot)
 - `A.1.9` (invalid concern slot under current canonical concern range)
 - `AA.1.3` (invalid under current draft grammar: multi-letter host tokens are deferred in §10)
