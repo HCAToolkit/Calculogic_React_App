@@ -1,10 +1,10 @@
-# Calculogic File Naming Master List (V1.1)
+# Calculogic File Naming Master List (V1.2)
 
 ## Document Status
 
 - **Document Type:** Canonical Naming Specification
 - **Status:** Active (Incremental Adoption)
-- **Version:** V1.1
+- **Version:** V1.2
 - **Effective Scope:** New files, renamed files, refactored/split files, generator-produced files targeting canonical naming
 - **Adoption Mode:** Incremental (legacy exceptions allowed until touched/replaced)
 - **Owner:** Calculogic Architecture / Repo Naming Contract
@@ -14,10 +14,14 @@
 
 ## Related Documents
 
-- **Validator / Naming Check Script Spec:** *(add path when created)*
-- **Provenance Token Spec (NL/C):** *(add path if separate)*
-- **Architecture / Module Boundary Docs:** *(add relevant paths)*
-- **Health Check / Reconciliation Docs (naming-related findings):** *(add relevant paths)*
+- **Validator / Naming Check Script Spec:** *(add path when created; suggested future path: `doc/ConventionRoutines/NamingValidatorSpec.md`)*
+- **Provenance Token Spec (NL/C):** *(add path if separated later; otherwise this document is currently the source for filename normalization rules)*
+- **Architecture / Module Boundary Docs:**
+  - `doc/ConventionRoutines/CSCS.md`
+  - `doc/ConventionRoutines/CCPP.md`
+  - `doc/ConventionRoutines/General-NL-Skeletons.md`
+  - `doc/ConventionRoutines/NL-First-Workflow.md`
+- **Health Check / Reconciliation Docs (naming-related findings):** *(add specific `doc/HealthChecks/...` and/or reconciliation docs when a naming-focused pass exists)*
 
 ## Change Control Rules
 
@@ -58,6 +62,10 @@ This spec is intentionally explicit and semantic (no guessing/inference required
   - [`semantic-name`](#semantic-name)
   - [`role`](#role)
   - [`ext`](#ext)
+  - [Concern vs Role vs Format (Important)](#concern-vs-role-vs-format-important)
+  - [Concern (CSCS meaning)](#concern-cscs-meaning)
+  - [Filename role (this document)](#filename-role-this-document)
+  - [Extension/format (implementation detail)](#extensionformat-implementation-detail)
 - [Delimiter Rules](#delimiter-rules)
   - [Use `-` for semantic words](#use---for-semantic-words)
   - [Use `.` for role suffix separation](#use--for-role-suffix-separation)
@@ -73,6 +81,7 @@ This spec is intentionally explicit and semantic (no guessing/inference required
     - [`host`](#host)
   - [Integration / Support Roles](#integration--support-roles)
     - [`wiring`](#wiring)
+    - [`contracts`](#contracts)
   - [Optional / Future Roles (Not Active by Default)](#optional--future-roles-not-active-by-default)
     - [`adapter` (optional future)](#adapter-optional-future)
     - [`registry` (optional future)](#registry-optional-future)
@@ -90,6 +99,7 @@ This spec is intentionally explicit and semantic (no guessing/inference required
   - [Rule 5 — One file, one primary role](#rule-5--one-file-one-primary-role)
 - [Filename Parsing Rules V1](#filename-parsing-rules-v1)
   - [Parsing assumptions](#parsing-assumptions)
+  - [CSS Modules parsing example (important)](#css-modules-parsing-example-important)
 - [Normalization Rules for Provenance Tokens (NL/C)](#normalization-rules-for-provenance-tokens-nlc)
   - [Filename → Token role normalization](#filename--token-role-normalization)
   - [Filename semantic-name → Token file key normalization](#filename-semantic-name--token-file-key-normalization)
@@ -157,13 +167,16 @@ Apply this spec incrementally and deliberately.
 
 `<semantic-name>.<role>.<ext>`
 
+Where `<ext>` may be a simple extension (e.g. `ts`, `tsx`, `css`) or a recognized compound format suffix (e.g. `module.css`).
+
 ### Examples
 
 - `leftpanel.host.tsx`
 - `leftpanel-tab-selector.wiring.ts`
 - `canvas-dropzone.logic.ts`
 - `buildsurface-layout.build.tsx`
-- `rightpanel.results-style.ts`
+- `rightpanel.results-style.css`
+- `buildsurface.build-style.module.css`
 
 ---
 
@@ -219,20 +232,77 @@ The canonical architectural purpose of the file (what role the file plays).
 ### `ext`
 
 **What it means:**  
-The file extension / implementation language.
+The file extension / implementation format/language.
 
 **Examples:**
 
 - `ts`
 - `tsx`
 - `css`
+- `module.css` *(CSS Modules format)*
 
 **Notes:**
 
-- extension does not define architecture role
+- extension/format does not define architecture role
 - role naming is separate and explicit (never inferred from extension alone)
+- `module` in `.module.css` means **CSS Modules file format** (tooling-scoped CSS), **not** a Calculogic concern/role/module type
+- treat `.module.css` as an implementation-format detail, not a canonical filename role
 
 ---
+
+## Concern vs Role vs Format (Important)
+
+This document uses **role** for filename classification.  
+That is related to, but not always identical to, CSCS concern naming.
+
+### Concern (CSCS meaning)
+
+A **concern** is an architectural responsibility category in the Calculogic concern system (CSCS), such as:
+
+- `build`
+- `build-style`
+- `logic`
+- `knowledge`
+- `results`
+- `results-style`
+
+These describe the primary kind of responsibility a file/module handles.
+
+### Filename role (this document)
+
+A **filename role** is the canonical role segment used in `<semantic-name>.<role>.<ext>`.
+
+Some filename roles map directly to CSCS concerns (for example `build`, `logic`, `results-style`).
+
+Other filename roles are **structural/support roles** and are not additional CSCS concerns, such as:
+
+- `host`
+- `wiring`
+- `contracts`
+
+These roles describe composition/support responsibilities in the naming system.
+
+### Extension/format (implementation detail)
+
+The extension/format describes how a file is implemented, not what architectural role it serves.
+
+Examples:
+
+- `ts`
+- `tsx`
+- `css`
+- `module.css` *(CSS Modules format)*
+
+Examples of the split:
+
+- `buildsurface.build-style.module.css`
+  - `build-style` = filename role (concern-aligned)
+  - `module.css` = implementation format (CSS Modules)
+- `content-resolution.contracts.ts`
+  - `contracts` = filename role (support role)
+  - `ts` = implementation format
+
+  ---
 
 ## Delimiter Rules
 
@@ -444,6 +514,29 @@ This is the “glue file” concept (canonical name).
 - `leftpanel-tab-selector.wiring.ts`
 - `buildsurface-panel-layout.wiring.ts`
 
+#### `contracts`
+
+**Purpose:**  
+Defines contract-level shapes, parsing/validation boundaries, normalization contracts, versioned payload expectations, and contract-safe adapters/helpers for a specific semantic target.
+
+**Use when:**
+
+- defining stable input/output shape contracts
+- parsing/normalizing persisted payloads into known shapes
+- version/shape guard logic is the file’s primary responsibility
+- contract behavior should be protected by unit/contract tests
+
+**Do not use when:**
+
+- file is primarily general runtime interaction behavior (`logic`)
+- file is static reference/config metadata without contract parsing/validation responsibility (`knowledge`)
+- file becomes a mixed “helpers + contracts + wiring” dump
+
+**Examples:**
+
+- `buildsurface-persistence.contracts.ts`
+- `content-resolution.contracts.ts` 
+
 ---
 
 ## Optional / Future Roles (Not Active by Default)
@@ -532,10 +625,25 @@ Parse as:
 
 ### Parsing assumptions
 
-- role is the last segment before extension
+- role is the last canonical role segment before the extension/format segment
 - semantic-name is everything before the role segment
 - semantic-name may contain `-`
 - role must match the role registry
+- extension/format may be a simple extension (e.g. `ts`, `tsx`, `css`) or a recognized compound format (e.g. `module.css`)
+
+### CSS Modules parsing example (important)
+
+Given:
+
+`buildsurface.build-style.module.css`
+
+Parse as:
+
+- `semantic-name = buildsurface`
+- `role = build-style`
+- `ext/format = module.css` *(CSS Modules format)*
+
+`module` in `module.css` is **not** a filename role and is **not** a Calculogic concern.
 
 ---
 
@@ -553,6 +661,7 @@ This bridges filenames to your canonical token format.
 - `results-style` → `ResultsStyle`
 - `host` → `Host`
 - `wiring` → `Wiring`
+- `contracts` → `Contracts`
 
 ### Filename semantic-name → Token file key normalization
 
@@ -579,8 +688,10 @@ Convert kebab-case semantic-name to PascalCase.
 - `leftpanel.host.tsx`
 - `leftpanel-tab-selector.wiring.ts`
 - `canvas-dropzone.logic.ts`
+- `buildsurface-persistence.contracts.ts`
 - `rightpanel-inspector.build.tsx`
-- `rightpanel.results-style.ts`
+- `rightpanel.results-style.css`
+- `rightpanel.results-style.module.css`
 
 ### Bad examples
 
@@ -589,6 +700,7 @@ Convert kebab-case semantic-name to PascalCase.
 - `leftpanel-selector-wiring.ts` (role not clearly separated)
 - `PanelStuff.tsx` (vague and inconsistent)
 - `leftpanel.logic-helper.ts` (multiple roles implied; unclear primary role)
+- `contracts.ts` (no explicit semantic target)
 
 ---
 
@@ -596,7 +708,7 @@ Convert kebab-case semantic-name to PascalCase.
 
 A validator should be able to enforce:
 
-1. Filename matches `<semantic-name>.<role>.<ext>`
+1. Filename matches the canonical pattern (`<semantic-name>.<role>.<ext>`), including recognized compound format suffixes (e.g. `.module.css`)
 2. `semantic-name` uses kebab-case
 3. `role` is in canonical role registry
 4. No banned generic filenames unless explicitly scoped/allowed
@@ -618,6 +730,8 @@ To add a new canonical role:
 6. Update validator role registry
 
 This prevents silent drift and synonym sprawl (`glue`, `helper`, `wiring`, `adapter` all being used interchangeably).
+
+When adding a new role, explicitly classify whether it is a concern-aligned role or a structural/support role.
 
 ---
 
@@ -658,6 +772,7 @@ If you want a minimal active set to start:
 
 - `host`
 - `wiring`
+- `contracts`
 - `build`
 - `build-style`
 - `logic`
@@ -684,7 +799,7 @@ This is already a usable foundation for:
 
 ## Role to Extension Guidance (Recommended, Non-Binding) (V1.1)
 
-Role defines purpose. Extension defines implementation language/runtime surface.
+Role defines purpose. Extension/format defines implementation language/runtime surface.
 
 This section is guidance only (not a hard validation rule unless explicitly promoted later).
 
@@ -702,13 +817,19 @@ This section is guidance only (not a hard validation rule unless explicitly prom
   - UI build/render composition for a semantic surface/component
   - primarily presentation assembly (not deep behavior logic)
 
-- `*.build-style.ts` or `*.build-style.tsx`
-  - style tokens / style helpers / style maps supporting build UI
-  - use repo styling conventions (CSS-in-TS, token maps, etc.)
+- `*.build-style.css` or `*.build-style.module.css`
+  - default style formats for build-layer style concerns
+  - prefer CSS / CSS Modules for framework-agnostic and portable style separation
+  - `.module.css` indicates CSS Modules format (tooling-scoped CSS), not a Calculogic role
 
 - `*.logic.ts`
   - pure logic, state transforms, reducers, selectors, parsing, guards, behavioral helpers
   - avoid UI rendering concerns where possible
+
+  - `*.contracts.ts`
+  - contract definitions, parsers, guards, normalization boundaries, version/shape checks
+  - use when contract responsibility is primary and should remain stable/testable
+  - avoid turning `contracts` files into generic helper dumps
 
 - `*.knowledge.ts`
   - static config/schema/registry/meta definitions used by the semantic surface
@@ -718,13 +839,19 @@ This section is guidance only (not a hard validation rule unless explicitly prom
   - result shaping, mapping, presentation assembly for result output
   - may include render-level result composition if UI-facing
 
-- `*.results-style.ts` or `*.results-style.tsx`
-  - style support for result presentation only
+- `*.results-style.css` or `*.results-style.module.css`
+  - default style formats for results-layer presentation
+  - prefer CSS / CSS Modules unless a documented subsystem pattern requires otherwise
+
+  - `.module.css` indicates CSS Modules format (tooling-scoped CSS), not a Calculogic role
+
 
 ### Notes
 
 - Some roles may validly use either `.ts` or `.tsx` depending on whether JSX is required.
-- Validators should treat role as canonical and extension as implementation detail unless stricter enforcement is introduced later.
+- Current repo default for style concerns should be treated as **CSS / CSS Modules** unless a specific subsystem/tooling pattern explicitly documents TS/TSX style-role files.
+- TS/TSX style-role files (e.g. `*.build-style.ts`, `*.results-style.tsx`) are allowed only when intentionally adopted for a documented pattern (e.g. style tokens/helpers or framework-specific styling systems).
+- Validators should treat role as canonical and extension/format as implementation detail unless stricter enforcement is introduced later.
 
 ---
 
@@ -780,7 +907,7 @@ If a framework requires route/entry names, those names are allowed as exceptions
 
 Until a dedicated test naming spec exists:
 
-- tests may follow current repo test conventions
+- tests may follow current repo test conventions (e.g. `*.test.mjs`, `*.test.ts`, `*.test.tsx`)
 - prefer semantic references in test filenames when possible
 - do not force production role suffixes into test files unless the repo adopts that rule intentionally
 
