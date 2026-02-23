@@ -1,5 +1,7 @@
-Calculogic Concern System (CCS, NL-Aligned, Codebase-Level)
-1. First Principles
+# Calculogic Concern System (CCS, NL-Aligned, Codebase-Level)
+
+> Note: This document filename remains `CSCS.md` for compatibility in this pass. In content, the canonical acronym is **CCS** (Calculogic Concern System).
+## 1. First Principles
 Configuration is semantic, not a file
 
 A Configuration is a semantic module (e.g. “Global Header Shell”, “Tab Navigation”).
@@ -8,7 +10,7 @@ It spans up to six concerns: Build, BuildStyle, Logic, Knowledge, Results, Resul
 
 Code lives in six concern files; the configuration is defined by its NL skeleton, not its file layout. The canonical section layout and numbering for NL skeletons is defined in General-NL-Skeletons.md and every configuration or shell document must follow it exactly.
 
-NL Skeleton as the ordering source
+### NL Skeleton as the Ordering Source
 
 Each configuration has an NL Configuration Skeleton (or ProjectShell skeleton).
 
@@ -16,7 +18,7 @@ The skeleton’s numbered sections (3 = Build, 4 = BuildStyle, 5 = Logic, 6 = Kn
 
 Code in all concern files must follow this order and mirror the same numbering in comments.
 
-Concerns vs. hierarchical types (orthogonal axes)
+### Concerns vs. Hierarchical Types (Orthogonal Axes)
 
 Every Atomic Component has:
 
@@ -26,7 +28,7 @@ A Hierarchical type: Container, Subcontainer, or Primitive.
 
 These axes are independent: you can have a Logic Container, a Build Primitive, a ResultsStyle Primitive, etc.
 
-Purity per concern
+### Purity per Concern
 
 Build – structure only (containers, subcontainers, primitives; no state, no visual design tokens).
 
@@ -40,7 +42,7 @@ Results – derived outputs / readouts; no structure creation beyond what Build 
 
 ResultsStyle – styling of results; no structure, no logic.
 
-Folder mapping
+### Folder Mapping
 
 - Build → files like src/configs/<configId>/<ConfigName>.build.tsx or src/shells/<shellId>/<ShellName>.build.tsx
 - BuildStyle → CSS or CSS-Module files like src/configs/<configId>/<ConfigName>.build.module.css or src/shells/<shellId>/<ShellName>.build.css
@@ -51,7 +53,7 @@ Folder mapping
 
 Shells follow the same pattern within src/shells/<shellId>/, sharing the same base name across all concern files. BuildStyle and ResultsStyle are implemented as CSS/CSS-Module files; the corresponding Build and Results `.tsx` components expose the class names and data attributes that those styles consume.
 
-Structure source and fallbacks
+### Structure Source and Fallbacks
 
 Build is the default structural source for any UI configuration or shell.
 
@@ -59,13 +61,13 @@ Non-structural concerns (BuildStyle, Logic, Knowledge, Results, ResultsStyle) ne
 
 Fallback (rare): if a configuration has no Build (e.g. a pure data concern), use the highest present non-style concern as the mental ordering source (Logic → Knowledge → Results), but it still must not invent DOM structure.
 
-Anchors are stable
+### Anchors Are Stable
 
 Every visible piece of structure exposes stable anchors (class, data-anchor, or id).
 
 All non-Build concerns refer to these anchors, never to incidental DOM or query patterns.
 
-Directional dependencies
+### Directional Dependencies
 
 Build → BuildStyle / Logic / ResultsStyle.
 
@@ -75,19 +77,19 @@ Knowledge informs all but depends on none.
 
 No upward or cyclic imports (e.g., Results cannot feed Logic, Logic cannot define anchors).
 
-Locality
+### Locality
 
 Code for one configuration’s concerns lives in its folder under builder/configs/ or builder/shells/.
 
 Nested configurations (e.g., a shell zone as its own config) live inside the parent’s folder but obey all the same rules independently.
 
-Monotonic diffs
+### Monotonic Diffs
 
 When you change structure in the NL skeleton for a configuration, corresponding changes in Build, BuildStyle, Logic, Knowledge, Results, and ResultsStyle must appear in the same top-down order when you read each file.
 
-2. Configuration Definition Template (Per Configuration or Shell)
+## 2. Configuration Definition Template (Per Configuration or Shell)
 Use this before writing code or asking AI to generate code.
-NL Skeleton:
+### NL Skeleton
 Create doc/nl-config/cfg-*.md or doc/nl-shell/shell-*.md using the General NL Skeleton – Configuration-Level or ProjectShell-Level.
 
 That document is the canonical contract for:
@@ -100,7 +102,7 @@ Containers/Subcontainers/Primitives and their order,
 
 Numbering (3.x.y, 4.x.y, 5.x.y, etc.).
 
-Concern entry (per configuration):
+### Concern Entry (Per Configuration)
 Name: Short, unambiguous; use cfg-* for configs, shell-* for shells.
 
 Purpose (1 sentence): What outcome this configuration achieves.
@@ -119,7 +121,7 @@ Invariants: Truths that must always hold (e.g. “Tabs never wrap; scroll instea
 
 Dependencies: Only on lower-level utilities, shared hooks, or Knowledge; no cross-concern cheating.
 
-3. Atomic Components (per concern)
+## 3. Atomic Components (Per Concern)
 For each concern in the NL skeleton, list:
 Containers – top-level roots for that concern in this configuration.
 
@@ -127,7 +129,7 @@ Subcontainers – nested encapsulations inside Containers.
 
 Primitives – leaves: individual fields, rules, styles, state atoms, maps, result lines.
 
-Rules:
+### Rules
 A concern can have one or more Containers at the top level.
 
 Subcontainers only appear inside Containers (never at the root of a concern).
@@ -139,9 +141,9 @@ Flat roots (contain only primitives), or
 
 Hierarchical roots (contain subcontainers and primitives).
 
-4. Decision Rules (What Belongs Where, NL-Aware)
+## 4. Decision Rules (What Belongs Where, NL-Aware)
 Use these to keep responsibilities clean:
-Structure vs interaction vs readout
+### Structure vs Interaction vs Readout
 
 Changes to regions, zones, section layout → Build.
 
@@ -153,24 +155,24 @@ Copy, labels, options, thresholds → Knowledge.
 
 Counters, scores, derived summaries → Results.
 
-No structure in non-structural concerns
+### No Structure in Non-Structural Concerns
 
 BuildStyle, Logic, Knowledge, Results, ResultsStyle must not introduce new DOM or change sibling ordering. They attach to anchors established in Build.
 
-Results is “where data ends”
+### Results Is “Where Data Ends”
 
 Once you are just showing derived information (e.g., state summaries, counts, debug), it belongs in Results / ResultsStyle; it cannot mutate structure or state.
 
-Knowledge is guidance, not behavior
+### Knowledge Is Guidance, Not Behavior
 
 Tooltips, doc text, label maps, thresholds live in Knowledge and do not contain side effects or layout code.
 
-Use the NL hierarchy to split or merge
+### Use the NL Hierarchy to Split or Merge
 
 If you can’t describe a section of behavior/structure in a single NL bullet under one concern, it’s a sign you have multiple concerns tangled together—split them.
 
-5. Nested vs Sibling Configurations
-Nested configuration if all are true:
+## 5. Nested vs Sibling Configurations
+### Nested Configuration (All Must Be True)
 
 It attaches to specific anchors owned by a parent configuration.
 
@@ -180,7 +182,7 @@ It never reorders or replaces the parent’s anchors.
 
 Example: The global header shell includes a nested tab-strip configuration that mounts directly into the header’s Build anchors.
 
-Sibling configuration otherwise:
+### Sibling Configuration (Otherwise)
 
 It uses the same frame (shell) but defines its own Build structure and anchors.
 
@@ -188,8 +190,8 @@ Promote from nested → sibling when a feature gains its own structure, reuse, o
 
 Example: cfg-intro, cfg-q-motivations, and cfg-buildSurface coexist as siblings that the spa host shell swaps within the same main-pane frame.
 
-6. Change Management
-When you change a configuration:
+## 6. Change Management
+### When You Change a Configuration
 Update its NL skeleton first:
 
 Adjust the numbering and text for any moved/added/removed Container/Subcontainer/Primitive.
@@ -204,7 +206,7 @@ Preserve anchors if possible:
 
 If anchors must change, treat that as a deliberate breaking change and update all attached concerns.
 
-Acceptance (per PR):
+### Acceptance (Per PR)
 
 NL skeleton updated and committed.
 

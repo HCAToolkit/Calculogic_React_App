@@ -51,7 +51,7 @@ This spec is intentionally explicit and semantic (no guessing/inference required
 ## Table of Contents
 
 - [Purpose](#purpose)
-- [Scope and Adoption Policy (V1.1)](#scope-and-adoption-policy-v11)
+- [Scope and Adoption Policy (V1.2)](#scope-and-adoption-policy-v12)
   - [Scope (what this applies to)](#scope-what-this-applies-to)
   - [Legacy file reality (important)](#legacy-file-reality-important)
   - [Adoption rule](#adoption-rule)
@@ -86,7 +86,7 @@ This spec is intentionally explicit and semantic (no guessing/inference required
     - [`adapter` (optional future)](#adapter-optional-future)
     - [`registry` (optional future)](#registry-optional-future)
     - [`selector` (optional future, use carefully)](#selector-optional-future-use-carefully)
-- [Legacy Migration and Rename Policy (V1.1)](#legacy-migration-and-rename-policy-v11)
+- [Legacy Migration and Rename Policy (V1.2)](#legacy-migration-and-rename-policy-v12)
   - [Do not mass-rename by default](#do-not-mass-rename-by-default)
   - [Rename when it is justified](#rename-when-it-is-justified)
   - [Commit hygiene for renames](#commit-hygiene-for-renames)
@@ -109,26 +109,26 @@ This spec is intentionally explicit and semantic (no guessing/inference required
   - [Bad examples](#bad-examples)
 - [Validation Rules V1 (for future script/test)](#validation-rules-v1-for-future-scripttest)
 - [Change Policy V1](#change-policy-v1)
-- [Validator Rollout Guidance (V1.1)](#validator-rollout-guidance-v11)
+- [Validator Rollout Guidance (V1.2)](#validator-rollout-guidance-v12)
   - [Recommended validator modes](#recommended-validator-modes)
   - [Important](#important)
 - [Suggested Initial Active Role Set](#suggested-initial-active-role-set)
-- [Role to Extension Guidance (Recommended, Non-Binding) (V1.1)](#role-to-extension-guidance-recommended-non-binding-v11)
+- [Role to Extension Guidance (Recommended, Non-Binding) (V1.2)](#role-to-extension-guidance-recommended-non-binding-v12)
   - [Recommended patterns](#recommended-patterns)
   - [Notes](#notes)
-- [Allowed Special Cases and Reserved Filenames (V1.1)](#allowed-special-cases-and-reserved-filenames-v11)
+- [Allowed Special Cases and Reserved Filenames (V1.2)](#allowed-special-cases-and-reserved-filenames-v12)
   - [1) Barrel files](#1-barrel-files)
   - [2) Framework / tool required filenames](#2-framework--tool-required-filenames)
   - [3) Route / entrypoint convention files (if applicable)](#3-route--entrypoint-convention-files-if-applicable)
   - [4) Test files (if/when covered by separate test naming spec)](#4-test-files-ifwhen-covered-by-separate-test-naming-spec)
   - [5) Type declaration and ambient files](#5-type-declaration-and-ambient-files)
-- [Rename Impact Checklist (V1.1)](#rename-impact-checklist-v11)
+- [Rename Impact Checklist (V1.2)](#rename-impact-checklist-v12)
   - [Required checks](#required-checks)
   - [Sanity checks](#sanity-checks)
 
 ---
 
-## Scope and Adoption Policy (V1.1)
+## Scope and Adoption Policy (V1.2)
 
 This document defines the canonical naming contract for Calculogic code files.
 
@@ -423,7 +423,7 @@ Defines style concerns for results-layer presentation.
 
 ---
 
-## Legacy Migration and Rename Policy (V1.1)
+## Legacy Migration and Rename Policy (V1.2)
 
 This section prevents unnecessary churn while still moving the repo toward canonical naming.
 
@@ -735,7 +735,7 @@ When adding a new role, explicitly classify whether it is a concern-aligned role
 
 ---
 
-## Validator Rollout Guidance (V1.1)
+## Validator Rollout Guidance (V1.2)
 
 Validation should support incremental adoption.
 
@@ -797,7 +797,7 @@ This is already a usable foundation for:
 
 ---
 
-## Role to Extension Guidance (Recommended, Non-Binding) (V1.1)
+## Role to Extension Guidance (Recommended, Non-Binding) (V1.2)
 
 Role defines purpose. Extension/format defines implementation language/runtime surface.
 
@@ -826,7 +826,7 @@ This section is guidance only (not a hard validation rule unless explicitly prom
   - pure logic, state transforms, reducers, selectors, parsing, guards, behavioral helpers
   - avoid UI rendering concerns where possible
 
-  - `*.contracts.ts`
+- `*.contracts.ts`
   - contract definitions, parsers, guards, normalization boundaries, version/shape checks
   - use when contract responsibility is primary and should remain stable/testable
   - avoid turning `contracts` files into generic helper dumps
@@ -842,7 +842,6 @@ This section is guidance only (not a hard validation rule unless explicitly prom
 - `*.results-style.css` or `*.results-style.module.css`
   - default style formats for results-layer presentation
   - prefer CSS / CSS Modules unless a documented subsystem pattern requires otherwise
-
   - `.module.css` indicates CSS Modules format (tooling-scoped CSS), not a Calculogic role
 
 
@@ -855,7 +854,7 @@ This section is guidance only (not a hard validation rule unless explicitly prom
 
 ---
 
-## Allowed Special Cases and Reserved Filenames (V1.1)
+## Allowed Special Cases and Reserved Filenames (V1.2)
 
 Not every file in a repo can or should use `<semantic-name>.<role>.<ext>`.
 
@@ -921,7 +920,7 @@ Allowed as implementation-specific exceptions.
 
 ---
 
-## Rename Impact Checklist (V1.1)
+## Rename Impact Checklist (V1.2)
 
 When renaming a file to canonical format, verify all impacted references and contracts.
 
