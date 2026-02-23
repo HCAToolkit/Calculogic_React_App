@@ -1,5 +1,7 @@
 # Calculogic Comment & Provenance Protocol (CCPP, NL-Aligned)
 
+> Draft alignment note: CCPP remains NL-first and production-usable now. It is additionally aligned with `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md` for optional structural-address references, without finalizing that draft’s deferred decisions.
+
 ## 1. Purpose
 
 Comments encode intent, structure, and provenance in a way that:
@@ -9,6 +11,8 @@ Comments encode intent, structure, and provenance in a way that:
 - Keeps files navigable top-down.
 
 Comments are not narration of obvious code; they are a projection of the NL skeleton and decisions into the codebase.
+
+CCPP currently requires NL section IDs/section numbers (for example `[3.2.2]`) as the primary comment anchor. Structural addresses are a separate draft concept and may be included as supplementary metadata where helpful.
 
 ## 2. Comment Types (Use Only These)
 
@@ -55,6 +59,7 @@ The leading number (`3.` here) matches the NL skeleton’s concern index.
 ```ts
 // [3.2.2] cfg-tabNavigation · Subcontainer · "Center Zone – Tab Strip"
 // Concern: Build · Parent: "Global Header Shell" · Catalog: layout.group
+// Structural Address (Draft, optional): A.2.3.1
 // Notes: hosts 4 tabs and info icons; no reordering; center-aligned
 function GlobalHeaderTabStripZone() {
   ...
@@ -65,7 +70,17 @@ Rules:
 
 - First line: `[NLSectionNumber] cfg-id · HierarchicalType · "Name"`.
 - Second line: Concern, Parent (if any), Catalog id.
-- Third line: short intent/constraint note.
+- Optional line: `Structural Address (Draft, optional): <address>` when needed for draft-aligned structural tracing.
+- Final line: short intent/constraint note.
+
+Atomic-comment requirement remains NL-section-based. Do not replace the bracket token with structural-address grammar in this pass.
+
+Draft boundary protection for atomic comments:
+
+- Do not mandate host-prefixed tokens inside bracket IDs unless/until that decision is closed in the structural-address draft.
+- Do not introduce placeholder markers such as `x` in production comment IDs.
+- Do not enforce new leading-zero transformations in CCPP examples until the draft decision is finalized.
+- If a structural address is included, treat it as draft-aligned supplemental metadata and keep NL section IDs authoritative for CCPP synchronization.
 
 These should read like compressed NL bullets and are the main thing AI should preserve.
 
@@ -129,11 +144,14 @@ The NL skeleton is the source:
 - When a number changes in NL (e.g. `3.2.1 → 3.2.2`), comments should be updated to match.
 - When a new atomic is added to NL, a new atomic comment + code block is added in the same position.
 
+Structural addresses (draft) do not replace NL section IDs in this protocol. If used, they supplement existing atomic comments and should remain consistent with the current draft grammar.
+
 ## 6. Strict Do / Don’t
 
 ### Do
 
 - Use NL section numbers `[3.2.1]` consistently across files.
+- Keep NL section numbers as the required CCPP anchor even when draft structural addresses are present.
 - Explain why something exists, not what it does.
 - Keep comments short and structured (good for humans and AI).
 - Update NL + comments in the same change as code.
@@ -144,6 +162,7 @@ The NL skeleton is the source:
 - Add code that doesn’t correspond to a skeleton section (unless you add it to NL first).
 - Use unlabeled `TODO:`.
 - Copy external content into comments.
+- Treat deferred structural-address decisions as finalized CCPP requirements.
 
 ## 7. Minimal Examples
 
@@ -167,6 +186,7 @@ The NL skeleton is the source:
 
 // [3.1] cfg-tabNavigation · Container · "Global Header Shell"
 // Concern: Build · Catalog: layout.shell
+// Structural Address (Draft, optional): A.1.3
 export function GlobalHeaderShell() { ... }
 ```
 
@@ -198,6 +218,7 @@ export function GlobalHeaderShell() { ... }
 - Good:
   - `// [5.2.2] cfg-tabNavigation · Primitive · "handleTabSelect"`
   - `// Concern: Logic · Parent: "Tab Navigation Logic" · Notes: syncs active tab state`
+  - `// Structural Address (Draft, optional): A.1.5.2`
   - `const handleTabSelect = (tabId: string) => setActiveTab(tabId);`
 
 ## 8. Maintenance Rules
@@ -220,4 +241,12 @@ Before merging, confirm each touched concern file passes all checks:
 - [ ] Every Container/Subcontainer/Primitive in code has an atomic comment immediately above it with NL section id.
 - [ ] Atomic comment lines include Concern, Parent (if applicable), and Catalog id.
 - [ ] NL numbering in comments matches the current NL skeleton document.
+- [ ] If a structural address is present in comments, it is labeled draft/optional and is supplementary (NL section ID remains authoritative).
+- [ ] Any structural-address usage in comments is consistent with the current draft spec (`doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`) and does not assume deferred decisions are final.
 - [ ] Any TODOs include owner + expiry date; any external references use provenance-only blocks.
+
+## 10. Draft Structural Addressing Cross-Reference
+
+- Structural-address grammar and examples live in `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`.
+- CCPP remains focused on comment/provenance protocol and NL synchronization behavior.
+- Until deferred decisions are closed in the draft spec, CCPP should treat structural addresses as optional draft-aligned metadata, not as a replacement for NL section IDs.
