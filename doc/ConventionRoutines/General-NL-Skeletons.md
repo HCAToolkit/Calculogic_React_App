@@ -1,19 +1,19 @@
-Purpose / Usage
+# Purpose / Usage
 
 This doc defines the canonical NL skeleton templates used by all configuration (doc/nl-config/*.md) and shell (doc/nl-shell/*.md) documents. Section numbers (1–10) and concern ordering are considered stable contracts.
 
-Changing this doc
+## Changing This Doc
 
 If you change top-level sections or numbering here, you must also update NL-First-Workflow.md, CSCS.md, and CCPP.md to keep the system consistent.
 
-1) General NL Skeleton – Configuration-Level
+## 1) General NL Skeleton – Configuration-Level
 Use this for things like “Motivations question,” individual sections, etc.
 Configuration: [Config Name] ([config-id])
 Project: [Project Name] ([project-id])
 Type: [Configuration type, e.g. Question Block / Section / Interaction]
 Scope: [Local to page / shared / referenced by others]
 Passes: [0–7] (Multi-pass implementation)
-Semantic notes
+### Semantic Notes
 A Configuration is a semantic module, not a file.
 
 
@@ -54,12 +54,12 @@ Concern vs hierarchy are orthogonal: any valid combination is allowed as long as
 
 
 
-1. Purpose and Scope
+### 1. Purpose and Scope
 1.1 This configuration is responsible for […]
 1.2 It appears in context of […]
 1.3 It interacts with other configurations by […]
 
-2. Configuration Contracts
+### 2. Configuration Contracts
 2.1 TypeScript Interfaces
 Define props/state models used by this configuration.
 
@@ -90,7 +90,7 @@ Shared hooks / utilities:
 
 
 
-3. Build Concern (Structure)
+### 3. Build Concern (Structure)
 3.0 Dependencies & Hierarchy Notes
 Requires parent layout: […]
 
@@ -181,7 +181,7 @@ Props (NL description): […]
 
 
 
-4. BuildStyle Concern (Visual Styling of Structure)
+### 4. BuildStyle Concern (Visual Styling of Structure)
 4.0 Dependencies
 Needs theme tokens: […]
 
@@ -212,7 +212,7 @@ Hover, focus, active, disabled.
 
 
 
-5. Logic Concern (Workflow)
+### 5. Logic Concern (Workflow)
 5.0 Dependencies
 Hooks / router / form libs used.
 
@@ -246,7 +246,7 @@ Validation, submission, navigation, etc. (expressed as sequences of logic atoms,
 
 
 
-6. Knowledge Concern (Reference Data)
+### 6. Knowledge Concern (Reference Data)
 6.1 Maps / Dictionaries (Primitives – Knowledge)
 e.g. option maps, type definitions (kb.map).
 
@@ -263,7 +263,7 @@ Note here if this configuration depends on project-global Knowledge atoms (e.g. 
 
 
 
-7. Results Concern (Outputs)
+### 7. Results Concern (Outputs)
 7.1 User-Facing Outputs (Primitives / Containers – Results)
 What this configuration renders as “results” (e.g. summary lines, scores, lists).
 
@@ -277,7 +277,7 @@ Announcements, ARIA live regions, etc.
 
 
 
-8. ResultsStyle Concern (Output Styling)
+### 8. ResultsStyle Concern (Output Styling)
 8.1 Results Layout Styles (Primitives – ResultsStyle)
 Layout/styling for result blocks.
 
@@ -287,7 +287,7 @@ Styling for debug overlays/panels.
 
 
 
-9. Assembly Pattern
+### 9. Assembly Pattern
 9.1 File Structure (implementation pattern; configuration still semantic)
 /src/configs/[config-id]/[ConfigName]/
   [ConfigName].build.tsx
@@ -306,7 +306,7 @@ How parent passes props/context and uses this configuration.
 
 
 
-10. Implementation Passes
+### 10. Implementation Passes
 10.1 Pass Mapping
 Pass 0: […]
 
@@ -334,14 +334,14 @@ Accessibility checks passed
 
 
 
-2) General NL Skeleton – ProjectShell-Level (Global Shells)
+## 2) General NL Skeleton – ProjectShell-Level (Global Shells)
 Use this for things like the Global Header, App Shell, persistent sidebars.
 ProjectShell Configuration: [Shell Name] ([shell-id])
 Project: [Project Name] ([project-id])
 Type: Persistent [Shell type, e.g. Navigation Shell / App Layout Shell]
 Scope: Global – wraps all Configuration views
 Passes: [0–7] (Multi-pass implementation)
-Semantic notes
+### Semantic Notes
 A ProjectShell is still a Configuration in the semantic sense, but it is global and persistent.
 
 
@@ -352,12 +352,12 @@ Many Knowledge atoms here will be project-global (tab definitions, routes, break
 
 
 
-1. Purpose and Scope
+### 1. Purpose and Scope
 1.1 This shell provides the global [header/sidebar/layout] that persists across all Configuration views.
 1.2 It manages [navigation state, modes, responsive layout, etc.].
 1.3 It coordinates with routing and configuration context.
 
-2. Configuration Contracts
+### 2. Configuration Contracts
 2.1 TypeScript Interfaces
 Shell-level state types (tabs, modes, viewport, etc.).
 
@@ -371,7 +371,7 @@ URL patterns, config ID context, etc.
 
 
 
-3. Build Concern (Structure)
+### 3. Build Concern (Structure)
 3.0 Dependencies & Hierarchy Notes
 Parent App, routing, providers.
 
@@ -410,7 +410,7 @@ Buttons, labels, icons, previews, etc., assigned to each zone as leaf-level prim
 
 
 
-4. BuildStyle Concern (Visual Styling of Structure)
+### 4. BuildStyle Concern (Visual Styling of Structure)
 4.0 Dependencies
 Theme tokens and global layout rules.
 
@@ -432,7 +432,7 @@ Active tab, hover preview, disabled states.
 
 
 
-5. Logic Concern (Workflow)
+### 5. Logic Concern (Workflow)
 5.0 Dependencies
 Router, viewport detection, config context.
 
@@ -454,7 +454,7 @@ e.g. Publish, open docs, open settings.
 
 
 
-6. Knowledge Concern (Reference Data)
+### 6. Knowledge Concern (Reference Data)
 6.1 Shell Metadata (often project-global Knowledge atoms)
 Tab definitions, routes, tooltips.
 
@@ -468,7 +468,7 @@ Wordmark, tagline, home tooltip.
 
 
 
-7. Results Concern (Outputs)
+### 7. Results Concern (Outputs)
 7.1 Navigation State Output
 Debug display / current route string.
 
@@ -478,11 +478,11 @@ Tab change messages, mode change messages.
 
 
 
-8. ResultsStyle Concern (Output Styling)
+### 8. ResultsStyle Concern (Output Styling)
 8.1 Debug Overlay Styles
 8.2 Any special shell-only result visuals.
 
-9. Assembly Pattern
+### 9. Assembly Pattern
 9.1 File Structure
 /src/shells/[shell-id]/[ShellName]/
   [ShellName].build.tsx
@@ -501,7 +501,7 @@ How the shell wraps child routes/configurations.
 
 
 
-10. Implementation Passes
+### 10. Implementation Passes
 10.1 Pass Mapping
 Pass 0: Shell container
 

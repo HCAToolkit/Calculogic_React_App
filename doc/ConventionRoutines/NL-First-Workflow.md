@@ -1,6 +1,6 @@
-NL-First Workflow (What the AI Does First)
+# NL-First Workflow (What the AI Does First)
 Golden rule: Before generating or editing any code for a configuration or shell, instantiate the appropriate NL skeleton template from General-NL-Skeletons.md (Configuration-Level or ProjectShell-Level) and create or update the NL skeleton text file for it.
-0. NL Skeleton Step (Mandatory First Step)
+## 0. NL Skeleton Step (Mandatory First Step)
 When starting work on a feature, configuration, or shell:
 Decide the type:
 
@@ -44,7 +44,7 @@ Never add new code that isn’t described in the NL skeleton first.
 
 If new behavior/structure is needed, AI must update the NL file first, then code.
 
-1. Code Generation Step (After NL)
+## 1. Code Generation Step (After NL)
 Once the NL skeleton file is in place:
 Read cfg-*.md or shell-*.md top to bottom.
 
@@ -61,7 +61,7 @@ Prepend each with an atomic comment:
 // [3.2.2] cfg-tabNavigation · Subcontainer · "Center Zone – Tab Strip"
 // Concern: Build · Parent: "Global Header Shell" · Catalog: layout.group
 
-2. Enforcement Checklist (For AI / You)
+## 2. Enforcement Checklist (For AI / You)
 Any time code is generated or changed for a config/shell:
 NL skeleton file exists in doc/nl-config or doc/nl-shell.
 
@@ -71,7 +71,7 @@ All new functions/components/blocks have the correct [sectionNumber] cfg-id · t
 
 No concern file contains “orphan” code that isn’t mentioned in the NL skeleton.
 
-Example alignment
+### Example Alignment
 
 - NL excerpt:
   - [3.2.1] Subcontainer “Center Zone – Tab Strip” (Build)
