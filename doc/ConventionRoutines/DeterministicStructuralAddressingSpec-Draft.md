@@ -88,57 +88,60 @@ Semantics are consistent, while storage and display context differ.
 
 ## 4. Deterministic Address Grammar (Draft)
 
-## 4.1 Token Rules
+### 4.1 Token Rules
 
-- Host token: `A`–`Z` (single uppercase letter in this draft pass).
+- Host token: `A`–`Z` (single uppercase letter for this draft).
 - Numeric token: positive integer (`1`, `2`, `3`, ...).
 - Separator: dot (`.`).
 - No whitespace inside an address.
 
-## 4.2 Forms
+> Draft assumption: single-letter host tokens are required for this draft grammar. Future host-token expansion is an explicit open decision in §10.
 
-### Host-present form
+### 4.2 Forms
+
+#### Host-present form
 
 `<HostLetter>.<HostLocalIndex>.<ConcernIndex>[.<NodeIndex>...]`
 
 Examples: `A.1.3`, `B.3.5.2`, `C.2.3.1.4`
 
-### No-host form
+#### No-host form
 
 `<RootStructureIndex>.<ConcernIndex>[.<NodeIndex>...]`
 
 Examples: `1.3`, `3.5.1`, `2.3.1.1.4`
 
-## 4.3 Position Semantics
+### 4.3 Position Semantics
 
-### Host-present
+#### Host-present
 
 1. Host letter (namespace root)
 2. Host-local structure index
 3. Concern slot
 4+ Nested node indices
 
-### No-host
+#### No-host
 
 1. Artifact-local root structure index
 2. Concern slot
 3+ Nested node indices
 
-## 4.4 Required vs Optional Positions
+### 4.4 Required vs Optional Positions
 
 - Host-present mode requires at least 3 segments.
 - No-host mode requires at least 2 segments.
 - Any additional segments are nested node depth.
 
-## 4.5 Parsing Assumptions
+### 4.5 Parsing Assumptions
 
 - Parse left-to-right by dot tokens.
 - Determine mode by first token:
   - alpha token => host-present mode
   - numeric token => no-host mode
-- Reject mixed or malformed tokens (e.g., `A.01.x`, `A..3`, `.1.3`).
+- Reject mixed or malformed tokens (e.g., `A.1.x`, `A..3`, `.1.3`).
+- Leading-zero handling is deferred (see §10). Until resolved, examples in this draft treat leading zeros as non-canonical and therefore invalid under current draft assumptions.
 
-## 4.6 Sorting Assumptions
+### 4.6 Sorting Assumptions
 
 For deterministic ordering, numeric segments are compared **numerically**, not lexically.
 
@@ -176,6 +179,8 @@ Within same host (or same no-host artifact), sort by numeric segment tuple.
 5. Concern numbering semantics are shared across codebase and future program/engine scopes (same foundation, different scope).
 6. This spec does not redefine concern purity or dependency rules; it only fixes concern-slot position in structural addresses.
 
+> Clarifying note: concern numbering may begin at a non-`1` slot because earlier segments represent structural scope (`HostLetter` + host-local structure in host-present mode, or artifact-local root structure in no-host mode). This preserves CSCS/CCS canonical concern ordering while keeping scope identity explicit.
+
 ## 8. Deep Nesting Rules (Required)
 
 1. After concern slot, each added numeric segment represents one deeper node encapsulation level.
@@ -198,41 +203,41 @@ Within same host (or same no-host artifact), sort by numeric segment tuple.
 
 ## 9. Examples and Non-Examples (Required)
 
-## 9.1 Valid Examples
+### 9.1 Valid Examples
 
-### Top-level host with local structures
+#### Top-level host with local structures
 
 - `A.1.3` => Host `A`, local structure `1`, concern Build
 - `A.2.5` => Host `A`, local structure `2`, concern Logic
 
-### Nested host context
+#### Nested host context
 
 - `B.1.3.2` => Host `B`, structure root `1`, Build concern, nested node `2`
 - Parent host may reference `B.1.3` as child-host entry while child host owns deeper `B.1.3.*`
 
-### Host-present concern addresses
+#### Host-present concern addresses
 
 - `C.3.4` => BuildStyle within host `C`
 - `C.3.7.1` => Results within host `C`, nested node `1`
 
-### No-host concern addresses
+#### No-host concern addresses
 
 - `1.3` => artifact-local structure `1`, Build concern
 - `2.6.1` => artifact-local structure `2`, Knowledge concern, nested node `1`
 
-### Deep nested node addresses
+#### Deep nested node addresses
 
 - `A.1.3.1.2.1`
 - `3.5.1.4.2`
 
-## 9.2 Non-Examples / Invalid or Ambiguous
+### 9.2 Non-Examples / Invalid or Ambiguous
 
 - `A.3` (invalid: host-present mode missing required concern slot)
 - `1` (invalid: no-host mode missing concern slot)
 - `A.1.9` (invalid concern slot under current canonical concern range)
-- `AA.1.3` (deferred/invalid in this draft: multi-letter host tokens not adopted)
-- `A.01.3` (invalid in strict deterministic form if leading-zero normalization is disallowed)
-- `A.1.x.2` (invalid non-numeric concern/node token)
+- `AA.1.3` (invalid under current draft grammar: multi-letter host tokens are deferred in §10)
+- `A.01.3` (invalid under current draft assumption of canonical non-padded numeric segments; final parser policy remains deferred in §10)
+- `A.1.x.2` (invalid under current draft grammar: placeholder markers such as `x` are deferred in §10 and not accepted)
 
 ## 10. Open Decisions / Deferred Decisions (Required)
 
@@ -252,6 +257,8 @@ The following items are intentionally unresolved in this draft and require follo
    - Whether to remain single-letter (`A`–`Z`) or permit multi-letter host ids in future.
 7. **Leading-zero policy:**
    - Explicit strict prohibition vs parser-normalized acceptance.
+
+Until these decisions are closed, this draft's examples and non-examples should be interpreted as **draft assumptions for consistency**, not final cross-repo mandates.
 
 ## 11. Future Sync Targets (Required)
 
