@@ -26,7 +26,7 @@ CCPP currently requires NL section IDs/section numbers (for example `[3.2.2]`) a
 
 ## 3. Required Fields & Format
 
-### 3.1 File Header (TS/TSX/TS, etc.)
+### 3.1 File Header (TS/TSX/JS, etc.)
 
 ```ts
 /**
@@ -217,7 +217,7 @@ export function GlobalHeaderShell() { ... }
   - (Narrates the obvious and lacks NL reference.)
 - Good:
   - `// [5.2.2] cfg-tabNavigation · Primitive · "handleTabSelect"`
-  - `// Concern: Logic · Parent: "Tab Navigation Logic" · Notes: syncs active tab state`
+  - `// Concern: Logic · Parent: "Tab Navigation Logic" · Catalog: logic.handler · Notes: syncs active tab state`
   - `// Structural Address (Draft, optional): A.1.5.2`
   - `const handleTabSelect = (tabId: string) => setActiveTab(tabId);`
 
