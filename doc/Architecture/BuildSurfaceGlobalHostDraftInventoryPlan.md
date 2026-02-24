@@ -57,6 +57,19 @@ This split is expected to reduce churn by keeping shell behavior stable while en
 - contracts that define tab-provider inputs/outputs for host consumption
 - thin wiring modules coordinating host and tab-provider seams
 
+## Current-State Build Surface Snapshot (Observed)
+
+This snapshot is an observational planning aid for reconciliation; it may lag repo reality if this section is not refreshed after major extraction slices land.
+
+| Current File / Surface | Current Role / Shape | Current Responsibility (Observed) | Likely Draft Inventory Target(s) | Notes |
+|---|---|---|---|---|
+| `src/tabs/build/BuildSurface.build.tsx` | Legacy-heavy / mixed host+tab composition | Owns structural shell composition for left catalog, canvas, and right inspector zones plus section panel framing. | `buildsurface.host.tsx`, `leftpanel.host.tsx`, `canvas.host.tsx`, `rightpanel.host.tsx` | Currently overloaded as a single Build-tab composition surface; expected to drain into global host shell + seams. |
+| `src/tabs/build/BuildSurface.logic.ts` | Mixed canonical concern file with both shell and tab coupling | Owns Build surface orchestration bindings, section ordering/state, resize/collapse interaction behavior, and anchor-facing bindings. | `buildsurface.host.tsx`, `buildsurface-breakpoint.logic.ts`, `buildsurface-host.wiring.ts`, `leftpanel-build-sources.wiring.ts` | Likely split by semantic-slice extraction to isolate tab-agnostic host behavior from tab population seam behavior. |
+| `src/tabs/build/buildSurfacePersistence.ts` | Legacy filename (no role suffix) | Implements parse/serialize and migration helpers for persisted panel/section/right-panel state. | `buildsurface-persistence.logic.ts` | Canonicalization target already identified; naming alignment remains incremental. |
+| `src/tabs/build/buildSurfacePersistence.contracts.ts` | Near-canonical contracts module | Defines persistence payload contracts, versioning constants, and parse-result types. | `buildsurface-persistence.contracts.ts` | Primarily naming normalization + ownership alignment into host persistence support bucket. |
+| `src/tabs/build/index.tsx` and `src/tabs/BuildTab.tsx` | Transitional forwarding surfaces | Provide Build-tab entry forwarding into the current Build surface composition path. | `buildsurface-host.wiring.ts` (integration seam), retained forwarders as needed during transition | Forwarders are useful during repoint phases; may remain temporarily while host root adoption converges. |
+| `src/App.tsx` (Build mount within app frame) | App host integration touchpoint | Mounts `BuildTab` inside app frame and therefore currently anchors Build-surface entry into app runtime composition. | `buildsurface-host.wiring.ts` (repoint touchpoint) | Not a Build-surface concern file itself, but an important reconciliation waypoint when host entry wiring shifts. |
+
 ## Draft File Inventory Table
 
 | Semantic Target | Proposed Filename | Role | Responsibility Summary | Bucket | Parent Host / Scope | Replaces / Extracted From (Draft) | Status | Notes / Naming Rationale |
@@ -75,6 +88,25 @@ This split is expected to reduce churn by keeping shell behavior stable while en
 | Logic tab left sources wiring | `leftpanel-logic-sources.wiring.ts` | wiring | Map Logic-tab sources into left-panel provider contract. | Tab Population | Logic tab provider implementation | Future provider addition. | deferred | Deferred until logic-tab source scope is finalized.
 | Knowledge tab left sources wiring | `leftpanel-knowledge-sources.wiring.ts` | wiring | Map Knowledge-tab sources into left-panel provider contract. | Tab Population | Knowledge tab provider implementation | Future provider addition. | deferred | Deferred while plugin shape remains draft.
 | Results tab left sources wiring | `leftpanel-results-sources.wiring.ts` | wiring | Map Results-tab sources into left-panel provider contract. | Tab Population | Results tab provider implementation | Future provider addition. | deferred | Deferred to avoid premature provider sprawl.
+
+## Legacy-to-Planned Mapping Aid (Draft Reconciliation View)
+
+`Legacy-to-planned mapping` is a lightweight planning/reconciliation aid that links current legacy sources to intended canonical destinations for semantic-slice extraction. These mappings are draft guides (not strict implementation law) and may evolve as extraction order or boundary details are refined.
+
+| Legacy Source | Planned Canonical Target(s) | Slice Type | Migration Notes | Mapping Confidence |
+|---|---|---|---|---|
+| `src/tabs/build/BuildSurface.build.tsx` | `buildsurface.host.tsx`; `leftpanel.host.tsx`; `canvas.host.tsx`; `rightpanel.host.tsx` | host | One-to-many drain expected; extract shell frame primitives first, then repoint zone composition incrementally. | high |
+| `src/tabs/build/BuildSurface.logic.ts` | `buildsurface-breakpoint.logic.ts`; `buildsurface-host.wiring.ts`; `leftpanel-build-sources.wiring.ts`; (host orchestration portions co-located with `buildsurface.host.tsx` as needed) | logic + wiring + host | Separate tab-agnostic shell orchestration from tab-population behaviors before broader cleanup. | medium |
+| `src/tabs/build/buildSurfacePersistence.ts` | `buildsurface-persistence.logic.ts` | persistence | Primarily naming/role normalization with behavior-preserving extraction. | high |
+| `src/tabs/build/buildSurfacePersistence.contracts.ts` | `buildsurface-persistence.contracts.ts` | contracts | Keep version/payload contract authority stable while repointing imports. | high |
+| `src/tabs/build/index.tsx`; `src/tabs/BuildTab.tsx`; `src/App.tsx` Build mount path | `buildsurface-host.wiring.ts` (integration seam), with temporary forwarders as needed | wiring | Treat as repoint path tracking to show where host-entry adoption crosses tab/app boundaries. | draft |
+
+### Snapshot & Mapping Maintenance Guidance
+
+- Treat snapshot and mapping rows as lightweight migration traceability aids, not a mandatory implementation checklist.
+- Refresh this section when major semantic-slice extraction milestones land (especially host root, persistence, or provider seam moves).
+- Preserve one-to-many mapping visibility so reconciliation can show how overloaded legacy files were drained across canonical targets.
+- Avoid mass editorial churn: for unrelated docs-only edits, update snapshot/mapping only when stale details would mislead implementation planning.
 
 ## Naming Decisions / Conventions for This Refactor
 
