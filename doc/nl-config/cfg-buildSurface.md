@@ -91,6 +91,9 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - **[3.3.8] Primitive – "Inspector Content Wrapper"**
   - Anchor: `builder-right-content`
   - Hosts settings placeholders and future nested configs.
+- **[3.3.9] Primitive – "Preview Breakpoint Controls"**
+  - Anchor: `builder-tabs`
+  - Provides preview-only viewport presets (`mobile` / `tablet` / `desktop`) for deterministic center-canvas sizing.
 
 ## 4. BuildStyle Concern (Visual Styling of Structure)
 ### 4.0 Dependencies
@@ -148,6 +151,8 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Padding and text styling for `builder-right-content`.
 - **[4.2.18] Primitive – "Anchor List Item"**
   - Item-level spacing for anchor registry lists.
+- **[4.2.19] Primitive – "Dark Theme Parity Styling"**
+  - `body.dark` selectors align left panel, preview stage, inspector, and grip tones for coherent host-surface theming.
 
 ### 4.3 Responsive Rules
 - At min-width 1440px widen left/right panels and clamp preview canvas for readability.
@@ -196,6 +201,8 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Distinguishes unsupported version mismatches from malformed/invalid-shape payloads and resets to safe defaults for unsupported/malformed payloads.
   - Marks successful legacy upgrades via `wasMigrated: true` so the persisted contract can be rewritten as versioned JSON by existing write effects.
   - Left-panel width intentionally remains a primitive numeric string contract until the payload requires additional structured fields.
+- **[5.2.8] Primitive – "Preview Breakpoint State"**
+  - Tracks selected preview breakpoint and exposes the active preview width variant to Build bindings.
 
 ### 5.2.3 Derived Values
 - Derived booleans for collapsed states, computed widths/heights.

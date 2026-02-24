@@ -306,6 +306,8 @@
   align-items: center;
   justify-content: center;
   min-width: 0;
+  max-width: 100%;
+  transition: width 160ms ease;
 }
 
 /* [4.4.3] cfg-buildSurface · Primitive · "Preview Placeholder Text"
@@ -424,4 +426,71 @@
    Concern: BuildStyle · Parent: "Anchor List Item" · Catalog: control.state */
 [data-anchor^="builder-list-"] li:nth-child(odd) {
   background: rgba(148, 163, 184, 0.2);
+}
+
+/* [4.5.13] cfg-buildSurface · Primitive · "Dark Theme Parity"
+   Concern: BuildStyle · Parent: "Surface Chrome Styling" · Catalog: tokens.theme */
+body.dark [data-anchor="builder-root"] {
+  background: #0b1220;
+  color: #e2e8f0;
+}
+
+body.dark [data-anchor="builder-header"] {
+  background: rgba(15, 23, 42, 0.9);
+  border-bottom-color: rgba(148, 163, 184, 0.25);
+}
+
+body.dark [data-anchor="builder-header"] h1,
+body.dark [data-anchor^="builder-section-"] > header span,
+body.dark [data-anchor="builder-right-panel"] > header span {
+  color: #e2e8f0;
+}
+
+body.dark [data-anchor="builder-tabs"] button,
+body.dark [data-anchor^="builder-button-group-"] button {
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.45);
+  color: #e2e8f0;
+}
+
+body.dark [data-anchor="builder-left-panel"] {
+  background: rgba(15, 23, 42, 0.75);
+  border-right-color: rgba(148, 163, 184, 0.25);
+}
+
+body.dark [data-anchor^="builder-section-"] > header {
+  background: rgba(30, 41, 59, 0.85);
+  border-bottom-color: rgba(148, 163, 184, 0.3);
+}
+
+body.dark [data-anchor="builder-center-panel"] {
+  background: rgba(15, 23, 42, 0.55);
+}
+
+body.dark [data-anchor="builder-center-inner"] {
+  background: #111827;
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+body.dark [data-anchor="builder-center-inner"] p,
+body.dark [data-anchor="builder-right-content"],
+body.dark [data-anchor^="builder-placeholder-"] {
+  color: rgba(226, 232, 240, 0.85);
+}
+
+body.dark [data-anchor="builder-right-panel"] {
+  background: rgba(17, 24, 39, 0.95);
+  border-left-color: rgba(148, 163, 184, 0.25);
+}
+
+body.dark [data-anchor^="builder-section-grip"],
+body.dark [data-anchor="builder-left-grip"],
+body.dark [data-anchor="builder-right-grip"] {
+  background: rgba(71, 85, 105, 0.6);
+}
+
+body.dark [data-anchor^="builder-section-grip"]::before,
+body.dark [data-anchor="builder-left-grip"]::before,
+body.dark [data-anchor="builder-right-grip"]::before {
+  background-image: linear-gradient(#cbd5e1, #cbd5e1), linear-gradient(#cbd5e1, #cbd5e1), linear-gradient(#cbd5e1, #cbd5e1);
 }
