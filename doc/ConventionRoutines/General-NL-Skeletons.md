@@ -47,7 +47,8 @@ Passes: [0–7] (Multi-pass implementation)
   - Container – top-level encapsulation in a concern for this configuration; not nested inside other Containers in that concern; may contain Subcontainers and/or Primitives directly (flat or hierarchical).
   - Subcontainer – nested encapsulation; always inside a Container or another Subcontainer; never at the root of a concern.
   - Primitive – leaf unit; contains nothing else (single field, rule, style block, kb map, result line, etc.).
-- Concern vs hierarchy are orthogonal: any valid combination is allowed as long as the concern’s purity rules are respected.
+- Concern vs hierarchy are orthogonal.
+  - Any valid combination is allowed as long as the concern’s purity rules are respected.
 
 ### Draft Structural-Address Usage Notes (Supplementary)
 
@@ -332,7 +333,8 @@ Passes: [0–7] (Multi-pass implementation)
 #### 3.0 Dependencies & Hierarchy Notes
 
 - Parent App, routing, providers.
-- This shell has one or more Containers at the top level for Build; shell zones are modeled as Subcontainers and Primitives under those containers.
+- This shell has one or more Containers at the top level for Build.
+  - Shell zones are modeled as Subcontainers and Primitives under those containers.
 
 #### 3.1 Atomic Components — Containers (Build) – `"[Shell Container]"`
 
@@ -343,7 +345,7 @@ Passes: [0–7] (Multi-pass implementation)
 - Anchor: shell-level anchor if needed.
 - Structural Address (Draft, optional): `[A.1.2 / 3.1 / etc.]`
 
-#### 3.2 Atomic Components — Subcontainers (Build) – “Shell Zones”
+#### 3.2 Atomic Components — Subcontainers (Build) – `"Shell Zones"`
 
 - Zone A Subcontainer: [Brand / Nav / Tools]
 - Zone B Subcontainer: [Tabs / Modes / Breadcrumbs]
@@ -448,7 +450,9 @@ Passes: [0–7] (Multi-pass implementation)
 
 #### 9.2 Assembly Logic
 
-- Implementation pattern:
+- `index.ts` wires shell concerns together.
+- It exports a shell component that implements this project shell.
+- Implementation pattern typically includes:
   - Hook for logic.
   - Build component for structure.
   - Knowledge/constants.
