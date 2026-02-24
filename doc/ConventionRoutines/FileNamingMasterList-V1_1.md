@@ -589,10 +589,14 @@ Examples of strong targets:
 
 ### Rule 3 — Subparts belong in semantic-name
 
-Subparts like `selector`, `layout`, `registry`, `actions`, `mapper`, `viewport` are semantic descriptors unless promoted to canonical roles later.
+Subparts like `selector`, `layout`, `registry`, `actions`, `mapper`, `viewport`, `breakpoint`, and `theme` are semantic descriptors unless promoted to canonical roles later.
 
 - ✅ `leftpanel-selector.wiring.ts`
 - ✅ `canvas-viewport.logic.ts`
+- ✅ `buildsurface-breakpoint.logic.ts`
+- ✅ `buildsurface-theme.knowledge.ts`
+
+This is an examples/clarification update only; no role policy change is introduced by these examples.
 
 ### Rule 4 — Avoid generic semantic names unless scoped
 
@@ -686,9 +690,14 @@ Convert kebab-case semantic-name to PascalCase.
 
 - `buildsurface.host.tsx`
 - `leftpanel.host.tsx`
+- `canvas.host.tsx`
+- `rightpanel.host.tsx`
 - `leftpanel-tab-selector.wiring.ts`
+- `leftpanel-build-sources.wiring.ts`
 - `canvas-dropzone.logic.ts`
 - `buildsurface-persistence.contracts.ts`
+- `buildsurface-breakpoint.logic.ts`
+- `buildsurface-theme.knowledge.ts`
 - `rightpanel-inspector.build.tsx`
 - `rightpanel.results-style.css`
 - `rightpanel.results-style.module.css`
