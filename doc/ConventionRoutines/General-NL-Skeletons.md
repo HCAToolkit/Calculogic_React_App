@@ -8,6 +8,7 @@ This doc defines the canonical NL skeleton templates used by all configuration (
 - **Structural Address (Draft):** Deterministic structural positioning (host-present or no-host forms) is a supplementary addressing layer described in `DeterministicStructuralAddressingSpec-Draft.md`.
 - These are related but **not identical** systems: structural addresses do not replace NL section numbering in this skeleton.
 - Where useful, templates may record structural addresses as **draft, optional metadata** alongside NL content.
+- Placeholder examples that use `x` (for example `3.2.x`) are illustrative draft placeholders in this doc; placeholder marker policy remains deferred to `DeterministicStructuralAddressingSpec-Draft.md`.
 - Comment/provenance protocol conventions remain governed by `CCPP.md`; this doc remains the canonical NL skeleton structure source.
 
 ## Changing This Doc
@@ -30,7 +31,7 @@ Passes: [0–7] (Multi-pass implementation)
 
 - A Configuration is a semantic module, not a file.
 - It spans up to six concerns: Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle.
-- Per-configuration implementation files live under paths like `src/configs/<configId>/<ConfigName>.build.tsx` (structure), `src/configs/<configId>/<ConfigName>.build.module.css` (configuration styling), and the other concern files with matching base names. The engine or build step may merge those into project-level bundles such as `src/projects/<projectId>/Project.build.tsx`. BuildStyle and ResultsStyle are implemented as CSS/CSS-Module files that target the anchors emitted by the Build and Results `.tsx` concerns.
+- Per-configuration implementation files live under paths like `src/configs/<configId>/<ConfigName>.build.tsx` (structure), `src/configs/<configId>/<ConfigName>.build-style.module.css` (configuration styling), and the other concern files with matching base names. The engine or build step may merge those into project-level bundles such as `src/projects/<projectId>/Project.build.tsx`. BuildStyle and ResultsStyle are implemented as CSS/CSS-Module files (for example `[ConfigName].build-style.module.css` and `[ConfigName].results-style.module.css`) that target the anchors emitted by the Build and Results `.tsx` concerns; actual repository naming should still follow the naming master and current repo conventions.
 - All content of a configuration is expressed as Atomic Components.
 - Each atomic component has:
   - a concern (Build / BuildStyle / Logic / Knowledge / Results / ResultsStyle), and
@@ -239,17 +240,17 @@ interface [ConfigName]State { ... }
 ```text
 /src/configs/[config-id]/[ConfigName]/
   [ConfigName].build.tsx
-  [ConfigName].build.module.css
+  [ConfigName].build-style.module.css
   [ConfigName].logic.ts
   [ConfigName].knowledge.ts
   [ConfigName].results.ts
-  [ConfigName].results.module.css
+  [ConfigName].results-style.module.css
   index.ts
 ```
 
 #### 9.2 Assembly Logic
 
-- `index.tsx` wires concerns together and exports a single component that implements this configuration.
+- `index.ts` wires concerns together and exports a single component that implements this configuration.
 
 #### 9.3 Integration
 
@@ -424,11 +425,11 @@ Passes: [0–7] (Multi-pass implementation)
 ```text
 /src/shells/[shell-id]/[ShellName]/
   [ShellName].build.tsx
-  [ShellName].build.module.css
+  [ShellName].build-style.module.css
   [ShellName].logic.ts
   [ShellName].knowledge.ts
   [ShellName].results.tsx
-  [ShellName].results.module.css
+  [ShellName].results-style.module.css
   index.ts
 ```
 
