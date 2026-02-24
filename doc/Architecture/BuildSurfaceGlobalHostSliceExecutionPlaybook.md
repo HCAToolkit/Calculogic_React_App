@@ -31,7 +31,7 @@ This playbook operationalizes the Build Surface → Global Host migration as a *
 - semantic-slice sequencing guidance
 - per-slice execution template and done criteria
 - reusable verification and safety checklists
-- wrapper/forwarder transitional rules and retirement criteria
+- wrapper/forwarder transitional seam rules and retirement criteria
 - PR boundary guidance for reviewability
 - inventory reconciliation/status update guidance
 
@@ -75,7 +75,7 @@ After extraction, repoint imports/call sites to the new destination in the minim
 Repoint guidance:
 
 - prefer direct repoint where impact is small and observable
-- allow temporary wrapper/forwarder only when repoint cannot land safely in the same slice
+- allow a temporary wrapper/forwarder only when repoint cannot land safely in the same slice
 - keep repoint diffs explicit and limited to touched seam paths
 
 ### 3) Cleanup / Normalize
@@ -90,12 +90,12 @@ Do not turn cleanup into broad tree-wide churn.
 
 ### 4) Retire Legacy
 
-Retire fully drained legacy files or leave a short-lived wrapper when necessary.
+Retire fully drained legacy files or leave a short-lived wrapper/forwarder when necessary.
 
 Legacy retirement should happen as soon as:
 
 - all call sites are repointed
-- wrapper has no unique behavior
+- wrapper/forwarder has no unique behavior
 - verification is complete for touched path
 
 ## Slice Ordering Strategy (Draft v1, Non-Mandatory)
@@ -177,7 +177,7 @@ This ordering is a **draft-safe starting strategy** and not immutable law.
 ### Wrapper/Forwarder Use
 - Allowed: <yes/no>
 - Why needed: <short rationale>
-- Retirement trigger for this wrapper: <explicit condition>
+- Retirement trigger for this wrapper/forwarder: <explicit condition>
 
 ### Verification Checks
 - [ ] Import/module safety checklist run (applicable items)
@@ -250,14 +250,14 @@ Use temporary wrappers/forwarders only as transitional seams.
 A wrapper/forwarder can be retired when:
 
 - all known call sites are repointed to canonical target
-- wrapper adds no unique behavior/state/contract translation
+- wrapper/forwarder adds no unique behavior/state/contract translation
 - touched-path verification is complete
 - inventory status has been updated to reflect repointed/retired state
-- no lingering imports depend on the wrapper path
+- no lingering imports depend on the wrapper/forwarder path
 
 ### Drift Control
 
-Avoid long-lived wrappers; if a wrapper survives multiple slices, record explicit blocker and target retirement slice.
+Avoid long-lived wrappers/forwarders; if a wrapper/forwarder survives multiple slices, record explicit blocker and target retirement slice.
 
 ## PR Boundary Guidance
 
