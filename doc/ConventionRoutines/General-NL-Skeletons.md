@@ -102,7 +102,7 @@ interface [ConfigName]State { ... }
 
 #### 3.1 Atomic Components — Containers (Build)
 
-- Name: `"[Container name]"`
+- Name: `[Container name]`
 - Hierarchical type: Container
 - Concern: Build
 - Catalog base: `[layout.group / layout.stack / section.*]`
@@ -113,7 +113,7 @@ interface [ConfigName]State { ... }
 
 #### 3.2 Atomic Components — Subcontainers (Build)
 
-##### 3.2.1 Subcontainer `"[Name]"`
+##### 3.2.1 Subcontainer `[Name]`
 
 - Hierarchical type: Subcontainer
 - Concern: Build
@@ -123,13 +123,13 @@ interface [ConfigName]State { ... }
 - Structural Address (Draft, optional): `[A.1.3.2 / 3.2.1 / etc.]`
 - Children: […].
 
-##### 3.2.2 Subcontainer `"[Name]"`
+##### 3.2.2 Subcontainer `[Name]`
 
 - […].
 
 #### 3.3 Atomic Components — Primitives (Build)
 
-##### 3.3.1 Primitive `"[Name]"`
+##### 3.3.1 Primitive `[Name]`
 
 - Hierarchical type: Primitive
 - Concern: Build
@@ -138,7 +138,7 @@ interface [ConfigName]State { ... }
 - Content / label: […].
 - Props (NL description): […].
 
-##### 3.3.2 Primitive `"[Name]"`
+##### 3.3.2 Primitive `[Name]`
 
 - […].
 
@@ -150,7 +150,7 @@ interface [ConfigName]State { ... }
 
 #### 4.1 Atomic Components — Containers / Groups (BuildStyle)
 
-- Optional named style group for this configuration (e.g. `"[ConfigName] Layout Styles"`).
+- Optional named style group for this configuration (e.g. `[ConfigName] Layout Styles`).
 
 #### 4.2 Atomic Components — Primitives (BuildStyle)
 
@@ -175,7 +175,7 @@ interface [ConfigName]State { ... }
 
 #### 5.1 Atomic Components — Containers (Logic)
 
-- Root logic container for this configuration (e.g. `"[ConfigName]Logic hook"`).
+- Root logic container for this configuration (e.g. `[ConfigName]Logic hook`).
 
 #### 5.2 Atomic Components — Primitives (Logic)
 
@@ -299,7 +299,9 @@ Passes: [0–7] (Multi-pass implementation)
 ### Semantic Notes
 
 - A ProjectShell is still a Configuration in the semantic sense, but it is global and persistent.
-- It spans the same concerns (Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle), and is also expressed entirely through Atomic Components (Containers, Subcontainers, Primitives).
+- It spans the same concerns as configuration-level templates.
+  - Concerns: Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle.
+  - Expression model: Atomic Components (Containers, Subcontainers, Primitives).
 - Many Knowledge atoms here will be project-global (tab definitions, routes, breakpoints, brand content) and consumed by other configurations.
 
 ### Draft Structural-Address Usage Notes (Supplementary)
@@ -336,7 +338,7 @@ Passes: [0–7] (Multi-pass implementation)
 - This shell has one or more Containers at the top level for Build.
   - Shell zones are modeled as Subcontainers and Primitives under those containers.
 
-#### 3.1 Atomic Components — Containers (Build) – `"[Shell Container]"`
+#### 3.1 Atomic Components — Containers (Build) – `[Shell Container]`
 
 - Hierarchical type: Container
 - Concern: Build
@@ -345,7 +347,7 @@ Passes: [0–7] (Multi-pass implementation)
 - Anchor: shell-level anchor if needed.
 - Structural Address (Draft, optional): `[A.1.2 / 3.1 / etc.]`
 
-#### 3.2 Atomic Components — Subcontainers (Build) – `"Shell Zones"`
+#### 3.2 Atomic Components — Subcontainers (Build) – `[Shell Zones]`
 
 - Zone A Subcontainer: [Brand / Nav / Tools]
 - Zone B Subcontainer: [Tabs / Modes / Breadcrumbs]
