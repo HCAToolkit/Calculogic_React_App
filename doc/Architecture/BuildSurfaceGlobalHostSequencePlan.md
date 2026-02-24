@@ -56,6 +56,17 @@ The Build Surface will evolve into a **global host surface** where:
 
 ## Work Order (Required Sequence)
 
+### Status Update (Post-Phase-1 Reconciliation)
+
+- **Phase 1 host stability pass is completed** via PR **#108**.
+- Landed scope (high level):
+  - preview-only breakpoint controls/state now drive deterministic preview sizing behavior in the Build Surface host UI
+  - dark-theme parity styling was expanded across Build Surface host regions (header/panels/canvas chrome)
+- Explicitly not included in PR #108:
+  - no Build Surface → Global Host refactor extraction/splitting
+  - no tab-provider seam extraction or inventory lifecycle progression work
+- Verification summary for that pass was captured in the PR (manual breakpoint/theme checks plus automated lint/build checks).
+
 ### Phase 1 — Build Surface Host Stability Pass
 
 #### Goal

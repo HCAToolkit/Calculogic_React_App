@@ -61,6 +61,8 @@ This split is expected to reduce churn by keeping shell behavior stable while en
 
 This snapshot is an observational planning aid for reconciliation; it may lag repo reality if this section is not refreshed after major extraction slices land.
 
+> Post-Phase-1 status note (PR #108): current repo reality includes preview breakpoint controls/header chrome in `BuildSurface.build.tsx`, preview breakpoint state/bindings in `BuildSurface.logic.ts`, and dark-theme parity selectors across host-surface regions in `BuildSurface.view.css`; this was a host-stability behavior pass, not a host/global extraction slice.
+
 | Current File / Surface | Current Role / Shape | Current Responsibility (Observed) | Likely Draft Inventory Target(s) | Notes |
 |---|---|---|---|---|
 | `src/tabs/build/BuildSurface.build.tsx` | Legacy-heavy / mixed host+tab composition | Owns structural shell composition for left catalog, canvas, and right inspector zones plus section panel framing. | `buildsurface.host.tsx`, `leftpanel.host.tsx`, `canvas.host.tsx`, `rightpanel.host.tsx` | Currently overloaded as a single Build-tab composition surface; expected to drain into global host shell + seams. |
