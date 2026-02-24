@@ -22,6 +22,7 @@ This playbook operationalizes the Build Surface → Global Host migration as a *
 - The inventory plan remains the source of truth for draft targets, mapping direction, status vocabulary, and naming alignment.
 - This playbook defines **how** semantic slices are executed, verified, and reconciled as implementation lands.
 - This playbook does not replace task-specific engineering judgment; it provides guardrails and repeatable review shape.
+- In short: the inventory plan is the target/mapping ledger, while this playbook is the execution/verification routine.
 
 ## Scope Boundaries
 
@@ -270,6 +271,7 @@ Keep each PR reviewable and semantically scoped.
 - do not combine refactor + optimization + feature behavior change unless safety-coupled
 - state boundary being migrated and legacy source being drained in PR summary
 - include explicit verification notes in PR summary
+- verification notes should state both what was checked (manual and/or automated) and what was intentionally not checked in this slice (if any)
 
 ### Good PR Shapes (Examples)
 
@@ -283,7 +285,7 @@ The inventory plan remains the migration ledger; update it deliberately.
 
 ### When to Update `Status`
 
-Update status when slice materially changes lifecycle state, e.g.:
+Update status when slice materially changes lifecycle state (that is, changes status/ownership interpretation in a way that affects inventory tracking or migration decisions), e.g.:
 
 - `planned` → `in-progress`
 - `in-progress` → `extracted`
@@ -320,6 +322,8 @@ Do not mass-edit inventory rows for docs-only wording polish unrelated to landed
 
 ## Optional Starter Slice Backlog (Draft Guidance, Not Mandatory)
 
+These starter examples follow current draft inventory/repo-reality naming and are illustrative execution aids for slicing; they are not a naming-policy or role-registry expansion by this playbook.
+
 ### 1) Persistence Canonicalization + Repoint Prep
 - **Objective:** align persistence contracts/logic to canonical targets and prep clean repoint seam.
 - **Likely target file(s):** `src/tabs/build/buildsurface-persistence.logic.ts`, `src/tabs/build/buildsurface-persistence.contracts.ts`
@@ -353,7 +357,7 @@ Do not mass-edit inventory rows for docs-only wording polish unrelated to landed
 - **Likely target file(s):** `src/tabs/build/leftpanel-build-sources.wiring.ts`, `src/tabs/build/leftpanel-tab-provider.contracts.ts`
 - **Likely legacy source(s):** `src/tabs/build/BuildSurface.logic.ts`
 - **Risk:** Medium
-- **Notes:** keep provider contract thin and host-facing.
+- **Notes:** keep provider contracts thin and host-facing.
 
 ### 6) Build Entry Repoint Slice (Forwarder-Aware)
 - **Objective:** repoint Build entry/mount path toward new host wiring seam.
