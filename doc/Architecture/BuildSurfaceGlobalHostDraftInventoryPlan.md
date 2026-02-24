@@ -112,6 +112,27 @@ This split is expected to reduce churn by keeping shell behavior stable while en
    - Repeated patterns around selectors/adapters may justify role promotion later.
    - This pass explicitly defers any role-registry expansion.
 
+## Incremental Refactor Migration Method (Draft)
+
+Implementation should execute as **semantic-slice extraction** rather than broad file rewrites.
+
+- Extract one semantic slice at a time from legacy source into its planned canonical target.
+- Prefer behavior-preserving moves first; do not combine extraction with broad behavior redesign in the same slice.
+- Drain legacy files incrementally as responsibilities move out.
+- A legacy file may remain temporarily as a thin delegator/wrapper ("legacy wrapper") only when needed for transition stability.
+- Legacy wrappers are transitional only and should be removed once repointing is stable.
+
+Recommended extraction rhythm per slice:
+
+1. **Extract**
+   - Move a bounded responsibility into the destination canonical file from this inventory.
+2. **Repoint**
+   - Update imports/references/call sites to consume the new destination.
+3. **Cleanup / Normalize**
+   - Align local names/comments/NL references, remove dead code, and normalize remaining seams.
+4. **Retire Legacy**
+   - Delete drained legacy files, or temporarily reduce to a thin wrapper until safe removal.
+
 ## Adoption / Implementation Guidance (Draft)
 
 1. Start with docs-first planning (this inventory + naming examples), then apply implementation in small PR slices.
@@ -121,7 +142,39 @@ This split is expected to reduce churn by keeping shell behavior stable while en
    - persistence extraction,
    - tab-provider wiring introduction,
    - optional follow-up tab-provider expansion.
-4. During implementation, keep NL and CCPP alignment for any changed shell/config concern files.
+4. Execute in semantic-slice order, extracting one bounded responsibility at a time and keeping host-shell vs tab-population boundaries explicit.
+5. Separate extraction churn from cleanup churn when practical (for example: extraction/repoint first, naming/comment normalization second).
+6. Avoid mixing refactor + optimization + behavior changes in one pass unless a safety fix requires coupling.
+7. Keep PRs boundary-focused and reviewable; each slice should state the boundary being migrated and the legacy surface being drained.
+8. During implementation, keep NL and CCPP alignment for any changed shell/config concern files.
+
+### Draft Inventory Status Tracking Guidance (Migration Lifecycle)
+
+The `Status` column may be used as a migration-lifecycle trace, not only planning intent.
+
+Recommended status progression vocabulary:
+
+- `draft`
+- `planned`
+- `in-progress`
+- `extracted`
+- `repointed`
+- `legacy-wrapper` *(optional, temporary transitional state)*
+- `retired`
+- `deferred`
+
+Guidance:
+
+- Not every inventory item must pass through every status.
+- `legacy-wrapper` is optional and should be short-lived.
+- Statuses are for migration traceability/reconciliation, not rigid process law.
+
+### Incremental Extraction Safety Notes
+
+- Avoid introducing circular imports while extracting slices from legacy files.
+- Keep ownership obvious after each extraction; do not leave misleading names/comments that imply old ownership.
+- Validate React hook/state boundary safety during logic extraction (hook order, closure capture, effects coupling).
+- Prefer behavior-preserving extraction before optimization.
 
 ## Repo-Reality Constraints (Observed in Current Tree)
 
