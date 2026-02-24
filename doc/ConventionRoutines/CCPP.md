@@ -71,7 +71,7 @@ Rules:
 - First line: `[NLSectionNumber] cfg-id · HierarchicalType · "Name"`.
 - Second line: Concern, Parent (if any), Catalog id.
 - Optional line: `Structural Address (Draft, optional): <address>` when needed for draft-aligned structural tracing.
-- Final line: short intent/constraint note.
+- Final line: `Notes: ...` short intent/constraint note (keep Notes separate from the metadata line for deterministic readability).
 
 Atomic-comment requirement remains NL-section-based. Do not replace the bracket token with structural-address grammar in this pass.
 
@@ -217,8 +217,9 @@ export function GlobalHeaderShell() { ... }
   - (Narrates the obvious and lacks NL reference.)
 - Good:
   - `// [5.2.2] cfg-tabNavigation · Primitive · "handleTabSelect"`
-  - `// Concern: Logic · Parent: "Tab Navigation Logic" · Catalog: logic.handler · Notes: syncs active tab state`
+  - `// Concern: Logic · Parent: "Tab Navigation Logic" · Catalog: logic.handler`
   - `// Structural Address (Draft, optional): A.1.5.2`
+  - `// Notes: syncs active tab state`
   - `const handleTabSelect = (tabId: string) => setActiveTab(tabId);`
 
 ## 8. Maintenance Rules
