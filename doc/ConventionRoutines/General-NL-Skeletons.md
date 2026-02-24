@@ -6,10 +6,10 @@ This doc defines the canonical NL skeleton templates used by all configuration (
 
 - **NL section numbering (this doc):** The `1–10` section structure below is a stable documentation/template contract.
 - **Structural Address (Draft):** Deterministic structural positioning (host-present or no-host forms) is a supplementary addressing layer described in `DeterministicStructuralAddressingSpec-Draft.md`.
-- These are related but **not identical** systems: structural addresses do not replace NL section numbering in this skeleton.
-- Where useful, templates may record structural addresses as **draft, optional metadata** alongside NL content.
-- Placeholder examples that use `x` (for example `3.2.x`) are illustrative draft placeholders in this doc; placeholder marker policy remains deferred to `DeterministicStructuralAddressingSpec-Draft.md`.
-- Comment/provenance protocol conventions remain governed by `CCPP.md`; this doc remains the canonical NL skeleton structure source.
+- **Relationship between the two:** These systems are related but **not identical**. Structural addresses do not replace NL section numbering in this skeleton.
+- **Template usage:** Where useful, templates may record structural addresses as **draft, optional metadata** alongside NL content.
+- **Placeholder note (`x`):** Examples that use `x` (for example `3.2.x`) are illustrative draft placeholders in this doc; placeholder marker policy remains deferred to `DeterministicStructuralAddressingSpec-Draft.md`.
+- **Governance note:** Comment/provenance protocol conventions remain governed by `CCPP.md`; this doc remains the canonical NL skeleton structure source.
 
 ## Changing This Doc
 
@@ -31,7 +31,13 @@ Passes: [0–7] (Multi-pass implementation)
 
 - A Configuration is a semantic module, not a file.
 - It spans up to six concerns: Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle.
-- Per-configuration implementation files live under paths like `src/configs/<configId>/<ConfigName>.build.tsx` (structure), `src/configs/<configId>/<ConfigName>.build-style.module.css` (configuration styling), and the other concern files with matching base names. The engine or build step may merge those into project-level bundles such as `src/projects/<projectId>/Project.build.tsx`. BuildStyle and ResultsStyle are implemented as CSS/CSS-Module files (for example `[ConfigName].build-style.module.css` and `[ConfigName].results-style.module.css`) that target the anchors emitted by the Build and Results `.tsx` concerns; actual repository naming should still follow the naming master and current repo conventions.
+- Per-configuration implementation files commonly live under paths like:
+  - `src/configs/<configId>/<ConfigName>.build.tsx` (structure)
+  - `src/configs/<configId>/<ConfigName>.build-style.module.css` (configuration styling)
+  - Other concern files with matching base names.
+- The engine or build step may merge those files into project-level bundles such as `src/projects/<projectId>/Project.build.tsx`.
+- BuildStyle and ResultsStyle are implemented as CSS/CSS-Module files (for example `[ConfigName].build-style.module.css` and `[ConfigName].results-style.module.css`) that target the anchors emitted by the Build and Results `.tsx` concerns.
+- Note: Actual repository naming should still follow the naming master and current repo conventions.
 - All content of a configuration is expressed as Atomic Components.
 - Each atomic component has:
   - a concern (Build / BuildStyle / Logic / Knowledge / Results / ResultsStyle), and
@@ -235,7 +241,9 @@ interface [ConfigName]State { ... }
 
 ### 9. Assembly Pattern
 
-#### 9.1 File Structure (implementation pattern; configuration still semantic)
+#### 9.1 File Structure
+
+- Implementation pattern only; configuration remains semantic.
 
 ```text
 /src/configs/[config-id]/[ConfigName]/
@@ -250,11 +258,14 @@ interface [ConfigName]State { ... }
 
 #### 9.2 Assembly Logic
 
-- `index.ts` wires concerns together and exports a single component that implements this configuration.
+- `index.ts` wires concerns together.
+- It exports a single component that implements this configuration.
 
 #### 9.3 Integration
 
-- How parent passes props/context and uses this configuration.
+- Parent integration pattern:
+  - How the parent passes props/context.
+  - How the parent uses this configuration.
 
 ### 10. Implementation Passes
 
@@ -422,6 +433,8 @@ Passes: [0–7] (Multi-pass implementation)
 
 #### 9.1 File Structure
 
+- Implementation pattern reference.
+
 ```text
 /src/shells/[shell-id]/[ShellName]/
   [ShellName].build.tsx
@@ -435,11 +448,16 @@ Passes: [0–7] (Multi-pass implementation)
 
 #### 9.2 Assembly Logic
 
-- Hook for logic, build component for structure, knowledge/constants, optional results debug.
+- Implementation pattern:
+  - Hook for logic.
+  - Build component for structure.
+  - Knowledge/constants.
+  - Optional results debug.
 
 #### 9.3 Integration
 
-- How the shell wraps child routes/configurations.
+- Integration pattern:
+  - How the shell wraps child routes/configurations.
 
 ### 10. Implementation Passes
 
