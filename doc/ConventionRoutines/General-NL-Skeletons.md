@@ -2,6 +2,14 @@
 
 This doc defines the canonical NL skeleton templates used by all configuration (`doc/nl-config/*.md`) and shell (`doc/nl-shell/*.md`) documents. Section numbers (1–10) and concern ordering are considered stable contracts.
 
+## Addressing & Numbering Note (Draft Alignment)
+
+- **NL section numbering (this doc):** The `1–10` section structure below is a stable documentation/template contract.
+- **Structural Address (Draft):** Deterministic structural positioning (host-present or no-host forms) is a supplementary addressing layer described in `DeterministicStructuralAddressingSpec-Draft.md`.
+- These are related but **not identical** systems: structural addresses do not replace NL section numbering in this skeleton.
+- Where useful, templates may record structural addresses as **draft, optional metadata** alongside NL content.
+- Comment/provenance protocol conventions remain governed by `CCPP.md`; this doc remains the canonical NL skeleton structure source.
+
 ## Changing This Doc
 
 If you change top-level sections or numbering here, you must also update `NL-First-Workflow.md`, `CSCS.md`, and `CCPP.md` to keep the system consistent.
@@ -33,6 +41,13 @@ Passes: [0–7] (Multi-pass implementation)
   - Subcontainer – nested encapsulation; always inside a Container or another Subcontainer; never at the root of a concern.
   - Primitive – leaf unit; contains nothing else (single field, rule, style block, kb map, result line, etc.).
 - Concern vs hierarchy are orthogonal: any valid combination is allowed as long as the concern’s purity rules are respected.
+
+### Draft Structural-Address Usage Notes (Supplementary)
+
+- **No-host mode (common):** For standalone/local configurations without a host composition file, draft structural addresses may be recorded in no-host form.
+- **Host-present mode (common in composed shells/layouts):** When a host composes zones/panels/substructures, draft structural addresses may be recorded in host-present form.
+- This guidance is descriptive and draft-aligned; final structural-address policy and token decisions remain deferred to the draft spec.
+- Concern ordering and NL-first structure are unchanged by this supplementary layer.
 
 ### 1. Purpose and Scope
 
@@ -84,6 +99,7 @@ interface [ConfigName]State { ... }
 - Concern: Build
 - Catalog base: `[layout.group / layout.stack / section.*]`
 - Anchor: `data-anchor="..."`
+- Structural Address (Draft, optional): `[A.1.3.2 / 3.1.2 / etc.]`
 - Layout: `[vertical / horizontal / grid]`
 - Children: `[subcontainers and/or primitives in order]`
 
@@ -96,6 +112,7 @@ interface [ConfigName]State { ... }
 - Purpose: […].
 - Catalog base: […].
 - Parent container: […].
+- Structural Address (Draft, optional): `[A.1.3.2 / 3.2.1 / etc.]`
 - Children: […].
 
 ##### 3.2.2 Subcontainer `"[Name]"`
@@ -109,6 +126,7 @@ interface [ConfigName]State { ... }
 - Hierarchical type: Primitive
 - Concern: Build
 - Catalog base: `[ui.text / ui.input / ui.button / ui.checkbox / ui.select / ui.details / etc.]`
+- Structural Address (Draft, optional): `[A.1.3.4 / 3.3.1 / etc.]`
 - Content / label: […].
 - Props (NL description): […].
 
@@ -161,6 +179,7 @@ interface [ConfigName]State { ... }
 ##### 5.2.2 Event Handlers
 
 - OnChange, OnClick, OnSubmit, etc. (`logic.on` or handler atoms).
+- Structural Address (Draft, optional): `[A.2.1.5 / 5.2.2 / etc.]`
 
 ##### 5.2.3 Derived Values
 
@@ -270,6 +289,12 @@ Passes: [0–7] (Multi-pass implementation)
 - It spans the same concerns (Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle), and is also expressed entirely through Atomic Components (Containers, Subcontainers, Primitives).
 - Many Knowledge atoms here will be project-global (tab definitions, routes, breakpoints, brand content) and consumed by other configurations.
 
+### Draft Structural-Address Usage Notes (Supplementary)
+
+- **No-host mode:** Can be used for shell-local structures when no external host composition file is involved.
+- **Host-present mode (common for global shells):** When the shell participates in/acts as a host composition context for nested zones, draft host-present structural addresses may be recorded as optional metadata.
+- Structural addresses here remain draft guidance and do not alter the stable `1–10` NL section contract.
+
 ### 1. Purpose and Scope
 
 - 1.1 This shell provides the global [header/sidebar/layout] that persists across all Configuration views.
@@ -304,16 +329,19 @@ Passes: [0–7] (Multi-pass implementation)
 - Catalog base: `layout.group / layout.shell`
 - Zones: left/center/right, top/bottom, etc.
 - Anchor: shell-level anchor if needed.
+- Structural Address (Draft, optional): `[A.1.2 / 3.1 / etc.]`
 
 #### 3.2 Atomic Components — Subcontainers (Build) – “Shell Zones”
 
 - Zone A Subcontainer: [Brand / Nav / Tools]
 - Zone B Subcontainer: [Tabs / Modes / Breadcrumbs]
 - Zone C Subcontainer: [Actions / Profile / Publish]
+- Structural Address (Draft, optional): `[A.1.2.1 / 3.2.x / etc.]`
 
 #### 3.3 Atomic Components — Primitives (Build)
 
 - Buttons, labels, icons, previews, etc., assigned to each zone as leaf-level primitives.
+- Structural Address (Draft, optional): `[A.1.2.1.4 / 3.3.x / etc.]`
 
 ### 4. BuildStyle Concern (Visual Styling of Structure)
 
