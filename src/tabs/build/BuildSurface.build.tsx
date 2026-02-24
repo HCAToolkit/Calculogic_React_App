@@ -171,6 +171,7 @@ export function BuildSurface({
   sections,
   leftPanel,
   rightPanel,
+  previewBreakpoint,
 }: BuildSurfaceBindings) {
   // [3.2.3] cfg-buildSurface · Subcontainer · "Catalog Column"
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: layout.column
@@ -205,7 +206,11 @@ export function BuildSurface({
   // Notes: Placeholder canvas for future form preview anchored to center panel IDs.
   const previewStage = (
     <main data-anchor={anchors.centerPanel}>
-      <div data-anchor={anchors.centerInner}>
+      <div
+        data-anchor={anchors.centerInner}
+        data-preview-breakpoint={previewBreakpoint.active}
+        style={{ width: previewBreakpoint.options.find(option => option.id === previewBreakpoint.active)?.width }}
+      >
         <p>Form preview placeholder</p>
       </div>
     </main>
@@ -260,6 +265,23 @@ export function BuildSurface({
 
   return (
     <div data-anchor={anchors.root}>
+      <div data-anchor="builder-header">
+        <h1>Build Surface</h1>
+        <div data-anchor="builder-tabs" role="group" aria-label="Preview breakpoint">
+          {previewBreakpoint.options.map(option => (
+            <button
+              key={option.id}
+              type="button"
+              data-active={previewBreakpoint.active === option.id ? 'true' : 'false'}
+              onClick={() => previewBreakpoint.select(option.id)}
+              aria-pressed={previewBreakpoint.active === option.id}
+              aria-label={`${option.label} preview`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
       <div data-anchor={anchors.layout}>
         {catalogColumn}
         {catalogGrip}

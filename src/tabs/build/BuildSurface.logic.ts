@@ -99,18 +99,37 @@ interface RightPanelLogic {
   };
 }
 
+type PreviewBreakpointId = 'mobile' | 'tablet' | 'desktop';
+
+interface PreviewBreakpointOption {
+  id: PreviewBreakpointId;
+  label: string;
+  width: string;
+}
+
 export interface BuildSurfaceBindings {
   anchors: typeof BUILD_ANCHORS;
   sectionOrder: SectionId[];
   sections: Record<SectionId, SectionLogicBinding>;
   leftPanel: LeftPanelLogic;
   rightPanel: RightPanelLogic;
+  previewBreakpoint: {
+    active: PreviewBreakpointId;
+    options: PreviewBreakpointOption[];
+    select: (id: PreviewBreakpointId) => void;
+  };
 }
 
 const SECTION_ORDER: SectionId[] = [
   'configurations',
   'atomic-components',
   'search-configurations',
+];
+
+const PREVIEW_BREAKPOINT_OPTIONS: PreviewBreakpointOption[] = [
+  { id: 'mobile', label: 'Mobile', width: '390px' },
+  { id: 'tablet', label: 'Tablet', width: '768px' },
+  { id: 'desktop', label: 'Desktop', width: '100%' },
 ];
 
 export function clamp(value: number, min: number, max: number) {
@@ -424,6 +443,17 @@ export function useBuildSurfaceLogic(): BuildSurfaceBindings {
 
   const leftPanel = useLeftPanelLogic();
   const rightPanel = useRightPanelLogic();
+  const [activePreviewBreakpoint, setActivePreviewBreakpoint] =
+    useState<PreviewBreakpointId>('desktop');
+
+  const previewBreakpoint = useMemo(
+    () => ({
+      active: activePreviewBreakpoint,
+      options: PREVIEW_BREAKPOINT_OPTIONS,
+      select: setActivePreviewBreakpoint,
+    }),
+    [activePreviewBreakpoint]
+  );
 
   return {
     anchors: BUILD_ANCHORS,
@@ -431,5 +461,6 @@ export function useBuildSurfaceLogic(): BuildSurfaceBindings {
     sections,
     leftPanel,
     rightPanel,
+    previewBreakpoint,
   };
 }
