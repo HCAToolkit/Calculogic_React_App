@@ -1,17 +1,17 @@
-# Naming Validator Spec (V0.1.1)
+# Naming Validator Spec (V0.1.2)
 
 ## Purpose and Scope
 
-This document defines the V0.1.1 filename naming validator slice for deterministic automation.
+This document defines the V0.1.2 filename naming validator slice for deterministic automation.
 
-V0.1.1 scope is intentionally narrow:
+V0.1.2 scope is intentionally narrow:
 - filename validation only
 - report mode only
 - deterministic findings output
-- richer diagnostics for migration planning
+- deterministic scope profiles for migration planning
 - no rename enforcement
 
-Out of scope for V0.1.1:
+Out of scope for V0.1.2:
 - structural addressing validation
 - NL↔Code numbering/parity validation
 - provenance token consistency checks
@@ -28,19 +28,19 @@ Supporting workflow alignment:
 - `doc/ConventionRoutines/CSCS.md`
 - `doc/ConventionRoutines/CCPP.md`
 
-## Canonical Filename Contract (V0.1.1)
+## Canonical Filename Contract (V0.1.2)
 
 Canonical grammar:
 - `<semantic-name>.<role>.<ext>`
 
-Recognized compound format suffixes in V0.1.1:
+Recognized compound format suffixes in V0.1.2:
 - `module.css`
 
-Filename grammar is unchanged from V0.1.
+Filename grammar is unchanged from V0.1.1.
 
-## Role Registry Metadata (V0.1.1)
+## Role Registry Metadata (V0.1.2)
 
-V0.1.1 uses a structured role registry with metadata:
+V0.1.2 uses a structured role registry with metadata:
 - `role`
 - `category` (`concern-core` | `architecture-support` | `deprecated`)
 - `status` (`active` | `deprecated`)
@@ -69,24 +69,63 @@ Parsing assumptions:
 - for `module.css`, role is the segment before `module`
 - role suffix must be dot-separated (not hyphen-appended)
 
-## Input Scope Modes
+## Input Scope Profiles (V0.1.2)
 
-V0.1.1 defines these modes:
+V0.1.2 implements deterministic scope profiles selected by CLI.
 
-1. `all-files` (implemented)
-   - scans repository files with deterministic sorting
-2. `folder-targeted` (placeholder in spec)
-   - planned: scan only selected folder prefixes
-3. `changed-files` (placeholder in spec)
-   - planned: scan files from VCS diff set
+### Default scope
+- default scope is `repo`
+
+### `repo` scope
+- current repository-wide behavior
+- includes all reportable files under repository root, excluding explicit walk exclusions (`.git`, `node_modules`, `dist`, `coverage`, `.vite`)
+
+### `app` scope
+- includes explicit roots:
+  - `src/`
+  - `test/`
+  - `scripts/`
+- includes explicit root tooling files (when present):
+  - `package.json`
+  - `package-lock.json`
+  - `eslint.config.js`
+  - `eslint.config.mjs`
+  - `vite.config.ts`
+  - `vite.config.js`
+  - `vite.config.mjs`
+  - `tsconfig.json`
+  - `tsconfig.app.json`
+  - `tsconfig.node.json`
+- excludes docs roots by profile definition
+
+### `docs` scope
+- includes explicit roots:
+  - `doc/`
+  - `docs/`
+- includes explicit root doc file:
+  - `README.md`
+- excludes `src/` by profile definition
+
+### Invalid scope behavior
+- invalid scope values are treated as deterministic CLI usage errors
+- CLI prints usage/help text and exits non-zero
+
+## CLI Usage (V0.1.2)
+
+- `npm run validate:naming` (defaults to `--scope=repo`)
+- `npm run validate:naming -- --scope=repo`
+- `npm run validate:naming -- --scope=app`
+- `npm run validate:naming -- --scope=docs`
 
 ## Classification Outputs
 
-Stable classifications used by V0.1.1:
+Stable classifications used by V0.1.2:
 - `canonical`
 - `allowed-special-case`
 - `legacy-exception`
 - `invalid-ambiguous`
+
+Classification semantics are unchanged from V0.1.1. Scope profiles only change selected input paths.
 
 ## Finding Schema
 
@@ -100,16 +139,21 @@ Each finding uses a stable object shape:
 - `suggestedFix` (optional)
 - `details` (optional object)
 
+Report object includes:
+- `mode`
+- `scope`
+- `totalFilesScanned`
+- summary count objects
+- `findings`
+
 ### Special-case subtype metadata
 
-V0.1.1 keeps top-level classification `allowed-special-case` and adds deterministic subtype metadata in `details.specialCaseType`:
+V0.1.2 keeps top-level classification `allowed-special-case` and includes deterministic subtype metadata in `details.specialCaseType`:
 - `ecosystem-required`: `package.json`, `package-lock.json`, `tsconfig*.json`, `vite.config.*`, `eslint.config.*`
 - `barrel`: `index.ts`, `index.tsx`
 - `test-convention`: `*.test.*`, `*.spec.*`
 - `ambient-declaration`: `*.d.ts`
 - `conventional-doc`: `README.md`
-
-README policy in V0.1.1: `README.md` is treated as `allowed-special-case` with subtype `conventional-doc`.
 
 ### Deprecated role metadata
 
@@ -122,7 +166,7 @@ When a canonical-like parse resolves to a known deprecated role (currently `view
   - optional `deprecationNote`
 - validator does not auto-map deprecated role to modern roles (manual migration required)
 
-## Finding / Error Codes (V0.1.1)
+## Finding / Error Codes (V0.1.2)
 
 - `NAMING_CANONICAL`
 - `NAMING_ALLOWED_SPECIAL_CASE`
@@ -132,29 +176,26 @@ When a canonical-like parse resolves to a known deprecated role (currently `view
 - `NAMING_BAD_SEMANTIC_CASE`
 - `NAMING_ROLE_HYPHEN_AMBIGUITY`
 
-Code alignment note: `NAMING_INVALID_PATTERN` is deferred/removed from active V0.1.1 emission because unmatched filenames are intentionally classified as `NAMING_LEGACY_EXCEPTION` in report mode.
-
 ## Rollout Modes
 
-- `report` (V0.1.1 behavior)
+- `report` (V0.1.2 behavior)
   - always emits findings and summary
-  - never fails build in V0.1.1
+  - never fails build for naming findings in V0.1.2
 - `soft-fail` (deferred)
-  - planned targeted enforcement by folders or changed files
 - `hard-fail` (deferred)
-  - planned full enforcement with explicit exceptions
 
 ## Exit Code Behavior
 
-V0.1.1 report mode exit behavior:
-- process exits `0`
-- invalid findings are reported but do not fail command
+V0.1.2 report mode exit behavior:
+- valid runs exit `0`
+- naming invalid findings are reported but do not fail command
+- invalid CLI usage (e.g., unknown `--scope`) exits non-zero
 
 ## Allowed Special-Case Handling Rules
 
-V0.1.1 recognizes these special cases:
+V0.1.2 recognizes these special cases:
 - barrel files: `index.ts`, `index.tsx`
-- framework/tool required names (root/tooling config patterns):
+- framework/tool required names:
   - `package.json`
   - `package-lock.json`
   - `tsconfig*.json`
@@ -164,28 +205,37 @@ V0.1.1 recognizes these special cases:
 - ambient declarations: `*.d.ts`
 - conventional docs: `README.md`
 
-Special-case list is explicit and intentionally narrow in V0.1.1.
-
 ## Legacy Exception Handling Rules
 
-For incremental adoption, V0.1.1 classifies non-canonical in-scope files as `legacy-exception` when they do not clearly claim canonical syntax.
+For incremental adoption, V0.1.2 classifies non-canonical in-scope files as `legacy-exception` when they do not clearly claim canonical syntax.
 
 A file is `invalid-ambiguous` instead of `legacy-exception` when it presents canonical intent but violates contract deterministically, including:
 - unknown role segment in canonical position
 - deprecated role segment in canonical position
 - semantic-name casing violation in canonical position
-- hyphen-appended role ambiguity (e.g., `leftpanel-selector-wiring.ts`)
+- hyphen-appended role ambiguity
 
 ## Determinism Requirements
 
 - normalize path separators to `/`
+- scope profile include sets are explicit
+- deduplicate overlapping inclusions before classification
 - sort findings by normalized path ascending
 - stable classification and code assignment per filename
 - deterministic summary breakdown ordering
+- same scope + same repository state => identical counts and ordering
 
-## Non-Goals (V0.1.1)
+## Summary / Reporting Expectations by Scope
 
+- `repo`: full baseline for complete repository migration visibility
+- `app`: app-focused baseline to reduce docs-driven legacy-exception noise
+- `docs`: docs-focused baseline for documentation naming profile visibility
+
+## Non-Goals (V0.1.2)
+
+- changed-files mode (deferred)
 - no automatic rename suggestions beyond optional textual hints
 - no repository-wide rename migration
 - no automatic suppression generation
 - no cross-file semantic validation
+- no role taxonomy expansion for `provider`/`catalog`/`ids`/`anchor` in this slice

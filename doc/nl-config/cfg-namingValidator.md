@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.1** (report-mode polish pass).
+Current implementation target: **V0.1.2** (report-mode scope-profile polish pass).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -10,8 +10,13 @@ Define a deterministic V0.1 filename naming validator that runs in report mode o
 ### 2.1 Naming authority
 The validator reads rules from `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` as authoritative naming guidance.
 
-### 2.2 Scope mode (V0.1)
-V0.1 scans repository files in all-files mode with deterministic path ordering.
+### 2.2 Scope mode (V0.1.2)
+V0.1.2 supports deterministic scope profiles selected via CLI and applied before filename classification:
+- `repo` (default): repository-wide reportable files.
+- `app`: app-focused files (`src/`, `test/`, `scripts/`, and explicit root tooling files).
+- `docs`: docs-focused files (`doc/`, `docs/`, and root `README.md`).
+
+All scope profile inclusions are explicit and deterministic. Invalid scope inputs are treated as CLI usage errors.
 
 ### 2.3 Role registry metadata (V0.1.1)
 The validator uses a structured role registry with metadata fields:
@@ -61,14 +66,17 @@ Each finding includes code, severity, path, classification, message, ruleRef, an
 ### 4.2 Deterministic ordering
 Findings and summary output sort by normalized relative path.
 
-### 4.3 Summary breakdowns (V0.1.1)
+### 4.3 Summary breakdowns (V0.1.2)
 Report output includes deterministic summary breakdowns for:
 - classification counts
 - finding code counts
 - special-case subtype counts
 - warning role status/category counts (when metadata is present)
 
-### 4.4 Exit behavior (report mode)
+### 4.4 Scope-aware reporting metadata (V0.1.2)
+Report output includes selected scope metadata and deterministic file-count/findings summaries within that scope.
+
+### 4.5 Exit behavior (report mode)
 Report mode always exits with status code 0 and prints counts by classification.
 
 ## 5.0 Deferred Behavior
