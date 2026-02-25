@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test --experimental-strip-types test/**/*.test.mjs"
+    "test": "node --test --experimental-strip-types test/**/*.test.mjs",
+    "validate:naming": "node --experimental-strip-types scripts/validate-naming.mjs"
   },
   "dependencies": {
     "json-logic-js": "^2.0.5",
