@@ -10,6 +10,7 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 
 ## Canonical Split NL Targets (Planned / In-Progress)
 > Placeholder index for semantic split targets. Entries remain non-canonical until explicitly marked repointed.
+> Naming note: placeholder filenames are illustrative and must be normalized to an approved semantic-first, low-churn pattern before the first repointed slice (`doc/ConventionRoutines/FileNamingMasterList-V1_1.md`, `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`). Provisional starting shape (example-only): `cfg-buildSurface-<semantic-slice>.md`.
 
 | Target NL Doc (planned) | Scope Intent | Status | Notes |
 |---|---|---|---|
@@ -19,6 +20,7 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 
 ## Legacy-to-Canonical Mapping Scaffold
 > Slice-by-slice migration tracker. Use one row per migrated section group; keep provenance explicit.
+> Placeholder target labels in this table are planning scaffolds only and should be finalized per convention/policy authority before repointed status is claimed.
 
 | Legacy section(s) in `cfg-buildSurface.md` | Canonical split target | Migration status (`planned`/`in-progress`/`repointed`/`retired`) | Provenance / continuity notes |
 |---|---|---|---|

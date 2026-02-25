@@ -86,6 +86,7 @@ Use this scaffold alongside the draft file inventory so each semantic slice trac
 
 Notes:
 - The NL target filenames above are **illustrative placeholders** to support planning vocabulary; adopt concrete paths only when slice work is approved.
+- Final NL split filename/pattern authority for placeholders belongs to `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` and `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`; this inventory is guidance, not naming law.
 - Lifecycle values can use the same migration vocabulary as code inventory tracking (`planned`, `in-progress`, `extracted`, `repointed`, `legacy-wrapper`, `retired`, `deferred`) with NL-aware interpretation.
 - This scaffold is intentionally additive and low-churn; expand per-slice rows as work is scheduled, not as a full up-front enumeration requirement.
 

@@ -279,14 +279,14 @@ This phase is intentionally deferred to avoid coupling publish implementation to
 
 ---
 
-## Suggested Immediate Next Task
+## Suggested Current Next Task
 
-**Phase 1 — Build Surface Host Stability Pass**
-- breakpoint preview behavior correctness
-- light/dark theme parity
-- verification + low-churn fixes only
+**Phase 2 — Global Host Surface Refactor Prep (Code + NL Co-Migration)**
+- separate host-generic surface concerns from Build-specific source composition
+- execute semantic NL co-migration for touched slices while preserving wrapper/index traceability
+- establish tab-driven source injection seams without broad implementation expansion
 
-This is the recommended first step before globalizing the surface or expanding Doc Engine/publish integration.
+With Phase 1 already completed, this is the recommended next step before deeper Doc Engine extraction/publish implementation phases.
 
 ---
 
