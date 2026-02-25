@@ -62,11 +62,17 @@ const SCOPE_PROFILES = {
     includeRootFiles: Array.from(ROOT_APP_FILES),
   },
   docs: {
-    description: 'Documentation-focused scan (doc/docs and root README).',
+    description: 'Documentation-focused scan (doc/docs and root conventional docs: README.md).',
     includeRoots: ['doc', 'docs'],
     includeRootFiles: ['README.md'],
   },
 };
+
+const cloneScopeProfile = profile => ({
+  description: profile.description,
+  includeRoots: [...profile.includeRoots],
+  includeRootFiles: [...profile.includeRootFiles],
+});
 
 export const normalizePath = relativePath => relativePath.split(path.sep).join('/');
 
@@ -226,7 +232,8 @@ export const listNamingValidatorScopes = () => sortPaths(new Set(Object.keys(SCO
 
 export const getScopeProfile = scope => {
   const normalizedScope = scope ?? 'repo';
-  return SCOPE_PROFILES[normalizedScope] ?? null;
+  const profile = SCOPE_PROFILES[normalizedScope];
+  return profile ? cloneScopeProfile(profile) : null;
 };
 
 export const collectRepositoryPaths = (rootDirectory, options = {}) => {

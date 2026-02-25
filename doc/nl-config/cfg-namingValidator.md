@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.2** (report-mode scope-profile polish pass).
+Current implementation target: **V0.1.3** (scope contract hardening pass).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -10,11 +10,12 @@ Define a deterministic V0.1 filename naming validator that runs in report mode o
 ### 2.1 Naming authority
 The validator reads rules from `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` as authoritative naming guidance.
 
-### 2.2 Scope mode (V0.1.2)
-V0.1.2 supports deterministic scope profiles selected via CLI and applied before filename classification:
-- `repo` (default): repository-wide reportable files.
+### 2.2 Scope mode (V0.1.3)
+V0.1.3 supports deterministic scope profiles selected via CLI and applied before filename classification:
+- default/no `--scope` input resolves to `repo`
+- `repo`: repository-wide reportable files.
 - `app`: app-focused files (`src/`, `test/`, `scripts/`, and explicit root tooling files).
-- `docs`: docs-focused files (`doc/`, `docs/`, and root `README.md`).
+- `docs`: docs-focused files (`doc/`, `docs/`, and selected root conventional docs currently limited to `README.md`).
 
 All scope profile inclusions are explicit and deterministic. Invalid scope inputs are treated as CLI usage errors.
 
