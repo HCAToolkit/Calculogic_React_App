@@ -11,6 +11,18 @@ This doc defines the canonical NL skeleton templates used by all configuration (
 - **Placeholder note (`x`):** Examples that use `x` (for example `3.2.x`) are illustrative draft placeholders in this doc; placeholder marker policy remains deferred to `DeterministicStructuralAddressingSpec-Draft.md`.
 - **Governance note:** Comment/provenance protocol conventions remain governed by `CCPP.md`; this doc remains the canonical NL skeleton structure source.
 
+## Split-Canonical NL Migration Clarification (Policy)
+
+- Semantic refactors may introduce **split-canonical NL docs** for a configuration when one monolithic NL file becomes too broad for maintainable co-migration.
+- During transition, the legacy monolith may temporarily operate as a **wrapper/index/forwarding** document that points to split-canonical targets.
+- The stable **1–10 section contract remains unchanged per NL document**. Split docs still follow the same top-level contract; this policy does not redesign or renumber the skeleton template.
+
+### Numbering & Provenance Continuity for Split Migration
+
+- Preserve continuity in content via explicit provenance/mapping references (for example, legacy section ranges and migrated atom IDs).
+- Keep numbering continuity in headings, mapping tables, provenance tokens, and migration manifests/indexes rather than requiring filename position prefixes.
+- A lightweight manifest/index may be used to improve visual ordering and scanability across split docs; this is recommended guidance, not a hard requirement.
+
 ## Changing This Doc
 
 If you change top-level sections or numbering here, you must also update `NL-First-Workflow.md`, `CSCS.md`, and `CCPP.md` to keep the system consistent.

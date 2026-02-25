@@ -2,6 +2,38 @@
 
 This document is an instance of the Configuration-Level NL Skeleton defined in ../ConventionRoutines/General-NL-Skeletons.md.
 
+## Transition Migration Status (Build Surface NL Split)
+- **State:** Planned / transition-ready scaffolding active.
+- **Current canonical source:** This monolithic `cfg-buildSurface.md` document remains the authoritative NL reference until split migration slices are explicitly repointed.
+- **Planned direction:** Introduce semantic split-canonical NL documents for Build Surface concerns and interaction slices while preserving section/provenance continuity.
+- **Truthfulness rule:** Mapping rows and target statuses must reflect actual migration state; do not mark slices as migrated until corresponding split docs are written and validated.
+
+## Canonical Split NL Targets (Planned / In-Progress)
+> Placeholder index for semantic split targets. Entries remain non-canonical until explicitly marked repointed.
+
+| Target NL Doc (planned) | Scope Intent | Status | Notes |
+|---|---|---|---|
+| `doc/nl-config/cfg-buildSurface-layoutAndAnchors.md` | Build/BuildStyle layout anchors and panel topology | planned | Placeholder only in this pass |
+| `doc/nl-config/cfg-buildSurface-panelStateAndPersistence.md` | Logic + Knowledge for resize/collapse persistence | planned | Placeholder only in this pass |
+| `doc/nl-config/cfg-buildSurface-previewAndInspectorFlows.md` | Preview controls + inspector behavioral workflows | planned | Placeholder only in this pass |
+
+## Legacy-to-Canonical Mapping Scaffold
+> Slice-by-slice migration tracker. Use one row per migrated section group; keep provenance explicit.
+
+| Legacy section(s) in `cfg-buildSurface.md` | Canonical split target | Migration status (`planned`/`in-progress`/`repointed`/`retired`) | Provenance / continuity notes |
+|---|---|---|---|
+| `3.x` (Build concern) | `TBD semantic split doc` | planned | Preserve direct traceability to existing `[3.*]` atoms |
+| `4.x` (BuildStyle concern) | `TBD semantic split doc` | planned | Keep selector/anchor provenance tied to migrated Build slices |
+| `5.x–6.x` (Logic + Knowledge) | `TBD semantic split doc` | planned | Keep persistence parser/version history references intact |
+| `7.x–8.x` (Results + ResultsStyle) | `TBD semantic split doc` | planned | Repoint only when output contracts are fully documented |
+
+## Monolith Behavior During Migration
+- This document currently acts as both:
+  - the **temporary source of truth** for Build Surface NL content, and
+  - a **transition wrapper/index** for upcoming semantic split-canonical NL docs.
+- During migration, sections may be incrementally forwarded/repointed to split docs, but unchanged sections continue to be read directly from this monolith.
+- Retirement rule: this monolith should be retired only after all mapped slices are repointed with explicit provenance continuity and no unresolved placeholders remain.
+
 ## 1. Purpose and Scope
 ### 1.1 Purpose
 Present the Calculogic Build tab surface, including navigation chrome, the catalog of configuration panels, the preview canvas, and the inspector column.
