@@ -64,6 +64,12 @@ This split is expected to reduce churn by keeping shell behavior stable while en
 
 This snapshot is an observational planning aid for reconciliation; it may lag repo reality if this section is not refreshed after major extraction slices land.
 
+- **Snapshot Basis Commit/PR:** Post-Phase-1 baseline (PR #108)
+- **Snapshot Freshness:** observational (stale-allowed)
+- **Use For:** planning/reconciliation, not canonical repo truth
+
+Repo reality may diverge after the snapshot basis and should be rechecked before using this inventory as current-state evidence.
+
 > Post-Phase-1 status note (PR #108): current repo reality includes preview breakpoint controls/header chrome in `BuildSurface.build.tsx`, preview breakpoint state/bindings in `BuildSurface.logic.ts`, and dark-theme parity selectors across host-surface regions in `BuildSurface.view.css`; this was a host-stability behavior pass, not a host/global extraction slice.
 
 | Current File / Surface | Current Role / Shape | Current Responsibility (Observed) | Likely Draft Inventory Target(s) | Notes |
