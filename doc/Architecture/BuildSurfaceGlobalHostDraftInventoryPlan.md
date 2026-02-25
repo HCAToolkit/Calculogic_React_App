@@ -74,6 +74,21 @@ This snapshot is an observational planning aid for reconciliation; it may lag re
 
 ## Draft File Inventory Table
 
+## NL Co-Migration Inventory Scaffold (Slice-Level Planning Aid)
+
+Use this scaffold alongside the draft file inventory so each semantic slice tracks both code targets and NL migration state.
+
+| Semantic Slice Target | Code Target(s) (Planned/Actual) | Canonical Split NL Target (Planned/Actual) | Legacy NL Source Section(s) in `cfg-buildSurface.md` | Naming Alignment Check | Numbering / Provenance Status | Lifecycle Status | Notes |
+|---|---|---|---|---|---|---|---|
+| Host shell extraction slice (example) | `buildsurface.host.tsx`, `buildsurface-host.wiring.ts` | `doc/nl-config/cfg-buildSurface.host-surface.md` *(placeholder example)* | `[3.x]` host shell structure + `[5.x]` host orchestration sections | planned | pre-validation pending | planned | Replace placeholder path with adopted canonical NL target when finalized. |
+| Persistence contract slice (example) | `buildsurface-persistence.logic.ts`, `buildsurface-persistence.contracts.ts` | `doc/nl-config/cfg-buildSurface.persistence.md` *(placeholder example)* | `[5.2.4]`, `[5.2.7]` and related persistence references | in-progress | in-review | in-progress | Keep legacy monolith references annotated until repointed. |
+| Tab population seam slice (example) | `leftpanel-build-sources.wiring.ts` | `doc/nl-config/cfg-buildSurface.tab-sources.md` *(placeholder example)* | Build-tab source composition sections in legacy monolith | planned | pre-validation pending | planned | Canonical NL split target should become authoritative once slice lands. |
+
+Notes:
+- The NL target filenames above are **illustrative placeholders** to support planning vocabulary; adopt concrete paths only when slice work is approved.
+- Lifecycle values can use the same migration vocabulary as code inventory tracking (`planned`, `in-progress`, `extracted`, `repointed`, `legacy-wrapper`, `retired`, `deferred`) with NL-aware interpretation.
+- This scaffold is intentionally additive and low-churn; expand per-slice rows as work is scheduled, not as a full up-front enumeration requirement.
+
 | Semantic Target | Proposed Filename | Role | Responsibility Summary | Bucket | Parent Host / Scope | Replaces / Extracted From (Draft) | Status | Notes / Naming Rationale |
 |---|---|---|---|---|---|---|---|---|
 | Build Surface global host root | `buildsurface.host.tsx` | host | Own global host shell composition, panel frame, and host-level orchestration boundaries. | Global Host | Root global host surface | Extract shell composition concerns from `src/tabs/build/BuildSurface.build.tsx`. | planned | Keeps existing `buildsurface` semantic target while role becomes explicit host.
@@ -181,6 +196,17 @@ Recommended extraction rhythm per slice:
 6. Avoid mixing refactor + optimization + behavior changes in one pass unless a safety fix requires coupling.
 7. Keep PRs boundary-focused and reviewable; each slice should state the boundary being migrated and the legacy surface being drained.
 8. During implementation, keep NL and CCPP alignment for any changed shell/config concern files.
+
+### NL Migration State + Pre-Validation Guidance
+
+Track NL migration state in parallel with code migration state for each active semantic slice:
+
+- record canonical split NL target status (planned/actual) when a slice is opened
+- record legacy monolith NL status as forwarded / partial / retained for touched sections
+- confirm naming alignment for touched code and NL filenames before marking slice done
+- perform numbering/provenance pre-validation for touched atoms/sections before slice closure
+
+This inventory support is intended to surface numbering/provenance inconsistencies early during migration, while keeping final numbering-policy authority in convention documents.
 
 ### Draft Inventory Status Tracking Guidance (Migration Lifecycle)
 

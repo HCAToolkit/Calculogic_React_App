@@ -103,7 +103,7 @@ Address:
 
 ---
 
-### Phase 2 — Global Host Surface Refactor Prep
+### Phase 2 — Global Host Surface Refactor Prep (Code + NL Co-Migration)
 
 #### Goal
 Prepare the Build Surface to become a shared/global host surface while preserving existing Build functionality.
@@ -113,6 +113,8 @@ Refactor the current surface so generic host behavior can be reused while tab-sp
 
 #### Objectives
 - Separate host-generic surface concerns from Build-specific source composition
+- Execute semantic NL split/refinement alongside code slice extraction for touched responsibilities
+- Establish canonical split NL targets incrementally while maintaining a legacy monolith wrapper/forwarding strategy during transition
 - Preserve deterministic UI structure/order and stable panel behavior
 - Create clean seams for tab-driven plugin-provided atoms/configurations/primitives
 
@@ -140,12 +142,17 @@ Split toward:
 - Refactor changes and/or architecture prep changes
 - Boundary notes documenting host-generic vs Build-specific responsibilities
 - Updated NL documents to maintain deterministic 1:1 ordering where affected
+- Canonical split NL targets for touched slices, plus legacy monolith forwarding/wrapper annotations where still transitional
 
 #### Verification (minimum)
 - `npm run lint`
 - `npm run build`
 - Existing Build tab behavior still works
 - Panel resize/collapse/persistence behavior remains stable
+- NL split targets are updated for touched semantic slices
+- Canonical split NL targets and legacy monolith forwarding/wrapper notes are coherent for touched areas
+- Naming alignment is preserved for touched code files and NL target filenames
+- Numbering/provenance consistency is preserved for touched atoms/sections
 
 ---
 
@@ -288,5 +295,6 @@ This is the recommended first step before globalizing the surface or expanding D
 When implementing any phase in this plan:
 - maintain deterministic ordering between NL and code
 - update NL only where responsibility/order/ownership changes
+- in Phase 2 slices, co-migrate touched NL sections with code extraction rather than deferring as cleanup
 - preserve low-churn boundaries during stabilization work
 - record boundary decisions if refactors alter subsystem responsibilities

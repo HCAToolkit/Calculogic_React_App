@@ -45,6 +45,16 @@ This playbook operationalizes the Build Surface → Global Host migration as a *
 
 ## Execution Model (Semantic-Slice Method)
 
+### NL Co-Migration Principle (Required)
+
+Semantic-slice execution for Build Surface global-host refactor uses **code + NL co-migration**, not deferred NL cleanup.
+
+- each semantic code slice should migrate/update corresponding NL slice content in the same pass when feasible
+- canonical split NL targets should become authoritative incrementally as slices land
+- legacy monolith NL content in `doc/nl-config/cfg-buildSurface.md` should be progressively forwarded/annotated as ownership drains
+- naming and NL references for touched files should be aligned in-slice to avoid post-hoc drift
+- numbering/provenance for touched atoms/sections should be pre-validated for consistency before slice exit
+
 Each slice should follow the same rhythm from the draft inventory plan:
 
 1. **Extract**
@@ -161,10 +171,18 @@ This ordering is a **draft-safe starting strategy** and not immutable law.
 - [ ] Related inventory rows identified
 - [ ] Dependencies from prior slices met
 - [ ] NL/CCPP touch impact identified (if concern ownership moves)
+- [ ] Legacy NL source section(s) in `doc/nl-config/cfg-buildSurface.md` identified for this slice
 
 ### Extract Steps
 1. <bounded extraction step>
 2. <bounded extraction step>
+
+### NL Co-Migration Steps
+1. <identify matching legacy NL section(s) in `cfg-buildSurface.md`>
+2. <create/update canonical split NL target file(s) for this semantic slice>
+3. <repoint or annotate legacy monolith NL references to reflect forwarded/partial/retained status>
+4. <verify naming alignment for touched code paths + NL filenames>
+5. <verify numbering/provenance consistency for touched atoms/sections>
 
 ### Repoint Steps
 1. <import/call-site repoint step>
@@ -185,10 +203,17 @@ This ordering is a **draft-safe starting strategy** and not immutable law.
 - [ ] Persistence safety checklist run (if touched)
 - [ ] Interaction safety checklist run (if touched)
 - [ ] Docs/contract alignment checklist run (if touched)
+- [ ] NL co-migration checklist run for touched semantic slice
 
 ### Done Criteria
 - [ ] Bounded responsibility moved
 - [ ] Required call sites repointed
+- [ ] Code behavior unchanged for the slice unless an explicit planned behavior adjustment was declared
+- [ ] Canonical split NL target exists or is updated for touched responsibility
+- [ ] Legacy `cfg-buildSurface.md` status updated (forwarded/partial/retained) for touched sections
+- [ ] NL/code references are coherent after repoint/annotation updates
+- [ ] Naming alignment check completed for touched code + NL files
+- [ ] Numbering/provenance consistency check completed for touched atoms/sections
 - [ ] Legacy status classified (`extracted`/`repointed`/`legacy-wrapper`/`retired`)
 - [ ] Inventory reconciliation update recorded when material
 
@@ -233,6 +258,10 @@ Use only the checklists relevant to the touched boundary.
 - [ ] NL references updated where filename/path contract changed
 - [ ] CCPP/NL notes updated where concern ownership shifted
 - [ ] inventory status/mapping updated when slice materially landed
+- [ ] canonical split NL target file(s) updated for touched semantic slice
+- [ ] legacy monolith NL sections marked forwarded/partial/retained where applicable
+- [ ] touched naming alignment validated across code path + NL filename references
+- [ ] touched numbering/provenance consistency validated (without expanding convention policy in this playbook)
 
 ## Wrapper / Forwarder Retirement Rules
 
