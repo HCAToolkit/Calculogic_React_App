@@ -14,6 +14,8 @@ Comments are not narration of obvious code; they are a projection of the NL skel
 
 CCPP currently requires NL section IDs/section numbers (for example `[3.2.2]`) as the primary comment anchor. Structural addresses are a separate draft concept and may be included as supplementary metadata where helpful.
 
+> Terminology scoping reference: when prose could confuse source-of-truth vs destination planning vs syntax/order meanings of "canonical", prefer scoped terms from `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md` (for example `canonical_source`, `canonical_target`, `canonical_order`, `canonical_grammar`).
+
 ## 2. Comment Types (Use Only These)
 
 - File Header – one per file.

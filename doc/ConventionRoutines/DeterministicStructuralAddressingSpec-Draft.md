@@ -29,6 +29,8 @@ This layer **complements and does not replace**:
 Addressing answers: “Where is this structural node in a deterministic sequence?”
 It does **not** redefine concern semantics, file naming, or provenance policy.
 
+> Terminology scoping note (V1): within this draft, address syntax/notation rules are treated as `canonical_grammar` concerns, while sequence/slot stability is treated as `canonical_order` concerns (see `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`).
+
 ## 3. Core Concepts / Terminology
 
 ### 3.1 Structural Address
@@ -146,7 +148,7 @@ Examples: `1.3`, `3.5.1`, `2.3.1.1.4`
 For deterministic ordering, numeric segments are compared **numerically**, not lexically.
 
 - Correct numeric order: `...2` before `...10`
-- Not allowed as canonical sort: lexical string order where `...10` precedes `...2`
+- Not allowed as `canonical_order`: lexical string order where `...10` precedes `...2`
 
 Host letters sort alphabetically when comparing across host roots.
 Within same host (or same no-host artifact), sort by numeric segment tuple.
@@ -236,8 +238,8 @@ Within same host (or same no-host artifact), sort by numeric segment tuple.
 - `1` (invalid: no-host mode missing concern slot)
 - `A.1.9` (invalid concern slot under current canonical concern range)
 - `AA.1.3` (invalid under current draft grammar: multi-letter host tokens are deferred in §10)
-- `A.01.3` (invalid: canonical numeric segments must not include leading zeros in this React App Scope v1 draft)
-- `A.1.x.2` (invalid: placeholder markers such as `x` are non-canonical and not accepted in canonical addresses)
+- `A.01.3` (invalid: `canonical_grammar` numeric segments must not include leading zeros in this React App Scope v1 draft)
+- `A.1.x.2` (invalid: placeholder markers such as `x` are non-`canonical_grammar` and not accepted in canonical addresses)
 
 ## 10. Open Decisions / Deferred Decisions (Required)
 

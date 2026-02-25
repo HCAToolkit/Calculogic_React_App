@@ -5,13 +5,13 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 ## Transition Migration Status (Build Surface NL Split)
 - **NL Migration Mode:** `hybrid-forwarding`
 - **State:** Planned / transition-ready scaffolding active.
-- **Current canonical source:** This monolithic `cfg-buildSurface.md` document remains the authoritative NL reference until split migration slices are explicitly repointed.
-- **Planned direction:** Introduce semantic split-canonical NL documents for Build Surface concerns and interaction slices while preserving section/provenance continuity.
+- **Current canonical_source:** This monolithic `cfg-buildSurface.md` document remains the authoritative NL reference until split migration slices are explicitly repointed.
+- **Planned direction:** Introduce semantic split `canonical_target` NL documents for Build Surface concerns and interaction slices while preserving section/provenance continuity.
 - **Truthfulness rule:** Mapping rows and target statuses must reflect actual migration state; do not mark slices as migrated until corresponding split docs are written and validated.
-- **Mode meaning:** `hybrid-forwarding` means this monolith remains canonical for current content while also serving as a transition wrapper/index for planned split-canonical targets.
+- **Mode meaning:** `hybrid-forwarding` means this monolith remains the `canonical_source` for current content while also serving as a transition wrapper/index for planned `canonical_target` entries.
 
 ## Canonical Split NL Targets (Planned / In-Progress)
-> Placeholder index for semantic split targets. Entries remain non-canonical until explicitly marked repointed.
+> Placeholder index for semantic split targets. Entries remain non-`canonical_source` until explicitly marked repointed.
 > Naming note: placeholder row filenames below are illustrative semantic examples only (planning vocabulary), not final segment-style commitments.
 > Provisional pattern note: `cfg-buildSurface-<semantic-slice>.md` is a shape-level placeholder (semantic-first, low-churn). Exact segment style remains subject to convention/policy authority before the first repointed slice (`doc/ConventionRoutines/FileNamingMasterList-V1_1.md`, `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`).
 > Binding-level note: **Binding Level** classifies row authoritativeness (`placeholder`/`planned`/`provisional`/`canonical`/`retired`) and is separate from migration lifecycle status.
@@ -23,8 +23,10 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 | `doc/nl-config/cfg-buildSurface-previewAndInspectorFlows.md` | Preview controls + inspector behavioral workflows | planned | placeholder | Placeholder only in this pass |
 
 ## Legacy-to-Canonical Mapping Scaffold
+
+> Terminology scoping note (V1): where determinism matters, this doc uses scoped labels from `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md` (for example `canonical_source` vs `canonical_target`) instead of overloaded plain "canonical".
 > Slice-by-slice migration tracker. Use one row per migrated section group; keep provenance explicit.
-> Placeholder target labels in this table are planning scaffolds only and should be finalized per convention/policy authority before repointed status is claimed; they follow the same temporary, non-authoritative guidance class as the canonical-target placeholder examples above.
+> Placeholder target labels in this table are planning scaffolds only and should be finalized per convention/policy authority before repointed status is claimed; they follow the same temporary, non-authoritative guidance class as the `canonical_target` placeholder examples above.
 > Migration lifecycle status and binding level are intentionally tracked as separate dimensions in this scaffold.
 
 | Legacy section(s) in `cfg-buildSurface.md` | Canonical split target | Migration status (`planned`/`in-progress`/`repointed`/`retired`) | Binding Level | Provenance / continuity notes |
@@ -37,7 +39,7 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 ## Monolith Behavior During Migration
 - This document currently acts as both:
   - the **temporary source of truth** for Build Surface NL content, and
-  - a **transition wrapper/index** for upcoming semantic split-canonical NL docs.
+  - a **transition wrapper/index** for upcoming semantic split `canonical_target` NL docs.
 - During migration, sections may be incrementally forwarded/repointed to split docs, but unchanged sections continue to be read directly from this monolith.
 - Retirement rule: this monolith should be retired only after all mapped slices are repointed with explicit provenance continuity and no unresolved placeholders remain.
 
