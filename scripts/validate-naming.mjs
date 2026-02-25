@@ -59,6 +59,11 @@ const report = {
   mode: 'report',
   scope,
   totalFilesScanned,
+  scopeSummary: {
+    scope,
+    reportableFilesInScope: totalFilesScanned,
+    findingsGenerated: findings.length,
+  },
   scopeContract: {
     description: selectedScopeProfile?.description ?? '',
     includeRoots: selectedScopeProfile?.includeRoots ?? [],
