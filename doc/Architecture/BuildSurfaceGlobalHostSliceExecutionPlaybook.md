@@ -130,7 +130,10 @@ Legacy retirement should happen when:
 
 ## Slice Ordering Strategy (Draft v1, Non-Mandatory)
 
+**Classification:** Heuristic Planning Guidance (Non-Normative)
+
 This ordering is a **draft-safe starting strategy** and not immutable law.
+It is not intended to be strict compliance criteria and may be adjusted based on repo reality, dependencies, and migration risk.
 
 ### Slice Group A — Canonicalization + Persistence Support Alignment (Low Risk)
 
