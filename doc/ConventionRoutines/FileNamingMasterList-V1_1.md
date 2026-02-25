@@ -55,6 +55,10 @@ This spec is intentionally explicit and semantic (no guessing/inference required
   - [Scope (what this applies to)](#scope-what-this-applies-to)
   - [Legacy file reality (important)](#legacy-file-reality-important)
   - [Adoption rule](#adoption-rule)
+- [NL Split Refactor Naming Guidance (Incremental, Semantic-First)](#nl-split-refactor-naming-guidance-incremental-semantic-first)
+  - [Where numbering should live for NL split workflows](#where-numbering-should-live-for-nl-split-workflows)
+  - [NL Split Examples and Non-Examples](#nl-split-examples-and-non-examples)
+  - [Visual pattern recognition without filename churn](#visual-pattern-recognition-without-filename-churn)
 - [Core Filename Grammar](#core-filename-grammar)
   - [Canonical pattern](#canonical-pattern)
   - [Examples](#examples)
@@ -160,6 +164,42 @@ Do not block progress solely because unrelated legacy filenames do not match thi
 Apply this spec incrementally and deliberately.
 
 ---
+
+## NL Split Refactor Naming Guidance (Incremental, Semantic-First)
+
+For NL documentation split migrations (for example, evolving `cfg-buildSurface.md` into semantic split docs):
+
+- Prefer **stable semantic filenames** that describe enduring responsibility/scope.
+- Avoid churn-prone positional filename numbering schemes that require renaming when slice order changes.
+- Keep migration ordering/continuity in NL content structures (headings, mapping tables, provenance tokens, and optional manifests/index docs).
+
+### Where numbering should live for NL split workflows
+
+Use numbering/provenance continuity in:
+
+- section headings and migrated atom references,
+- legacy-to-canonical mapping tables,
+- provenance tokens and migration status rows,
+- optional manifest/index views for scanability.
+
+Do **not** require positional filename prefixes solely to preserve order.
+
+### NL Split Examples and Non-Examples
+
+**Examples (preferred semantic stability):**
+
+- `cfg-buildSurface-layoutAndAnchors.md`
+- `cfg-buildSurface-panelStateAndPersistence.md`
+- `cfg-buildSurface-previewAndInspectorFlows.md`
+
+**Non-examples (positional churn risk):**
+
+- `01-cfg-buildSurface.md`, `02-cfg-buildSurface.md`, `03-cfg-buildSurface.md`
+- `cfg-buildSurface-part1.md`, `cfg-buildSurface-part2.md` when parts are expected to reorder over time
+
+### Visual pattern recognition without filename churn
+
+When visual ordering is needed, prefer a manifest/index document that lists semantic files in desired reading order instead of encoding order into filenames.
 
 ## Core Filename Grammar
 
