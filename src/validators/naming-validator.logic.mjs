@@ -37,6 +37,37 @@ const REPORTABLE_EXTENSIONS = new Set([
 
 const EXCLUDED_DIRECTORIES = new Set(['.git', 'node_modules', 'dist', 'coverage', '.vite']);
 
+const ROOT_APP_FILES = new Set([
+  'package.json',
+  'package-lock.json',
+  'eslint.config.js',
+  'eslint.config.mjs',
+  'vite.config.ts',
+  'vite.config.js',
+  'vite.config.mjs',
+  'tsconfig.json',
+  'tsconfig.app.json',
+  'tsconfig.node.json',
+]);
+
+const SCOPE_PROFILES = {
+  repo: {
+    description: 'Repository-wide scan of all reportable files.',
+    includeRoots: ['.'],
+    includeRootFiles: [],
+  },
+  app: {
+    description: 'Application-focused scan (src/test/scripts and root tooling files).',
+    includeRoots: ['src', 'test', 'scripts'],
+    includeRootFiles: Array.from(ROOT_APP_FILES),
+  },
+  docs: {
+    description: 'Documentation-focused scan (doc/docs and root README).',
+    includeRoots: ['doc', 'docs'],
+    includeRootFiles: ['README.md'],
+  },
+};
+
 export const normalizePath = relativePath => relativePath.split(path.sep).join('/');
 
 const getSpecialCaseType = filePath => {
@@ -118,6 +149,111 @@ const isReportableFile = relativePath => {
   }
 
   return path.basename(relativePath) === 'package-lock.json' || path.basename(relativePath) === 'package.json';
+};
+
+const sortPaths = paths => Array.from(paths).sort((left, right) => left.localeCompare(right));
+
+const collectPathsFromRoot = (rootDirectory, rootRelativePath) => {
+  const normalizedRoot = normalizePath(rootRelativePath);
+  const absoluteRoot = path.resolve(rootDirectory, normalizedRoot);
+  if (!fs.existsSync(absoluteRoot)) {
+    return [];
+  }
+
+  const stat = fs.statSync(absoluteRoot);
+  if (!stat.isDirectory()) {
+    return [];
+  }
+
+  const collected = [];
+
+  const walk = absoluteDirectoryPath => {
+    const entries = fs.readdirSync(absoluteDirectoryPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      if (entry.name.startsWith('.') && entry.name !== '.eslintrc') {
+        if (entry.isDirectory()) {
+          continue;
+        }
+      }
+
+      if (entry.isDirectory()) {
+        if (EXCLUDED_DIRECTORIES.has(entry.name)) {
+          continue;
+        }
+
+        walk(path.join(absoluteDirectoryPath, entry.name));
+        continue;
+      }
+
+      const absolutePath = path.join(absoluteDirectoryPath, entry.name);
+      const relativePath = path.relative(rootDirectory, absolutePath);
+      const normalizedPath = normalizePath(relativePath);
+      if (isReportableFile(normalizedPath)) {
+        collected.push(normalizedPath);
+      }
+    }
+  };
+
+  walk(absoluteRoot);
+  return collected;
+};
+
+const collectRootFiles = (rootDirectory, rootFiles) => {
+  const collected = [];
+
+  for (const rootFile of rootFiles) {
+    const normalizedPath = normalizePath(rootFile);
+    const absolutePath = path.resolve(rootDirectory, normalizedPath);
+    if (!fs.existsSync(absolutePath)) {
+      continue;
+    }
+
+    const stat = fs.statSync(absolutePath);
+    if (!stat.isFile()) {
+      continue;
+    }
+
+    if (isReportableFile(normalizedPath)) {
+      collected.push(normalizedPath);
+    }
+  }
+
+  return collected;
+};
+
+export const listNamingValidatorScopes = () => sortPaths(new Set(Object.keys(SCOPE_PROFILES)));
+
+export const getScopeProfile = scope => {
+  const normalizedScope = scope ?? 'repo';
+  return SCOPE_PROFILES[normalizedScope] ?? null;
+};
+
+export const collectRepositoryPaths = (rootDirectory, options = {}) => {
+  const selectedScope = options.scope ?? 'repo';
+  const profile = getScopeProfile(selectedScope);
+  if (!profile) {
+    throw new Error(`Invalid scope profile: ${selectedScope}`);
+  }
+
+  if (selectedScope === 'repo') {
+    return sortPaths(new Set(collectPathsFromRoot(rootDirectory, '.')));
+  }
+
+  const collected = new Set();
+
+  for (const includeRoot of profile.includeRoots) {
+    const paths = collectPathsFromRoot(rootDirectory, includeRoot);
+    for (const pathname of paths) {
+      collected.add(pathname);
+    }
+  }
+
+  for (const pathname of collectRootFiles(rootDirectory, profile.includeRootFiles)) {
+    collected.add(pathname);
+  }
+
+  return sortPaths(collected);
 };
 
 export const classifyPath = relativePath => {
@@ -240,48 +376,15 @@ export const classifyPath = relativePath => {
   };
 };
 
-export const collectRepositoryPaths = rootDirectory => {
-  const collected = [];
-
-  const walk = absoluteDirectoryPath => {
-    const entries = fs.readdirSync(absoluteDirectoryPath, { withFileTypes: true });
-
-    for (const entry of entries) {
-      if (entry.name.startsWith('.') && entry.name !== '.eslintrc') {
-        if (entry.isDirectory()) {
-          continue;
-        }
-      }
-
-      if (entry.isDirectory()) {
-        if (EXCLUDED_DIRECTORIES.has(entry.name)) {
-          continue;
-        }
-
-        walk(path.join(absoluteDirectoryPath, entry.name));
-        continue;
-      }
-
-      const absolutePath = path.join(absoluteDirectoryPath, entry.name);
-      const relativePath = path.relative(rootDirectory, absolutePath);
-      if (isReportableFile(relativePath)) {
-        collected.push(normalizePath(relativePath));
-      }
-    }
-  };
-
-  walk(rootDirectory);
-
-  return collected.sort((left, right) => left.localeCompare(right));
-};
-
-export const runNamingValidator = rootDirectory => {
-  const paths = collectRepositoryPaths(rootDirectory);
+export const runNamingValidator = (rootDirectory, options = {}) => {
+  const selectedScope = options.scope ?? 'repo';
+  const paths = collectRepositoryPaths(rootDirectory, { scope: selectedScope });
   const findings = paths.map(pathname => classifyPath(pathname));
 
   return {
     findings,
     totalFilesScanned: paths.length,
+    scope: selectedScope,
   };
 };
 

@@ -1,16 +1,62 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { runNamingValidator, summarizeFindings } from '../src/validators/naming-validator.logic.mjs';
+import {
+  runNamingValidator,
+  summarizeFindings,
+  listNamingValidatorScopes,
+  getScopeProfile,
+} from '../src/validators/naming-validator.logic.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repositoryRoot = path.resolve(__dirname, '..');
 
-const { findings, totalFilesScanned } = runNamingValidator(repositoryRoot);
+const parseScopeFromCli = argv => {
+  let selectedScope = 'repo';
+
+  for (const argument of argv) {
+    if (argument.startsWith('--scope=')) {
+      selectedScope = argument.slice('--scope='.length);
+      continue;
+    }
+
+    if (argument === '--help' || argument === '-h') {
+      return { helpRequested: true, selectedScope };
+    }
+  }
+
+  return { helpRequested: false, selectedScope };
+};
+
+const usageLines = [
+  'Usage: npm run validate:naming -- --scope=<repo|app|docs>',
+  'Scopes:',
+  ...listNamingValidatorScopes().map(scope => {
+    const profile = getScopeProfile(scope);
+    return `  - ${scope}: ${profile?.description ?? ''}`;
+  }),
+  'Default scope: repo',
+];
+
+const { helpRequested, selectedScope } = parseScopeFromCli(process.argv.slice(2));
+
+if (helpRequested) {
+  console.log(usageLines.join('\n'));
+  process.exit(0);
+}
+
+if (!getScopeProfile(selectedScope)) {
+  console.error(`Invalid scope: ${selectedScope}`);
+  console.error(usageLines.join('\n'));
+  process.exit(1);
+}
+
+const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: selectedScope });
 const summary = summarizeFindings(findings);
 
 const report = {
   mode: 'report',
+  scope,
   totalFilesScanned,
   counts: summary.counts,
   codeCounts: summary.codeCounts,
