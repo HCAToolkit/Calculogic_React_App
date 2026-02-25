@@ -316,4 +316,4 @@ This draft establishes grammar first. Later passes should synchronize wording/ex
    - new convention examples
    - new comment patterns where applicable
 4. Backfill legacy material incrementally during normal touchpoints.
-5. Validator/tooling enforcement is intentionally deferred to a later pass; this document does not define validator modes, parser APIs, or implementation behavior in this closure pass.
+5. Validator/tooling enforcement remains intentionally deferred until draft grammar decisions are closed and convention wording is stabilized; this document does not define validator modes, parser APIs, or implementation behavior in this closure pass.
