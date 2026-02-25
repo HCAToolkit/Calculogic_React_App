@@ -22,6 +22,12 @@ Use explicit statuses in migration indexes/mapping tables:
 3. **repointed** – canonical source moved for the mapped slice; provenance links recorded.
 4. **retired** – legacy slice/doc no longer canonical after complete verified migration.
 
+### Lifecycle Vocabulary Alignment Note
+
+The four statuses above are the **minimum/core scaffold** for this policy. Architecture/inventory docs may use additional transitional statuses (for example `extracted`, `legacy-wrapper`, `deferred`) for finer migration tracking, provided meanings are explicit and truthfully applied.
+
+`legacy-wrapper` may apply to NL docs when a monolith or index/wrapper continues forwarding readers to repointed split-canonical slices. In code-oriented inventories, the same term may remain code-centric; NL docs may alternatively use equivalent explicit wording when that is clearer.
+
 ## Numbering and Provenance Continuity Rules
 
 - Preserve stable NL section continuity inside content and provenance artifacts; do not break the per-document 1–10 skeleton contract.
