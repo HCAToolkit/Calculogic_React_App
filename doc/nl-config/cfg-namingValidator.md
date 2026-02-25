@@ -1,5 +1,8 @@
 # cfg-namingValidator
 
+## 0.0 Version
+Current implementation target: **V0.1.1** (report-mode polish pass).
+
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
 
@@ -10,8 +13,14 @@ The validator reads rules from `doc/ConventionRoutines/FileNamingMasterList-V1_1
 ### 2.2 Scope mode (V0.1)
 V0.1 scans repository files in all-files mode with deterministic path ordering.
 
-### 2.3 Active roles (V0.1)
-The validator uses the suggested initial active role set:
+### 2.3 Role registry metadata (V0.1.1)
+The validator uses a structured role registry with metadata fields:
+- `role`
+- `category` (`concern-core`, `architecture-support`, `deprecated`)
+- `status` (`active`, `deprecated`)
+- optional `notes`
+
+Active roles:
 - host
 - wiring
 - contracts
@@ -22,18 +31,28 @@ The validator uses the suggested initial active role set:
 - results
 - results-style
 
+Deprecated historical roles:
+- view
+
 ## 3.0 Classification Contract
 ### 3.1 Canonical
 Classify as canonical when filename parses as `<semantic-name>.<role>.<ext>` (including `.module.css`) with kebab-case semantic name and known role.
 
 ### 3.2 Allowed special case
-Classify as allowed special case for reserved filenames and patterns including barrel files, framework-required names, test files, and ambient declaration files.
+Classify as allowed special case for reserved filenames and patterns including barrel files, framework-required names, test files, ambient declaration files, and README convention docs.
+
+Allowed special-case findings include `details.specialCaseType` values:
+- `ecosystem-required`
+- `barrel`
+- `test-convention`
+- `ambient-declaration`
+- `conventional-doc`
 
 ### 3.3 Legacy exception
 Classify as legacy exception when file is in-scope but does not claim canonical structure and is tolerated by incremental adoption.
 
 ### 3.4 Invalid or ambiguous
-Classify as invalid or ambiguous when filename appears to claim canonical intent but violates deterministic parse rules (unknown role, bad semantic casing, or hyphen-appended role ambiguity).
+Classify as invalid or ambiguous when filename appears to claim canonical intent but violates deterministic parse rules (unknown role, deprecated role, bad semantic casing, or hyphen-appended role ambiguity).
 
 ## 4.0 Findings and Reporting
 ### 4.1 Stable finding schema
@@ -42,7 +61,14 @@ Each finding includes code, severity, path, classification, message, ruleRef, an
 ### 4.2 Deterministic ordering
 Findings and summary output sort by normalized relative path.
 
-### 4.3 Exit behavior (report mode)
+### 4.3 Summary breakdowns (V0.1.1)
+Report output includes deterministic summary breakdowns for:
+- classification counts
+- finding code counts
+- special-case subtype counts
+- warning role status/category counts (when metadata is present)
+
+### 4.4 Exit behavior (report mode)
 Report mode always exits with status code 0 and prints counts by classification.
 
 ## 5.0 Deferred Behavior

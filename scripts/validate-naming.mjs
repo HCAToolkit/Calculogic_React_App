@@ -7,12 +7,16 @@ const __dirname = path.dirname(__filename);
 const repositoryRoot = path.resolve(__dirname, '..');
 
 const { findings, totalFilesScanned } = runNamingValidator(repositoryRoot);
-const counts = summarizeFindings(findings);
+const summary = summarizeFindings(findings);
 
 const report = {
   mode: 'report',
   totalFilesScanned,
-  counts,
+  counts: summary.counts,
+  codeCounts: summary.codeCounts,
+  specialCaseTypeCounts: summary.specialCaseTypeCounts,
+  warningRoleStatusCounts: summary.warningRoleStatusCounts,
+  warningRoleCategoryCounts: summary.warningRoleCategoryCounts,
   findings,
 };
 

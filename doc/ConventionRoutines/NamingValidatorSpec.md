@@ -1,16 +1,17 @@
-# Naming Validator Spec (V0.1)
+# Naming Validator Spec (V0.1.1)
 
 ## Purpose and Scope
 
-This document defines the V0.1 filename naming validator slice for deterministic automation.
+This document defines the V0.1.1 filename naming validator slice for deterministic automation.
 
-V0.1 scope is intentionally narrow:
+V0.1.1 scope is intentionally narrow:
 - filename validation only
 - report mode only
 - deterministic findings output
+- richer diagnostics for migration planning
 - no rename enforcement
 
-Out of scope for V0.1:
+Out of scope for V0.1.1:
 - structural addressing validation
 - NL↔Code numbering/parity validation
 - provenance token consistency checks
@@ -27,24 +28,37 @@ Supporting workflow alignment:
 - `doc/ConventionRoutines/CSCS.md`
 - `doc/ConventionRoutines/CCPP.md`
 
-## Canonical Filename Contract (V0.1)
+## Canonical Filename Contract (V0.1.1)
 
 Canonical grammar:
 - `<semantic-name>.<role>.<ext>`
 
-Recognized compound format suffixes in V0.1:
+Recognized compound format suffixes in V0.1.1:
 - `module.css`
 
-V0.1 active role registry:
-- `host`
-- `wiring`
-- `contracts`
-- `build`
-- `build-style`
-- `logic`
-- `knowledge`
-- `results`
-- `results-style`
+Filename grammar is unchanged from V0.1.
+
+## Role Registry Metadata (V0.1.1)
+
+V0.1.1 uses a structured role registry with metadata:
+- `role`
+- `category` (`concern-core` | `architecture-support` | `deprecated`)
+- `status` (`active` | `deprecated`)
+- `notes` (optional)
+
+Active roles:
+- `host` (`architecture-support`, `active`)
+- `wiring` (`architecture-support`, `active`)
+- `contracts` (`architecture-support`, `active`)
+- `build` (`concern-core`, `active`)
+- `build-style` (`concern-core`, `active`)
+- `logic` (`concern-core`, `active`)
+- `knowledge` (`concern-core`, `active`)
+- `results` (`concern-core`, `active`)
+- `results-style` (`concern-core`, `active`)
+
+Deprecated historical roles:
+- `view` (`deprecated`, `deprecated`) — historical pre-current concern split term.
 
 Semantic-name rules:
 - kebab-case only for canonical filenames
@@ -57,7 +71,7 @@ Parsing assumptions:
 
 ## Input Scope Modes
 
-V0.1 defines these modes:
+V0.1.1 defines these modes:
 
 1. `all-files` (implemented)
    - scans repository files with deterministic sorting
@@ -68,7 +82,7 @@ V0.1 defines these modes:
 
 ## Classification Outputs
 
-Stable classifications used by V0.1:
+Stable classifications used by V0.1.1:
 - `canonical`
 - `allowed-special-case`
 - `legacy-exception`
@@ -86,21 +100,45 @@ Each finding uses a stable object shape:
 - `suggestedFix` (optional)
 - `details` (optional object)
 
-## Finding / Error Codes (V0.1)
+### Special-case subtype metadata
+
+V0.1.1 keeps top-level classification `allowed-special-case` and adds deterministic subtype metadata in `details.specialCaseType`:
+- `ecosystem-required`: `package.json`, `package-lock.json`, `tsconfig*.json`, `vite.config.*`, `eslint.config.*`
+- `barrel`: `index.ts`, `index.tsx`
+- `test-convention`: `*.test.*`, `*.spec.*`
+- `ambient-declaration`: `*.d.ts`
+- `conventional-doc`: `README.md`
+
+README policy in V0.1.1: `README.md` is treated as `allowed-special-case` with subtype `conventional-doc`.
+
+### Deprecated role metadata
+
+When a canonical-like parse resolves to a known deprecated role (currently `view`):
+- classification remains `invalid-ambiguous`
+- code is `NAMING_DEPRECATED_ROLE`
+- `details` includes parsed filename metadata plus:
+  - `roleStatus: "deprecated"`
+  - `roleCategory: "deprecated"`
+  - optional `deprecationNote`
+- validator does not auto-map deprecated role to modern roles (manual migration required)
+
+## Finding / Error Codes (V0.1.1)
 
 - `NAMING_CANONICAL`
 - `NAMING_ALLOWED_SPECIAL_CASE`
 - `NAMING_LEGACY_EXCEPTION`
-- `NAMING_INVALID_PATTERN`
 - `NAMING_UNKNOWN_ROLE`
+- `NAMING_DEPRECATED_ROLE`
 - `NAMING_BAD_SEMANTIC_CASE`
 - `NAMING_ROLE_HYPHEN_AMBIGUITY`
 
+Code alignment note: `NAMING_INVALID_PATTERN` is deferred/removed from active V0.1.1 emission because unmatched filenames are intentionally classified as `NAMING_LEGACY_EXCEPTION` in report mode.
+
 ## Rollout Modes
 
-- `report` (V0.1 behavior)
+- `report` (V0.1.1 behavior)
   - always emits findings and summary
-  - never fails build in V0.1
+  - never fails build in V0.1.1
 - `soft-fail` (deferred)
   - planned targeted enforcement by folders or changed files
 - `hard-fail` (deferred)
@@ -108,13 +146,13 @@ Each finding uses a stable object shape:
 
 ## Exit Code Behavior
 
-V0.1 report mode exit behavior:
+V0.1.1 report mode exit behavior:
 - process exits `0`
 - invalid findings are reported but do not fail command
 
 ## Allowed Special-Case Handling Rules
 
-V0.1 recognizes these special cases:
+V0.1.1 recognizes these special cases:
 - barrel files: `index.ts`, `index.tsx`
 - framework/tool required names (root/tooling config patterns):
   - `package.json`
@@ -124,15 +162,17 @@ V0.1 recognizes these special cases:
   - `eslint.config.*`
 - test files: `*.test.*`, `*.spec.*`
 - ambient declarations: `*.d.ts`
+- conventional docs: `README.md`
 
-Special-case list is explicit and intentionally narrow in V0.1.
+Special-case list is explicit and intentionally narrow in V0.1.1.
 
 ## Legacy Exception Handling Rules
 
-For incremental adoption, V0.1 classifies non-canonical in-scope files as `legacy-exception` when they do not clearly claim canonical syntax.
+For incremental adoption, V0.1.1 classifies non-canonical in-scope files as `legacy-exception` when they do not clearly claim canonical syntax.
 
 A file is `invalid-ambiguous` instead of `legacy-exception` when it presents canonical intent but violates contract deterministically, including:
 - unknown role segment in canonical position
+- deprecated role segment in canonical position
 - semantic-name casing violation in canonical position
 - hyphen-appended role ambiguity (e.g., `leftpanel-selector-wiring.ts`)
 
@@ -141,8 +181,9 @@ A file is `invalid-ambiguous` instead of `legacy-exception` when it presents can
 - normalize path separators to `/`
 - sort findings by normalized path ascending
 - stable classification and code assignment per filename
+- deterministic summary breakdown ordering
 
-## Non-Goals (V0.1)
+## Non-Goals (V0.1.1)
 
 - no automatic rename suggestions beyond optional textual hints
 - no repository-wide rename migration
