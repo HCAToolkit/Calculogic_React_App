@@ -14,12 +14,14 @@
   - `doc/ConventionRoutines/CCPP.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `doc/ConventionRoutines/NL-First-Workflow.md`
+  - `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`
 
 ## Purpose
 
 This playbook operationalizes the Build Surface → Global Host migration as a **repeatable execution workflow**.
 
-- The inventory plan remains the source of truth for draft targets, mapping direction, status vocabulary, and naming alignment.
+- The inventory plan remains the source of truth for draft targets, mapping direction, and naming alignment.
+- Status token meanings are centralized in `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`.
 - This playbook defines **how** semantic slices are executed, verified, and reconciled as implementation lands.
 - This playbook does not replace task-specific engineering judgment; it provides guardrails and repeatable review shape.
 - In short: the inventory plan is the target/mapping ledger, while this playbook is the execution/verification routine.
@@ -268,6 +270,8 @@ Use only the checklists relevant to the touched boundary.
 Use temporary wrappers/forwarders only as transitional seams.
 
 ### Lifecycle Labels
+
+Use centralized token meanings from `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`.
 
 - **`extracted`**: responsibility moved to target, but consumers may still route through legacy path.
 - **`repointed`**: active consumers switched to target path.

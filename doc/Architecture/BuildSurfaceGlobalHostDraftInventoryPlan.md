@@ -12,6 +12,7 @@
   - `doc/ConventionRoutines/CSCS.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
+  - `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`
 
 ## Purpose
 
@@ -213,7 +214,7 @@ This inventory support is intended to surface numbering/provenance inconsistenci
 
 The `Status` column may be used as a migration-lifecycle trace, not only planning intent.
 
-Recommended status progression vocabulary:
+Recommended status progression vocabulary (from `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`):
 
 - `draft`
 - `planned`
