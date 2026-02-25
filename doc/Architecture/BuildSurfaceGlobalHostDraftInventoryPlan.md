@@ -184,7 +184,13 @@ Recommended extraction rhythm per slice:
 4. **Retire Legacy**
    - Delete drained legacy files, or temporarily reduce to a thin wrapper until safe removal.
 
+## Rule-Class Split (v1)
+
+This inventory distinguishes **Normative Requirements** (deterministic/checkable expectations) from **Heuristic Guidance (Non-Normative)** (human-judgment recommendations). Heuristic guidance is intentionally non-normative and should not be interpreted as strict compliance criteria.
+
 ## Adoption / Implementation Guidance (Draft)
+
+### Normative Requirements
 
 1. Start with docs-first planning (this inventory + naming examples), then apply implementation in small PR slices.
 2. Rename/split only when corresponding refactor work lands; avoid mass canonicalization unrelated to active change scope.
@@ -194,10 +200,13 @@ Recommended extraction rhythm per slice:
    - tab-provider wiring introduction,
    - optional follow-up tab-provider expansion.
 4. Execute in semantic-slice order, extracting one bounded responsibility at a time and keeping host-shell vs tab-population boundaries explicit.
-5. Separate extraction churn from cleanup churn when practical (for example: extraction/repoint first, naming/comment normalization second).
-6. Avoid mixing refactor + optimization + behavior changes in one pass unless a safety fix requires coupling.
-7. Keep PRs boundary-focused and reviewable; each slice should state the boundary being migrated and the legacy surface being drained.
-8. During implementation, keep NL and CCPP alignment for any changed shell/config concern files.
+5. Avoid mixing refactor + optimization + behavior changes in one pass unless a safety fix requires coupling.
+6. During implementation, keep NL and CCPP alignment for any changed shell/config concern files.
+
+### Heuristic Guidance (Non-Normative)
+
+1. Separate extraction churn from cleanup churn when practical (for example: extraction/repoint first, naming/comment normalization second).
+2. Keep PRs boundary-focused and reviewable; each slice should state the boundary being migrated and the legacy surface being drained.
 
 ### NL Migration State + Pre-Validation Guidance
 
@@ -225,7 +234,7 @@ Recommended status progression vocabulary (from `doc/ConventionRoutines/StatusVo
 - `retired`
 - `deferred`
 
-Guidance:
+#### Heuristic Guidance (Non-Normative)
 
 - Not every inventory item must pass through every status.
 - `legacy-wrapper` is optional and should be short-lived.

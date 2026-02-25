@@ -26,6 +26,10 @@ This playbook operationalizes the Build Surface → Global Host migration as a *
 - This playbook does not replace task-specific engineering judgment; it provides guardrails and repeatable review shape.
 - In short: the inventory plan is the target/mapping ledger, while this playbook is the execution/verification routine.
 
+## Rule-Class Split (v1)
+
+This playbook distinguishes **Normative Requirements** (deterministic/checkable expectations) from **Heuristic Guidance (Non-Normative)** (human-judgment recommendations). Heuristic guidance is intentionally non-normative and should not be interpreted as strict compliance criteria.
+
 ## Scope Boundaries
 
 ### In Scope (Required)
@@ -51,18 +55,22 @@ This playbook operationalizes the Build Surface → Global Host migration as a *
 
 Semantic-slice execution for Build Surface global-host refactor uses **code + NL co-migration**, not deferred NL cleanup.
 
-- each semantic code slice should migrate/update corresponding NL slice content in the same pass when feasible
-- canonical split NL targets should become authoritative incrementally as slices land
-- legacy monolith NL content in `doc/nl-config/cfg-buildSurface.md` should be progressively forwarded/annotated as ownership drains
-- naming and NL references for touched files should be aligned in-slice to avoid post-hoc drift
-- numbering/provenance for touched atoms/sections should be pre-validated for consistency before slice exit
+#### Normative Requirements
 
-Each slice should follow the same rhythm from the draft inventory plan:
+- each semantic code slice must migrate/update corresponding NL slice content in the same pass
+- naming and NL references for touched files must be aligned in-slice to avoid post-hoc drift
+- numbering/provenance for touched atoms/sections must be pre-validated for consistency before slice exit
+- each slice must follow the same rhythm from the draft inventory plan:
 
 1. **Extract**
 2. **Repoint**
 3. **Cleanup / Normalize**
 4. **Retire Legacy**
+
+#### Heuristic Guidance (Non-Normative)
+
+- canonical split NL targets should become authoritative incrementally as slices land
+- legacy monolith NL content in `doc/nl-config/cfg-buildSurface.md` should be progressively forwarded/annotated as ownership drains
 
 ### 1) Extract
 
@@ -84,6 +92,8 @@ Defer from this step:
 
 After extraction, repoint imports/call sites to the new destination in the minimum required scope.
 
+#### Heuristic Guidance (Non-Normative)
+
 Repoint guidance:
 
 - prefer direct repoint where impact is small and observable
@@ -102,13 +112,19 @@ Do not turn cleanup into broad tree-wide churn.
 
 ### 4) Retire Legacy
 
-Retire fully drained legacy files or leave a short-lived wrapper/forwarder when necessary.
+#### Normative Requirements
 
-Legacy retirement should happen as soon as:
+Retire fully drained legacy files or leave a wrapper/forwarder only when necessary.
+
+Legacy retirement should happen when:
 
 - all call sites are repointed
 - wrapper/forwarder has no unique behavior
 - verification is complete for touched path
+
+#### Heuristic Guidance (Non-Normative)
+
+- wrapper/forwarder usage should be short-lived transitional seam usage
 
 ## Slice Ordering Strategy (Draft v1, Non-Mandatory)
 
@@ -290,6 +306,8 @@ A wrapper/forwarder can be retired when:
 
 ### Drift Control
 
+#### Heuristic Guidance (Non-Normative)
+
 Avoid long-lived wrappers/forwarders; if a wrapper/forwarder survives multiple slices, record explicit blocker and target retirement slice.
 
 ## PR Boundary Guidance
@@ -298,13 +316,18 @@ Keep each PR reviewable and semantically scoped.
 
 ### Required PR Shape Principles
 
-- one primary migration boundary per PR when practical
-- separate extraction work from broad cleanup work where possible
+#### Normative Requirements
+
 - do not combine unrelated semantic slices
 - do not combine refactor + optimization + feature behavior change unless safety-coupled
 - state boundary being migrated and legacy source being drained in PR summary
 - include explicit verification notes in PR summary
 - verification notes should state both what was checked (manual and/or automated) and what was intentionally not checked in this slice (if any)
+
+#### Heuristic Guidance (Non-Normative)
+
+- one primary migration boundary per PR when practical
+- separate extraction work from broad cleanup work where possible
 
 ### Good PR Shapes (Examples)
 
@@ -318,7 +341,9 @@ The inventory plan remains the migration ledger; update it deliberately.
 
 ### When to Update `Status`
 
-Update status when slice materially changes lifecycle state (that is, changes status/ownership interpretation in a way that affects inventory tracking or migration decisions), e.g.:
+#### Normative Requirements
+
+Update status when a slice changes lifecycle state (that is, changes status/ownership interpretation in a way that affects inventory tracking or migration decisions), e.g.:
 
 - `planned` → `in-progress`
 - `in-progress` → `extracted`
@@ -328,9 +353,14 @@ Update status when slice materially changes lifecycle state (that is, changes st
 
 ### Snapshot/Mapping Update Rules
 
-- update snapshot/mapping sections when extracted/repointed ownership materially changes interpretation
+#### Normative Requirements
+
+- update snapshot/mapping sections when extracted/repointed ownership changes interpretation
 - preserve one-to-many drain visibility (one legacy source to multiple canonical targets)
 - avoid rewriting unaffected rows during narrow-scope slices
+
+#### Heuristic Guidance (Non-Normative)
+
 - for partial completion, annotate precisely rather than over-claiming completion
 
 ### Partial Slice Handling
