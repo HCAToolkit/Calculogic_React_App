@@ -1,4 +1,4 @@
-# Naming Validator Spec (V0.1.2)
+# Naming Validator Spec (V0.1.3)
 
 ## Purpose and Scope
 
@@ -109,6 +109,24 @@ V0.1.2 implements deterministic scope profiles selected by CLI.
 ### Invalid scope behavior
 - invalid scope values are treated as deterministic CLI usage errors
 - CLI prints usage/help text and exits non-zero
+
+## Scope Contract (V0.1.3)
+
+Supported scopes:
+- `repo`
+- `app`
+- `docs`
+
+Default behavior:
+- No `--scope` input is equivalent to `--scope=repo`.
+
+Inclusion/exclusion summary:
+- `repo`: all reportable files under repository root (minus explicit walker exclusions).
+- `app`: includes `src/**`, `test/**`, `scripts/**`, and explicit root tooling files; excludes `doc/**` and `docs/**`.
+- `docs`: includes `doc/**`, `docs/**`, and selected root conventional docs currently limited to `README.md`; excludes `src/**` by profile definition.
+
+Invalid scope behavior:
+- Unknown scope values are usage errors with non-zero exit and valid-scope usage text.
 
 ## CLI Usage (V0.1.2)
 

@@ -51,6 +51,7 @@ if (!getScopeProfile(selectedScope)) {
   process.exit(1);
 }
 
+const selectedScopeProfile = getScopeProfile(selectedScope);
 const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: selectedScope });
 const summary = summarizeFindings(findings);
 
@@ -58,6 +59,11 @@ const report = {
   mode: 'report',
   scope,
   totalFilesScanned,
+  scopeContract: {
+    description: selectedScopeProfile?.description ?? '',
+    includeRoots: selectedScopeProfile?.includeRoots ?? [],
+    includeRootFiles: selectedScopeProfile?.includeRootFiles ?? [],
+  },
   counts: summary.counts,
   codeCounts: summary.codeCounts,
   specialCaseTypeCounts: summary.specialCaseTypeCounts,
