@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.3** (scope contract hardening pass).
+Current implementation target: **V0.1.4** (scope filter enforcement + scope contract hardening).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -10,14 +10,14 @@ Define a deterministic V0.1 filename naming validator that runs in report mode o
 ### 2.1 Naming authority
 The validator reads rules from `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` as authoritative naming guidance.
 
-### 2.2 Scope mode (V0.1.3)
-V0.1.3 supports deterministic scope profiles selected via CLI and applied before filename classification:
+### 2.2 Scope mode (V0.1.4)
+V0.1.4 supports deterministic scope profiles selected via CLI and applied before filename classification using explicit scope path predicates:
 - default/no `--scope` input resolves to `repo`
 - `repo`: repository-wide reportable files.
 - `app`: app-focused files (`src/`, `test/`, `scripts/`, and explicit root tooling files).
 - `docs`: docs-focused files (`doc/`, `docs/`, and selected root conventional docs currently limited to `README.md`).
 
-All scope profile inclusions are explicit and deterministic. Invalid scope inputs are treated as CLI usage errors.
+Scope predicates are evaluated on normalized repository-relative paths before report findings are generated. Invalid scope inputs are treated as CLI usage errors.
 
 ### 2.3 Role registry metadata (V0.1.1)
 The validator uses a structured role registry with metadata fields:
@@ -77,7 +77,15 @@ Report output includes deterministic summary breakdowns for:
 ### 4.4 Scope-aware reporting metadata (V0.1.2)
 Report output includes selected scope metadata and deterministic file-count/findings summaries within that scope.
 
-### 4.5 Exit behavior (report mode)
+### 4.5 Scope observability metadata (V0.1.4)
+Report output includes additive scope observability metadata:
+- `scopeSummary.scope`
+- `scopeSummary.reportableFilesInScope`
+- `scopeSummary.findingsGenerated`
+
+This metadata is additive and does not alter legacy report-mode findings behavior.
+
+### 4.6 Exit behavior (report mode)
 Report mode always exits with status code 0 and prints counts by classification.
 
 ## 5.0 Deferred Behavior

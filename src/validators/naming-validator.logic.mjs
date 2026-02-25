@@ -159,7 +159,7 @@ const isReportableFile = relativePath => {
 
 const sortPaths = paths => Array.from(paths).sort((left, right) => left.localeCompare(right));
 
-const collectPathsFromRoot = (rootDirectory, rootRelativePath) => {
+const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.') => {
   const normalizedRoot = normalizePath(rootRelativePath);
   const absoluteRoot = path.resolve(rootDirectory, normalizedRoot);
   if (!fs.existsSync(absoluteRoot)) {
@@ -205,27 +205,19 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath) => {
   return collected;
 };
 
-const collectRootFiles = (rootDirectory, rootFiles) => {
-  const collected = [];
+const buildScopePathPredicate = profile => {
+  const includeRootSet = new Set(profile.includeRoots.map(normalizePath));
+  const includeRootFileSet = new Set(profile.includeRootFiles.map(normalizePath));
 
-  for (const rootFile of rootFiles) {
-    const normalizedPath = normalizePath(rootFile);
-    const absolutePath = path.resolve(rootDirectory, normalizedPath);
-    if (!fs.existsSync(absolutePath)) {
-      continue;
+  return relativePath => {
+    const normalizedPath = normalizePath(relativePath);
+    if (normalizedPath.includes('/')) {
+      const firstSegment = normalizedPath.split('/')[0];
+      return includeRootSet.has(firstSegment);
     }
 
-    const stat = fs.statSync(absolutePath);
-    if (!stat.isFile()) {
-      continue;
-    }
-
-    if (isReportableFile(normalizedPath)) {
-      collected.push(normalizedPath);
-    }
-  }
-
-  return collected;
+    return includeRootFileSet.has(normalizedPath);
+  };
 };
 
 export const listNamingValidatorScopes = () => sortPaths(new Set(Object.keys(SCOPE_PROFILES)));
@@ -243,24 +235,15 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
     throw new Error(`Invalid scope profile: ${selectedScope}`);
   }
 
+  const allReportablePaths = collectPathsFromRoot(rootDirectory, '.');
+
   if (selectedScope === 'repo') {
-    return sortPaths(new Set(collectPathsFromRoot(rootDirectory, '.')));
+    return sortPaths(new Set(allReportablePaths));
   }
 
-  const collected = new Set();
-
-  for (const includeRoot of profile.includeRoots) {
-    const paths = collectPathsFromRoot(rootDirectory, includeRoot);
-    for (const pathname of paths) {
-      collected.add(pathname);
-    }
-  }
-
-  for (const pathname of collectRootFiles(rootDirectory, profile.includeRootFiles)) {
-    collected.add(pathname);
-  }
-
-  return sortPaths(collected);
+  const scopePathPredicate = buildScopePathPredicate(profile);
+  const scopedPaths = allReportablePaths.filter(scopePathPredicate);
+  return sortPaths(new Set(scopedPaths));
 };
 
 export const classifyPath = relativePath => {
