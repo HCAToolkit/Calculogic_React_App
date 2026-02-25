@@ -1,19 +1,27 @@
 import path from 'node:path';
 import fs from 'node:fs';
 
-const ACTIVE_ROLES = new Set([
-  'host',
-  'wiring',
-  'contracts',
-  'build',
-  'build-style',
-  'logic',
-  'knowledge',
-  'results',
-  'results-style',
-]);
+const ROLE_REGISTRY = [
+  { role: 'host', category: 'architecture-support', status: 'active' },
+  { role: 'wiring', category: 'architecture-support', status: 'active' },
+  { role: 'contracts', category: 'architecture-support', status: 'active' },
+  { role: 'build', category: 'concern-core', status: 'active' },
+  { role: 'build-style', category: 'concern-core', status: 'active' },
+  { role: 'logic', category: 'concern-core', status: 'active' },
+  { role: 'knowledge', category: 'concern-core', status: 'active' },
+  { role: 'results', category: 'concern-core', status: 'active' },
+  { role: 'results-style', category: 'concern-core', status: 'active' },
+  {
+    role: 'view',
+    category: 'deprecated',
+    status: 'deprecated',
+    notes: 'Historical role from pre-current concern split; manual migration required.',
+  },
+];
 
-const ROLE_SUFFIXES = [...ACTIVE_ROLES].sort((a, b) => b.length - a.length);
+const ROLE_METADATA = new Map(ROLE_REGISTRY.map(entry => [entry.role, entry]));
+const ACTIVE_ROLES = new Set(ROLE_REGISTRY.filter(entry => entry.status === 'active').map(entry => entry.role));
+const ROLE_SUFFIXES = ROLE_REGISTRY.map(entry => entry.role).sort((a, b) => b.length - a.length);
 const CANONICAL_SEMANTIC_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const REPORTABLE_EXTENSIONS = new Set([
   '.ts',
@@ -31,36 +39,42 @@ const EXCLUDED_DIRECTORIES = new Set(['.git', 'node_modules', 'dist', 'coverage'
 
 export const normalizePath = relativePath => relativePath.split(path.sep).join('/');
 
-export const isAllowedSpecialCase = filePath => {
+const getSpecialCaseType = filePath => {
   const normalizedPath = normalizePath(filePath);
   const basename = path.posix.basename(normalizedPath);
 
+  if (basename === 'README.md') {
+    return 'conventional-doc';
+  }
+
   if (basename === 'index.ts' || basename === 'index.tsx') {
-    return true;
+    return 'barrel';
   }
 
   if (/\.test\.[^.]+$/u.test(basename) || /\.spec\.[^.]+$/u.test(basename)) {
-    return true;
+    return 'test-convention';
   }
 
   if (/\.d\.ts$/u.test(basename)) {
-    return true;
+    return 'ambient-declaration';
   }
 
   if (normalizedPath === 'package.json' || normalizedPath === 'package-lock.json') {
-    return true;
+    return 'ecosystem-required';
   }
 
   if (/^tsconfig(\..+)?\.json$/u.test(basename)) {
-    return true;
+    return 'ecosystem-required';
   }
 
   if (/^vite\.config\.[^.]+$/u.test(basename) || /^eslint\.config\.[^.]+$/u.test(basename)) {
-    return true;
+    return 'ecosystem-required';
   }
 
-  return false;
+  return null;
 };
+
+export const isAllowedSpecialCase = filePath => getSpecialCaseType(filePath) !== null;
 
 export const parseCanonicalName = basename => {
   const parts = basename.split('.');
@@ -110,7 +124,8 @@ export const classifyPath = relativePath => {
   const normalizedPath = normalizePath(relativePath);
   const basename = path.posix.basename(normalizedPath);
 
-  if (isAllowedSpecialCase(normalizedPath)) {
+  const specialCaseType = getSpecialCaseType(normalizedPath);
+  if (specialCaseType) {
     return {
       code: 'NAMING_ALLOWED_SPECIAL_CASE',
       severity: 'info',
@@ -118,11 +133,45 @@ export const classifyPath = relativePath => {
       classification: 'allowed-special-case',
       message: 'Filename matches an allowed reserved/special-case pattern.',
       ruleRef: 'FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12',
+      details: { specialCaseType },
     };
   }
 
   const parsed = parseCanonicalName(basename);
   if (parsed) {
+    const roleMetadata = ROLE_METADATA.get(parsed.role);
+
+    if (!roleMetadata) {
+      return {
+        code: 'NAMING_UNKNOWN_ROLE',
+        severity: 'warn',
+        path: normalizedPath,
+        classification: 'invalid-ambiguous',
+        message: `Unknown role segment "${parsed.role}" in canonical position.`,
+        ruleRef: 'FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
+        suggestedFix: 'Use a role from the active role registry.',
+        details: parsed,
+      };
+    }
+
+    if (roleMetadata.status === 'deprecated') {
+      return {
+        code: 'NAMING_DEPRECATED_ROLE',
+        severity: 'warn',
+        path: normalizedPath,
+        classification: 'invalid-ambiguous',
+        message: `Role segment "${parsed.role}" is deprecated and requires manual migration planning.`,
+        ruleRef: 'FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
+        suggestedFix: 'Replace deprecated roles manually using current active role taxonomy.',
+        details: {
+          ...parsed,
+          roleStatus: roleMetadata.status,
+          roleCategory: roleMetadata.category,
+          deprecationNote: roleMetadata.notes,
+        },
+      };
+    }
+
     if (!ACTIVE_ROLES.has(parsed.role)) {
       return {
         code: 'NAMING_UNKNOWN_ROLE',
@@ -145,7 +194,11 @@ export const classifyPath = relativePath => {
         message: 'Semantic name must use kebab-case for canonical filenames.',
         ruleRef: 'FileNamingMasterList-V1_1.md#semantic-name',
         suggestedFix: `Rename semantic name "${parsed.semanticName}" to kebab-case.`,
-        details: parsed,
+        details: {
+          ...parsed,
+          roleStatus: roleMetadata.status,
+          roleCategory: roleMetadata.category,
+        },
       };
     }
 
@@ -156,7 +209,11 @@ export const classifyPath = relativePath => {
       classification: 'canonical',
       message: 'Filename is canonical.',
       ruleRef: 'FileNamingMasterList-V1_1.md#core-filename-grammar',
-      details: parsed,
+      details: {
+        ...parsed,
+        roleStatus: roleMetadata.status,
+        roleCategory: roleMetadata.category,
+      },
     };
   }
 
@@ -228,6 +285,15 @@ export const runNamingValidator = rootDirectory => {
   };
 };
 
+const incrementCounter = (counts, key) => {
+  counts[key] = (counts[key] ?? 0) + 1;
+};
+
+const sortCountObject = counts =>
+  Object.fromEntries(
+    Object.entries(counts).sort(([left], [right]) => left.localeCompare(right)),
+  );
+
 export const summarizeFindings = findings => {
   const counts = {
     canonical: 0,
@@ -235,10 +301,33 @@ export const summarizeFindings = findings => {
     'legacy-exception': 0,
     'invalid-ambiguous': 0,
   };
+  const codeCounts = {};
+  const specialCaseTypeCounts = {};
+  const warningRoleStatusCounts = {};
+  const warningRoleCategoryCounts = {};
 
   for (const finding of findings) {
-    counts[finding.classification] += 1;
+    incrementCounter(counts, finding.classification);
+    incrementCounter(codeCounts, finding.code);
+
+    if (finding.details?.specialCaseType) {
+      incrementCounter(specialCaseTypeCounts, finding.details.specialCaseType);
+    }
+
+    if (finding.severity === 'warn' && finding.details?.roleStatus) {
+      incrementCounter(warningRoleStatusCounts, finding.details.roleStatus);
+    }
+
+    if (finding.severity === 'warn' && finding.details?.roleCategory) {
+      incrementCounter(warningRoleCategoryCounts, finding.details.roleCategory);
+    }
   }
 
-  return counts;
+  return {
+    counts,
+    codeCounts: sortCountObject(codeCounts),
+    specialCaseTypeCounts: sortCountObject(specialCaseTypeCounts),
+    warningRoleStatusCounts: sortCountObject(warningRoleStatusCounts),
+    warningRoleCategoryCounts: sortCountObject(warningRoleCategoryCounts),
+  };
 };

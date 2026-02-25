@@ -46,10 +46,40 @@ test('classifies hyphen-appended role ambiguity as invalid-ambiguous', () => {
   assert.equal(finding.code, 'NAMING_ROLE_HYPHEN_AMBIGUITY');
 });
 
-test('classifies allowed special case for test files', () => {
+test('classifies ecosystem-required special case with subtype', () => {
+  const finding = classifyPath('vite.config.ts');
+  assert.equal(finding.classification, 'allowed-special-case');
+  assert.equal(finding.code, 'NAMING_ALLOWED_SPECIAL_CASE');
+  assert.equal(finding.details?.specialCaseType, 'ecosystem-required');
+});
+
+test('classifies barrel special case with subtype', () => {
+  const finding = classifyPath('src/tabs/build/index.ts');
+  assert.equal(finding.classification, 'allowed-special-case');
+  assert.equal(finding.code, 'NAMING_ALLOWED_SPECIAL_CASE');
+  assert.equal(finding.details?.specialCaseType, 'barrel');
+});
+
+test('classifies test convention special case with subtype', () => {
   const finding = classifyPath('test/content-provider-registry.test.mjs');
   assert.equal(finding.classification, 'allowed-special-case');
   assert.equal(finding.code, 'NAMING_ALLOWED_SPECIAL_CASE');
+  assert.equal(finding.details?.specialCaseType, 'test-convention');
+});
+
+test('classifies deprecated role usage as invalid-ambiguous with metadata', () => {
+  const finding = classifyPath('src/tabs/build/BuildSurface.view.css');
+  assert.equal(finding.classification, 'invalid-ambiguous');
+  assert.equal(finding.code, 'NAMING_DEPRECATED_ROLE');
+  assert.equal(finding.details?.roleStatus, 'deprecated');
+  assert.equal(finding.details?.roleCategory, 'deprecated');
+});
+
+test('classifies README as conventional-doc special case', () => {
+  const finding = classifyPath('README.md');
+  assert.equal(finding.classification, 'allowed-special-case');
+  assert.equal(finding.code, 'NAMING_ALLOWED_SPECIAL_CASE');
+  assert.equal(finding.details?.specialCaseType, 'conventional-doc');
 });
 
 test('classifies legacy exceptions for non-canonical legacy names', () => {
