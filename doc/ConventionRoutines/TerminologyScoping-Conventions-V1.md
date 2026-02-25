@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document introduces a compact scoped-terminology convention for overloaded uses of the word `canonical`.
+This document introduces a compact scoped-terminology convention for overloaded uses of key terms including `canonical` and `host`.
 
 This is a **docs-only terminology scoping pass**. It is intended to reduce ambiguity in validator-facing and convention-heavy documentation without performing a repo-wide prose rewrite.
 
@@ -35,14 +35,39 @@ Use the following scoped forms when determinism depends on exact meaning.
 - Does **not** refer to: sort order, source authority, or destination planning.
 - Example: deterministic structural address token/segment grammar.
 
-## 3. Usage Guidance
+## 3. Scoped Host Terms (V1)
+
+Use the following scoped forms when `host` meaning must be deterministic across architecture and convention documents.
+
+### 3.1 `address_host`
+- Refers to: the structural-addressing namespace token/root concept used by deterministic address grammar (for example host-letter namespace roots in address strings).
+- Does **not** refer to: UI shell composition surfaces, app mount shells, or ownership assignments in refactor planning docs.
+- Example context: structural addressing/convention specs and validator-facing address grammar notes.
+
+### 3.2 `ui_host_surface`
+- Refers to: the UI composition shell/surface role (for example the Build Surface evolving into a global host surface).
+- Does **not** refer to: structural address namespace tokens/roots.
+- Example context: architecture plans, sequencing docs, and slice playbooks describing host UI composition/refactor boundaries.
+
+### 3.3 `host_owner`
+- Refers to: ownership/composition boundary assignment for host responsibilities (which module/surface owns specific host behavior/contracts).
+- Does **not** refer to: ticket/people ownership metadata or structural address namespace token semantics.
+- Example context: migration inventories/playbooks tracking responsibility drains and ownership shifts across host slices.
+
+## 4. Usage Guidance
 
 - Prefer scoped terms in tables, manifests, validator-facing notes, migration metadata, and other determinism-sensitive contexts.
-- Plain-language prose may still use unscoped "canonical" where context is obvious and ambiguity risk is low.
+- Plain-language prose may still use unscoped terms (for example `canonical` or `host`) where context is obvious and ambiguity risk is low.
+- In definition/rule statements where ambiguity is plausible, prefer scoped forms (for example `address_host` and `ui_host_surface`).
 - Do not force awkward prose rewrites solely to insert scoped terminology.
 
-## 4. Scope Boundary for This Pass
+## 5. Scope Boundary for This Pass
 
 This V1 pass is **not** a repo-wide terminology normalization rewrite.
 
-Deferred follow-up: a separate **Terminology Normalization Pass** can broaden normalization across overloaded terms, including `canonical` and `host` (and optionally `root`/`source`).
+Deferred follow-up: a separate **Terminology Normalization Pass (future)** should handle broader prose normalization across overloaded terms.
+
+High-risk normalization targets for that future pass:
+- Structural Addressing spec
+- Build Surface global host architecture docs
+- playbooks/inventories where both structural addressing and UI-host meanings appear
