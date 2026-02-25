@@ -265,7 +265,8 @@ Until broader decisions are finalized, this draft should be interpreted as a liv
 
 ### 10.1 Current Draft v1 Decisions (React App Scope)
 
-For the current React repository usage, the following parser/notation decisions are **closed for v1 draft purposes**:
+For the current React repository usage, the following parser/notation decisions are **closed for v1 draft purposes**.
+Classification: `Draft-Assumption` (scoped draft closure guidance, not global final law).
 
 1. **Placeholder `x`**
    - `x` is **not canonical** in structural addresses.
@@ -300,6 +301,7 @@ These closures resolve ambiguity for current React-repo draft usage while preser
 ### 10.2 Placeholder `x` Legality Matrix (Documentation Classification Rule)
 
 This subsection is the **authoritative source** for `x` placeholder legality in this React repository's documentation scope.
+Classification: `Normative` for placeholder-legality rules in this subsection.
 It is a documentation classification rule only; parser/validator/tooling behavior remains deferred as described elsewhere in this draft.
 
 | Context | `x` Allowed? | Classification / Marking Requirement | Notes |

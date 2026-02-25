@@ -11,6 +11,7 @@ This doc defines the canonical NL skeleton templates used by all configuration (
 - **Placeholder note (`x`):** This document follows the authoritative placeholder legality rule in `DeterministicStructuralAddressingSpec-Draft.md` (§10.2). Any `x` usage here is non-canonical and allowed only for illustrative/template contexts.
 - **Marking requirement:** Any example/template in this document that uses `x` MUST be explicitly marked `Illustrative` or `Placeholder`.
 - **Governance note:** Comment/provenance protocol conventions remain governed by `CCPP.md`; this doc remains the canonical NL skeleton structure source.
+- **Classification note:** Apply content labels per `DocumentContentClassificationConvention-V1.md` when ambiguity exists (for example: `Normative` rules vs `Illustrative` or `Placeholder` examples).
 
 ## Split-Canonical NL Migration Clarification (Policy)
 
@@ -365,12 +366,12 @@ Passes: [0–7] (Multi-pass implementation)
 - Zone A Subcontainer: [Brand / Nav / Tools]
 - Zone B Subcontainer: [Tabs / Modes / Breadcrumbs]
 - Zone C Subcontainer: [Actions / Profile / Publish]
-- Structural Address (Draft, optional, **Placeholder** example): `[A.1.2.1 / 3.2.x / etc.]`
+- Structural Address (Draft, optional, Classification: **Placeholder**): `[A.1.2.1 / 3.2.x / etc.]`
 
 #### 3.3 Atomic Components — Primitives (Build)
 
 - Buttons, labels, icons, previews, etc., assigned to each zone as leaf-level primitives.
-- Structural Address (Draft, optional, **Placeholder** example): `[A.1.2.1.4 / 3.3.x / etc.]`
+- Structural Address (Draft, optional, Classification: **Placeholder**): `[A.1.2.1.4 / 3.3.x / etc.]`
 
 ### 4. BuildStyle Concern (Visual Styling of Structure)
 
