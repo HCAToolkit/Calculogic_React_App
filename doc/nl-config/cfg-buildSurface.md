@@ -271,21 +271,36 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - Provides canonical anchor string literals for use by other configurations.
 
 ## 7. Results Concern (Outputs)
+### 7.0 Absence-State Vocabulary (v1)
+Absence-state labels distinguish intentional omission from planned future additions so reserved Results/ResultsStyle sections remain deterministic during incremental implementation.
+
+| Absence State | Meaning | Intent Type | Current Omission Expected? |
+|---|---|---|---|
+| `absent-by-design` | Intentionally not present in the current scope/design. | Intentional omission. | Yes — not an error/oversight. |
+| `deferred-planned` | Not present yet, but planned for a future iteration. | Planned future work. | Yes — pending a later pass. |
+| `not-applicable` | Concept/category does not apply to this artifact/section in its current form. | Non-applicable. | Yes — omission is structurally correct. |
+| `future-slot-reserved` | Section/slot intentionally reserved for structural continuity and provenance; content is expected later when triggering conditions exist. | Intentional structural reservation for future activation. | Yes — placeholder is deliberate. |
+
 ### 7.1 User-Facing Outputs
-- Not present; Build surface focuses on structure and interaction.
+- Absence State: `absent-by-design`.
+- Build surface currently focuses on structure and interaction rather than user-facing result outputs.
 
 ### 7.2 Dev / Debug Outputs
-- Optional debug panel for anchor inspection deferred to future iteration.
+- Absence State: `deferred-planned`.
+- Optional debug panel for anchor inspection is planned for a future iteration.
 
 ### 7.3 Accessibility Outputs
-- Live region hooks (future) will surface here when builder emits status messages.
+- Absence State: `future-slot-reserved`.
+- Live-region hooks will surface here when the builder emits status messages that require announcements.
 
 ## 8. ResultsStyle Concern (Output Styling)
 ### 8.1 Results Layout Styles
-- Not present until Results concern is implemented.
+- Absence State: `future-slot-reserved`.
+- Results layout styles are intentionally reserved and will be added when Results outputs exist.
 
 ### 8.2 Debug Display Styles
-- Not present.
+- Absence State: `deferred-planned`.
+- Debug display styles are planned for the same future iteration as Results debug outputs.
 
 ## 9. Assembly Pattern
 ### 9.1 File Structure
@@ -295,7 +310,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - src/tabs/build/buildSurfacePersistence.ts
 - src/tabs/build/buildSurfacePersistence.contracts.ts
 - src/tabs/build/BuildSurface.knowledge.ts
-- (Results and ResultsStyle files will be added when outputs exist.)
+- (Results and ResultsStyle files: `future-slot-reserved`; add when outputs exist.)
 - src/tabs/build/index.ts
 
 ### 9.2 Assembly Logic
@@ -311,11 +326,11 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - Pass 2: Implement BuildStyle styling groups.
 - Pass 3: Implement Logic hooks for resizing and persistence.
 - Pass 4: Expand Knowledge with copy/aria tokens.
-- Pass 5+: Add Results/ResultsStyle when builder emits analytics or summaries.
+- Pass 5+: Add Results/ResultsStyle (`deferred-planned`) when builder emits analytics or summaries.
 
 ### 10.2 Export Checklist
 - All Build anchors match Knowledge registry.
 - BuildStyle selectors reference anchors without introducing structure.
 - Logic handlers clean up pointer listeners and persist state safely.
 - Knowledge exports copy strings consumed by Build and BuildStyle.
-- Results concerns remain absent by design; confirm omission when reviewing changes.
+- Results user-facing outputs remain `absent-by-design`; reserved accessibility/style slots are `future-slot-reserved`; debug outputs/styles are `deferred-planned`. Confirm these typed omissions when reviewing changes.
