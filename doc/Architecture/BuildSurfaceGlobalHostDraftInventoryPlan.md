@@ -170,8 +170,11 @@ Ambiguity note: final global semantic root naming remains intentionally deferred
    - Potential future rename to a broader semantic target is deferred.
 
 2. **Final tab-provider naming pattern**
-   - Current draft uses `leftpanel-<tab>-sources.wiring.ts`.
-   - Whether provider naming should converge on `leftpanel-<tab>-provider.*` is deferred.
+   - **Temporary naming policy (current migration/refactor phase):**
+     - Preferred draft pattern: `leftpanel-<tab>-sources.wiring.ts`
+     - Allowed alternate (draft): provider-based naming (for example `leftpanel-<tab>-provider.*`) where already present or explicitly documented for a slice
+     - Current expectation: new additions in this migration phase use the preferred draft pattern unless a document explicitly states otherwise
+   - Final long-term convergence of sources-vs-provider naming remains deferred.
 
 3. **Future role promotion evaluation**
    - Repeated patterns around selectors/adapters may justify role promotion later.
