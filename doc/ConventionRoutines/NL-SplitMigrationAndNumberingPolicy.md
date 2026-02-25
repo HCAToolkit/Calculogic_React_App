@@ -15,16 +15,20 @@ This policy defines lightweight conventions for NL-document split migrations dur
 
 ## Migration Lifecycle Statuses
 
-Use explicit statuses in migration indexes/mapping tables:
+Status token meanings are centralized in:
 
-1. **planned** – target and intent identified; no canonical repoint yet.
-2. **in-progress** – split target drafting/migration underway.
-3. **repointed** – canonical source moved for the mapped slice; provenance links recorded.
-4. **retired** – legacy slice/doc no longer canonical after complete verified migration.
+- `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`
+
+This policy keeps the core scaffold lifecycle statuses and relies on the registry for deterministic shared meanings:
+
+1. **planned**
+2. **in-progress**
+3. **repointed**
+4. **retired**
 
 ### Lifecycle Vocabulary Alignment Note
 
-The four statuses above are the **minimum/core scaffold** for this policy. Architecture/inventory docs may use additional transitional statuses (for example `extracted`, `legacy-wrapper`, `deferred`) for finer migration tracking, provided meanings are explicit and truthfully applied.
+The four statuses above are the **minimum/core scaffold** for this policy. Additional transitional statuses used in architecture/inventory/playbook tracking (for example `extracted`, `legacy-wrapper`, `deferred`) should use the same centralized meanings from the registry rather than ad-hoc redefinition.
 
 `legacy-wrapper` may apply to NL docs when a monolith or index/wrapper continues forwarding readers to repointed split-canonical slices. In code-oriented inventories, the same term may remain code-centric; NL docs may alternatively use equivalent explicit wording when that is clearer.
 
@@ -53,6 +57,7 @@ A slice is considered done when all of the following are true:
 
 ## Cross-References
 
+- `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
 - `doc/ConventionRoutines/NL-First-Workflow.md`
 - `doc/ConventionRoutines/CCPP.md`
