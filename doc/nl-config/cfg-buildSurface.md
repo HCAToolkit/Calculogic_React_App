@@ -3,10 +3,12 @@
 This document is an instance of the Configuration-Level NL Skeleton defined in ../ConventionRoutines/General-NL-Skeletons.md.
 
 ## Transition Migration Status (Build Surface NL Split)
+- **NL Migration Mode:** `hybrid-forwarding`
 - **State:** Planned / transition-ready scaffolding active.
 - **Current canonical source:** This monolithic `cfg-buildSurface.md` document remains the authoritative NL reference until split migration slices are explicitly repointed.
 - **Planned direction:** Introduce semantic split-canonical NL documents for Build Surface concerns and interaction slices while preserving section/provenance continuity.
 - **Truthfulness rule:** Mapping rows and target statuses must reflect actual migration state; do not mark slices as migrated until corresponding split docs are written and validated.
+- **Mode meaning:** `hybrid-forwarding` means this monolith remains canonical for current content while also serving as a transition wrapper/index for planned split-canonical targets.
 
 ## Canonical Split NL Targets (Planned / In-Progress)
 > Placeholder index for semantic split targets. Entries remain non-canonical until explicitly marked repointed.
