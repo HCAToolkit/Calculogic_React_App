@@ -8,9 +8,11 @@ It exists to prevent scope creep and to avoid building deeper integrations on to
 
 The current Build Surface is evolving from a Build-tab-specific implementation into a future **global host surface** that can support multiple concern tabs (Build, BuildStyle, Logic, Knowledge, Results, ResultsStyle) and plugin-driven atom/config sources.
 
-Before that refactor, the Build Surface needs a correctness pass for:
+This sequencing plan defined an upfront correctness prerequisite for:
 - breakpoint preview behavior (mobile/tablet/desktop)
 - light/dark theme parity
+
+That prerequisite host-stability pass is now completed (see Phase 1 status), and remains the baseline for the remaining refactor/integration phases.
 
 This plan also defines when to:
 - prove Doc Engine integration in the host app

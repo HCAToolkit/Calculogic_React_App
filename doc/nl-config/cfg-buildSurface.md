@@ -10,7 +10,8 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 
 ## Canonical Split NL Targets (Planned / In-Progress)
 > Placeholder index for semantic split targets. Entries remain non-canonical until explicitly marked repointed.
-> Naming note: placeholder filenames are illustrative and must be normalized to an approved semantic-first, low-churn pattern before the first repointed slice (`doc/ConventionRoutines/FileNamingMasterList-V1_1.md`, `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`). Provisional starting shape (example-only): `cfg-buildSurface-<semantic-slice>.md`.
+> Naming note: placeholder row filenames below are illustrative semantic examples only (planning vocabulary), not final segment-style commitments.
+> Provisional pattern note: `cfg-buildSurface-<semantic-slice>.md` is a shape-level placeholder (semantic-first, low-churn). Exact segment style remains subject to convention/policy authority before the first repointed slice (`doc/ConventionRoutines/FileNamingMasterList-V1_1.md`, `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`).
 
 | Target NL Doc (planned) | Scope Intent | Status | Notes |
 |---|---|---|---|
@@ -20,7 +21,7 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 
 ## Legacy-to-Canonical Mapping Scaffold
 > Slice-by-slice migration tracker. Use one row per migrated section group; keep provenance explicit.
-> Placeholder target labels in this table are planning scaffolds only and should be finalized per convention/policy authority before repointed status is claimed.
+> Placeholder target labels in this table are planning scaffolds only and should be finalized per convention/policy authority before repointed status is claimed; they follow the same temporary, non-authoritative guidance class as the canonical-target placeholder examples above.
 
 | Legacy section(s) in `cfg-buildSurface.md` | Canonical split target | Migration status (`planned`/`in-progress`/`repointed`/`retired`) | Provenance / continuity notes |
 |---|---|---|---|
