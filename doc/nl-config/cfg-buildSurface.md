@@ -14,23 +14,25 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 > Placeholder index for semantic split targets. Entries remain non-canonical until explicitly marked repointed.
 > Naming note: placeholder row filenames below are illustrative semantic examples only (planning vocabulary), not final segment-style commitments.
 > Provisional pattern note: `cfg-buildSurface-<semantic-slice>.md` is a shape-level placeholder (semantic-first, low-churn). Exact segment style remains subject to convention/policy authority before the first repointed slice (`doc/ConventionRoutines/FileNamingMasterList-V1_1.md`, `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`).
+> Binding-level note: **Binding Level** classifies row authoritativeness (`placeholder`/`planned`/`provisional`/`canonical`/`retired`) and is separate from migration lifecycle status.
 
-| Target NL Doc (planned) | Scope Intent | Status | Notes |
-|---|---|---|---|
-| `doc/nl-config/cfg-buildSurface-layoutAndAnchors.md` | Build/BuildStyle layout anchors and panel topology | planned | Placeholder only in this pass |
-| `doc/nl-config/cfg-buildSurface-panelStateAndPersistence.md` | Logic + Knowledge for resize/collapse persistence | planned | Placeholder only in this pass |
-| `doc/nl-config/cfg-buildSurface-previewAndInspectorFlows.md` | Preview controls + inspector behavioral workflows | planned | Placeholder only in this pass |
+| Target NL Doc (planned) | Scope Intent | Migration status | Binding Level | Notes |
+|---|---|---|---|---|
+| `doc/nl-config/cfg-buildSurface-layoutAndAnchors.md` | Build/BuildStyle layout anchors and panel topology | planned | placeholder | Placeholder only in this pass |
+| `doc/nl-config/cfg-buildSurface-panelStateAndPersistence.md` | Logic + Knowledge for resize/collapse persistence | planned | placeholder | Placeholder only in this pass |
+| `doc/nl-config/cfg-buildSurface-previewAndInspectorFlows.md` | Preview controls + inspector behavioral workflows | planned | placeholder | Placeholder only in this pass |
 
 ## Legacy-to-Canonical Mapping Scaffold
 > Slice-by-slice migration tracker. Use one row per migrated section group; keep provenance explicit.
 > Placeholder target labels in this table are planning scaffolds only and should be finalized per convention/policy authority before repointed status is claimed; they follow the same temporary, non-authoritative guidance class as the canonical-target placeholder examples above.
+> Migration lifecycle status and binding level are intentionally tracked as separate dimensions in this scaffold.
 
-| Legacy section(s) in `cfg-buildSurface.md` | Canonical split target | Migration status (`planned`/`in-progress`/`repointed`/`retired`) | Provenance / continuity notes |
-|---|---|---|---|
-| `3.x` (Build concern) | `TBD semantic split doc` | planned | Preserve direct traceability to existing `[3.*]` atoms |
-| `4.x` (BuildStyle concern) | `TBD semantic split doc` | planned | Keep selector/anchor provenance tied to migrated Build slices |
-| `5.x–6.x` (Logic + Knowledge) | `TBD semantic split doc` | planned | Keep persistence parser/version history references intact |
-| `7.x–8.x` (Results + ResultsStyle) | `TBD semantic split doc` | planned | Repoint only when output contracts are fully documented |
+| Legacy section(s) in `cfg-buildSurface.md` | Canonical split target | Migration status (`planned`/`in-progress`/`repointed`/`retired`) | Binding Level | Provenance / continuity notes |
+|---|---|---|---|---|
+| `3.x` (Build concern) | `TBD semantic split doc` | planned | placeholder | Preserve direct traceability to existing `[3.*]` atoms |
+| `4.x` (BuildStyle concern) | `TBD semantic split doc` | planned | placeholder | Keep selector/anchor provenance tied to migrated Build slices |
+| `5.x–6.x` (Logic + Knowledge) | `TBD semantic split doc` | planned | placeholder | Keep persistence parser/version history references intact |
+| `7.x–8.x` (Results + ResultsStyle) | `TBD semantic split doc` | planned | placeholder | Repoint only when output contracts are fully documented |
 
 ## Monolith Behavior During Migration
 - This document currently acts as both:
