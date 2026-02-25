@@ -159,6 +159,12 @@ Notes:
 
 ## Deferred Decisions / Open Questions
 
+### Temporary Rule (Current React App Scope)
+
+For current React app inventory/refactor planning, `buildsurface` is the **canonical draft semantic root** unless superseded by an approved naming/architecture decision.
+
+Ambiguity note: final global semantic root naming remains intentionally deferred due to potential confusion between Build concern/tab naming and BuildSurface architectural surface/root naming.
+
 1. **Global root semantic target finalization**
    - Keep `buildsurface` for this draft.
    - Potential future rename to a broader semantic target is deferred.
