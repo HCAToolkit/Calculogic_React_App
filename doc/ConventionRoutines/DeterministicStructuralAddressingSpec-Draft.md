@@ -269,7 +269,7 @@ For the current React repository usage, the following parser/notation decisions 
 
 1. **Placeholder `x`**
    - `x` is **not canonical** in structural addresses.
-   - Placeholder markers may appear only in illustrative/template contexts and must not appear in canonical addresses.
+   - Placeholder markers may appear only in explicitly marked illustrative/template contexts and must not appear in canonical addresses.
 
 2. **Host token in CCPP atomic IDs**
    - Host token remains **externally bound/context-bound** for now.
@@ -296,6 +296,22 @@ For the current React repository usage, the following parser/notation decisions 
    - Canonical parsing for this React App Scope v1 draft does not accept leading-zero normalization.
 
 These closures resolve ambiguity for current React-repo draft usage while preserving future cross-repo/engine flexibility.
+
+### 10.2 Placeholder `x` Legality Matrix (Documentation Classification Rule)
+
+This subsection is the **authoritative source** for `x` placeholder legality in this React repository's documentation scope.
+It is a documentation classification rule only; parser/validator/tooling behavior remains deferred as described elsewhere in this draft.
+
+| Context | `x` Allowed? | Classification / Marking Requirement | Notes |
+| --- | --- | --- | --- |
+| Illustrative examples | Yes, conditionally | **MUST** be labeled `Illustrative` or `Placeholder` near the example block/line. | Allowed only to demonstrate structure shape (for example, unresolved depth/index examples). |
+| Template scaffolds | Yes, conditionally | **MUST** be labeled `Illustrative` or `Placeholder`. | Applies to reusable doc templates where concrete canonical addresses are not yet assigned. |
+| Canonical structural addresses | No | Not applicable; canonical values must be fully concrete and numeric per grammar. | `x` is non-canonical and invalid in canonical address values. |
+| Canonical NL docs/config entries (address metadata intended as real/canonical) | No | Not applicable; address metadata must use canonical concrete addresses. | If placeholder text is temporarily shown for drafting, it must be explicitly marked and treated as non-canonical. |
+| CCPP canonical IDs (when referenced from this spec) | No (current React App Scope v1) | Not applicable in canonical IDs. | CCPP atomic IDs remain NL-section authoritative; placeholder `x` is non-canonical unless a future policy explicitly changes this. |
+| Migration planning rows | Yes, conditionally | **MUST** be labeled `Placeholder` or `Illustrative` at row/table scope. | Permitted only for transitional planning artifacts that are explicitly non-canonical. |
+
+Marking requirement (normative for docs): examples/templates using placeholder marker `x` **MUST** be explicitly marked `Illustrative` or `Placeholder` to avoid ambiguous interpretation in future scanning/validation workflows.
 
 ## 11. Future Sync Targets (Required)
 

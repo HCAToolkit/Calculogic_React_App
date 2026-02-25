@@ -8,7 +8,8 @@ This doc defines the canonical NL skeleton templates used by all configuration (
 - **Structural Address (Draft):** Deterministic structural positioning (host-present or no-host forms) is a supplementary addressing layer described in `DeterministicStructuralAddressingSpec-Draft.md`.
 - **Relationship between the two:** These systems are related but **not identical**. Structural addresses do not replace NL section numbering in this skeleton.
 - **Template usage:** Where useful, templates may record structural addresses as **draft, optional metadata** alongside NL content.
-- **Placeholder note (`x`):** Examples that use `x` (for example `3.2.x`) are illustrative draft placeholders in this doc; placeholder marker policy remains deferred to `DeterministicStructuralAddressingSpec-Draft.md`.
+- **Placeholder note (`x`):** This document follows the authoritative placeholder legality rule in `DeterministicStructuralAddressingSpec-Draft.md` (§10.2). Any `x` usage here is non-canonical and allowed only for illustrative/template contexts.
+- **Marking requirement:** Any example/template in this document that uses `x` MUST be explicitly marked `Illustrative` or `Placeholder`.
 - **Governance note:** Comment/provenance protocol conventions remain governed by `CCPP.md`; this doc remains the canonical NL skeleton structure source.
 
 ## Split-Canonical NL Migration Clarification (Policy)
@@ -364,12 +365,12 @@ Passes: [0–7] (Multi-pass implementation)
 - Zone A Subcontainer: [Brand / Nav / Tools]
 - Zone B Subcontainer: [Tabs / Modes / Breadcrumbs]
 - Zone C Subcontainer: [Actions / Profile / Publish]
-- Structural Address (Draft, optional): `[A.1.2.1 / 3.2.x / etc.]`
+- Structural Address (Draft, optional, **Placeholder** example): `[A.1.2.1 / 3.2.x / etc.]`
 
 #### 3.3 Atomic Components — Primitives (Build)
 
 - Buttons, labels, icons, previews, etc., assigned to each zone as leaf-level primitives.
-- Structural Address (Draft, optional): `[A.1.2.1.4 / 3.3.x / etc.]`
+- Structural Address (Draft, optional, **Placeholder** example): `[A.1.2.1.4 / 3.3.x / etc.]`
 
 ### 4. BuildStyle Concern (Visual Styling of Structure)
 
