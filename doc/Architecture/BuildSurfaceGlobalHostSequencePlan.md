@@ -1,6 +1,8 @@
 # Build Surface Global Host Sequence Plan
 
 This document defines the recommended sequencing for stabilizing the Build Surface before converting it into a global host surface, integrating Doc Engine entry points, and preparing publish-flow integration seams.
+> Terminology note: in this architecture/playbook context, `host` refers to the `ui_host_surface` concept (UI composition shell) and `host_owner` boundary assignments where stated, not the `address_host` namespace token semantics used by structural addressing grammar. See `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`.
+
 
 It exists to prevent scope creep and to avoid building deeper integrations on top of an unreliable host surface baseline.
 

@@ -14,6 +14,8 @@
   - `doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md` (global host sequencing context)
 - **Last reviewed:** 2026-02-23
 
+> Terminology note: in this document, unscoped `host` references for address grammar/namespace semantics should be interpreted as `address_host` (see `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`). UI composition-shell meanings belong to `ui_host_surface` terminology in architecture docs.
+
 ## 2. Purpose
 
 This document defines the **deterministic structural addressing layer** used to identify structural units (containers/subcontainers/primitives or equivalent nodes) in a way that is parseable and stable.

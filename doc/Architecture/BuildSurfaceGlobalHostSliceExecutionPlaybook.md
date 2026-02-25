@@ -1,6 +1,8 @@
 # Build Surface Global Host Slice Execution Playbook
 
 ## Document Status
+> Terminology note: in this architecture/playbook context, `host` refers to the `ui_host_surface` concept (UI composition shell) and `host_owner` boundary assignments where stated, not the `address_host` namespace token semantics used by structural addressing grammar. See `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`.
+
 
 - **Document Type:** Architecture Execution Playbook
 - **Status:** Draft (Docs-First Refactor Execution Guidance)
