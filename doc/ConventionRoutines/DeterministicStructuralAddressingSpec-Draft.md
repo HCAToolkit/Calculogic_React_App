@@ -62,7 +62,7 @@ A numeric segment that indicates concern position (aligned with canonical concer
 
 Any subsequent numeric segment after the concern slot representing deeper nesting (container/subcontainer/primitive lineage or equivalent nested units).
 
-> Draft terminology note: this doc uses **node index** as the neutral default term. “atom index” and “encapsulation index” remain viable alternates (see Open Decisions).
+> Draft terminology note: this doc uses **node index** as the canonical machine-facing term for this draft. Historical alternates such as “atom index” and “encapsulation index” may appear only as non-canonical vocabulary references.
 
 ### 3.7 No-Host Mode
 
@@ -139,7 +139,7 @@ Examples: `1.3`, `3.5.1`, `2.3.1.1.4`
   - alpha token => host-present mode
   - numeric token => no-host mode
 - Reject mixed or malformed tokens (e.g., `A.1.x`, `A..3`, `.1.3`).
-- Leading-zero handling is deferred (see §10). Until resolved, examples in this draft treat leading zeros as non-canonical and therefore invalid under current draft assumptions.
+- Canonical numeric segments must not include leading zeros. Leading-zero numeric segments are invalid in this React App Scope v1 draft.
 
 ### 4.6 Sorting Assumptions
 
@@ -236,29 +236,66 @@ Within same host (or same no-host artifact), sort by numeric segment tuple.
 - `1` (invalid: no-host mode missing concern slot)
 - `A.1.9` (invalid concern slot under current canonical concern range)
 - `AA.1.3` (invalid under current draft grammar: multi-letter host tokens are deferred in §10)
-- `A.01.3` (invalid under current draft assumption of canonical non-padded numeric segments; final parser policy remains deferred in §10)
-- `A.1.x.2` (invalid under current draft grammar: placeholder markers such as `x` are deferred in §10 and not accepted)
+- `A.01.3` (invalid: canonical numeric segments must not include leading zeros in this React App Scope v1 draft)
+- `A.1.x.2` (invalid: placeholder markers such as `x` are non-canonical and not accepted in canonical addresses)
 
 ## 10. Open Decisions / Deferred Decisions (Required)
 
-The following items are intentionally unresolved in this draft and require follow-up decisions:
+This section remains the broad cross-repo/engine decision backlog.
+React App Scope v1 draft closures are recorded in §10.1 and should be treated as scoped guidance, not universal finalization.
 
-1. **Placeholder segment marker** (e.g., `x`) for unknown positions:
-   - Candidate outcomes: adopt with strict rules, defer entirely, or reject.
-2. **Host letters in CCPP atomic comment IDs:**
-   - Whether host token should appear directly in bracketed IDs or remain context-bound externally.
-3. **Dual notation vs single notation:**
-   - Whether comments/docs should allow both host-present and host-omitted views for same node.
-4. **Term standardization:**
-   - Final canonical term among “node”, “atom”, “encapsulation”.
-5. **Concern presentation style:**
-   - Numeric slots only vs optional semantic aliases (`3(Build)`) in human-facing docs.
-6. **Host token width:**
-   - Whether to remain single-letter (`A`–`Z`) or permit multi-letter host ids in future.
-7. **Leading-zero policy:**
-   - Explicit strict prohibition vs parser-normalized acceptance.
+Open items still intentionally deferred beyond this scoped pass:
 
-Until these decisions are closed, this draft's examples and non-examples should be interpreted as **draft assumptions for consistency**, not final cross-repo mandates.
+1. **Cross-repo placeholder policy harmonization:**
+   - Whether any future non-canonical placeholder workflows should be standardized outside React scope.
+2. **CCPP atomic ID host-token finalization across all repos/tools:**
+   - React scope currently keeps host token context-bound; broader final model remains open.
+3. **Future notation portability needs:**
+   - Whether any additional display notations are worth formalizing beyond canonical storage grammar.
+4. **Vocabulary cleanup across legacy docs:**
+   - How/when to migrate historical “atom/encapsulation” wording in untouched materials.
+5. **Concern alias publishing conventions in external documentation:**
+   - How to present semantic aliases (if at all) outside canonical address strings.
+6. **Potential host-token expansion for future engines:**
+   - Whether any non-React scope requires multi-letter host identifiers later.
+7. **Parser strictness profiles across products:**
+   - Whether strict canonical rejection should remain universal or be profile-configurable in future systems.
+
+Until broader decisions are finalized, this draft should be interpreted as a living specification with scoped closures where explicitly stated.
+
+### 10.1 Current Draft v1 Decisions (React App Scope)
+
+For the current React repository usage, the following parser/notation decisions are **closed for v1 draft purposes**:
+
+1. **Placeholder `x`**
+   - `x` is **not canonical** in structural addresses.
+   - Placeholder markers may appear only in illustrative/template contexts and must not appear in canonical addresses.
+
+2. **Host token in CCPP atomic IDs**
+   - Host token remains **externally bound/context-bound** for now.
+   - Bracketed CCPP atomic IDs are not required to embed host token in this React App Scope v1 draft.
+
+3. **Notation policy**
+   - Structural addresses use **one canonical notation** defined by this grammar.
+   - Any alternate human-friendly representation is non-canonical display/prose only.
+   - Rationale: a single canonical notation preserves deterministic parsing and simplifies normalization.
+
+4. **Canonical term**
+   - `node` is the canonical machine-facing term in this spec for React App Scope v1 draft usage.
+   - Historical alternates may be referenced only as non-canonical vocabulary notes.
+
+5. **Concern presentation style**
+   - Canonical address notation uses **numeric concern slot values only**.
+   - Semantic aliases such as `3(Build)` are non-canonical prose/display forms only.
+
+6. **Host token width**
+   - Current v1 draft grammar remains **single-letter host token only** (`A`–`Z`).
+
+7. **Leading-zero policy**
+   - Leading-zero numeric segments are rejected in canonical form.
+   - Canonical parsing for this React App Scope v1 draft does not accept leading-zero normalization.
+
+These closures resolve ambiguity for current React-repo draft usage while preserving future cross-repo/engine flexibility.
 
 ## 11. Future Sync Targets (Required)
 
@@ -279,4 +316,4 @@ This draft establishes grammar first. Later passes should synchronize wording/ex
    - new convention examples
    - new comment patterns where applicable
 4. Backfill legacy material incrementally during normal touchpoints.
-5. Validator/tooling enforcement is deferred to a later pass after open decisions are resolved.
+5. Validator/tooling enforcement is intentionally deferred to a later pass; this document does not define validator modes, parser APIs, or implementation behavior in this closure pass.
