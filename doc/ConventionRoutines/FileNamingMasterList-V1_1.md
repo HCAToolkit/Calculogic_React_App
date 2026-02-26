@@ -74,6 +74,15 @@ This spec is intentionally explicit and semantic (no guessing/inference required
   - [Use `-` for semantic words](#use---for-semantic-words)
   - [Use `.` for role suffix separation](#use--for-role-suffix-separation)
 - [Role Registry Master List V1](#role-registry-master-list-v1)
+  - [Role Category Registry](#role-category-registry)
+    - [Role Categories (deterministic set)](#role-categories-deterministic-set)
+    - [Role Status Values (deterministic vocabulary)](#role-status-values-deterministic-vocabulary)
+    - [Role Change-Control Rules](#role-change-control-rules)
+  - [Role Semantics Definitions](#role-semantics-definitions)
+    - [Active Roles](#active-roles)
+    - [Deprecated Roles](#deprecated-roles)
+    - [Provisional Roles (Documented, Not Finalized)](#provisional-roles-documented-not-finalized)
+  - [Role Decision Rubric](#role-decision-rubric)
   - [Primary Concern Roles](#primary-concern-roles)
     - [`build`](#build)
     - [`build-style`](#build-style)
@@ -357,6 +366,8 @@ Use hyphens inside the semantic name.
 
 ### Use `.` for role suffix separation
 
+<a id="role-suffix-separation-rule-important"></a>
+
 Use a dot to separate semantic-name from role.
 
 - ✅ `leftpanel-selector.wiring.ts`
@@ -369,6 +380,230 @@ Use a dot to separate semantic-name from role.
 
 This is the canonical role list for filenames.  
 (You can expand later through a change process.)
+
+### Role Category Registry
+
+#### Role Categories (deterministic set)
+
+All role registry entries MUST declare one category from the bounded list below.
+
+- `concern-core`: core Calculogic concern roles that represent primary concern responsibilities.
+- `concern-style`: style-partner concern roles dedicated to visual/layout styling concerns.
+- `architecture-support`: architecture support/wiring/composition/contract boundary roles.
+- `indexing-registry`: stable indexing/catalog/inventory/anchor/identifier-style roles.
+- `integration-adapter`: adapter/mapper/resolver boundary translation roles (defined now for deterministic future use).
+- `deprecated`: historical role segments retained for detection and migration guidance.
+
+#### Role Status Values (deterministic vocabulary)
+
+All role registry entries MUST declare one status from the bounded list below.
+
+- `active`: finalized role, allowed for canonical naming decisions.
+- `deprecated`: historical role retained for detection/migration guidance; not allowed for new canonical naming.
+- `provisional`: documented role candidate that is explicitly not finalized.
+
+#### Role Change-Control Rules
+
+- Any new role segment MUST be documented in this master list before use, including category, status, and semantics.
+- Provisional roles MUST include a finalization plan note describing what evidence/conditions would make the role `active` versus removed/renamed.
+- Deprecated roles MUST include a deprecation note and migration intent (manual migration intent is acceptable; no automatic mapping promise required).
+- Role meaning changes MUST update the semantics definition block in this document first, then any downstream validator/spec references.
+
+### Role Semantics Definitions
+
+Each role below has an explicit deterministic definition: meaning, purpose/use-cases, non-goals, category, and status.
+
+#### Active Roles
+
+##### `build`
+
+- **Meaning:** local UI structure/content construction for a specific target.
+- **Purpose / use-cases:**
+  - section-level UI composition
+  - local structural assembly for a specific semantic target
+- **Non-goals / misuse examples:**
+  - not top-level placement/orchestration across sibling sections (use `host`)
+  - not generic integration glue (use `wiring`)
+- **Category:** `concern-core`
+- **Status:** `active`
+
+##### `logic`
+
+- **Meaning:** interaction/state/behavior logic for a specific target.
+- **Purpose / use-cases:**
+  - event handling and transitions
+  - local behavior orchestration
+- **Non-goals / misuse examples:**
+  - not static reference/config payloads (use `knowledge`)
+  - not contract-boundary parsing/shape guard files (use `contracts`)
+- **Category:** `concern-core`
+- **Status:** `active`
+
+##### `knowledge`
+
+- **Meaning:** static knowledge/config/schema/reference data for a target.
+- **Purpose / use-cases:**
+  - constants and maps
+  - static definitions that support build/logic/results concerns
+- **Non-goals / misuse examples:**
+  - not behavior workflows/state transitions (use `logic`)
+  - not a misc dumping ground for unrelated constants
+- **Category:** `concern-core`
+- **Status:** `active`
+
+##### `results`
+
+- **Meaning:** result-layer output shaping/mapping/preparation.
+- **Purpose / use-cases:**
+  - transforming domain/app data into result-friendly structures
+  - rendering-oriented output preparation in the results concern
+- **Non-goals / misuse examples:**
+  - not general interaction workflows (use `logic`)
+  - not visual styling declarations (use `results-style`)
+- **Category:** `concern-core`
+- **Status:** `active`
+
+##### `build-style`
+
+- **Meaning:** style/layout rules paired to build concern structure.
+- **Purpose / use-cases:**
+  - visual/layout styling for build concern outputs
+  - build concern style partner files
+- **Non-goals / misuse examples:**
+  - not results concern output styling (use `results-style`)
+  - not runtime behavior or state transitions
+- **Category:** `concern-style`
+- **Status:** `active`
+
+##### `results-style`
+
+- **Meaning:** style/layout rules paired to results concern outputs.
+- **Purpose / use-cases:**
+  - visual presentation of results concern output
+  - result-specific display styling
+- **Non-goals / misuse examples:**
+  - not build concern layout/style files (use `build-style`)
+  - not data shaping or behavior logic (use `results` / `logic`)
+- **Category:** `concern-style`
+- **Status:** `active`
+
+##### `host`
+
+- **Meaning:** structural host/composition file for section/subsection placement.
+- **Purpose / use-cases:**
+  - assembling and placing sibling sections
+  - defining structural layout relationships
+- **Non-goals / misuse examples:**
+  - not local section implementation detail files (`build`)
+  - not generic helper glue without clear hosting responsibility (`wiring`)
+- **Category:** `architecture-support`
+- **Status:** `active`
+
+##### `wiring`
+
+- **Meaning:** integration glue connecting modules/contracts/adapters for a target.
+- **Purpose / use-cases:**
+  - dependency hookups and module composition
+  - shared integration setup that reduces repetition
+- **Non-goals / misuse examples:**
+  - not a mixed junk drawer with unclear ownership
+  - not replacing clear concern files where concern ownership is explicit
+- **Category:** `architecture-support`
+- **Status:** `active`
+
+##### `contracts`
+
+- **Meaning:** stable contract boundary definitions, parsing/normalization, and shape guards.
+- **Purpose / use-cases:**
+  - contract-level input/output expectations
+  - version/shape guard logic and normalization contracts
+- **Non-goals / misuse examples:**
+  - not general runtime interaction behavior (`logic`)
+  - not static non-contract metadata-only files (`knowledge`)
+- **Category:** `architecture-support`
+- **Status:** `active`
+
+#### Deprecated Roles
+
+##### `view`
+
+- **Meaning:** historical pre-current concern split role term.
+- **Purpose / use-cases:**
+  - retained only for detection and migration guidance.
+- **Non-goals / misuse examples:**
+  - not valid for new canonical naming decisions
+  - not auto-mapped by policy to current roles
+- **Category:** `deprecated`
+- **Status:** `deprecated`
+- **Deprecation note:** historical pre-current concern split; manual migration required.
+- **Migration intent:** migrate case-by-case to current active role taxonomy based on real responsibility.
+
+#### Provisional Roles (Documented, Not Finalized)
+
+##### `ids`
+
+- **Meaning:** stable identifier constants/tokens/key sets for a specific semantic target.
+- **Purpose / use-cases:**
+  - canonical ID/token collections
+  - stable key lists used by registries/inventories/lookup boundaries
+- **Non-goals / misuse examples:**
+  - not a general constants dumping ground
+  - not behavior logic, orchestration, or runtime resolution flows
+- **Category:** `indexing-registry`
+- **Status:** `provisional`
+- **Finalization plan note:** promote to `active` only if repository usage stabilizes around consistent identifier-set semantics and validator-distinguishable checks; otherwise merge intent back into `knowledge`.
+
+##### `anchor`
+
+- **Meaning:** stable anchor/address tokens for deterministic addressing.
+- **Purpose / use-cases:**
+  - document/content anchor tokens
+  - structured addressing identifiers used as durable references
+- **Non-goals / misuse examples:**
+  - not free-form URL utilities
+  - not general routing/flow logic
+- **Category:** `indexing-registry`
+- **Status:** `provisional`
+- **Finalization plan note:** promote to `active` when anchor/address semantics remain stable across multiple targets and produce clear validator value; otherwise fold into `knowledge`/`contracts` by responsibility.
+
+##### `catalog`
+
+- **Meaning:** inventory/listing of what exists for a bounded target.
+- **Purpose / use-cases:**
+  - explicit inventories/manifests
+  - listing/index surfaces without resolution execution
+- **Non-goals / misuse examples:**
+  - not resolution/orchestration logic
+  - not adapter glue or contracts parsing
+- **Category:** `indexing-registry`
+- **Status:** `provisional`
+- **Finalization plan note:** promote to `active` when inventory-only usage is stable and distinguishable from `knowledge` plus `wiring`; otherwise keep as semantic-name term under existing active roles.
+
+##### `provider`
+
+- **Meaning:** provisional placeholder only; term is currently polysemous and not yet single-meaning.
+- **Purpose / use-cases:**
+  - none finalized; requires one locked semantic definition before activation.
+- **Non-goals / misuse examples:**
+  - not to be used as a generic dependency-injection, data-source, context wrapper, or service label catch-all
+  - not to be used for new canonical naming decisions without explicit role-finalization note
+- **Category:** `integration-adapter` *(provisional category assignment pending final meaning lock)*
+- **Status:** `provisional`
+- **Finalization plan note:** before activation, this document MUST define a single intended meaning and boundary; if no single meaning converges, remove/rename instead of activating.
+
+### Role Decision Rubric
+
+Use this rubric before creating a new role segment:
+
+- **Stable meaning across the repo:** the role means the same thing in all intended contexts.
+- **Predictable usage patterns:** maintainers can reliably predict when to use/not use it.
+- **Validator value:** deterministic checks can be written that add signal beyond existing roles.
+- **Non-duplication:** role is not duplicative with existing roles/categories.
+
+Non-binding mapping guidance:
+
+- indexing/registry-like responsibilities often overlap with `knowledge` constants or `wiring` inventories.
+- define the boundary explicitly in role semantics first; avoid guessing in validator behavior.
 
 ### Primary Concern Roles
 

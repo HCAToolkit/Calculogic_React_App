@@ -22,6 +22,7 @@ Out of scope for V0.1.2:
 
 Primary naming authority:
 - `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+- Role categories, role status values, role semantics, and provisional-role policy are authoritative in the `Role Registry Master List V1` section of `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`.
 
 Supporting workflow alignment:
 - `doc/ConventionRoutines/NL-First-Workflow.md`
