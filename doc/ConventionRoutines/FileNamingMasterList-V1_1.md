@@ -390,6 +390,7 @@ All role registry entries MUST declare one category from the bounded list below.
 - `concern-core`: core Calculogic concern roles that represent primary concern responsibilities.
 - `concern-style`: style-partner concern roles dedicated to visual/layout styling concerns.
 - `architecture-support`: architecture support/wiring/composition/contract boundary roles.
+- `documentation`: documentation-only filename roles (spec/policy/workflow/plan/audit/healthcheck).
 - `indexing-registry`: stable indexing/catalog/inventory/anchor/identifier-style roles.
 - `integration-adapter`: adapter/mapper/resolver boundary translation roles (defined now for deterministic future use).
 - `deprecated`: historical role segments retained for detection and migration guidance.
@@ -509,6 +510,79 @@ Each role below has an explicit deterministic definition: meaning, purpose/use-c
   - not a mixed junk drawer with unclear ownership
   - not replacing clear concern files where concern ownership is explicit
 - **Category:** `architecture-support`
+- **Status:** `active`
+
+
+##### `spec`
+
+- **Meaning:** canonical specification/contract documentation for a defined scope.
+- **Purpose / use-cases:**
+  - definitive behavioral/structural specs used as implementation references
+  - bounded contracts expressed in documentation form
+- **Non-goals / misuse examples:**
+  - not governance rules or mandates (use `policy`)
+  - not procedural step-by-step routines (use `workflow`)
+- **Category:** `documentation`
+- **Status:** `active`
+
+##### `policy`
+
+- **Meaning:** governance and rule-setting documentation that defines must/should decisions.
+- **Purpose / use-cases:**
+  - coding/process policy statements
+  - stable decision rules and constraints for contributors
+- **Non-goals / misuse examples:**
+  - not implementation planning timelines (use `plan`)
+  - not one-off findings snapshots (use `audit`)
+- **Category:** `documentation`
+- **Status:** `active`
+
+##### `workflow`
+
+- **Meaning:** procedural documentation for repeatable routines and sequences.
+- **Purpose / use-cases:**
+  - step-by-step operational runbooks
+  - recurring contributor workflows
+- **Non-goals / misuse examples:**
+  - not normative governance requirements (use `policy`)
+  - not canonical behavior contracts (use `spec`)
+- **Category:** `documentation`
+- **Status:** `active`
+
+##### `plan`
+
+- **Meaning:** forward-looking planning documents for intended future work.
+- **Purpose / use-cases:**
+  - roadmap slices and planned implementation phases
+  - scoped intent docs for upcoming changes
+- **Non-goals / misuse examples:**
+  - not completed-state verification records (use `audit`/`healthcheck`)
+  - not normative rules for all contributors (use `policy`)
+- **Category:** `documentation`
+- **Status:** `active`
+
+##### `audit`
+
+- **Meaning:** point-in-time audit/reconciliation findings for a defined scope.
+- **Purpose / use-cases:**
+  - one-off conformance checks
+  - reconciliation snapshots and discrepancy reports
+- **Non-goals / misuse examples:**
+  - not recurring routine status tracking (use `healthcheck`)
+  - not future intent planning (use `plan`)
+- **Category:** `documentation`
+- **Status:** `active`
+
+##### `healthcheck`
+
+- **Meaning:** recurring health/status check documentation for operational visibility.
+- **Purpose / use-cases:**
+  - periodic status checks with repeated cadence
+  - lightweight system/process health reporting
+- **Non-goals / misuse examples:**
+  - not one-off deep-dive reconciliations (use `audit`)
+  - not step-by-step runbook procedures (use `workflow`)
+- **Category:** `documentation`
 - **Status:** `active`
 
 ##### `contracts`

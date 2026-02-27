@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.9** (runtime config supports additive role-registry extensions for naming classification).
+Current implementation target: **V0.1.10** (runtime config supports additive role-registry extensions and documentation role taxonomy).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -22,7 +22,7 @@ Scope predicates are evaluated on normalized repository-relative paths before re
 ### 2.3 Role registry metadata (V0.1.1)
 The validator uses a structured role registry with metadata fields:
 - `role`
-- `category` (`concern-core`, `architecture-support`, `deprecated`)
+- `category` (`concern-core`, `architecture-support`, `documentation`, `deprecated`)
 - `status` (`active`, `deprecated`)
 - optional `notes`
 
@@ -36,6 +36,12 @@ Active roles:
 - knowledge
 - results
 - results-style
+- spec
+- policy
+- workflow
+- plan
+- audit
+- healthcheck
 
 Deprecated historical roles:
 - view
@@ -71,7 +77,7 @@ Naming validator supports optional runtime config input with deterministic JSON 
 - each extension entry must be a string starting with `.`
 - optional `naming.roles.add` array of role metadata objects:
   - required `role` string
-  - required `category` from `concern-core | architecture-support | deprecated`
+  - required `category` from `concern-core | architecture-support | documentation | deprecated`
   - required `status` from `active | deprecated`
   - optional `notes` string
 
@@ -95,7 +101,7 @@ Runtime behavior for role additions:
 Classify as canonical when filename parses as `<semantic-name>.<role>.<ext>` (including `.module.css`) with kebab-case semantic name and known role.
 
 ### 3.2 Allowed special case
-Classify as allowed special case for reserved filenames and patterns including barrel files, framework-required names, test files, ambient declaration files, and README convention docs.
+Classify as allowed special case for reserved filenames and patterns including barrel files, framework-required names, test files (`*.test.<code-ext>` / `*.spec.<code-ext>`), ambient declaration files, and README convention docs.
 
 Allowed special-case findings include `details.specialCaseType` values:
 - `ecosystem-required`

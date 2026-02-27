@@ -36,6 +36,14 @@ test('classifies canonical valid example', () => {
   assert.equal(finding.code, 'NAMING_CANONICAL');
 });
 
+test('classifies documentation spec role as canonical with role metadata', () => {
+  const finding = classifyPath('doc/ConventionRoutines/cscs.spec.md');
+  assert.equal(finding.classification, 'canonical');
+  assert.equal(finding.code, 'NAMING_CANONICAL');
+  assert.equal(finding.details?.roleCategory, 'documentation');
+  assert.equal(finding.details?.roleStatus, 'active');
+});
+
 test('classifies unknown role as invalid-ambiguous', () => {
   const finding = classifyPath('src/rightpanel.widget.ts');
   assert.equal(finding.classification, 'invalid-ambiguous');
@@ -70,6 +78,13 @@ test('classifies barrel special case with subtype', () => {
 
 test('classifies test convention special case with subtype', () => {
   const finding = classifyPath('test/content-provider-registry.test.mjs');
+  assert.equal(finding.classification, 'allowed-special-case');
+  assert.equal(finding.code, 'NAMING_ALLOWED_SPECIAL_CASE');
+  assert.equal(finding.details?.specialCaseType, 'test-convention');
+});
+
+test('classifies spec test convention file with code extension as special case', () => {
+  const finding = classifyPath('test/content-provider-registry.spec.ts');
   assert.equal(finding.classification, 'allowed-special-case');
   assert.equal(finding.code, 'NAMING_ALLOWED_SPECIAL_CASE');
   assert.equal(finding.details?.specialCaseType, 'test-convention');

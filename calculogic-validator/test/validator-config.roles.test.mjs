@@ -91,7 +91,7 @@ test('fails when naming.roles.add category or status is invalid', () => {
   try {
     assert.throws(
       () => loadValidatorConfigFromFile(invalidCategoryPath, { cwd: '/' }),
-      /Invalid validator config: naming\.roles\.add\[0\]\.category must be one of: concern-core, architecture-support, deprecated\./u,
+      /Invalid validator config: naming\.roles\.add\[0\]\.category must be one of: concern-core, architecture-support, documentation, deprecated\./u,
     );
 
     assert.throws(
