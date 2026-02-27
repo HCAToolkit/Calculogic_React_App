@@ -6,6 +6,7 @@ import {
 } from '../src/naming/naming-validator.host.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
+import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
@@ -77,11 +78,20 @@ try {
   process.exit(1);
 }
 
+const toolVersion = getValidatorToolVersion();
+const configDigest = config ? computeConfigDigest(config) : undefined;
+const startedAtDate = new Date();
 const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: selectedScope, config });
+const endedAtDate = new Date();
 const summary = summarizeFindings(findings);
 
 const report = {
   mode: 'report',
+  toolVersion,
+  ...(configDigest ? { configDigest } : {}),
+  startedAt: startedAtDate.toISOString(),
+  endedAt: endedAtDate.toISOString(),
+  durationMs: endedAtDate.getTime() - startedAtDate.getTime(),
   scope,
   totalFilesScanned,
   scopeSummary: {

@@ -1,7 +1,7 @@
 # cfg-validatorRunner
 
 ## 0.0 Version
-Current implementation target: **V0.1.1** (deterministic multi-validator runner core with split scope profiles including validator/system).
+Current implementation target: **V0.1.2** (deterministic multi-validator runner core with report metadata envelope support).
 
 ## 1.0 Purpose
 Provide a deterministic runner that executes one or more registered validators and returns a single versioned combined report.
@@ -18,11 +18,18 @@ The runner reads validator definitions from a deterministic registry in `calculo
 ### 2.3 Initial validator set
 V0.1.0 includes the naming validator only, wrapped through the registry run hook without changing naming-validator internals.
 
+### 2.4 Metadata injections
+Runner accepts optional host-provided report metadata:
+- `toolVersion` (validator package version)
+- `configDigest` (stable digest of normalized loaded config)
+
 ## 3.0 Combined Report Contract
 ### 3.1 Report envelope
 - `version`
 - `mode` (`report`)
 - optional `scope`
+- optional `toolVersion`
+- optional `configDigest`
 - `startedAt`, `endedAt`, `durationMs`
 - `validators` (deterministic execution order)
 

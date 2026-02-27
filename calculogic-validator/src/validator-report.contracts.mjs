@@ -6,6 +6,8 @@ export const CALCULOGIC_VALIDATOR_REPORT_VERSION = '0.1.0';
  *   version: string,
  *   mode: 'report',
  *   scope?: string,
+ *   toolVersion?: string,
+ *   configDigest?: string,
  *   startedAt: string,
  *   endedAt: string,
  *   durationMs: number,

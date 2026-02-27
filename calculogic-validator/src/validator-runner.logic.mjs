@@ -55,6 +55,8 @@ export const runValidatorRunner = (repositoryRoot, options = {}) => {
     version: CALCULOGIC_VALIDATOR_REPORT_VERSION,
     mode: 'report',
     ...(scope ? { scope } : {}),
+    ...(options.toolVersion ? { toolVersion: options.toolVersion } : {}),
+    ...(options.configDigest ? { configDigest: options.configDigest } : {}),
     startedAt: startedAtDate.toISOString(),
     endedAt: endedAtDate.toISOString(),
     durationMs: endedAtDate.getTime() - startedAtDate.getTime(),
