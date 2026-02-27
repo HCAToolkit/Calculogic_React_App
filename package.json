@@ -11,7 +11,13 @@
     "test": "node --test --experimental-strip-types test/**/*.test.mjs calculogic-validator/test/**/*.test.mjs",
     "validate:naming": "node --experimental-strip-types calculogic-validator/scripts/validate-naming.mjs",
     "validate:all": "node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs",
-    "health:validator": "node --experimental-strip-types calculogic-validator/scripts/validator-health-check.host.mjs"
+    "health:validator": "node --experimental-strip-types calculogic-validator/scripts/validator-health-check.host.mjs",
+    "report:naming:repo": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-repo -- node --experimental-strip-types calculogic-validator/scripts/validate-naming.mjs --scope=repo",
+    "report:naming:app": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-app -- node --experimental-strip-types calculogic-validator/scripts/validate-naming.mjs --scope=app",
+    "report:naming:docs": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-docs -- node --experimental-strip-types calculogic-validator/scripts/validate-naming.mjs --scope=docs",
+    "report:all:repo": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-repo -- node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs --scope=repo",
+    "report:all:app": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-app -- node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs --scope=app",
+    "report:all:docs": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-docs -- node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs --scope=docs"
   },
   "dependencies": {
     "json-logic-js": "^2.0.5",
