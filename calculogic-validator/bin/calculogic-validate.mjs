@@ -8,17 +8,27 @@ import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromRunnerReport } from '../src/validator-exit-code.logic.mjs';
 
+const supportedScopes = listValidatorScopes();
+const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
+const supportedScopesToken = preferredScopeOrder.filter(scope => supportedScopes.includes(scope)).join('|');
+
 const usageLines = [
-  'Usage: calculogic-validate [--scope=<repo|app|docs|validator|system>] [--validators=<id1,id2>] [--config=<path>] [--strict]',
+  `Usage: calculogic-validate [--scope=<${supportedScopesToken}>] [--validators=<id1,id2>] [--config=<path>] [--strict]`,
   'Validators:',
   ...listRegisteredValidators().map(validatorId => `  - ${validatorId}`),
   'Scopes:',
-  ...listValidatorScopes().map(scope => {
+  ...supportedScopes.map(scope => {
     const profile = getValidatorScopeProfile(scope);
     return `  - ${scope}: ${profile?.description ?? ''}`;
   }),
   'Default scope: validator default (repo for naming)',
   'Default validators: all registered validators',
+  'Examples:',
+  '  ✅ npm run validate:naming -- --scope=app',
+  '  ✅ npm run validate:all -- --validators=naming --scope=docs',
+  '  ✅ node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app',
+  '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=docs',
+  '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=repo --strict',
 ];
 
 const parseCliArgs = argv => {

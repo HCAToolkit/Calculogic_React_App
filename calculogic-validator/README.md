@@ -4,6 +4,12 @@ This folder contains the Calculogic naming validator tooling extracted from the 
 
 ## Commands
 
+## npm argument forwarding (wrong vs right)
+
+- ✅ Correct: `npm run validate:naming -- --scope=app`
+- ❌ Incorrect: `npm run validate:naming --scope=app`
+- npm consumes script arguments unless you place `--` before validator flags.
+
 Run naming validator:
 
 ```bash
@@ -40,9 +46,8 @@ npm exec -- calculogic-report-capture --dir .local-reports --keep 50 -- npm run 
 
 Offline / locked registry note:
 
-- Preferred: `npm exec -- calculogic-report-capture ...` (requires dependencies already installed via `npm ci` or `npm install`).
-- Strict no-download mode: `npx --no-install calculogic-report-capture ...`
-- Example: `npx --no-install calculogic-report-capture --keep 20 -- npm run validate:naming -- --scope=app`
+- Preferred (deps already installed): `npm exec -- calculogic-report-capture --keep 20 -- npm run validate:naming -- --scope=app`
+- Strict no-download: `npx --no-install calculogic-report-capture --keep 20 -- npm run validate:naming -- --scope=app`
 
 By default, `calculogic-report-capture` writes report files to OS cache storage.
 Use `--dir` to write to a repo-local or custom directory.

@@ -42,14 +42,24 @@ const parseScopeFromCli = argv => {
   return { helpRequested: false, selectedScope, configPath, strict };
 };
 
+const supportedScopes = listNamingValidatorScopes();
+const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
+const supportedScopesToken = preferredScopeOrder.filter(scope => supportedScopes.includes(scope)).join('|');
+
 const usageLines = [
-  'Usage: npm run validate:naming -- [--scope=<repo|app|docs|validator|system>] [--config=<path>] [--strict]',
+  `Usage: npm run validate:naming -- [--scope=<${supportedScopesToken}>] [--config=<path>] [--strict]`,
   'Scopes:',
-  ...listNamingValidatorScopes().map(scope => {
+  ...supportedScopes.map(scope => {
     const profile = getScopeProfile(scope);
     return `  - ${scope}: ${profile?.description ?? ''}`;
   }),
   'Default scope: repo',
+  'Examples:',
+  '  ✅ npm run validate:naming -- --scope=app',
+  '  ✅ npm run validate:all -- --validators=naming --scope=docs',
+  '  ✅ node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app',
+  '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=docs',
+  '  ✅ npm run validate:naming -- --scope=repo --strict',
 ];
 
 let parsed;
