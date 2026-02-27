@@ -1,8 +1,6 @@
 import { REPORTABLE_EXTENSIONS } from './registries/naming-extensions.knowledge.mjs';
 import {
   ROLE_METADATA,
-  ACTIVE_ROLES,
-  ROLE_SUFFIXES,
 } from './registries/naming-roles.knowledge.mjs';
 import {
   parseCanonicalName,
