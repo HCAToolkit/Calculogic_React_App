@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "node --test --experimental-strip-types test/**/*.test.mjs calculogic-validator/test/**/*.test.mjs",
     "validate:naming": "node --experimental-strip-types calculogic-validator/scripts/validate-naming.mjs",
-    "validate:all": "node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs"
+    "validate:all": "node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs",
+    "health:validator": "node --experimental-strip-types calculogic-validator/scripts/validator-health-check.host.mjs"
   },
   "dependencies": {
     "json-logic-js": "^2.0.5",
