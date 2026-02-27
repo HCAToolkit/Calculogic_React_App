@@ -90,10 +90,10 @@ test('classifies README as conventional-doc special case', () => {
   assert.equal(finding.details?.specialCaseType, 'conventional-doc');
 });
 
-test('classifies legacy exceptions for non-canonical legacy names', () => {
+test('classifies missing-role teaching case for non-canonical two-segment names', () => {
   const finding = classifyPath('src/App.tsx');
   assert.equal(finding.classification, 'legacy-exception');
-  assert.equal(finding.code, 'NAMING_LEGACY_EXCEPTION');
+  assert.equal(finding.code, 'NAMING_MISSING_ROLE');
 });
 
 test('repo scope includes docs + src + root config examples', () => {
