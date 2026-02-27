@@ -5,6 +5,7 @@ import { runValidatorRunner } from '../src/validator-runner.logic.mjs';
 import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
+import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
 
 const usageLines = [
   'Usage: calculogic-validate [--scope=<repo|app|docs>] [--validators=<id1,id2>] [--config=<path>]',
@@ -84,6 +85,8 @@ try {
     scope: parsed.selectedScope,
     validators: parsed.validators,
     config,
+    toolVersion: getValidatorToolVersion(),
+    ...(config ? { configDigest: computeConfigDigest(config) } : {}),
   });
 
   console.log(JSON.stringify(report, null, 2));

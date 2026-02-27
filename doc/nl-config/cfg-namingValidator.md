@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.11** (scope contract split into app/docs/validator/system with repo as full scan).
+Current implementation target: **V0.1.12** (scope contract split + deterministic report metadata: toolVersion/configDigest/timing).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -97,6 +97,15 @@ Runtime behavior for role additions:
 - runtime active role set = roles with `status=active` from runtime role metadata
 - runtime role suffix list = runtime role keys sorted by descending length for hyphen-role ambiguity detection
 - filename classification uses the runtime role structures when supplied, and default registries when omitted
+
+
+### 2.7 Report metadata contract (V0.1.12)
+Naming report JSON includes deterministic metadata fields for CI/debug sharing while preserving all prior fields:
+- `toolVersion`: loaded from `calculogic-validator/package.json` `version`.
+- `configDigest`: `sha256(stableStringify(config))` when `--config` is supplied.
+- `startedAt`, `endedAt`, `durationMs`: execution timing for each naming report invocation.
+
+`stableStringify` sorts object keys recursively and preserves array order to keep digest generation deterministic across runs.
 
 ## 3.0 Classification Contract
 ### 3.1 Canonical
