@@ -114,6 +114,26 @@ export const getScopeProfile = scope => {
   return profile ? cloneScopeProfile(profile) : null;
 };
 
+const detectMissingRoleCandidate = basename => {
+  const segments = basename.split('.');
+
+  if (segments.length === 2) {
+    return {
+      semanticNameCandidate: segments[0],
+      extension: segments[1],
+    };
+  }
+
+  if (segments.length === 3 && segments[1] === 'module' && segments[2] === 'css') {
+    return {
+      semanticNameCandidate: segments[0],
+      extension: 'module.css',
+    };
+  }
+
+  return null;
+};
+
 export const collectRepositoryPaths = (rootDirectory, options = {}) => {
   const selectedScope = options.scope ?? 'repo';
   const profile = getScopeProfile(selectedScope);
@@ -154,6 +174,20 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
 
   const parsed = parseCanonicalName(basename);
   if (parsed) {
+    const missingRoleCandidate = detectMissingRoleCandidate(basename);
+    if (missingRoleCandidate && parsed.role === 'module' && parsed.extension === 'css') {
+      return {
+        code: 'NAMING_MISSING_ROLE',
+        severity: 'info',
+        path: normalizedPath,
+        classification: 'legacy-exception',
+        message: 'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
+        ruleRef: 'doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
+        suggestedFix: 'Rename to <semantic-name>.<role>.<ext> using an active role.',
+        details: missingRoleCandidate,
+      };
+    }
+
     const roleMetadata = getRoleMetadata(parsed.role, runtime.roleMetadata);
 
     if (isUnknownOrInactiveRole(parsed.role, roleMetadata, runtime.activeRoles)) {
@@ -229,6 +263,20 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       message: `Role "${ambiguity.role}" appears hyphen-appended instead of dot-separated.`,
       ruleRef: 'FileNamingMasterList-V1_1.md#role-suffix-separation-rule-important',
       suggestedFix: 'Rename using <semantic-name>.<role>.<ext>.',
+    };
+  }
+
+  const missingRoleCandidate = detectMissingRoleCandidate(basename);
+  if (missingRoleCandidate) {
+    return {
+      code: 'NAMING_MISSING_ROLE',
+      severity: 'info',
+      path: normalizedPath,
+      classification: 'legacy-exception',
+      message: 'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
+      ruleRef: 'doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
+      suggestedFix: 'Rename to <semantic-name>.<role>.<ext> using an active role.',
+      details: missingRoleCandidate,
     };
   }
 
