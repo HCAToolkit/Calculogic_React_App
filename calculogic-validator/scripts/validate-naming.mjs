@@ -5,11 +5,13 @@ import {
   getScopeProfile,
 } from '../src/naming/naming-validator.host.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
+import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
 const parseScopeFromCli = argv => {
   let selectedScope = 'repo';
+  let configPath;
 
   for (const argument of argv) {
     if (argument.startsWith('--scope=')) {
@@ -18,15 +20,22 @@ const parseScopeFromCli = argv => {
     }
 
     if (argument === '--help' || argument === '-h') {
-      return { helpRequested: true, selectedScope };
+      return { helpRequested: true, selectedScope, configPath };
     }
+
+    if (argument.startsWith('--config=')) {
+      configPath = argument.slice('--config='.length);
+      continue;
+    }
+
+    throw new Error(`Invalid argument: ${argument}`);
   }
 
-  return { helpRequested: false, selectedScope };
+  return { helpRequested: false, selectedScope, configPath };
 };
 
 const usageLines = [
-  'Usage: npm run validate:naming -- --scope=<repo|app|docs>',
+  'Usage: npm run validate:naming -- [--scope=<repo|app|docs>] [--config=<path>]',
   'Scopes:',
   ...listNamingValidatorScopes().map(scope => {
     const profile = getScopeProfile(scope);
@@ -35,7 +44,16 @@ const usageLines = [
   'Default scope: repo',
 ];
 
-const { helpRequested, selectedScope } = parseScopeFromCli(process.argv.slice(2));
+let parsed;
+try {
+  parsed = parseScopeFromCli(process.argv.slice(2));
+} catch (error) {
+  console.error(error.message);
+  console.error(usageLines.join('\n'));
+  process.exit(1);
+}
+
+const { helpRequested, selectedScope, configPath } = parsed;
 
 if (helpRequested) {
   console.log(usageLines.join('\n'));
@@ -49,7 +67,17 @@ if (!getScopeProfile(selectedScope)) {
 }
 
 const selectedScopeProfile = getScopeProfile(selectedScope);
-const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: selectedScope });
+
+let config;
+try {
+  config = configPath ? loadValidatorConfigFromFile(configPath, { cwd: process.cwd() }) : undefined;
+} catch (error) {
+  console.error(error.message);
+  console.error(usageLines.join('\n'));
+  process.exit(1);
+}
+
+const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: selectedScope, config });
 const summary = summarizeFindings(findings);
 
 const report = {

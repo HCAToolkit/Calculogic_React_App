@@ -42,9 +42,10 @@ export const runValidatorRunner = (repositoryRoot, options = {}) => {
   const startedAtDate = new Date();
   const validatorsToRun = resolveValidatorsToRun(options.validators);
   const scope = options.scope;
+  const config = options.config;
 
   const validators = validatorsToRun.map(registryEntry => {
-    const result = registryEntry.run(repositoryRoot, { scope });
+    const result = registryEntry.run(repositoryRoot, { scope, config });
     return toValidatorReportEntry(registryEntry, result);
   });
 

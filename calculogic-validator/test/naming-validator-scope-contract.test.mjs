@@ -77,7 +77,7 @@ test('invalid scope handling is deterministic (usage error + non-zero exit)', ()
   const result = runValidatorCli(['--scope=not-a-scope']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Invalid scope: not-a-scope/u);
-  assert.match(result.stderr, /Usage: npm run validate:naming -- --scope=<repo\|app\|docs>/u);
+  assert.match(result.stderr, /Usage: npm run validate:naming/u);
 });
 
 test('CLI default scope report is repo', () => {

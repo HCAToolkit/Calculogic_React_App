@@ -13,6 +13,7 @@ The runner reads validator definitions from a deterministic registry in `calculo
 ### 2.2 Runtime options
 - `validators` (optional list of validator IDs)
 - `scope` (optional scope string forwarded to validators that support scope selection)
+- `config` (optional loaded validator config object from JSON contract V0.1)
 
 ### 2.3 Initial validator set
 V0.1.0 includes the naming validator only, wrapped through the registry run hook without changing naming-validator internals.
@@ -45,6 +46,7 @@ Each validator entry includes:
 - `--help`
 - `--scope=<repo|app|docs>` (optional)
 - `--validators=<id1,id2>` (optional)
+- `--config=<path>` (optional JSON config path)
 
 ### 4.2 Behavior
 - Resolves repository root deterministically from script location.

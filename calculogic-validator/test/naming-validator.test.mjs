@@ -151,5 +151,5 @@ test('invalid CLI scope returns deterministic usage error and non-zero exit', ()
 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Invalid scope: invalid-scope/u);
-  assert.match(result.stderr, /Usage: npm run validate:naming -- --scope=<repo\|app\|docs>/u);
+  assert.match(result.stderr, /Usage: npm run validate:naming/u);
 });
