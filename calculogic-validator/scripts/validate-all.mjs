@@ -7,7 +7,7 @@ import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 const repositoryRoot = resolveRepositoryRoot();
 
 const usageLines = [
-  'Usage: npm run validate:all -- [--scope=<repo|app|docs>] [--validators=<id1,id2>] [--config=<path>]',
+  'Usage: npm run validate:all -- [--scope=<repo|app|docs|validator|system>] [--validators=<id1,id2>] [--config=<path>]',
   'Validators:',
   ...listRegisteredValidators().map(validatorId => `  - ${validatorId}`),
   'Scopes:',

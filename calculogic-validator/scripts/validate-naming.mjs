@@ -35,7 +35,7 @@ const parseScopeFromCli = argv => {
 };
 
 const usageLines = [
-  'Usage: npm run validate:naming -- [--scope=<repo|app|docs>] [--config=<path>]',
+  'Usage: npm run validate:naming -- [--scope=<repo|app|docs|validator|system>] [--config=<path>]',
   'Scopes:',
   ...listNamingValidatorScopes().map(scope => {
     const profile = getScopeProfile(scope);
