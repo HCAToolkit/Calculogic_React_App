@@ -1,17 +1,8 @@
+import { ROOT_APP_FILES } from '../../validator-root-files.knowledge.mjs';
+
 export const EXCLUDED_DIRECTORIES = new Set(['.git', 'node_modules', 'dist', 'coverage', '.vite']);
 
-export const ROOT_APP_FILES = new Set([
-  'package.json',
-  'package-lock.json',
-  'eslint.config.js',
-  'eslint.config.mjs',
-  'vite.config.ts',
-  'vite.config.js',
-  'vite.config.mjs',
-  'tsconfig.json',
-  'tsconfig.app.json',
-  'tsconfig.node.json',
-]);
+export { ROOT_APP_FILES };
 
 export const TEST_CONVENTION_PATTERN = /\.test\.[^.]+$|\.spec\.[^.]+$/u;
 export const AMBIENT_DECLARATION_PATTERN = /\.d\.ts$/u;

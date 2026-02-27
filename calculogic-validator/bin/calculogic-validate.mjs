@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { getScopeProfile, listNamingValidatorScopes } from '../src/naming/naming-validator.host.mjs';
+import { getValidatorScopeProfile, listValidatorScopes } from '../src/validator-scopes.knowledge.mjs';
 import { runValidatorRunner } from '../src/validator-runner.logic.mjs';
 import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
@@ -10,8 +10,8 @@ const usageLines = [
   'Validators:',
   ...listRegisteredValidators().map(validatorId => `  - ${validatorId}`),
   'Scopes:',
-  ...listNamingValidatorScopes().map(scope => {
-    const profile = getScopeProfile(scope);
+  ...listValidatorScopes().map(scope => {
+    const profile = getValidatorScopeProfile(scope);
     return `  - ${scope}: ${profile?.description ?? ''}`;
   }),
   'Default scope: validator default (repo for naming)',
@@ -61,7 +61,7 @@ if (parsed.helpRequested) {
   process.exit(0);
 }
 
-if (parsed.selectedScope && !getScopeProfile(parsed.selectedScope)) {
+if (parsed.selectedScope && !getValidatorScopeProfile(parsed.selectedScope)) {
   console.error(`Invalid scope: ${parsed.selectedScope}`);
   console.error(usageLines.join('\n'));
   process.exit(1);
