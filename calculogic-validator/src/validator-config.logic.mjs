@@ -9,6 +9,15 @@ const fail = message => {
   throw new Error(`Invalid validator config: ${message}`);
 };
 
+const assertOnlyKeys = (obj, allowedKeys, pathLabel) => {
+  const allowed = new Set(allowedKeys);
+  Object.keys(obj).forEach(key => {
+    if (!allowed.has(key)) {
+      fail(`${pathLabel} contains unknown key "${key}".`);
+    }
+  });
+};
+
 const normalizeReportableExtensions = additions =>
   Array.from(new Set(additions.map(extension => extension.trim())));
 
@@ -62,7 +71,16 @@ const normalizeConfig = config => {
 };
 
 const validateReportableExtensionAdditions = config => {
-  const additions = config?.naming?.reportableExtensions?.add;
+  const reportableExtensions = config?.naming?.reportableExtensions;
+  if (reportableExtensions !== undefined) {
+    if (!reportableExtensions || typeof reportableExtensions !== 'object' || Array.isArray(reportableExtensions)) {
+      fail('naming.reportableExtensions must be an object when provided.');
+    }
+
+    assertOnlyKeys(reportableExtensions, ['add'], 'naming.reportableExtensions');
+  }
+
+  const additions = reportableExtensions?.add;
   if (additions === undefined) {
     return;
   }
@@ -88,6 +106,8 @@ const validateRoleAdditionEntry = (entry, index) => {
     fail(`naming.roles.add[${index}] must be an object.`);
   }
 
+  assertOnlyKeys(entry, ['role', 'category', 'status', 'notes'], `naming.roles.add[${index}]`);
+
   if (typeof entry.role !== 'string' || entry.role.trim().length === 0) {
     fail(`naming.roles.add[${index}].role must be a non-empty string.`);
   }
@@ -108,7 +128,16 @@ const validateRoleAdditionEntry = (entry, index) => {
 };
 
 const validateRoleAdditions = config => {
-  const additions = config?.naming?.roles?.add;
+  const roles = config?.naming?.roles;
+  if (roles !== undefined) {
+    if (!roles || typeof roles !== 'object' || Array.isArray(roles)) {
+      fail('naming.roles must be an object when provided.');
+    }
+
+    assertOnlyKeys(roles, ['add'], 'naming.roles');
+  }
+
+  const additions = roles?.add;
   if (additions === undefined) {
     return;
   }
@@ -125,8 +154,19 @@ const validateConfig = config => {
     fail('root must be an object.');
   }
 
+  assertOnlyKeys(config, ['version', 'naming'], 'root');
+
   if (config.version !== VALIDATOR_CONFIG_VERSION) {
     fail(`version must be "${VALIDATOR_CONFIG_VERSION}".`);
+  }
+
+  const naming = config.naming;
+  if (naming !== undefined) {
+    if (!naming || typeof naming !== 'object' || Array.isArray(naming)) {
+      fail('naming must be an object when provided.');
+    }
+
+    assertOnlyKeys(naming, ['reportableExtensions', 'roles'], 'naming');
   }
 
   validateReportableExtensionAdditions(config);
