@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import {
   runNamingValidator,
   summarizeFindings,
@@ -5,8 +7,6 @@ import {
   getScopeProfile,
 } from '../src/naming/naming-validator.host.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
-
-const repositoryRoot = resolveRepositoryRoot();
 
 const parseScopeFromCli = argv => {
   let selectedScope = 'repo';
@@ -20,13 +20,15 @@ const parseScopeFromCli = argv => {
     if (argument === '--help' || argument === '-h') {
       return { helpRequested: true, selectedScope };
     }
+
+    throw new Error(`Invalid argument: ${argument}`);
   }
 
   return { helpRequested: false, selectedScope };
 };
 
 const usageLines = [
-  'Usage: npm run validate:naming -- --scope=<repo|app|docs>',
+  'Usage: calculogic-validate-naming [--scope=<repo|app|docs>]',
   'Scopes:',
   ...listNamingValidatorScopes().map(scope => {
     const profile = getScopeProfile(scope);
@@ -35,21 +37,29 @@ const usageLines = [
   'Default scope: repo',
 ];
 
-const { helpRequested, selectedScope } = parseScopeFromCli(process.argv.slice(2));
-
-if (helpRequested) {
-  console.log(usageLines.join('\n'));
-  process.exit(0);
-}
-
-if (!getScopeProfile(selectedScope)) {
-  console.error(`Invalid scope: ${selectedScope}`);
+let parsed;
+try {
+  parsed = parseScopeFromCli(process.argv.slice(2));
+} catch (error) {
+  console.error(error.message);
   console.error(usageLines.join('\n'));
   process.exit(1);
 }
 
-const selectedScopeProfile = getScopeProfile(selectedScope);
-const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: selectedScope });
+if (parsed.helpRequested) {
+  console.log(usageLines.join('\n'));
+  process.exit(0);
+}
+
+if (!getScopeProfile(parsed.selectedScope)) {
+  console.error(`Invalid scope: ${parsed.selectedScope}`);
+  console.error(usageLines.join('\n'));
+  process.exit(1);
+}
+
+const selectedScopeProfile = getScopeProfile(parsed.selectedScope);
+const repositoryRoot = resolveRepositoryRoot();
+const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: parsed.selectedScope });
 const summary = summarizeFindings(findings);
 
 const report = {

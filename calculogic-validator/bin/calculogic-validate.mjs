@@ -1,12 +1,12 @@
+#!/usr/bin/env node
+
 import { getScopeProfile, listNamingValidatorScopes } from '../src/naming/naming-validator.host.mjs';
 import { runValidatorRunner } from '../src/validator-runner.logic.mjs';
 import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 
-const repositoryRoot = resolveRepositoryRoot();
-
 const usageLines = [
-  'Usage: npm run validate:all -- [--scope=<repo|app|docs>] [--validators=<id1,id2>]',
+  'Usage: calculogic-validate [--scope=<repo|app|docs>] [--validators=<id1,id2>]',
   'Validators:',
   ...listRegisteredValidators().map(validatorId => `  - ${validatorId}`),
   'Scopes:',
@@ -68,6 +68,7 @@ if (parsed.selectedScope && !getScopeProfile(parsed.selectedScope)) {
 }
 
 try {
+  const repositoryRoot = resolveRepositoryRoot();
   const report = runValidatorRunner(repositoryRoot, {
     scope: parsed.selectedScope,
     validators: parsed.validators,

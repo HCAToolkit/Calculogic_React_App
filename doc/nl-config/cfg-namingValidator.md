@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.7** (adds deterministic validator health-check host script and command discoverability docs).
+Current implementation target: **V0.1.8** (publish-ready validator package metadata, stable installable bins, and repository-root resolution for CLIs).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -40,18 +40,22 @@ Active roles:
 Deprecated historical roles:
 - view
 
-### 2.4 Repository layout contract (V0.1.6)
+### 2.4 Repository layout contract (V0.1.8)
 Validator implementation assets live under top-level `calculogic-validator/`:
 - canonical module layout: `calculogic-validator/src/naming/{naming-validator.host.mjs,naming-validator.wiring.mjs,naming-validator.logic.mjs,naming-validator.contracts.mjs}`
 - extension-point folders: `calculogic-validator/src/naming/registries/` and `calculogic-validator/src/naming/rules/`
+- package export barrel: `calculogic-validator/src/index.mjs`
+- stable repository-root resolver shared by CLIs: `calculogic-validator/src/repository-root.logic.mjs`
 - temporary compatibility shim (legacy imports): `calculogic-validator/src/validators/naming-validator.logic.mjs`
-- CLI entrypoint: `calculogic-validator/scripts/validate-naming.mjs`
+- repo-local script entrypoints remain supported: `calculogic-validator/scripts/{validate-naming.mjs,validate-all.mjs,validator-health-check.host.mjs}`
+- stable installable bin entrypoints: `calculogic-validator/bin/{calculogic-validate.mjs,calculogic-validate-naming.mjs,calculogic-validator-health.mjs}`
 - validator tests: `calculogic-validator/test/*.test.mjs`
 
-Root `package.json` scripts remain the canonical invocation interface (`npm run validate:naming`, `npm test`).
+Root `package.json` scripts remain the canonical invocation interface (`npm run validate:naming`, `npm run validate:all`, `npm run health:validator`, `npm test`) while local package bins are testable via `npm exec` through the file dependency `@calculogic/validator`.
 
-### 2.5 Health-check contract (V0.1.7)
+### 2.5 Health-check contract (V0.1.8)
 Health-check entrypoint lives at `calculogic-validator/scripts/validator-health-check.host.mjs` and is exposed via root script `npm run health:validator`.
+Stable installable health bin entrypoint lives at `calculogic-validator/bin/calculogic-validator-health.mjs`.
 
 The health-check performs deterministic, CI-friendly assertions for scope profiles `repo`, `app`, and `docs`:
 - required scope profiles must resolve via host API

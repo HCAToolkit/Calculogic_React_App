@@ -1,13 +1,13 @@
+#!/usr/bin/env node
+
 import path from 'node:path';
+import fs from 'node:fs';
 import {
   runNamingValidator,
   summarizeFindings,
   getScopeProfile,
 } from '../src/naming/naming-validator.host.mjs';
-import fs from 'node:fs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
-
-const repositoryRoot = resolveRepositoryRoot();
 
 const SCOPES = ['repo', 'app', 'docs'];
 
@@ -17,7 +17,7 @@ const assert = (condition, message) => {
   }
 };
 
-const runScopeSummary = scope => {
+const runScopeSummary = (repositoryRoot, scope) => {
   const { findings, totalFilesScanned } = runNamingValidator(repositoryRoot, { scope });
   const summary = summarizeFindings(findings);
 
@@ -31,12 +31,12 @@ const runScopeSummary = scope => {
   };
 };
 
-const assertDeterministicScope = scope => {
+const assertDeterministicScope = (repositoryRoot, scope) => {
   const profile = getScopeProfile(scope);
   assert(profile, `Missing naming validator scope profile: ${scope}`);
 
-  const firstRun = runScopeSummary(scope);
-  const secondRun = runScopeSummary(scope);
+  const firstRun = runScopeSummary(repositoryRoot, scope);
+  const secondRun = runScopeSummary(repositoryRoot, scope);
 
   assert(
     firstRun.totalFilesScanned === secondRun.totalFilesScanned,
@@ -61,7 +61,7 @@ const assertDeterministicScope = scope => {
   }
 };
 
-const assertAppScopeDocs = () => {
+const assertAppScopeDocs = repositoryRoot => {
   const docsToValidate = [
     path.resolve(repositoryRoot, 'doc/ConventionRoutines/NamingValidatorSpec.md'),
     path.resolve(repositoryRoot, 'doc/nl-config/cfg-namingValidator.md'),
@@ -81,11 +81,13 @@ const assertAppScopeDocs = () => {
 };
 
 const main = () => {
+  const repositoryRoot = resolveRepositoryRoot();
+
   for (const scope of SCOPES) {
-    assertDeterministicScope(scope);
+    assertDeterministicScope(repositoryRoot, scope);
   }
 
-  assertAppScopeDocs();
+  assertAppScopeDocs(repositoryRoot);
 
   console.log('OK: naming validator deterministic for repo|app|docs');
   console.log('OK: docs match app scope roots');
