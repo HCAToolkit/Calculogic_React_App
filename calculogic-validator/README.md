@@ -60,3 +60,28 @@ If you use a repo-local report directory, add it to `.gitignore`.
 ## Compatibility shim
 
 Legacy imports from `src/validators/naming-validator.logic.mjs` remain supported via a thin re-export shim to the canonical host entrypoint.
+
+## Validator config schema and strictness
+
+- Published schema: `calculogic-validator/src/validator-config.schema.json`.
+- Runtime validation is strict and rejects unknown keys at the same levels the schema disallows them (root, `naming`, `naming.reportableExtensions`, `naming.roles`, and each `naming.roles.add[]` entry).
+
+Tool-agnostic schema reference example for editor integration:
+
+```json
+{
+  "$schema": "./calculogic-validator/src/validator-config.schema.json",
+  "version": "0.1",
+  "naming": {
+    "roles": {
+      "add": [
+        {
+          "role": "provider",
+          "category": "architecture-support",
+          "status": "active"
+        }
+      ]
+    }
+  }
+}
+```

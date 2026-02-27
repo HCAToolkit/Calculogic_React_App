@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.13** (CI-friendly exit codes with optional strict legacy-exception enforcement).
+Current implementation target: **V0.1.14** (validator config schema publication + strict unknown-key validation parity).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -97,6 +97,17 @@ Runtime behavior for role additions:
 - runtime active role set = roles with `status=active` from runtime role metadata
 - runtime role suffix list = runtime role keys sorted by descending length for hyphen-role ambiguity detection
 - filename classification uses the runtime role structures when supplied, and default registries when omitted
+
+Validator config contract includes a publishable JSON Schema for editor/tool integration:
+- schema path: `calculogic-validator/src/validator-config.schema.json`
+- schema `properties.version.const` must match runtime `VALIDATOR_CONFIG_VERSION`
+
+Runtime and schema strictness are intentionally aligned. Unknown keys are rejected at the following levels:
+- root object
+- `naming`
+- `naming.reportableExtensions`
+- `naming.roles`
+- each `naming.roles.add[]` entry object
 
 
 ### 2.7 Report metadata contract (V0.1.12)
