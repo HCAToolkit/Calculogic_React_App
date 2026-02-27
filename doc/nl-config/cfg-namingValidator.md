@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.6** (naming validator modularized under `src/naming/` with compatibility shim).
+Current implementation target: **V0.1.7** (adds deterministic validator health-check host script and command discoverability docs).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -49,6 +49,16 @@ Validator implementation assets live under top-level `calculogic-validator/`:
 - validator tests: `calculogic-validator/test/*.test.mjs`
 
 Root `package.json` scripts remain the canonical invocation interface (`npm run validate:naming`, `npm test`).
+
+### 2.5 Health-check contract (V0.1.7)
+Health-check entrypoint lives at `calculogic-validator/scripts/validator-health-check.host.mjs` and is exposed via root script `npm run health:validator`.
+
+The health-check performs deterministic, CI-friendly assertions for scope profiles `repo`, `app`, and `docs`:
+- required scope profiles must resolve via host API
+- repeated in-process runs per scope must keep stable summary-level outputs (`totalFilesScanned`, `counts`, `codeCounts`, `specialCaseTypeCounts`, `warningRoleStatusCounts`, `warningRoleCategoryCounts`)
+- docs contract checks ensure scope documentation continues to state that `app` includes `src/`, `test/`, and `calculogic-validator/`
+
+Health-check behavior is fail-fast semantics: any contract violation returns non-zero exit status.
 
 ## 3.0 Classification Contract
 ### 3.1 Canonical
