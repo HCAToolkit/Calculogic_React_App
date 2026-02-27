@@ -103,7 +103,7 @@ Validator config contract includes a publishable JSON Schema for editor/tool int
 - schema `properties.version.const` must match runtime `VALIDATOR_CONFIG_VERSION`
 
 Runtime and schema strictness are intentionally aligned. Unknown keys are rejected at the following levels:
-- root object
+- root object (except optional `$schema` editor-hint key, ignored by runtime normalization)
 - `naming`
 - `naming.reportableExtensions`
 - `naming.roles`
