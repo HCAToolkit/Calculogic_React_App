@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.10** (runtime config supports additive role-registry extensions and documentation role taxonomy).
+Current implementation target: **V0.1.11** (scope contract split into app/docs/validator/system with repo as full scan).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -10,12 +10,14 @@ Define a deterministic V0.1 filename naming validator that runs in report mode o
 ### 2.1 Naming authority
 The validator reads rules from `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` as authoritative naming guidance.
 
-### 2.2 Scope mode (V0.1.4)
-V0.1.4 supports deterministic scope profiles selected via CLI and applied before filename classification using explicit scope path predicates:
+### 2.2 Scope mode (V0.1.11)
+V0.1.11 supports deterministic scope profiles selected via CLI and applied before filename classification using explicit scope path predicates:
 - default/no `--scope` input resolves to `repo`
 - `repo`: repository-wide reportable files.
-- `app`: app-focused files (`src/`, `test/`, `calculogic-validator/`, and explicit root tooling files).
+- `app`: application-focused files (`src/` and `test/` only).
 - `docs`: docs-focused files (`doc/`, `docs/`, and selected root conventional docs currently limited to `README.md`).
+- `validator`: validator implementation files (`calculogic-validator/` only).
+- `system`: root tooling files only (`package.json`, `package-lock.json`, `tsconfig*.json`, `eslint.config.*`, `vite.config.*`).
 
 Scope predicates are evaluated on normalized repository-relative paths before report findings are generated. Invalid scope inputs are treated as CLI usage errors.
 
@@ -59,14 +61,14 @@ Validator implementation assets live under top-level `calculogic-validator/`:
 
 Root `package.json` scripts remain the canonical invocation interface (`npm run validate:naming`, `npm run validate:all`, `npm run health:validator`, `npm test`) while local package bins are testable via `npm exec` through the file dependency `@calculogic/validator`.
 
-### 2.5 Health-check contract (V0.1.8)
+### 2.5 Health-check contract (V0.1.11)
 Health-check entrypoint lives at `calculogic-validator/scripts/validator-health-check.host.mjs` and is exposed via root script `npm run health:validator`.
 Stable installable health bin entrypoint lives at `calculogic-validator/bin/calculogic-validator-health.mjs`.
 
-The health-check performs deterministic, CI-friendly assertions for scope profiles `repo`, `app`, and `docs`:
+The health-check performs deterministic, CI-friendly assertions for scope profiles `repo`, `app`, `docs`, `validator`, and `system`:
 - required scope profiles must resolve via host API
 - repeated in-process runs per scope must keep stable summary-level outputs (`totalFilesScanned`, `counts`, `codeCounts`, `specialCaseTypeCounts`, `warningRoleStatusCounts`, `warningRoleCategoryCounts`)
-- docs contract checks ensure scope documentation continues to state that `app` includes `src/`, `test/`, and `calculogic-validator/`
+- docs contract checks ensure scope documentation continues to state app/docs/validator/system split behavior
 
 Health-check behavior is fail-fast semantics: any contract violation returns non-zero exit status.
 

@@ -1,7 +1,7 @@
 # cfg-validatorRunner
 
 ## 0.0 Version
-Current implementation target: **V0.1.0** (deterministic multi-validator runner core with registry-backed execution).
+Current implementation target: **V0.1.1** (deterministic multi-validator runner core with split scope profiles including validator/system).
 
 ## 1.0 Purpose
 Provide a deterministic runner that executes one or more registered validators and returns a single versioned combined report.
@@ -44,7 +44,7 @@ Each validator entry includes:
 ## 4.0 CLI Contract (`validate-all`)
 ### 4.1 Inputs
 - `--help`
-- `--scope=<repo|app|docs>` (optional)
+- `--scope=<repo|app|docs|validator|system>` (optional)
 - `--validators=<id1,id2>` (optional)
 - `--config=<path>` (optional JSON config path)
 

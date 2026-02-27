@@ -7,14 +7,24 @@ export const SCOPE_PROFILES = {
     includeRootFiles: [],
   },
   app: {
-    description: 'Application-focused scan (src/test/calculogic-validator and root tooling files).',
-    includeRoots: ['src', 'test', 'calculogic-validator'],
-    includeRootFiles: Array.from(ROOT_APP_FILES),
+    description: 'Application-only scan (src/** and test/**).',
+    includeRoots: ['src', 'test'],
+    includeRootFiles: [],
   },
   docs: {
     description: 'Documentation-focused scan (doc/docs and root conventional docs: README.md).',
     includeRoots: ['doc', 'docs'],
     includeRootFiles: ['README.md'],
+  },
+  validator: {
+    description: 'Validator-only scan (calculogic-validator/**).',
+    includeRoots: ['calculogic-validator'],
+    includeRootFiles: [],
+  },
+  system: {
+    description: 'System/tooling files scan (root package/tsconfig/eslint/vite files).',
+    includeRoots: [],
+    includeRootFiles: Array.from(ROOT_APP_FILES),
   },
 };
 

@@ -118,14 +118,14 @@ test('repo scope includes docs + src + root config examples', () => {
   assert.ok(paths.includes('package.json'));
 });
 
-test('app scope excludes docs and includes src/test/scripts/root tooling files', () => {
+test('app scope includes only src/test and excludes docs, validator, and system root files', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'app' });
-  assert.ok(paths.includes('calculogic-validator/src/validators/naming-validator.logic.mjs'));
-  assert.ok(paths.includes('calculogic-validator/test/naming-validator.test.mjs'));
-  assert.ok(paths.includes('calculogic-validator/scripts/validate-naming.mjs'));
-  assert.ok(paths.includes('package.json'));
+  assert.ok(paths.some(p => p.startsWith('src/')));
+  assert.ok(paths.some(p => p.startsWith('test/')));
   assert.equal(paths.some(p => p.startsWith('doc/')), false);
   assert.equal(paths.some(p => p.startsWith('docs/')), false);
+  assert.equal(paths.some(p => p.startsWith('calculogic-validator/')), false);
+  assert.equal(paths.includes('package.json'), false);
 });
 
 test('docs scope includes doc/docs and excludes src', () => {

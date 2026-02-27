@@ -24,6 +24,9 @@ Report filenames are deterministic and filesystem-safe:
 - Prefix defaults to `report`
 - Timestamp is local time and zero-padded
 
+### 2.4 Scope capture presets
+Root package scripts provide deterministic capture presets for naming and validate-all across `repo`, `app`, `docs`, `validator`, and `system` scopes, writing files to repo-local `./.reports/` for safe exclusion from validator walking behavior.
+
 ## 3.0 Build Concern
 ### 3.1 CLI host assembly
 Host module parses argv, resolves directory defaults, warns about pending prune deletions, starts capture run, and exits with the wrapped command exit code.

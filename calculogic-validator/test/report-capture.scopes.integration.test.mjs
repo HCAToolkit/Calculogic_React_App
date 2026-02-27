@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
-const scopes = ['repo', 'app', 'docs'];
+const scopes = ['repo', 'app', 'docs', 'validator', 'system'];
 const hostPath = path.resolve('calculogic-validator/tools/report-capture/src/report-capture.host.mjs');
 
 const runReportCapture = (prefix, scriptPath, scope, outputDir) => new Promise((resolve, reject) => {
@@ -40,7 +40,7 @@ const reportFilesForPrefix = (dirPath, prefix) => fs
   .filter(name => name.startsWith(`${prefix}-`) && name.endsWith('.txt'))
   .sort();
 
-test('report-capture host emits naming reports for repo/app/docs scopes', async () => {
+test('report-capture host emits naming reports for repo/app/docs/validator/system scopes', async () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'report-capture-scopes-naming-'));
 
   try {
@@ -65,7 +65,7 @@ test('report-capture host emits naming reports for repo/app/docs scopes', async 
   }
 });
 
-test('report-capture host emits validate-all reports for repo/app/docs scopes', async () => {
+test('report-capture host emits validate-all reports for repo/app/docs/validator/system scopes', async () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'report-capture-scopes-all-'));
 
   try {
