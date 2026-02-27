@@ -6,9 +6,10 @@ import { listRegisteredValidators } from '../src/validator-registry.knowledge.mj
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
+import { deriveExitCodeFromRunnerReport } from '../src/validator-exit-code.logic.mjs';
 
 const usageLines = [
-  'Usage: calculogic-validate [--scope=<repo|app|docs>] [--validators=<id1,id2>] [--config=<path>]',
+  'Usage: calculogic-validate [--scope=<repo|app|docs|validator|system>] [--validators=<id1,id2>] [--config=<path>] [--strict]',
   'Validators:',
   ...listRegisteredValidators().map(validatorId => `  - ${validatorId}`),
   'Scopes:',
@@ -24,10 +25,11 @@ const parseCliArgs = argv => {
   let selectedScope;
   let validators;
   let configPath;
+  let strict = false;
 
   for (const argument of argv) {
     if (argument === '--help' || argument === '-h') {
-      return { helpRequested: true, selectedScope, validators, configPath };
+      return { helpRequested: true, selectedScope, validators, configPath, strict };
     }
 
     if (argument.startsWith('--scope=')) {
@@ -49,10 +51,15 @@ const parseCliArgs = argv => {
       continue;
     }
 
+    if (argument === '--strict') {
+      strict = true;
+      continue;
+    }
+
     throw new Error(`Invalid argument: ${argument}`);
   }
 
-  return { helpRequested: false, selectedScope, validators, configPath };
+  return { helpRequested: false, selectedScope, validators, configPath, strict };
 };
 
 let parsed;
@@ -90,7 +97,7 @@ try {
   });
 
   console.log(JSON.stringify(report, null, 2));
-  process.exit(0);
+  process.exit(deriveExitCodeFromRunnerReport(report, { strict: parsed.strict }));
 } catch (error) {
   console.error(error.message);
   console.error(usageLines.join('\n'));

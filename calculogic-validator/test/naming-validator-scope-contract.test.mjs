@@ -102,14 +102,14 @@ test('invalid scope handling is deterministic (usage error + non-zero exit)', ()
 
 test('CLI default scope report is repo', () => {
   const result = runValidatorCli([]);
-  assert.equal(result.status, 0);
+  assert.ok([0, 1, 2].includes(result.status));
   const report = JSON.parse(result.stdout);
   assert.equal(report.scope, 'repo');
 });
 
 test('CLI explicit scope reports selected scope and scope summary metadata', () => {
   const result = runValidatorCli(['--scope=docs']);
-  assert.equal(result.status, 0);
+  assert.ok([0, 1, 2].includes(result.status));
   const report = JSON.parse(result.stdout);
   assert.equal(report.scope, 'docs');
   assert.deepEqual(report.scopeContract.includeRoots, ['doc', 'docs']);

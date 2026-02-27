@@ -9,10 +9,12 @@ import {
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
+import { deriveExitCodeFromFindings } from '../src/validator-exit-code.logic.mjs';
 
 const parseScopeFromCli = argv => {
   let selectedScope = 'repo';
   let configPath;
+  let strict = false;
 
   for (const argument of argv) {
     if (argument.startsWith('--scope=')) {
@@ -21,7 +23,7 @@ const parseScopeFromCli = argv => {
     }
 
     if (argument === '--help' || argument === '-h') {
-      return { helpRequested: true, selectedScope, configPath };
+      return { helpRequested: true, selectedScope, configPath, strict };
     }
 
     if (argument.startsWith('--config=')) {
@@ -29,14 +31,19 @@ const parseScopeFromCli = argv => {
       continue;
     }
 
+    if (argument === '--strict') {
+      strict = true;
+      continue;
+    }
+
     throw new Error(`Invalid argument: ${argument}`);
   }
 
-  return { helpRequested: false, selectedScope, configPath };
+  return { helpRequested: false, selectedScope, configPath, strict };
 };
 
 const usageLines = [
-  'Usage: calculogic-validate-naming [--scope=<repo|app|docs>] [--config=<path>]',
+  'Usage: calculogic-validate-naming [--scope=<repo|app|docs|validator|system>] [--config=<path>] [--strict]',
   'Scopes:',
   ...listNamingValidatorScopes().map(scope => {
     const profile = getScopeProfile(scope);
@@ -114,4 +121,4 @@ const report = {
 };
 
 console.log(JSON.stringify(report, null, 2));
-process.exit(0);
+process.exit(deriveExitCodeFromFindings(findings, { strict: parsed.strict }));
