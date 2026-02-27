@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.5** (validator package extraction to top-level `calculogic-validator/`).
+Current implementation target: **V0.1.6** (naming validator modularized under `src/naming/` with compatibility shim).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -40,9 +40,11 @@ Active roles:
 Deprecated historical roles:
 - view
 
-### 2.4 Repository layout contract (V0.1.5)
+### 2.4 Repository layout contract (V0.1.6)
 Validator implementation assets live under top-level `calculogic-validator/`:
-- core logic: `calculogic-validator/src/validators/naming-validator.logic.mjs`
+- canonical module layout: `calculogic-validator/src/naming/{naming-validator.host.mjs,naming-validator.wiring.mjs,naming-validator.logic.mjs,naming-validator.contracts.mjs}`
+- extension-point folders: `calculogic-validator/src/naming/registries/` and `calculogic-validator/src/naming/rules/`
+- temporary compatibility shim (legacy imports): `calculogic-validator/src/validators/naming-validator.logic.mjs`
 - CLI entrypoint: `calculogic-validator/scripts/validate-naming.mjs`
 - validator tests: `calculogic-validator/test/*.test.mjs`
 
