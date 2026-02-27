@@ -27,6 +27,9 @@ Report filenames are deterministic and filesystem-safe:
 ### 2.4 Scope capture presets
 Root package scripts provide deterministic capture presets for naming and validate-all across `repo`, `app`, `docs`, `validator`, and `system` scopes, writing files to repo-local `./.reports/` for safe exclusion from validator walking behavior.
 
+### 2.5 Verifier workflow contract
+A repo-local verifier script (`calculogic-validator/scripts/report-capture-verify.mjs`) runs naming validation through report-capture for one or more scopes, parses the metadata JSON line, and asserts the generated report file exists in the configured reports directory and contains a full JSON naming report.
+
 ## 3.0 Build Concern
 ### 3.1 CLI host assembly
 Host module parses argv, resolves directory defaults, warns about pending prune deletions, starts capture run, and exits with the wrapped command exit code.
@@ -62,6 +65,9 @@ Stdout and stderr both stream to terminal and are appended to the same report fi
 When `--json` is set, emit one compact JSON line to stderr with:
 - `path`, `exitCode`, `bytes`, `startedAt`, `endedAt`, `durationMs`, `dir`, `prefix`
 
+### 7.3 Verifier output summary
+The verifier emits one compact success line per scope (`OK naming:<scope> -> <path> (<bytes> bytes, <durationMs> ms)`) and exits non-zero when metadata or report assertions fail.
+
 ## 8.0 ResultsStyle Concern
 Not applicable for this CLI feature.
 
@@ -78,3 +84,4 @@ Not applicable for this CLI feature.
 - Pass B: Implement host orchestration and command execution.
 - Pass C: Add deterministic unit/integration-light tests.
 - Pass D: Wire local file dependency for `npx calculogic-report-capture` usage.
+- Pass E: Add report-capture verifier script + integration coverage for metadata/report integrity checks.
