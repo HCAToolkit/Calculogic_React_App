@@ -1,7 +1,7 @@
 # cfg-reportCapture
 
 ## 0.0 Version
-Current implementation target: **V0.0.0** (cross-platform CLI wrapper for command output capture).
+Current implementation target: **V0.1.0** (capture wrapper plus compact latest-report summarizer).
 
 ## 1.0 Purpose
 Provide a deterministic command wrapper that captures combined stdout/stderr into timestamped reports while still streaming output live to the terminal.
@@ -29,6 +29,9 @@ Root package scripts provide deterministic capture presets for naming and valida
 
 ### 2.5 Verifier workflow contract
 A repo-local verifier script (`calculogic-validator/scripts/report-capture-verify.mjs`) runs naming validation through report-capture for one or more scopes, parses the metadata JSON line, and asserts the generated report file exists in the configured reports directory and contains a full JSON naming report.
+
+### 2.6 Post-capture summarizer contract
+A repo-local summarizer script (`calculogic-validator/scripts/report-capture-summarize.mjs`) reads the latest captured JSON report per prefix from `./.reports` (or `--dir`) and prints compact per-scope summaries suitable for Codex/PR notes.
 
 ## 3.0 Build Concern
 ### 3.1 CLI host assembly
@@ -68,6 +71,9 @@ When `--json` is set, emit one compact JSON line to stderr with:
 ### 7.3 Verifier output summary
 The verifier emits one compact success line per scope (`OK naming:<scope> -> <path> (<bytes> bytes, <durationMs> ms)`) and exits non-zero when metadata or report assertions fail.
 
+### 7.4 Summarizer output summary
+The summarizer emits a compact block per prefix including latest file metadata, report scope totals, counts, top code counts, and warn samples. It exits non-zero when any requested prefix is missing a report or has invalid JSON.
+
 ## 8.0 ResultsStyle Concern
 Not applicable for this CLI feature.
 
@@ -85,3 +91,4 @@ Not applicable for this CLI feature.
 - Pass C: Add deterministic unit/integration-light tests.
 - Pass D: Wire local file dependency for `npx calculogic-report-capture` usage.
 - Pass E: Add report-capture verifier script + integration coverage for metadata/report integrity checks.
+- Pass F: Add latest-report summarizer script + deterministic tests for newest-file selection and missing-prefix failures.

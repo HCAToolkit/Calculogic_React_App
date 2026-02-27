@@ -22,7 +22,8 @@
     "report:naming:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-system -- node --experimental-strip-types calculogic-validator/scripts/validate-naming.mjs --scope=system",
     "report:all:validator": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-validator -- node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs --scope=validator",
     "report:all:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-system -- node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs --scope=system",
-    "report:verify": "node calculogic-validator/scripts/report-capture-verify.mjs"
+    "report:verify": "node calculogic-validator/scripts/report-capture-verify.mjs",
+    "report:summarize": "node calculogic-validator/scripts/report-capture-summarize.mjs"
   },
   "dependencies": {
     "json-logic-js": "^2.0.5",
