@@ -1,0 +1,9 @@
+{
+  "name": "@calculogic/report-capture",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "bin": {
+    "calculogic-report-capture": "./src/report-capture.host.mjs"
+  }
+}
