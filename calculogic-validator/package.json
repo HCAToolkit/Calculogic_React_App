@@ -1,0 +1,28 @@
+{
+  "name": "@calculogic/validator",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "src/**",
+    "bin/**",
+    "scripts/**",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": "./src/index.mjs",
+    "./runner": "./src/validator-runner.logic.mjs",
+    "./registry": "./src/validator-registry.knowledge.mjs",
+    "./naming": "./src/naming/naming-validator.host.mjs"
+  },
+  "bin": {
+    "calculogic-validate": "./bin/calculogic-validate.mjs",
+    "calculogic-validate-naming": "./bin/calculogic-validate-naming.mjs",
+    "calculogic-validator-health": "./bin/calculogic-validator-health.mjs"
+  }
+}
