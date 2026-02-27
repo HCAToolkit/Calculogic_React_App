@@ -2,8 +2,36 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { VALIDATOR_CONFIG_VERSION } from './validator-config.contracts.mjs';
 
+const VALID_ROLE_CATEGORIES = new Set(['concern-core', 'architecture-support', 'deprecated']);
+const VALID_ROLE_STATUSES = new Set(['active', 'deprecated']);
+
 const fail = message => {
   throw new Error(`Invalid validator config: ${message}`);
+};
+
+const normalizeReportableExtensions = additions =>
+  Array.from(new Set(additions.map(extension => extension.trim())));
+
+const normalizeRoleAdditions = additions => {
+  const uniqueRoles = new Set();
+  const normalized = [];
+
+  additions.forEach(entry => {
+    const trimmedRole = entry.role.trim();
+    if (uniqueRoles.has(trimmedRole)) {
+      return;
+    }
+
+    uniqueRoles.add(trimmedRole);
+    normalized.push({
+      role: trimmedRole,
+      category: entry.category,
+      status: entry.status,
+      ...(entry.notes === undefined ? {} : { notes: entry.notes }),
+    });
+  });
+
+  return normalized;
 };
 
 const normalizeConfig = config => {
@@ -11,27 +39,29 @@ const normalizeConfig = config => {
     version: VALIDATOR_CONFIG_VERSION,
   };
 
-  const additions = config?.naming?.reportableExtensions?.add;
-  if (additions) {
-    normalized.naming = {
-      reportableExtensions: {
-        add: Array.from(new Set(additions.map(extension => extension.trim()))),
-      },
+  const extensionAdditions = config?.naming?.reportableExtensions?.add;
+  const roleAdditions = config?.naming?.roles?.add;
+
+  if (extensionAdditions || roleAdditions) {
+    normalized.naming = {};
+  }
+
+  if (extensionAdditions) {
+    normalized.naming.reportableExtensions = {
+      add: normalizeReportableExtensions(extensionAdditions),
+    };
+  }
+
+  if (roleAdditions) {
+    normalized.naming.roles = {
+      add: normalizeRoleAdditions(roleAdditions),
     };
   }
 
   return normalized;
 };
 
-const validateConfig = config => {
-  if (!config || typeof config !== 'object' || Array.isArray(config)) {
-    fail('root must be an object.');
-  }
-
-  if (config.version !== VALIDATOR_CONFIG_VERSION) {
-    fail(`version must be "${VALIDATOR_CONFIG_VERSION}".`);
-  }
-
+const validateReportableExtensionAdditions = config => {
   const additions = config?.naming?.reportableExtensions?.add;
   if (additions === undefined) {
     return;
@@ -51,6 +81,56 @@ const validateConfig = config => {
       fail(`naming.reportableExtensions.add[${index}] must start with ".".`);
     }
   });
+};
+
+const validateRoleAdditionEntry = (entry, index) => {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+    fail(`naming.roles.add[${index}] must be an object.`);
+  }
+
+  if (typeof entry.role !== 'string' || entry.role.trim().length === 0) {
+    fail(`naming.roles.add[${index}].role must be a non-empty string.`);
+  }
+
+  if (!VALID_ROLE_CATEGORIES.has(entry.category)) {
+    fail(
+      `naming.roles.add[${index}].category must be one of: concern-core, architecture-support, deprecated.`,
+    );
+  }
+
+  if (!VALID_ROLE_STATUSES.has(entry.status)) {
+    fail(`naming.roles.add[${index}].status must be one of: active, deprecated.`);
+  }
+
+  if (entry.notes !== undefined && typeof entry.notes !== 'string') {
+    fail(`naming.roles.add[${index}].notes must be a string when provided.`);
+  }
+};
+
+const validateRoleAdditions = config => {
+  const additions = config?.naming?.roles?.add;
+  if (additions === undefined) {
+    return;
+  }
+
+  if (!Array.isArray(additions)) {
+    fail('naming.roles.add must be an array of role metadata objects.');
+  }
+
+  additions.forEach(validateRoleAdditionEntry);
+};
+
+const validateConfig = config => {
+  if (!config || typeof config !== 'object' || Array.isArray(config)) {
+    fail('root must be an object.');
+  }
+
+  if (config.version !== VALIDATOR_CONFIG_VERSION) {
+    fail(`version must be "${VALIDATOR_CONFIG_VERSION}".`);
+  }
+
+  validateReportableExtensionAdditions(config);
+  validateRoleAdditions(config);
 };
 
 export const loadValidatorConfigFromFile = (configPath, { cwd = process.cwd() } = {}) => {

@@ -11,6 +11,7 @@ npm run validate:naming
 npm run validate:naming -- --scope=repo
 npm run validate:naming -- --scope=app
 npm run validate:naming -- --scope=docs
+node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app --config=calculogic-validator/test/fixtures/validator-config.roles.contracts.json
 ```
 
 Run full validator suite:

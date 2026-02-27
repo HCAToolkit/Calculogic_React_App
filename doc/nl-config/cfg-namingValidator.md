@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.8** (publish-ready validator package metadata, stable installable bins, and repository-root resolution for CLIs).
+Current implementation target: **V0.1.9** (runtime config supports additive role-registry extensions for naming classification).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -69,10 +69,26 @@ Naming validator supports optional runtime config input with deterministic JSON 
 - `version` must equal `"0.1"`
 - optional `naming.reportableExtensions.add` array
 - each extension entry must be a string starting with `.`
+- optional `naming.roles.add` array of role metadata objects:
+  - required `role` string
+  - required `category` from `concern-core | architecture-support | deprecated`
+  - required `status` from `active | deprecated`
+  - optional `notes` string
+
+Normalization and merge semantics for `naming.roles.add` are deterministic and additive-only:
+- role values are trimmed before validation and storage
+- duplicate role entries in config are dropped by first occurrence (input-order stable)
+- entries whose role already exists in default role registry are treated as no-op at runtime
 
 Runtime behavior in this slice is additive-only for reportable extension collection:
 - derived reportable extensions = default registry union `config.naming.reportableExtensions.add`
 - defaults remain unchanged when config is omitted
+
+Runtime behavior for role additions:
+- runtime role metadata map = default metadata map + config role additions (add-only)
+- runtime active role set = roles with `status=active` from runtime role metadata
+- runtime role suffix list = runtime role keys sorted by descending length for hyphen-role ambiguity detection
+- filename classification uses the runtime role structures when supplied, and default registries when omitted
 
 ## 3.0 Classification Contract
 ### 3.1 Canonical
