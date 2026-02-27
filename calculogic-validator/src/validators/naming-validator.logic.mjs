@@ -57,8 +57,8 @@ const SCOPE_PROFILES = {
     includeRootFiles: [],
   },
   app: {
-    description: 'Application-focused scan (src/test/scripts and root tooling files).',
-    includeRoots: ['src', 'test', 'scripts'],
+    description: 'Application-focused scan (src/test/calculogic-validator and root tooling files).',
+    includeRoots: ['src', 'test', 'calculogic-validator'],
     includeRootFiles: Array.from(ROOT_APP_FILES),
   },
   docs: {

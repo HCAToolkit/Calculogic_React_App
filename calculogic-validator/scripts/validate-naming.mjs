@@ -9,7 +9,7 @@ import {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const repositoryRoot = path.resolve(__dirname, '..');
+const repositoryRoot = path.resolve(__dirname, '..', '..');
 
 const parseScopeFromCli = argv => {
   let selectedScope = 'repo';

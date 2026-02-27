@@ -8,7 +8,7 @@ import {
 } from '../src/validators/naming-validator.logic.mjs';
 
 const runValidatorCli = args =>
-  spawnSync(process.execPath, ['--experimental-strip-types', 'scripts/validate-naming.mjs', ...args], {
+  spawnSync(process.execPath, ['--experimental-strip-types', 'calculogic-validator/scripts/validate-naming.mjs', ...args], {
     cwd: process.cwd(),
     encoding: 'utf8',
   });
@@ -25,7 +25,7 @@ test('default/no-scope behavior resolves to repo', () => {
 
 test('--scope=repo aligns with repo contract roots', () => {
   const repoPaths = collectRepositoryPaths(process.cwd(), { scope: 'repo' });
-  assert.ok(repoPaths.includes('src/validators/naming-validator.logic.mjs'));
+  assert.ok(repoPaths.includes('calculogic-validator/src/validators/naming-validator.logic.mjs'));
   assert.ok(repoPaths.includes('doc/ConventionRoutines/NamingValidatorSpec.md'));
   assert.ok(repoPaths.includes('README.md'));
 });
@@ -40,9 +40,9 @@ test('--scope=docs includes doc/**, docs/**, and root README.md only from root c
 
 test('--scope=app excludes doc/docs folders while including app roots and root tooling files', () => {
   const appPaths = collectRepositoryPaths(process.cwd(), { scope: 'app' });
-  assert.ok(appPaths.includes('src/validators/naming-validator.logic.mjs'));
-  assert.ok(appPaths.includes('test/naming-validator.test.mjs'));
-  assert.ok(appPaths.includes('scripts/validate-naming.mjs'));
+  assert.ok(appPaths.includes('calculogic-validator/src/validators/naming-validator.logic.mjs'));
+  assert.ok(appPaths.includes('calculogic-validator/test/naming-validator.test.mjs'));
+  assert.ok(appPaths.includes('calculogic-validator/scripts/validate-naming.mjs'));
   assert.ok(appPaths.includes('package.json'));
   assert.equal(appPaths.some(pathname => pathname.startsWith('doc/')), false);
   assert.equal(appPaths.some(pathname => pathname.startsWith('docs/')), false);
