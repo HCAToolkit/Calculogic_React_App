@@ -30,6 +30,7 @@ const parseOptions = argv => {
     prefixes: defaultPrefixes,
     top: 6,
     warnSamples: 5,
+    strict: false,
   };
 
   for (const argument of argv) {
@@ -63,6 +64,11 @@ const parseOptions = argv => {
       continue;
     }
 
+    if (argument === '--strict') {
+      options.strict = true;
+      continue;
+    }
+
     throw new Error(`Unknown option: ${argument}`);
   }
 
@@ -76,7 +82,7 @@ const getLatestReportForPrefix = async ({ dir, prefix }) => {
     .map(entry => entry.name);
 
   if (matchingFiles.length === 0) {
-    throw new Error(`No report files found for prefix "${prefix}" in ${dir}`);
+    return null;
   }
 
   const reportsWithStats = await Promise.all(matchingFiles.map(async filename => {
@@ -120,6 +126,11 @@ const formatCodeCounts = ({ codeCounts, top }) => {
 };
 
 const printSummary = ({ prefix, report, parsedReport, top, warnSamples }) => {
+  if (Array.isArray(parsedReport.validators)) {
+    printRunnerSummary({ prefix, report, parsedReport, top });
+    return;
+  }
+
   const findings = Array.isArray(parsedReport.findings) ? parsedReport.findings : [];
   const warnFindings = findings.filter(finding => finding?.severity === 'warn');
   const warnSampleLines = warnFindings
@@ -128,10 +139,15 @@ const printSummary = ({ prefix, report, parsedReport, top, warnSamples }) => {
 
   process.stdout.write(`=== ${prefix} (latest) ===\n`);
   process.stdout.write(`file: ${report.filename} | bytes: ${report.bytes}\n`);
-  process.stdout.write(`scope: ${parsedReport.scope ?? 'unknown'} | totalFilesScanned: ${parsedReport.totalFilesScanned ?? 0} | findingsGenerated: ${parsedReport.findingsGenerated ?? findings.length}\n`);
+  process.stdout.write(`scope: ${parsedReport.scope ?? 'unknown'} | totalFilesScanned: ${parsedReport.totalFilesScanned ?? 0} | findingsGenerated: ${parsedReport.scopeSummary?.findingsGenerated ?? parsedReport.findingsGenerated ?? findings.length}\n`);
 
   const counts = parsedReport.counts ?? {};
-  process.stdout.write(`counts: canonical=${counts.canonical ?? 0}, allowed=${counts.allowed ?? 0}, legacy=${counts.legacy ?? 0}, invalid=${counts.invalid ?? 0}\n`);
+  const hasNamingCountShape = Object.prototype.hasOwnProperty.call(counts, 'allowed-special-case');
+  const countsLine = hasNamingCountShape
+    ? `counts: canonical=${counts.canonical ?? 0}, allowedSpecialCase=${counts['allowed-special-case'] ?? 0}, legacyException=${counts['legacy-exception'] ?? 0}, invalidAmbiguous=${counts['invalid-ambiguous'] ?? 0}`
+    : `counts: canonical=${counts.canonical ?? 0}, allowed=${counts.allowed ?? 0}, legacy=${counts.legacy ?? 0}, invalid=${counts.invalid ?? 0}`;
+
+  process.stdout.write(`${countsLine}\n`);
   process.stdout.write(`topCodeCounts(${top}): ${formatCodeCounts({ codeCounts: parsedReport.codeCounts, top })}\n`);
   process.stdout.write(`warnCount: ${warnFindings.length}\n`);
 
@@ -142,15 +158,55 @@ const printSummary = ({ prefix, report, parsedReport, top, warnSamples }) => {
   process.stdout.write('\n');
 };
 
+const printRunnerSummary = ({ prefix, report, parsedReport, top }) => {
+  const validators = parsedReport.validators;
+  process.stdout.write(`=== ${prefix} (latest) ===\n`);
+  process.stdout.write(`file: ${report.filename} | bytes: ${report.bytes}\n`);
+  process.stdout.write(`scope: ${parsedReport.scope ?? '(none)'} | validators: ${validators.length} | durationMs: ${parsedReport.durationMs ?? '(n/a)'}\n`);
+
+  for (const validator of validators) {
+    const findings = Array.isArray(validator?.findings) ? validator.findings : [];
+    const warnCount = findings.filter(finding => finding?.severity === 'warn').length;
+    const countsEntries = Object.entries(validator?.counts ?? {});
+    const countsLine = countsEntries.length === 0
+      ? 'none'
+      : countsEntries.map(([key, value]) => `${key}=${value}`).join(', ');
+
+    process.stdout.write(`validator: ${validator?.id ?? '(unknown)'} | totalFilesScanned: ${validator?.totalFilesScanned ?? 0}\n`);
+    process.stdout.write(`counts: ${countsLine}\n`);
+    process.stdout.write(`warnCount: ${warnCount}\n`);
+    process.stdout.write(`topCodeCounts(${top}): ${formatCodeCounts({ codeCounts: validator?.codeCounts, top })}\n`);
+  }
+
+  process.stdout.write('\n');
+};
+
 const run = async () => {
   const options = parseOptions(process.argv.slice(2));
   const reportsDir = path.resolve(options.dir);
+
+  try {
+    await fs.stat(reportsDir);
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      process.stderr.write(`No reports directory found at ${reportsDir}. Run a report capture command first (e.g. npm run report:naming:docs).\n`);
+      process.exit(options.strict ? 1 : 0);
+    }
+
+    throw error;
+  }
 
   let hasFailures = false;
 
   for (const prefix of options.prefixes) {
     try {
       const latestReport = await getLatestReportForPrefix({ dir: reportsDir, prefix });
+      if (!latestReport) {
+        process.stderr.write(`SKIP ${prefix}: no report files found in ${reportsDir}\n`);
+        hasFailures ||= options.strict;
+        continue;
+      }
+
       const { parsed } = await parseReportJson(latestReport);
       printSummary({
         prefix,

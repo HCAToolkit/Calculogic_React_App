@@ -116,17 +116,18 @@ test('report-capture summarizer uses newest file and prints compact docs scope s
   }
 });
 
-test('report-capture summarizer exits non-zero when requested prefix has no report files', async () => {
+test('report-capture summarizer exits non-zero in strict mode when requested prefix has no report files', async () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'report-capture-summarize-missing-'));
 
   try {
     const result = await runSummarizer([
       `--dir=${tempDir}`,
       '--prefixes=naming-missing',
+      '--strict',
     ]);
 
     assert.notEqual(result.exitCode, 0);
-    assert.match(result.stderr, /FAIL naming-missing/u);
+    assert.match(result.stderr, /SKIP naming-missing/u);
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
