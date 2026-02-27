@@ -98,16 +98,16 @@ test('classifies legacy exceptions for non-canonical legacy names', () => {
 
 test('repo scope includes docs + src + root config examples', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'repo' });
-  assert.ok(paths.includes('src/validators/naming-validator.logic.mjs'));
+  assert.ok(paths.includes('calculogic-validator/src/validators/naming-validator.logic.mjs'));
   assert.ok(paths.includes('doc/ConventionRoutines/NamingValidatorSpec.md'));
   assert.ok(paths.includes('package.json'));
 });
 
 test('app scope excludes docs and includes src/test/scripts/root tooling files', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'app' });
-  assert.ok(paths.includes('src/validators/naming-validator.logic.mjs'));
-  assert.ok(paths.includes('test/naming-validator.test.mjs'));
-  assert.ok(paths.includes('scripts/validate-naming.mjs'));
+  assert.ok(paths.includes('calculogic-validator/src/validators/naming-validator.logic.mjs'));
+  assert.ok(paths.includes('calculogic-validator/test/naming-validator.test.mjs'));
+  assert.ok(paths.includes('calculogic-validator/scripts/validate-naming.mjs'));
   assert.ok(paths.includes('package.json'));
   assert.equal(paths.some(p => p.startsWith('doc/')), false);
   assert.equal(paths.some(p => p.startsWith('docs/')), false);
@@ -145,7 +145,7 @@ test('scope filtering output order is deterministic', () => {
 test('invalid CLI scope returns deterministic usage error and non-zero exit', () => {
   const result = spawnSync(
     process.execPath,
-    ['--experimental-strip-types', 'scripts/validate-naming.mjs', '--scope=invalid-scope'],
+    ['--experimental-strip-types', 'calculogic-validator/scripts/validate-naming.mjs', '--scope=invalid-scope'],
     { cwd: process.cwd(), encoding: 'utf8' },
   );
 
