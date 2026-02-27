@@ -112,8 +112,12 @@ const runScopeVerification = async ({ scope, reportsDir, repositoryRoot, hostPat
     throw new Error(`Report path is not inside reports directory for ${scope}: ${metadata.path}`);
   }
 
-  if (typeof metadata.exitCode !== 'number' || metadata.exitCode !== 0 || execution.exitCode !== 0) {
-    throw new Error(`Expected zero exit code for ${scope}, got metadata.exitCode=${metadata.exitCode}, process.exitCode=${execution.exitCode}`);
+  if (typeof metadata.exitCode !== 'number') {
+    throw new Error(`Expected numeric metadata.exitCode for ${scope}, got ${metadata.exitCode}`);
+  }
+
+  if (metadata.exitCode !== execution.exitCode) {
+    throw new Error(`Mismatched exit code for ${scope}: metadata.exitCode=${metadata.exitCode}, process.exitCode=${execution.exitCode}`);
   }
 
   if (typeof metadata.bytes !== 'number' || metadata.bytes <= 0) {

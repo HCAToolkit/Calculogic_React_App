@@ -1,7 +1,7 @@
 # cfg-validatorRunner
 
 ## 0.0 Version
-Current implementation target: **V0.1.2** (deterministic multi-validator runner core with report metadata envelope support).
+Current implementation target: **V0.1.3** (deterministic multi-validator runner report with CI-friendly CLI exit policy).
 
 ## 1.0 Purpose
 Provide a deterministic runner that executes one or more registered validators and returns a single versioned combined report.
@@ -54,12 +54,15 @@ Each validator entry includes:
 - `--scope=<repo|app|docs|validator|system>` (optional)
 - `--validators=<id1,id2>` (optional)
 - `--config=<path>` (optional JSON config path)
+- `--strict` (optional legacy-exception enforcement when no warnings are present)
 
 ### 4.2 Behavior
 - Resolves repository root deterministically from script location.
 - Executes runner with selected options.
 - Writes JSON report to stdout.
-- Exits `0` on success.
+- Exits `2` when any aggregated finding has `severity="warn"`.
+- Exits `1` only in strict mode when no warnings exist and any aggregated finding has `classification="legacy-exception"`.
+- Exits `0` when neither condition applies.
 - Exits `1` for usage errors (invalid flags, unknown validator IDs, invalid scope).
 
 ## 5.0 Deferred Behavior

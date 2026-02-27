@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.12** (scope contract split + deterministic report metadata: toolVersion/configDigest/timing).
+Current implementation target: **V0.1.13** (CI-friendly exit codes with optional strict legacy-exception enforcement).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -152,8 +152,18 @@ Report output includes additive scope observability metadata:
 
 This metadata is additive and does not alter legacy report-mode findings behavior.
 
-### 4.6 Exit behavior (report mode)
-Report mode always exits with status code 0 and prints counts by classification.
+### 4.6 Exit behavior (report mode, V0.1.13)
+Report mode always prints full JSON report payload to stdout in non-usage-error flows, then exits with deterministic CI-oriented status:
+- default mode: exit `2` when any finding has `severity="warn"`.
+- strict mode (`--strict`): exit `2` when any warning exists; otherwise exit `1` when any finding has `classification="legacy-exception"`.
+- exit `0` when neither warning criteria nor strict legacy criteria are present.
+
+Priority order is deterministic:
+1. warnings (`severity="warn"`) dominate and force exit `2`.
+2. strict legacy-exception enforcement produces exit `1` only when no warnings exist.
+3. otherwise success is exit `0`.
+
+Invalid CLI usage and argument parse errors remain exit `1`.
 
 ## 5.0 Deferred Behavior
 Deferred to later slices:

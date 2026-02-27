@@ -26,12 +26,12 @@ const runReportCapture = (prefix, scriptPath, scope, outputDir) => new Promise((
 
   child.on('error', reject);
   child.on('close', code => {
-    if (code === 0) {
-      resolve();
+    if (typeof code !== 'number') {
+      reject(new Error(`report capture returned non-numeric exit code for ${prefix}`));
       return;
     }
 
-    reject(new Error(`report capture exited with code ${code} for ${prefix}`));
+    resolve(code);
   });
 });
 
@@ -48,7 +48,8 @@ test('report-capture host emits naming reports for repo/app/docs/validator/syste
       const prefix = `naming-${scope}`;
       const before = reportFilesForPrefix(tempDir, prefix);
 
-      await runReportCapture(prefix, 'calculogic-validator/scripts/validate-naming.mjs', scope, tempDir);
+      const exitCode = await runReportCapture(prefix, 'calculogic-validator/scripts/validate-naming.mjs', scope, tempDir);
+      assert.ok([0, 1, 2].includes(exitCode));
 
       const after = reportFilesForPrefix(tempDir, prefix);
       assert.equal(after.length, before.length + 1);
@@ -73,7 +74,8 @@ test('report-capture host emits validate-all reports for repo/app/docs/validator
       const prefix = `validate-all-${scope}`;
       const before = reportFilesForPrefix(tempDir, prefix);
 
-      await runReportCapture(prefix, 'calculogic-validator/scripts/validate-all.mjs', scope, tempDir);
+      const exitCode = await runReportCapture(prefix, 'calculogic-validator/scripts/validate-all.mjs', scope, tempDir);
+      assert.ok([0, 1, 2].includes(exitCode));
 
       const after = reportFilesForPrefix(tempDir, prefix);
       assert.equal(after.length, before.length + 1);

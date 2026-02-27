@@ -22,7 +22,7 @@ test('calculogic-validate bin runs naming validator and returns JSON', () => {
     '--validators=naming',
   ]);
 
-  assert.equal(result.status, 0, result.stderr);
+  assert.ok([0, 1, 2].includes(result.status), result.stderr);
   const report = JSON.parse(result.stdout);
   assert.ok(Array.isArray(report.validators));
 });
@@ -33,7 +33,7 @@ test('calculogic-validate-naming bin returns naming report JSON', () => {
     '--scope=app',
   ]);
 
-  assert.equal(result.status, 0, result.stderr);
+  assert.ok([0, 1, 2].includes(result.status), result.stderr);
   const report = JSON.parse(result.stdout);
   assert.equal(report.scope, 'app');
   assert.equal(typeof report.totalFilesScanned, 'number');
@@ -48,7 +48,7 @@ test('calculogic-validate bin accepts --config path', () => {
     '--config=calculogic-validator/test/fixtures/validator-config.extensions.contracts.json',
   ]);
 
-  assert.equal(result.status, 0, result.stderr);
+  assert.ok([0, 1, 2].includes(result.status), result.stderr);
   const report = JSON.parse(result.stdout);
   assert.equal(report.validators[0].id, 'naming');
 });
