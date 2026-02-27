@@ -25,6 +25,14 @@ export const normalizePath = relativePath => relativePath.split(path.sep).join('
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
 
+const buildDefaultNamingRolesRuntime = () => ({
+  roleMetadata: ROLE_METADATA,
+  activeRoles: ACTIVE_ROLES,
+  roleSuffixes: ROLE_SUFFIXES,
+});
+
+const resolveNamingRolesRuntime = namingRolesRuntime => namingRolesRuntime ?? buildDefaultNamingRolesRuntime();
+
 const isReportableFile = (relativePath, reportableExtensions = REPORTABLE_EXTENSIONS) => {
   const extension = path.extname(relativePath);
   if (reportableExtensions.has(extension)) {
@@ -126,7 +134,8 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
   return sortPaths(new Set(scopedPaths));
 };
 
-export const classifyPath = relativePath => {
+export const classifyPath = (relativePath, namingRolesRuntime) => {
+  const runtime = resolveNamingRolesRuntime(namingRolesRuntime);
   const normalizedPath = normalizePath(relativePath);
   const basename = path.posix.basename(normalizedPath);
 
@@ -145,9 +154,9 @@ export const classifyPath = relativePath => {
 
   const parsed = parseCanonicalName(basename);
   if (parsed) {
-    const roleMetadata = getRoleMetadata(parsed.role, ROLE_METADATA);
+    const roleMetadata = getRoleMetadata(parsed.role, runtime.roleMetadata);
 
-    if (isUnknownOrInactiveRole(parsed.role, roleMetadata, ACTIVE_ROLES)) {
+    if (isUnknownOrInactiveRole(parsed.role, roleMetadata, runtime.activeRoles)) {
       if (isDeprecatedRole(roleMetadata)) {
         return {
           code: 'NAMING_DEPRECATED_ROLE',
@@ -210,7 +219,7 @@ export const classifyPath = relativePath => {
     };
   }
 
-  const ambiguity = hasHyphenAppendedRoleAmbiguity(basename, ROLE_SUFFIXES);
+  const ambiguity = hasHyphenAppendedRoleAmbiguity(basename, runtime.roleSuffixes);
   if (ambiguity) {
     return {
       code: 'NAMING_ROLE_HYPHEN_AMBIGUITY',
@@ -239,7 +248,7 @@ export const runNamingValidator = (rootDirectory, options = {}) => {
     scope: selectedScope,
     reportableExtensions: options.reportableExtensions,
   });
-  const findings = paths.map(pathname => classifyPath(pathname));
+  const findings = paths.map(pathname => classifyPath(pathname, options.namingRolesRuntime));
 
   return {
     findings,

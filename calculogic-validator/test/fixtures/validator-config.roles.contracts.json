@@ -1,0 +1,15 @@
+{
+  "version": "0.1",
+  "naming": {
+    "roles": {
+      "add": [
+        {
+          "role": "provider",
+          "category": "architecture-support",
+          "status": "active",
+          "notes": "Extension role for provider-oriented module naming."
+        }
+      ]
+    }
+  }
+}
