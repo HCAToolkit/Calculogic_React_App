@@ -8,6 +8,12 @@ export const ROLE_REGISTRY = [
   { role: 'knowledge', category: 'concern-core', status: 'active' },
   { role: 'results', category: 'concern-core', status: 'active' },
   { role: 'results-style', category: 'concern-core', status: 'active' },
+  { role: 'spec', category: 'documentation', status: 'active' },
+  { role: 'policy', category: 'documentation', status: 'active' },
+  { role: 'workflow', category: 'documentation', status: 'active' },
+  { role: 'plan', category: 'documentation', status: 'active' },
+  { role: 'audit', category: 'documentation', status: 'active' },
+  { role: 'healthcheck', category: 'documentation', status: 'active' },
   {
     role: 'view',
     category: 'deprecated',

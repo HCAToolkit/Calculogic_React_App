@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { VALIDATOR_CONFIG_VERSION } from './validator-config.contracts.mjs';
 
-const VALID_ROLE_CATEGORIES = new Set(['concern-core', 'architecture-support', 'deprecated']);
+const VALID_ROLE_CATEGORIES = new Set(['concern-core', 'architecture-support', 'documentation', 'deprecated']);
 const VALID_ROLE_STATUSES = new Set(['active', 'deprecated']);
 
 const fail = message => {
@@ -94,7 +94,7 @@ const validateRoleAdditionEntry = (entry, index) => {
 
   if (!VALID_ROLE_CATEGORIES.has(entry.category)) {
     fail(
-      `naming.roles.add[${index}].category must be one of: concern-core, architecture-support, deprecated.`,
+      `naming.roles.add[${index}].category must be one of: concern-core, architecture-support, documentation, deprecated.`,
     );
   }
 
