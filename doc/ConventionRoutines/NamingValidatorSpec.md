@@ -1,4 +1,4 @@
-# Naming Validator Spec (V0.1.3)
+# Naming Validator Spec (V0.1.5)
 
 ## Purpose and Scope
 
@@ -85,7 +85,7 @@ V0.1.2 implements deterministic scope profiles selected by CLI.
 - includes explicit roots:
   - `src/`
   - `test/`
-  - `scripts/`
+  - `calculogic-validator/`
 - includes explicit root tooling files (when present):
   - `package.json`
   - `package-lock.json`
@@ -123,7 +123,7 @@ Default behavior:
 
 Inclusion/exclusion summary:
 - `repo`: all reportable files under repository root (minus explicit walker exclusions).
-- `app`: includes `src/**`, `test/**`, `scripts/**`, and explicit root tooling files; excludes `doc/**` and `docs/**`.
+- `app`: includes `src/**`, `test/**`, `calculogic-validator/**`, and explicit root tooling files; excludes `doc/**` and `docs/**`.
 - `docs`: includes `doc/**`, `docs/**`, and selected root conventional docs currently limited to `README.md`; excludes `src/**` by profile definition.
 
 Invalid scope behavior:

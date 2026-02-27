@@ -14,7 +14,7 @@ The validator reads rules from `doc/ConventionRoutines/FileNamingMasterList-V1_1
 V0.1.4 supports deterministic scope profiles selected via CLI and applied before filename classification using explicit scope path predicates:
 - default/no `--scope` input resolves to `repo`
 - `repo`: repository-wide reportable files.
-- `app`: app-focused files (`src/`, `test/`, `scripts/`, and explicit root tooling files).
+- `app`: app-focused files (`src/`, `test/`, `calculogic-validator/`, and explicit root tooling files).
 - `docs`: docs-focused files (`doc/`, `docs/`, and selected root conventional docs currently limited to `README.md`).
 
 Scope predicates are evaluated on normalized repository-relative paths before report findings are generated. Invalid scope inputs are treated as CLI usage errors.
