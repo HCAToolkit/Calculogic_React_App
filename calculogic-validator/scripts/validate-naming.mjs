@@ -5,7 +5,7 @@ import {
   summarizeFindings,
   listNamingValidatorScopes,
   getScopeProfile,
-} from '../src/validators/naming-validator.logic.mjs';
+} from '../src/naming/naming-validator.host.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
