@@ -154,7 +154,7 @@ const validateConfig = config => {
     fail('root must be an object.');
   }
 
-  assertOnlyKeys(config, ['version', 'naming'], 'root');
+  assertOnlyKeys(config, ['version', 'naming', '$schema'], 'root');
 
   if (config.version !== VALIDATOR_CONFIG_VERSION) {
     fail(`version must be "${VALIDATOR_CONFIG_VERSION}".`);

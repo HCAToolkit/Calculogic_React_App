@@ -6,6 +6,9 @@
   "additionalProperties": false,
   "required": ["version"],
   "properties": {
+    "$schema": {
+      "type": "string"
+    },
     "version": {
       "const": "0.1"
     },
@@ -21,7 +24,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "pattern": "^\\\\."
+                "pattern": "^\\."
               }
             }
           }

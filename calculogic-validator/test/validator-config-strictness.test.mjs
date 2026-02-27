@@ -28,6 +28,24 @@ test('fails when config root contains unknown key', () => {
   }
 });
 
+
+
+test('allows optional root $schema editor hint key and normalizes deterministically', () => {
+  const tempPath = writeTempConfig('tmp-config-with-root-schema-key.json', {
+    $schema: './calculogic-validator/src/validator-config.schema.json',
+    version: '0.1',
+  });
+
+  try {
+    const config = loadValidatorConfigFromFile(tempPath, { cwd: '/' });
+    assert.deepEqual(config, {
+      version: '0.1',
+    });
+  } finally {
+    fs.rmSync(tempPath, { force: true });
+  }
+});
+
 test('fails when naming contains unknown key', () => {
   const tempPath = writeTempConfig('tmp-config-unknown-naming-key.json', {
     version: '0.1',

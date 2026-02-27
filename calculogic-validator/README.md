@@ -69,7 +69,7 @@ Legacy imports from `src/validators/naming-validator.logic.mjs` remain supported
 ## Validator config schema and strictness
 
 - Published schema: `calculogic-validator/src/validator-config.schema.json`.
-- Runtime validation is strict and rejects unknown keys at the same levels the schema disallows them (root, `naming`, `naming.reportableExtensions`, `naming.roles`, and each `naming.roles.add[]` entry).
+- Runtime validation is strict and rejects unknown keys at the same levels the schema disallows them (`naming`, `naming.reportableExtensions`, `naming.roles`, and each `naming.roles.add[]` entry; root allows optional `$schema` as an editor hint and normalization ignores it).
 
 Tool-agnostic schema reference example for editor integration:
 
