@@ -7,9 +7,11 @@ import {
   getScopeProfile,
 } from '../src/naming/naming-validator.host.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
+import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 
 const parseScopeFromCli = argv => {
   let selectedScope = 'repo';
+  let configPath;
 
   for (const argument of argv) {
     if (argument.startsWith('--scope=')) {
@@ -18,17 +20,22 @@ const parseScopeFromCli = argv => {
     }
 
     if (argument === '--help' || argument === '-h') {
-      return { helpRequested: true, selectedScope };
+      return { helpRequested: true, selectedScope, configPath };
+    }
+
+    if (argument.startsWith('--config=')) {
+      configPath = argument.slice('--config='.length);
+      continue;
     }
 
     throw new Error(`Invalid argument: ${argument}`);
   }
 
-  return { helpRequested: false, selectedScope };
+  return { helpRequested: false, selectedScope, configPath };
 };
 
 const usageLines = [
-  'Usage: calculogic-validate-naming [--scope=<repo|app|docs>]',
+  'Usage: calculogic-validate-naming [--scope=<repo|app|docs>] [--config=<path>]',
   'Scopes:',
   ...listNamingValidatorScopes().map(scope => {
     const profile = getScopeProfile(scope);
@@ -59,7 +66,19 @@ if (!getScopeProfile(parsed.selectedScope)) {
 
 const selectedScopeProfile = getScopeProfile(parsed.selectedScope);
 const repositoryRoot = resolveRepositoryRoot();
-const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: parsed.selectedScope });
+
+let config;
+try {
+  config = parsed.configPath
+    ? loadValidatorConfigFromFile(parsed.configPath, { cwd: process.cwd() })
+    : undefined;
+} catch (error) {
+  console.error(error.message);
+  console.error(usageLines.join('\n'));
+  process.exit(1);
+}
+
+const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: parsed.selectedScope, config });
 const summary = summarizeFindings(findings);
 
 const report = {

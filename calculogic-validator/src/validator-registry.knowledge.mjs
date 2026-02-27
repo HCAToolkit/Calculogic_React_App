@@ -5,7 +5,8 @@ import {
 
 const runNamingValidatorHook = (repositoryRoot, options = {}) => {
   const scope = options.scope;
-  const namingResult = runNamingValidator(repositoryRoot, { scope });
+  const config = options.config;
+  const namingResult = runNamingValidator(repositoryRoot, { scope, config });
   const summary = summarizeFindings(namingResult.findings);
 
   return {

@@ -25,9 +25,9 @@ export const normalizePath = relativePath => relativePath.split(path.sep).join('
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
 
-const isReportableFile = relativePath => {
+const isReportableFile = (relativePath, reportableExtensions = REPORTABLE_EXTENSIONS) => {
   const extension = path.extname(relativePath);
-  if (REPORTABLE_EXTENSIONS.has(extension)) {
+  if (reportableExtensions.has(extension)) {
     return true;
   }
 
@@ -36,7 +36,7 @@ const isReportableFile = relativePath => {
 
 const sortPaths = paths => Array.from(paths).sort((left, right) => left.localeCompare(right));
 
-const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.') => {
+const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {}) => {
   const normalizedRoot = normalizePath(rootRelativePath);
   const absoluteRoot = path.resolve(rootDirectory, normalizedRoot);
   if (!fs.existsSync(absoluteRoot)) {
@@ -48,6 +48,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.') => {
     return [];
   }
 
+  const reportableExtensions = options.reportableExtensions ?? REPORTABLE_EXTENSIONS;
   const collected = [];
 
   const walk = absoluteDirectoryPath => {
@@ -72,7 +73,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.') => {
       const absolutePath = path.join(absoluteDirectoryPath, entry.name);
       const relativePath = path.relative(rootDirectory, absolutePath);
       const normalizedPath = normalizePath(relativePath);
-      if (isReportableFile(normalizedPath)) {
+      if (isReportableFile(normalizedPath, reportableExtensions)) {
         collected.push(normalizedPath);
       }
     }
@@ -112,7 +113,9 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
     throw new Error(`Invalid scope profile: ${selectedScope}`);
   }
 
-  const allReportablePaths = collectPathsFromRoot(rootDirectory, '.');
+  const allReportablePaths = collectPathsFromRoot(rootDirectory, '.', {
+    reportableExtensions: options.reportableExtensions,
+  });
 
   if (selectedScope === 'repo') {
     return sortPaths(new Set(allReportablePaths));
@@ -232,7 +235,10 @@ export const classifyPath = relativePath => {
 
 export const runNamingValidator = (rootDirectory, options = {}) => {
   const selectedScope = options.scope ?? 'repo';
-  const paths = collectRepositoryPaths(rootDirectory, { scope: selectedScope });
+  const paths = collectRepositoryPaths(rootDirectory, {
+    scope: selectedScope,
+    reportableExtensions: options.reportableExtensions,
+  });
   const findings = paths.map(pathname => classifyPath(pathname));
 
   return {

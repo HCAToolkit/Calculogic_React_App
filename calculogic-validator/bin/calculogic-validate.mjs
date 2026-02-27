@@ -4,9 +4,10 @@ import { getValidatorScopeProfile, listValidatorScopes } from '../src/validator-
 import { runValidatorRunner } from '../src/validator-runner.logic.mjs';
 import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
+import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 
 const usageLines = [
-  'Usage: calculogic-validate [--scope=<repo|app|docs>] [--validators=<id1,id2>]',
+  'Usage: calculogic-validate [--scope=<repo|app|docs>] [--validators=<id1,id2>] [--config=<path>]',
   'Validators:',
   ...listRegisteredValidators().map(validatorId => `  - ${validatorId}`),
   'Scopes:',
@@ -21,14 +22,20 @@ const usageLines = [
 const parseCliArgs = argv => {
   let selectedScope;
   let validators;
+  let configPath;
 
   for (const argument of argv) {
     if (argument === '--help' || argument === '-h') {
-      return { helpRequested: true, selectedScope, validators };
+      return { helpRequested: true, selectedScope, validators, configPath };
     }
 
     if (argument.startsWith('--scope=')) {
       selectedScope = argument.slice('--scope='.length);
+      continue;
+    }
+
+    if (argument.startsWith('--config=')) {
+      configPath = argument.slice('--config='.length);
       continue;
     }
 
@@ -44,7 +51,7 @@ const parseCliArgs = argv => {
     throw new Error(`Invalid argument: ${argument}`);
   }
 
-  return { helpRequested: false, selectedScope, validators };
+  return { helpRequested: false, selectedScope, validators, configPath };
 };
 
 let parsed;
@@ -69,9 +76,14 @@ if (parsed.selectedScope && !getValidatorScopeProfile(parsed.selectedScope)) {
 
 try {
   const repositoryRoot = resolveRepositoryRoot();
+  const config = parsed.configPath
+    ? loadValidatorConfigFromFile(parsed.configPath, { cwd: process.cwd() })
+    : undefined;
+
   const report = runValidatorRunner(repositoryRoot, {
     scope: parsed.selectedScope,
     validators: parsed.validators,
+    config,
   });
 
   console.log(JSON.stringify(report, null, 2));

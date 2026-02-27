@@ -64,6 +64,16 @@ The health-check performs deterministic, CI-friendly assertions for scope profil
 
 Health-check behavior is fail-fast semantics: any contract violation returns non-zero exit status.
 
+### 2.6 Validator config contract (V0.1)
+Naming validator supports optional runtime config input with deterministic JSON contract:
+- `version` must equal `"0.1"`
+- optional `naming.reportableExtensions.add` array
+- each extension entry must be a string starting with `.`
+
+Runtime behavior in this slice is additive-only for reportable extension collection:
+- derived reportable extensions = default registry union `config.naming.reportableExtensions.add`
+- defaults remain unchanged when config is omitted
+
 ## 3.0 Classification Contract
 ### 3.1 Canonical
 Classify as canonical when filename parses as `<semantic-name>.<role>.<ext>` (including `.module.css`) with kebab-case semantic name and known role.

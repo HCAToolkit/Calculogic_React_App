@@ -38,3 +38,29 @@ test('calculogic-validate-naming bin returns naming report JSON', () => {
   assert.equal(report.scope, 'app');
   assert.equal(typeof report.totalFilesScanned, 'number');
 });
+
+
+test('calculogic-validate bin accepts --config path', () => {
+  const result = runBin([
+    'calculogic-validator/bin/calculogic-validate.mjs',
+    '--scope=app',
+    '--validators=naming',
+    '--config=calculogic-validator/test/fixtures/validator-config.extensions.contracts.json',
+  ]);
+
+  assert.equal(result.status, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.validators[0].id, 'naming');
+});
+
+test('calculogic-validate-naming bin fails deterministically on invalid config', () => {
+  const result = runBin([
+    'calculogic-validator/bin/calculogic-validate-naming.mjs',
+    '--scope=app',
+    '--config=calculogic-validator/test/fixtures/not-found.json',
+  ]);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Failed to read validator config file:/u);
+  assert.match(result.stderr, /Usage: calculogic-validate-naming/u);
+});
