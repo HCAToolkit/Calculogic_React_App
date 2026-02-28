@@ -15,11 +15,14 @@ This hub defines the in-repo standards and architecture for the Interface/Builde
 - `doc/ConventionRoutines/NL-First-Workflow.md`
 
 ## Documents in this hub
+- `Identity-Deployment-Ownership.md` (canonical identity + boundaries)
 - `StandardsSummary.md`
 - `ContributionChecklist.md`
 - `Architecture.md`
 - `Contracts.md`
 - `ContentDrawerMVP.md`
+
+Other doc-engine restatements elsewhere are non-canonical unless explicitly referenced from this hub.
 
 ## Legacy portable documents (consolidated from `doc/DocEngine`)
 - `Overview-Architecture.md`
