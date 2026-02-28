@@ -116,3 +116,28 @@ test('validate-all fails fast when npm script args are not forwarded', () => {
   assert.match(result.stderr, /Detected npm argument forwarding issue/);
   assert.match(result.stderr, /Usage: npm run validate:all --/);
 });
+
+
+test('validate-naming fails fast in env-only npm v7+ style forwarding footgun case', () => {
+  const result = runNodeScript(namingScriptPath, [], repositoryRoot, {
+    npm_lifecycle_event: 'validate:naming',
+    npm_config_scope: 'app',
+    npm_config_argv: undefined,
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Detected npm argument forwarding issue/);
+  assert.match(result.stderr, /Usage: npm run validate:naming --/);
+});
+
+test('validate-all fails fast in env-only npm v7+ style forwarding footgun case', () => {
+  const result = runNodeScript(validateAllScriptPath, [], repositoryRoot, {
+    npm_lifecycle_event: 'validate:all',
+    npm_config_validators: 'naming',
+    npm_config_argv: undefined,
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Detected npm argument forwarding issue/);
+  assert.match(result.stderr, /Usage: npm run validate:all --/);
+});

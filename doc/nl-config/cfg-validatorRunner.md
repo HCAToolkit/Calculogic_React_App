@@ -68,6 +68,10 @@ Each validator entry includes:
 ### 4.2 Behavior
 - Resolves repository root deterministically from script location.
 - Forwards `--target` values to target-aware validators as convenience filters applied within selected scope.
+- Performs npm argument-forwarding footgun detection before parsing CLI:
+  - Primary path: if `npm_config_argv` is parseable, detect supported validator flags supplied to npm while absent in forwarded argv.
+  - Fallback path (npm v7+ / Codespaces): when `npm_config_argv` is unavailable, use deterministic `npm_config_<flag>` heuristics gated by lifecycle event and only when forwarded argv lacks supported flags.
+  - Fallback suspicious env detection uses stable ordering and low-false-positive rules: known scopes (`repo|app|docs|validator|system`), non-empty target/config, truthy strict (`true|1|yes`), and validator list indicators (`naming` or comma-list).
 - Executes runner with selected options.
 - Writes JSON report to stdout.
 - Exits `2` when any aggregated finding has `severity="warn"`.
