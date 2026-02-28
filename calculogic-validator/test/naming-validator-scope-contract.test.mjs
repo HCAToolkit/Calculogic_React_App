@@ -179,4 +179,5 @@ test('CLI nonexistent target fails deterministically with stable message', () =>
   const result = runValidatorCli(['--scope=app', '--target=src/does-not-exist-target']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Target path does not exist: src\/does-not-exist-target/u);
+  assert.match(result.stderr, /Usage: npm run validate:naming --/u);
 });
