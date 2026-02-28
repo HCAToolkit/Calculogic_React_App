@@ -45,9 +45,10 @@ const deriveNamingRolesRuntime = config => {
   };
 };
 
-export const runNamingValidator = (repositoryRoot, { scope, config } = {}) =>
+export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) =>
   runNamingValidatorRuntime(repositoryRoot, {
     scope,
+    targets,
     reportableExtensions: deriveReportableExtensions(config),
     namingRolesRuntime: deriveNamingRolesRuntime(config),
   });

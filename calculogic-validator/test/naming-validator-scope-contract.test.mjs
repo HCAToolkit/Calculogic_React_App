@@ -118,3 +118,65 @@ test('CLI explicit scope reports selected scope and scope summary metadata', () 
   assert.equal(report.scopeSummary.reportableFilesInScope, report.totalFilesScanned);
   assert.equal(report.scopeSummary.findingsGenerated, report.findings.length);
 });
+
+
+test('CLI no-target regression keeps scope behavior and unfiltered metadata', () => {
+  const result = runValidatorCli(['--scope=app']);
+  assert.ok([0, 1, 2].includes(result.status));
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.scope, 'app');
+  assert.equal(report.filters.isFiltered, false);
+  assert.equal(report.filters.targets, undefined);
+});
+
+test('CLI file target filters to one in-scope file and reports normalized targets', () => {
+  const appPaths = collectRepositoryPaths(process.cwd(), { scope: 'app' });
+  const targetPath = appPaths.find(pathname => pathname.endsWith('.tsx') || pathname.endsWith('.ts')) ?? appPaths[0];
+  assert.ok(targetPath, 'Expected at least one app-scope path for target test');
+
+  const result = runValidatorCli(['--scope=app', `--target=${targetPath}`]);
+  assert.ok([0, 1, 2].includes(result.status));
+  const report = JSON.parse(result.stdout);
+
+  assert.equal(report.filters.isFiltered, true);
+  assert.deepEqual(report.filters.targets, [targetPath]);
+  assert.deepEqual(report.findings.map(finding => finding.path), [targetPath]);
+});
+
+test('CLI directory target filters recursively within scope', () => {
+  const appPaths = collectRepositoryPaths(process.cwd(), { scope: 'app' });
+  const targetDirectory = 'src';
+  const expectedPaths = appPaths.filter(pathname => pathname === targetDirectory || pathname.startsWith(`${targetDirectory}/`));
+  assert.ok(expectedPaths.length > 0, 'Expected src directory to contain app-scope reportable files');
+
+  const result = runValidatorCli(['--scope=app', '--target', targetDirectory]);
+  assert.ok([0, 1, 2].includes(result.status));
+  const report = JSON.parse(result.stdout);
+
+  assert.equal(report.filters.isFiltered, true);
+  assert.deepEqual(report.filters.targets, [targetDirectory]);
+  assert.deepEqual(report.findings.map(finding => finding.path), expectedPaths);
+});
+
+test('CLI multiple targets apply union semantics', () => {
+  const appPaths = collectRepositoryPaths(process.cwd(), { scope: 'app' });
+  const targetDirectories = ['src', 'test'];
+  const expectedPaths = appPaths.filter(pathname =>
+    targetDirectories.some(target => pathname === target || pathname.startsWith(`${target}/`)),
+  );
+  assert.ok(expectedPaths.length > 0, 'Expected app scope to include files under src or test');
+
+  const result = runValidatorCli(['--scope=app', '--target=src', '--target', 'test']);
+  assert.ok([0, 1, 2].includes(result.status));
+  const report = JSON.parse(result.stdout);
+
+  assert.equal(report.filters.isFiltered, true);
+  assert.deepEqual(report.filters.targets, targetDirectories);
+  assert.deepEqual(report.findings.map(finding => finding.path), expectedPaths);
+});
+
+test('CLI nonexistent target fails deterministically with stable message', () => {
+  const result = runValidatorCli(['--scope=app', '--target=src/does-not-exist-target']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Target path does not exist: src\/does-not-exist-target/u);
+});
