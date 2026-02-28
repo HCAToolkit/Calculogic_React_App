@@ -8,6 +8,7 @@ import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromFindings } from '../src/validator-exit-code.logic.mjs';
+import { detectNpmArgForwardingFootgun } from '../src/npm-arg-forwarding-guard.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
@@ -84,6 +85,20 @@ const usageLines = [
 ];
 
 let parsed;
+const npmArgForwardingMessage = detectNpmArgForwardingFootgun({
+  argv: process.argv.slice(2),
+  npmConfigArgvJson: process.env.npm_config_argv,
+  lifecycleEvent: process.env.npm_lifecycle_event,
+  expectedLifecycleEvent: 'validate:naming',
+  supportedFlagNames: ['scope', 'target', 'config', 'strict'],
+});
+
+if (npmArgForwardingMessage) {
+  console.error(npmArgForwardingMessage);
+  console.error(usageLines.join('\n'));
+  process.exit(1);
+}
+
 try {
   parsed = parseScopeFromCli(process.argv.slice(2));
 } catch (error) {
