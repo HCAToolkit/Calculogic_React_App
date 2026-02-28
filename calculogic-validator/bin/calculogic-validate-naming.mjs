@@ -125,6 +125,7 @@ try {
   validatorResult = runNamingValidator(repositoryRoot, { scope: parsed.selectedScope, config, targets: parsed.targets });
 } catch (error) {
   console.error(error.message);
+  console.error(usageLines.join('\n'));
   process.exit(1);
 }
 const { findings, totalFilesScanned, scope, filters } = validatorResult;

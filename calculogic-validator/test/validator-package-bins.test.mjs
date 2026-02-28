@@ -40,6 +40,20 @@ test('calculogic-validate-naming bin returns naming report JSON', () => {
 });
 
 
+test('calculogic-validate-naming bin prints usage on runtime target resolution errors', () => {
+  const result = runBin([
+    '--experimental-strip-types',
+    'calculogic-validator/bin/calculogic-validate-naming.mjs',
+    '--scope=app',
+    '--target=does-not-exist',
+  ]);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Target path does not exist: does-not-exist/u);
+  assert.match(result.stderr, /Usage: calculogic-validate-naming/u);
+});
+
+
 test('calculogic-validate bin accepts --config path', () => {
   const result = runBin([
     'calculogic-validator/bin/calculogic-validate.mjs',
