@@ -1,4 +1,4 @@
-# Naming Validator Spec (V0.1.5)
+# Naming Validator Spec (V0.1.6)
 
 ## Purpose and Scope
 
@@ -129,12 +129,37 @@ Inclusion/exclusion summary:
 Invalid scope behavior:
 - Unknown scope values are usage errors with non-zero exit and valid-scope usage text.
 
-## CLI Usage (V0.1.2)
+## CLI Usage (V0.1.6)
 
 - `npm run validate:naming` (defaults to `--scope=repo`)
 - `npm run validate:naming -- --scope=repo`
 - `npm run validate:naming -- --scope=app`
 - `npm run validate:naming -- --scope=docs`
+- `npm run validate:naming -- --scope=app --target src/buildsurface`
+- `npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared`
+
+
+## Targeted runs (developer convenience, V0.1.6)
+
+Optional CLI filter flag:
+- `--target <path>`
+- `--target=<path>`
+- repeatable; union semantics when provided multiple times
+
+Path handling:
+- accepts repo-relative or absolute paths
+- target may be a file (exact path match) or directory (recursive descendants)
+- normalization stores report metadata in repo-relative `/`-separated form
+
+Filtering contract:
+- target filtering is applied after canonical scope discovery
+- selected scope remains authoritative and report `scope` remains unchanged
+- non-existent target path is deterministic non-zero error
+- existing targets that produce zero in-scope files produce valid empty report output
+
+Report metadata additions:
+- `filters.isFiltered` (boolean)
+- `filters.targets` (sorted normalized target list, only when filtering is active)
 
 ## Classification Outputs
 

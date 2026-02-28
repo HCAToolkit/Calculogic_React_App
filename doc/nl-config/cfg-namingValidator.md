@@ -1,7 +1,7 @@
 # cfg-namingValidator
 
 ## 0.0 Version
-Current implementation target: **V0.1.14** (validator config schema publication + strict unknown-key validation parity).
+Current implementation target: **V0.1.15** (optional --target path/folder filtering within scope).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -11,6 +11,22 @@ Define a deterministic V0.1 filename naming validator that runs in report mode o
 The validator reads rules from `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` as authoritative naming guidance.
 
 ### 2.2 Scope mode (V0.1.11)
+### 2.2.1 Target filter mode (V0.1.15)
+V0.1.15 adds optional repeatable `--target` inputs for developer-convenience focused runs while preserving canonical scope semantics:
+- `--target <path>` and `--target=<path>` are both accepted and can be repeated
+- target may resolve to a file (exact-match) or directory (recursive prefix-match)
+- target paths can be repository-relative or absolute, with deterministic normalization to repository-relative `/` form for reporting
+- filtering applies after canonical scope discovery (`repo|app|docs|validator|system` remain authoritative)
+
+Deterministic validation and safety requirements:
+- each target is resolved via realpath and must remain within repository root
+- nonexistent targets are deterministic CLI usage/runtime errors with non-zero exit
+- target unions are deduplicated and sorted deterministically
+- when target filtering is active, report metadata includes:
+  - `filters.isFiltered = true`
+  - `filters.targets = [sorted repo-relative targets]`
+- when target filtering is inactive, metadata includes `filters.isFiltered = false` and omits `filters.targets`
+
 V0.1.11 supports deterministic scope profiles selected via CLI and applied before filename classification using explicit scope path predicates:
 - default/no `--scope` input resolves to `repo`
 - `repo`: repository-wide reportable files.

@@ -44,6 +44,9 @@ const isReportableFile = (relativePath, reportableExtensions = REPORTABLE_EXTENS
 
 const sortPaths = paths => Array.from(paths).sort((left, right) => left.localeCompare(right));
 
+const isPathOutsideRoot = relativePath =>
+  relativePath.startsWith('..') || path.isAbsolute(relativePath);
+
 const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {}) => {
   const normalizedRoot = normalizePath(rootRelativePath);
   const absoluteRoot = path.resolve(rootDirectory, normalizedRoot);
@@ -152,6 +155,78 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
   const scopePathPredicate = buildScopePathPredicate(profile);
   const scopedPaths = allReportablePaths.filter(scopePathPredicate);
   return sortPaths(new Set(scopedPaths));
+};
+
+export const resolveNamingValidatorTargets = (rootDirectory, targets = []) => {
+  if (!targets?.length) {
+    return [];
+  }
+
+  const repositoryRoot = fs.realpathSync(rootDirectory);
+  const resolvedTargets = [];
+  const dedupeByAbsolutePath = new Set();
+
+  for (const rawTarget of targets) {
+    const trimmedTarget = String(rawTarget ?? '').trim();
+    const normalizedInput = trimmedTarget.replaceAll('\\', '/');
+
+    if (!normalizedInput) {
+      throw new Error('Target path must be a non-empty string.');
+    }
+
+    const absoluteCandidatePath = path.isAbsolute(trimmedTarget)
+      ? path.resolve(trimmedTarget)
+      : path.resolve(rootDirectory, normalizedInput);
+
+    if (!fs.existsSync(absoluteCandidatePath)) {
+      throw new Error(`Target path does not exist: ${normalizedInput}`);
+    }
+
+    const absoluteRealPath = fs.realpathSync(absoluteCandidatePath);
+    const relativeToRoot = path.relative(repositoryRoot, absoluteRealPath);
+    if (isPathOutsideRoot(relativeToRoot)) {
+      throw new Error(`Target path escapes repository root: ${normalizedInput}`);
+    }
+
+    if (dedupeByAbsolutePath.has(absoluteRealPath)) {
+      continue;
+    }
+
+    const targetStat = fs.statSync(absoluteRealPath);
+    const kind = targetStat.isDirectory() ? 'dir' : targetStat.isFile() ? 'file' : null;
+    if (!kind) {
+      throw new Error(`Target path must be a file or directory: ${normalizedInput}`);
+    }
+
+    dedupeByAbsolutePath.add(absoluteRealPath);
+    resolvedTargets.push({
+      absPath: absoluteRealPath,
+      relPath: relativeToRoot ? normalizePath(relativeToRoot) : '.',
+      kind,
+    });
+  }
+
+  return resolvedTargets.sort((left, right) => left.relPath.localeCompare(right.relPath));
+};
+
+export const filterRepositoryPathsByTargets = (rootDirectory, relativePaths, resolvedTargets = []) => {
+  if (!resolvedTargets.length) {
+    return sortPaths(new Set(relativePaths));
+  }
+
+  const selectedPaths = relativePaths.filter(relativePath => {
+    const absolutePath = path.resolve(rootDirectory, relativePath);
+
+    return resolvedTargets.some(target => {
+      if (target.kind === 'file') {
+        return absolutePath === target.absPath;
+      }
+
+      return absolutePath === target.absPath || absolutePath.startsWith(`${target.absPath}${path.sep}`);
+    });
+  });
+
+  return sortPaths(new Set(selectedPaths));
 };
 
 export const classifyPath = (relativePath, namingRolesRuntime) => {
@@ -292,16 +367,26 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
 
 export const runNamingValidator = (rootDirectory, options = {}) => {
   const selectedScope = options.scope ?? 'repo';
-  const paths = collectRepositoryPaths(rootDirectory, {
+  const inScopePaths = collectRepositoryPaths(rootDirectory, {
     scope: selectedScope,
     reportableExtensions: options.reportableExtensions,
   });
+  const resolvedTargets = resolveNamingValidatorTargets(rootDirectory, options.targets ?? []);
+  const paths = filterRepositoryPathsByTargets(rootDirectory, inScopePaths, resolvedTargets);
   const findings = paths.map(pathname => classifyPath(pathname, options.namingRolesRuntime));
 
   return {
     findings,
     totalFilesScanned: paths.length,
     scope: selectedScope,
+    filters: {
+      isFiltered: resolvedTargets.length > 0,
+      ...(resolvedTargets.length > 0
+        ? {
+            targets: resolvedTargets.map(target => target.relPath),
+          }
+        : {}),
+    },
   };
 };
 

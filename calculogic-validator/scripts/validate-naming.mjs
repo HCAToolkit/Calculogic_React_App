@@ -15,15 +15,34 @@ const parseScopeFromCli = argv => {
   let selectedScope = 'repo';
   let configPath;
   let strict = false;
+  const targets = [];
 
-  for (const argument of argv) {
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+
     if (argument.startsWith('--scope=')) {
       selectedScope = argument.slice('--scope='.length);
       continue;
     }
 
+    if (argument === '--target') {
+      const rawTarget = argv[index + 1];
+      if (!rawTarget || rawTarget.startsWith('--')) {
+        throw new Error('Missing required value for --target');
+      }
+
+      targets.push(rawTarget.trim().replaceAll('\\', '/'));
+      index += 1;
+      continue;
+    }
+
+    if (argument.startsWith('--target=')) {
+      targets.push(argument.slice('--target='.length).trim().replaceAll('\\', '/'));
+      continue;
+    }
+
     if (argument === '--help' || argument === '-h') {
-      return { helpRequested: true, selectedScope, configPath, strict };
+      return { helpRequested: true, selectedScope, configPath, strict, targets };
     }
 
     if (argument.startsWith('--config=')) {
@@ -39,7 +58,7 @@ const parseScopeFromCli = argv => {
     throw new Error(`Invalid argument: ${argument}`);
   }
 
-  return { helpRequested: false, selectedScope, configPath, strict };
+  return { helpRequested: false, selectedScope, configPath, strict, targets };
 };
 
 const supportedScopes = listNamingValidatorScopes();
@@ -47,7 +66,7 @@ const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
 const supportedScopesToken = preferredScopeOrder.filter(scope => supportedScopes.includes(scope)).join('|');
 
 const usageLines = [
-  `Usage: npm run validate:naming -- [--scope=<${supportedScopesToken}>] [--config=<path>] [--strict]`,
+  `Usage: npm run validate:naming -- [--scope=<${supportedScopesToken}>] [--target=<path>]... [--config=<path>] [--strict]`,
   'Scopes:',
   ...supportedScopes.map(scope => {
     const profile = getScopeProfile(scope);
@@ -56,6 +75,8 @@ const usageLines = [
   'Default scope: repo',
   'Examples:',
   '  ✅ npm run validate:naming -- --scope=app',
+  '  ✅ npm run validate:naming -- --scope=app --target src/buildsurface',
+  '  ✅ npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared',
   '  ✅ npm run validate:all -- --validators=naming --scope=docs',
   '  ✅ node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app',
   '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=docs',
@@ -71,7 +92,7 @@ try {
   process.exit(1);
 }
 
-const { helpRequested, selectedScope, configPath, strict } = parsed;
+const { helpRequested, selectedScope, configPath, strict, targets } = parsed;
 
 if (helpRequested) {
   console.log(usageLines.join('\n'));
@@ -98,7 +119,14 @@ try {
 const toolVersion = getValidatorToolVersion();
 const configDigest = config ? computeConfigDigest(config) : undefined;
 const startedAtDate = new Date();
-const { findings, totalFilesScanned, scope } = runNamingValidator(repositoryRoot, { scope: selectedScope, config });
+let validatorResult;
+try {
+  validatorResult = runNamingValidator(repositoryRoot, { scope: selectedScope, config, targets });
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
+const { findings, totalFilesScanned, scope, filters } = validatorResult;
 const endedAtDate = new Date();
 const summary = summarizeFindings(findings);
 
@@ -111,6 +139,7 @@ const report = {
   durationMs: endedAtDate.getTime() - startedAtDate.getTime(),
   scope,
   totalFilesScanned,
+  filters,
   scopeSummary: {
     scope,
     reportableFilesInScope: totalFilesScanned,
