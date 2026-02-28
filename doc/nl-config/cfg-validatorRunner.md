@@ -1,7 +1,7 @@
 # cfg-validatorRunner
 
 ## 0.0 Version
-Current implementation target: **V0.1.3** (deterministic multi-validator runner report with CI-friendly CLI exit policy).
+Current implementation target: **V0.1.4** (deterministic multi-validator runner target pass-through and per-validator filter metadata).
 
 ## 1.0 Purpose
 Provide a deterministic runner that executes one or more registered validators and returns a single versioned combined report.
@@ -14,6 +14,7 @@ The runner reads validator definitions from a deterministic registry in `calculo
 - `validators` (optional list of validator IDs)
 - `scope` (optional scope string forwarded to validators that support scope selection)
 - `config` (optional loaded validator config object from JSON contract V0.1)
+- `targets` (optional repeatable path filters forwarded to validators that implement target-aware filtering)
 
 ### 2.3 Initial validator set
 V0.1.0 includes the naming validator only, wrapped through the registry run hook without changing naming-validator internals.
@@ -44,6 +45,13 @@ Each validator entry includes:
 - `findings`
 - optional `meta`
 
+### 3.4 Per-validator filter metadata (V0.1.4)
+- Runner preserves report schema compatibility by attaching optional filter metadata only to validator entries that actively use filtering.
+- For naming validator, when target filtering is active:
+  - `validators[n].meta.filters.isFiltered = true`
+  - `validators[n].meta.filters.targets = [sorted, deduped, repository-relative paths with '/' separators]`
+- When no targets are provided, naming validator entries omit `meta.filters` entirely.
+
 ### 3.3 Ordering and determinism
 - Validator execution order matches registry declaration order.
 - Findings order from each validator is preserved as-is (no resorting in the runner).
@@ -53,17 +61,20 @@ Each validator entry includes:
 - `--help`
 - `--scope=<repo|app|docs|validator|system>` (optional)
 - `--validators=<id1,id2>` (optional)
+- `--target=<path>` or `--target <path>` (optional, repeatable)
 - `--config=<path>` (optional JSON config path)
 - `--strict` (optional legacy-exception enforcement when no warnings are present)
 
 ### 4.2 Behavior
 - Resolves repository root deterministically from script location.
+- Forwards `--target` values to target-aware validators as convenience filters applied within selected scope.
 - Executes runner with selected options.
 - Writes JSON report to stdout.
 - Exits `2` when any aggregated finding has `severity="warn"`.
 - Exits `1` only in strict mode when no warnings exist and any aggregated finding has `classification="legacy-exception"`.
 - Exits `0` when neither condition applies.
 - Exits `1` for usage errors (invalid flags, unknown validator IDs, invalid scope).
+- Exits `1` for malformed target input (e.g., missing `--target` value) and deterministic target resolution errors (e.g., nonexistent target).
 
 ## 5.0 Deferred Behavior
 Deferred to future slices:
