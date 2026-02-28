@@ -1,77 +1,127 @@
 # calculogic-validator
 
-This folder contains the Calculogic naming validator tooling extracted from the builder app tree.
+## 1) Overview
 
-## Commands
+`calculogic-validator` is the repository-local validator package in `calculogic-validator/`, including CLI binaries, host scripts, schema, and tests for naming and full validation workflows. In this repo, the recommended way to run it is from the **repo root** via npm scripts so command behavior, arguments, and report capture stay consistent with CI and team workflows.
 
-## npm argument forwarding (wrong vs right)
+## 2) Quickstart (repo root)
 
-- ✅ Correct: `npm run validate:naming -- --scope=app`
-- ❌ Incorrect: `npm run validate:naming --scope=app`
-- npm consumes script arguments unless you place `--` before validator flags.
+```bash
+npm ci
+npm test
+npm run validate:naming -- --scope=app
+```
 
-Run naming validator:
+What this does:
+
+- `npm ci`: installs exact lockfile dependencies.
+- `npm test`: runs the project and validator tests.
+- `npm run validate:naming -- --scope=app`: runs naming validation against app scope only.
+
+> npm argument forwarding reminder:
+>
+> - ✅ Correct: `npm run validate:naming -- --scope=app`
+> - ❌ Incorrect: `npm run validate:naming --scope=app`
+>
+> Use `--` before validator flags so npm forwards them to the script.
+
+## 3) Root npm workflows (recommended)
+
+Use these from the repository root.
+
+### Core validation
 
 ```bash
 npm run validate:naming
-npm run validate:naming -- --scope=repo
-npm run validate:naming -- --scope=app
-npm run validate:naming -- --scope=docs
-node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app --config=calculogic-validator/test/fixtures/validator-config.roles.contracts.json
-```
-
-Run full validator suite:
-
-```bash
 npm run validate:all
-npm run validate:all -- --scope=repo
-npm run validate:all -- --scope=app
-npm run validate:all -- --scope=docs
-npm run validate:all -- --validators=naming --scope=app
-```
-
-Run validator health check:
-
-```bash
 npm run health:validator
 ```
 
-Capture command output into timestamped report files:
+- `npm run validate:naming`: naming-only validation using repo defaults.
+- `npm run validate:all`: full validator pass (all configured validators).
+- `npm run health:validator`: validator environment/health diagnostics.
+
+### Reports by scope and target
+
+Naming report capture:
 
 ```bash
-npm exec -- calculogic-report-capture --keep 20 -- npm run validate:naming -- --scope=app
-npm exec -- calculogic-report-capture --prefix validator-health --keep 20 -- npm run health:validator
-npm exec -- calculogic-report-capture --dir .local-reports --keep 50 -- npm run validate:naming -- --scope=repo
+npm run report:naming:repo
+npm run report:naming:app
+npm run report:naming:docs
+npm run report:naming:validator
+npm run report:naming:system
 ```
 
-Offline / locked registry note:
+Full-suite report capture:
 
-- Preferred (deps already installed): `npm exec -- calculogic-report-capture --keep 20 -- npm run validate:naming -- --scope=app`
-- Strict no-download: `npx --no-install calculogic-report-capture --keep 20 -- npm run validate:naming -- --scope=app`
+```bash
+npm run report:all:repo
+npm run report:all:app
+npm run report:all:docs
+npm run report:all:validator
+npm run report:all:system
+```
 
-By default, `calculogic-report-capture` writes report files to OS cache storage.
-Use `--dir` to write to a repo-local or custom directory.
-Use `--json` if you want machine-readable metadata that includes the report path.
-CI tip: use `--dir .local-reports` (or another workspace folder) so the report can be uploaded as an artifact.
-If you use a repo-local report directory, add it to `.gitignore`.
+Report utilities:
 
-- Canonical validator module now lives in `src/naming/` (`naming-validator.host.mjs` / `naming-validator.wiring.mjs` / `naming-validator.logic.mjs` / `naming-validator.contracts.mjs`).
-- CLI entrypoint lives in `scripts/validate-naming.mjs`.
-- Validator tests live in `test/`.
-- Run from repository root with `npm run validate:naming`.
-- Canonical naming contract docs remain in `doc/ConventionRoutines/`.
+```bash
+npm run report:verify
+npm run report:summarize
+```
 
+- `report:naming:*`: capture naming validator output for a specific scope.
+- `report:all:*`: capture full-suite output for a specific scope.
+- `report:verify`: checks report-capture wiring/outputs.
+- `report:summarize`: summarizes captured reports.
 
-## Compatibility shim
+## 4) Validator binaries (direct invocation)
 
-Legacy imports from `src/validators/naming-validator.logic.mjs` remain supported via a thin re-export shim to the canonical host entrypoint.
+These binaries are defined in `calculogic-validator/package.json` and can be executed directly from repo root.
 
-## Validator config schema and strictness
+```bash
+node calculogic-validator/bin/calculogic-validate.mjs
+node calculogic-validator/bin/calculogic-validate-naming.mjs
+node calculogic-validator/bin/calculogic-validator-health.mjs
+```
 
-- Published schema: `calculogic-validator/src/validator-config.schema.json`.
-- Runtime validation is strict and rejects unknown keys at the same levels the schema disallows them (`naming`, `naming.reportableExtensions`, `naming.roles`, and each `naming.roles.add[]` entry; root allows optional `$schema` as an editor hint and normalization ignores it).
+What each binary does:
 
-Tool-agnostic schema reference example for editor integration:
+- `calculogic-validate.mjs`: full validator entrypoint.
+- `calculogic-validate-naming.mjs`: naming-only validator entrypoint.
+- `calculogic-validator-health.mjs`: validator health/diagnostic entrypoint.
+
+## 5) Scopes and targets
+
+Common scopes used in this repository:
+
+- `repo`
+- `app`
+- `docs`
+- `validator`
+- `system`
+
+Examples:
+
+```bash
+npm run validate:naming -- --scope=repo
+npm run validate:naming -- --scope=app
+npm run validate:naming -- --scope=docs
+npm run validate:all -- --scope=validator
+npm run validate:all -- --scope=system
+```
+
+Use scope-specific `report:*` commands when you want one-command capture per target/scope combination.
+
+## 6) Strict config and schema
+
+Validator config schema:
+
+- `calculogic-validator/src/validator-config.schema.json`
+
+Runtime behavior is strict and rejects unknown keys where the schema disallows them. Root-level `$schema` is allowed as an editor hint.
+
+Example:
 
 ```json
 {
@@ -90,3 +140,14 @@ Tool-agnostic schema reference example for editor integration:
   }
 }
 ```
+
+## 7) Report capture notes
+
+- Report scripts write JSON capture metadata to `./.reports` in this repository.
+- Keep count/retention is handled by script-level `--keep` values.
+- Use `npm run report:verify` after setup changes.
+- Use `npm run report:summarize` for a concise overview of recent captures.
+
+## 8) Compatibility note
+
+Legacy imports from `src/validators/naming-validator.logic.mjs` remain supported via a thin re-export shim to the canonical naming validator host entrypoint.
