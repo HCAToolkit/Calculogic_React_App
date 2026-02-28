@@ -139,6 +139,13 @@ Invalid scope behavior:
 - `npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared`
 
 
+npm argument forwarding note:
+- npm requires a separator `--` to forward CLI flags to scripts.
+- Wrong (now deterministic usage error): `npm run validate:naming --scope=app`, `npm run validate:all --scope=app`
+- Right: `npm run validate:naming -- --scope=app`, `npm run validate:all -- --scope=app`
+- The validator scripts fail fast with guidance when supported flags are detected in npm invocation metadata but not forwarded to script argv.
+
+
 ## Targeted runs (developer convenience, V0.1.6)
 
 Optional CLI filter flag:

@@ -19,10 +19,11 @@ const writeFixtureRepo = async fixtureDir => {
   await fs.writeFile(path.join(fixtureDir, 'src/App.tsx'), 'export const App = () => null;\n', 'utf8');
 };
 
-const runNodeScript = (scriptPath, args, cwd) =>
+const runNodeScript = (scriptPath, args, cwd, extraEnv = {}) =>
   spawnSync(process.execPath, ['--experimental-strip-types', scriptPath, ...args], {
     cwd,
     encoding: 'utf8',
+    env: { ...process.env, ...extraEnv },
   });
 
 const parseJsonStdout = result => {
@@ -91,4 +92,27 @@ test('validate-all mirrors exit policy from aggregated findings', async () => {
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
+});
+
+
+test('validate-naming fails fast when npm script args are not forwarded', () => {
+  const result = runNodeScript(namingScriptPath, [], repositoryRoot, {
+    npm_lifecycle_event: 'validate:naming',
+    npm_config_argv: JSON.stringify({ original: ['run', 'validate:naming', '--scope=app'], cooked: [], remain: [] }),
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Detected npm argument forwarding issue/);
+  assert.match(result.stderr, /Usage: npm run validate:naming --/);
+});
+
+test('validate-all fails fast when npm script args are not forwarded', () => {
+  const result = runNodeScript(validateAllScriptPath, [], repositoryRoot, {
+    npm_lifecycle_event: 'validate:all',
+    npm_config_argv: JSON.stringify({ original: ['run', 'validate:all', '--validators=naming'], cooked: [], remain: [] }),
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Detected npm argument forwarding issue/);
+  assert.match(result.stderr, /Usage: npm run validate:all --/);
 });
