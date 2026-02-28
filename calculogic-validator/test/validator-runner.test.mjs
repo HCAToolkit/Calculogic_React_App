@@ -36,3 +36,18 @@ test('validate-all CLI runs and returns naming validator report', () => {
   assert.equal(report.validators[0].id, 'naming');
   assert.equal(report.validators[0].scope, 'docs');
 });
+
+test('runner forwards targets and includes naming filter meta when filtering is active', () => {
+  const report = runValidatorRunner(process.cwd(), { scope: 'app', validators: ['naming'], targets: ['src'] });
+
+  assert.equal(report.validators[0].id, 'naming');
+  assert.equal(report.validators[0].meta?.filters?.isFiltered, true);
+  assert.deepEqual(report.validators[0].meta?.filters?.targets, ['src']);
+});
+
+test('runner omits naming filter meta when no targets are provided', () => {
+  const report = runValidatorRunner(process.cwd(), { scope: 'app', validators: ['naming'] });
+
+  assert.equal(report.validators[0].id, 'naming');
+  assert.equal(report.validators[0].meta?.filters, undefined);
+});

@@ -13,7 +13,7 @@ const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
 const supportedScopesToken = preferredScopeOrder.filter(scope => supportedScopes.includes(scope)).join('|');
 
 const usageLines = [
-  `Usage: npm run validate:all -- [--scope=<${supportedScopesToken}>] [--validators=<id1,id2>] [--config=<path>] [--strict]`,
+  `Usage: npm run validate:all -- [--scope=<${supportedScopesToken}>] [--validators=<id1,id2>] [--target=<path>]... [--config=<path>] [--strict]`,
   'Validators:',
   ...listRegisteredValidators().map(validatorId => `  - ${validatorId}`),
   'Scopes:',
@@ -26,6 +26,8 @@ const usageLines = [
   'Examples:',
   '  ✅ npm run validate:naming -- --scope=app',
   '  ✅ npm run validate:all -- --validators=naming --scope=docs',
+  '  ✅ npm run validate:all -- --validators=naming --scope=app --target src/buildsurface',
+  '  ✅ npm run validate:all -- --target src --target test',
   '  ✅ node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app',
   '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=docs',
   '  ✅ npm run validate:all -- --scope=repo --strict',
@@ -36,14 +38,33 @@ const parseCliArgs = argv => {
   let validators;
   let configPath;
   let strict = false;
+  const targets = [];
 
-  for (const argument of argv) {
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+
     if (argument === '--help' || argument === '-h') {
-      return { helpRequested: true, selectedScope, validators, configPath, strict };
+      return { helpRequested: true, selectedScope, validators, configPath, strict, targets };
     }
 
     if (argument.startsWith('--scope=')) {
       selectedScope = argument.slice('--scope='.length);
+      continue;
+    }
+
+    if (argument === '--target') {
+      const rawTarget = argv[index + 1];
+      if (!rawTarget || rawTarget.startsWith('--')) {
+        throw new Error('Missing required value for --target');
+      }
+
+      targets.push(rawTarget.trim().replaceAll('\\', '/'));
+      index += 1;
+      continue;
+    }
+
+    if (argument.startsWith('--target=')) {
+      targets.push(argument.slice('--target='.length).trim().replaceAll('\\', '/'));
       continue;
     }
 
@@ -69,7 +90,7 @@ const parseCliArgs = argv => {
     throw new Error(`Invalid argument: ${argument}`);
   }
 
-  return { helpRequested: false, selectedScope, validators, configPath, strict };
+  return { helpRequested: false, selectedScope, validators, configPath, strict, targets };
 };
 
 let parsed;
@@ -101,6 +122,7 @@ try {
     scope: parsed.selectedScope,
     validators: parsed.validators,
     config,
+    targets: parsed.targets,
     toolVersion: getValidatorToolVersion(),
     ...(config ? { configDigest: computeConfigDigest(config) } : {}),
   });
