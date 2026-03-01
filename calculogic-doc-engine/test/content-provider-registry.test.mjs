@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ContentProviderRegistry, parseContentRef, splitNamespace } from '../src/doc-engine/index.ts';
+import { ContentProviderRegistry, parseContentRef, splitNamespace } from '@calculogic/doc-engine';
 
 const createMockDocsProvider = () => ({
   resolveContent: ({ contentId, anchorId }) => {
