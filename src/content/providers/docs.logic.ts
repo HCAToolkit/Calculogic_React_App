@@ -8,7 +8,7 @@
 
 import { HEADER_DOC_DEFINITIONS, type HeaderDocDefinition } from '../packs/header-docs/header-docs.knowledge.ts';
 import { isHeaderDocId } from '../packs/header-docs/header-doc.knowledge.ts';
-import type { ContentProvider } from '../../doc-engine/index.ts';
+import type { ContentProvider } from '@calculogic/doc-engine';
 
 export const DOCS_PROVIDER: ContentProvider<unknown, HeaderDocDefinition> = {
   resolveContent: ({ contentId, anchorId }) => {
