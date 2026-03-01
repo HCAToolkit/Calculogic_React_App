@@ -32,11 +32,11 @@ This slice exists to reduce “tree drift” as additional validators beyond nam
 ## Source-of-Truth References
 
 - Deterministic address grammar + concern slot semantics:
-  - `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
+  - `calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
 - Canonical filename grammar + role registry categories/status:
-  - `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+  - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
 - Naming validator conventions (classification shape, determinism expectations):
-  - `doc/ConventionRoutines/NamingValidatorSpec.md`
+  - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
 
 ---
 

@@ -9,8 +9,8 @@ This hub defines the in-repo standards and architecture for the Interface/Builde
 - CCPP/CSCS/NL-first governance for all doc-engine modules
 
 ## Standards References
-- `doc/ConventionRoutines/CCPP.md`
-- `doc/ConventionRoutines/CSCS.md`
+- `calculogic-validator/doc/ConventionRoutines/CCPP.md`
+- `calculogic-validator/doc/ConventionRoutines/CSCS.md`
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
 - `doc/ConventionRoutines/NL-First-Workflow.md`
 

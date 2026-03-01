@@ -6,15 +6,15 @@
 - **Purpose:** Define a deterministic structural addressing grammar usable across Calculogic docs, NL skeletons, comments, and future JSON/engine representations.
 - **Scope:** Host-letter rules, no-host rules, concern-slot positioning, deep nesting extension, parse/sort assumptions, examples, and deferred decisions.
 - **Related docs:**
-  - `doc/ConventionRoutines/CSCS.md` (canonical concern model/order)
-  - `doc/ConventionRoutines/CCPP.md` (comment/provenance conventions)
+  - `calculogic-validator/doc/ConventionRoutines/CSCS.md` (canonical concern model/order)
+  - `calculogic-validator/doc/ConventionRoutines/CCPP.md` (comment/provenance conventions)
   - `doc/ConventionRoutines/General-NL-Skeletons.md` (NL section structure/order)
   - `doc/ConventionRoutines/NL-First-Workflow.md` (workflow precedence)
-  - `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` (naming pattern baseline)
+  - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` (naming pattern baseline)
   - `doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md` (global host sequencing context)
 - **Last reviewed:** 2026-02-23
 
-> Terminology note: in this document, unscoped `host` references for address grammar/namespace semantics should be interpreted as `address_host` (see `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`). UI composition-shell meanings belong to `ui_host_surface` terminology in architecture docs.
+> Terminology note: in this document, unscoped `host` references for address grammar/namespace semantics should be interpreted as `address_host` (see `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`). UI composition-shell meanings belong to `ui_host_surface` terminology in architecture docs.
 
 ## 2. Purpose
 
@@ -31,7 +31,7 @@ This layer **complements and does not replace**:
 Addressing answers: “Where is this structural node in a deterministic sequence?”
 It does **not** redefine concern semantics, file naming, or provenance policy.
 
-> Terminology scoping note (V1): within this draft, address syntax/notation rules are treated as `canonical_grammar` concerns, while sequence/slot stability is treated as `canonical_order` concerns (see `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`).
+> Terminology scoping note (V1): within this draft, address syntax/notation rules are treated as `canonical_grammar` concerns, while sequence/slot stability is treated as `canonical_order` concerns (see `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`).
 
 ## 3. Core Concepts / Terminology
 
@@ -323,10 +323,10 @@ Marking requirement (normative for docs): examples/templates using placeholder m
 
 This draft establishes grammar first. Later passes should synchronize wording/examples in:
 
-- `doc/ConventionRoutines/CCPP.md`
+- `calculogic-validator/doc/ConventionRoutines/CCPP.md`
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
 - `doc/ConventionRoutines/NL-First-Workflow.md` (if workflow steps should explicitly reference structural address validation checkpoints)
-- `doc/ConventionRoutines/CSCS.md` (only if cross-reference section is needed; concern ordering itself remains canonical there)
+- `calculogic-validator/doc/ConventionRoutines/CSCS.md` (only if cross-reference section is needed; concern ordering itself remains canonical there)
 - Relevant architecture docs where host/address references should be explicit (starting with `doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md`)
 
 ## 12. Change Control / Adoption Guidance (Draft)

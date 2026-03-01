@@ -1,6 +1,6 @@
 # Calculogic Comment & Provenance Protocol (CCPP, NL-Aligned)
 
-> Draft alignment note: CCPP remains NL-first and production-usable now. It is additionally aligned with `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md` for optional structural-address references, without finalizing that draft’s deferred decisions.
+> Draft alignment note: CCPP remains NL-first and production-usable now. It is additionally aligned with `calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md` for optional structural-address references, without finalizing that draft’s deferred decisions.
 
 ## 1. Purpose
 
@@ -14,7 +14,7 @@ Comments are not narration of obvious code; they are a projection of the NL skel
 
 CCPP currently requires NL section IDs/section numbers (for example `[3.2.2]`) as the primary comment anchor. Structural addresses are a separate draft concept and may be included as supplementary metadata where helpful.
 
-> Terminology scoping reference: when prose could confuse source-of-truth vs destination planning vs syntax/order meanings of "canonical", prefer scoped terms from `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md` (for example `canonical_source`, `canonical_target`, `canonical_order`, `canonical_grammar`).
+> Terminology scoping reference: when prose could confuse source-of-truth vs destination planning vs syntax/order meanings of "canonical", prefer scoped terms from `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md` (for example `canonical_source`, `canonical_target`, `canonical_order`, `canonical_grammar`).
 
 ## 2. Comment Types (Use Only These)
 
@@ -245,11 +245,11 @@ Before merging, confirm each touched concern file passes all checks:
 - [ ] Atomic comment lines include Concern, Parent (if applicable), and Catalog id.
 - [ ] NL numbering in comments matches the current NL skeleton document.
 - [ ] If a structural address is present in comments, it is labeled draft/optional and is supplementary (NL section ID remains authoritative).
-- [ ] Any structural-address usage in comments is consistent with the current draft spec (`doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`) and does not assume deferred decisions are final.
+- [ ] Any structural-address usage in comments is consistent with the current draft spec (`calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`) and does not assume deferred decisions are final.
 - [ ] Any TODOs include owner + expiry date; any external references use provenance-only blocks.
 
 ## 10. Draft Structural Addressing Cross-Reference
 
-- Structural-address grammar and examples live in `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`.
+- Structural-address grammar and examples live in `calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`.
 - CCPP remains focused on comment/provenance protocol and NL synchronization behavior.
 - Until deferred decisions are closed in the draft spec, CCPP should treat structural addresses as optional draft-aligned metadata, not as a replacement for NL section IDs.

@@ -26,16 +26,16 @@ test('default/no-scope behavior resolves to repo', () => {
 test('--scope=repo aligns with repo contract roots', () => {
   const repoPaths = collectRepositoryPaths(process.cwd(), { scope: 'repo' });
   assert.ok(repoPaths.includes('calculogic-validator/src/validators/naming-validator.logic.mjs'));
-  assert.ok(repoPaths.includes('doc/ConventionRoutines/NamingValidatorSpec.md'));
+  assert.ok(repoPaths.includes('calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md'));
   assert.ok(repoPaths.includes('README.md'));
 });
 
 test('--scope=docs includes doc/**, docs/**, and root README.md only from root conventional docs set', () => {
   const docsPaths = collectRepositoryPaths(process.cwd(), { scope: 'docs' });
-  assert.ok(docsPaths.includes('doc/ConventionRoutines/NamingValidatorSpec.md'));
   assert.ok(docsPaths.includes('README.md'));
   assert.equal(docsPaths.some(pathname => pathname.startsWith('src/')), false);
   assert.equal(docsPaths.some(pathname => pathname === 'package.json'), false);
+  assert.equal(docsPaths.some(pathname => pathname.startsWith('calculogic-validator/')), false);
 });
 
 test('--scope=app includes src/test and excludes docs, validator, and root tooling files', () => {

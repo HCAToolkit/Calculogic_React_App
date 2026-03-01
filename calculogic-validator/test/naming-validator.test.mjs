@@ -114,7 +114,7 @@ test('classifies missing-role teaching case for non-canonical two-segment names'
 test('repo scope includes docs + src + root config examples', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'repo' });
   assert.ok(paths.includes('calculogic-validator/src/validators/naming-validator.logic.mjs'));
-  assert.ok(paths.includes('doc/ConventionRoutines/NamingValidatorSpec.md'));
+  assert.ok(paths.includes('calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md'));
   assert.ok(paths.includes('package.json'));
 });
 
@@ -130,8 +130,8 @@ test('app scope includes only src/test and excludes docs, validator, and system 
 
 test('docs scope includes doc/docs and excludes src', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'docs' });
-  assert.ok(paths.includes('doc/ConventionRoutines/NamingValidatorSpec.md'));
   assert.equal(paths.some(p => p.startsWith('src/')), false);
+  assert.equal(paths.some(p => p.startsWith('calculogic-validator/')), false);
 });
 
 test('scope filtering output order is deterministic', () => {

@@ -8,7 +8,7 @@ Define a deterministic V0.1 filename naming validator that runs in report mode o
 
 ## 2.0 Inputs and Source of Truth
 ### 2.1 Naming authority
-The validator reads rules from `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` as authoritative naming guidance.
+The validator reads rules from `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` as authoritative naming guidance.
 
 ### 2.2 Scope mode (V0.1.11)
 ### 2.2.1 Target filter mode (V0.1.15)

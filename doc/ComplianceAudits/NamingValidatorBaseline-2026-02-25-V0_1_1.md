@@ -4,7 +4,7 @@
 
 - Validator: filename naming validator V0.1.1 polish pass
 - Mode: `report` only (no enforcement)
-- Source authority: `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+- Source authority: `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
 
 ## Baseline Summary
 

@@ -13,7 +13,7 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 ## Canonical Split NL Targets (Planned / In-Progress)
 > Placeholder index for semantic split targets. Entries remain non-`canonical_source` until explicitly marked repointed.
 > Naming note: placeholder row filenames below are illustrative semantic examples only (planning vocabulary), not final segment-style commitments.
-> Provisional pattern note: `cfg-buildSurface-<semantic-slice>.md` is a shape-level placeholder (semantic-first, low-churn). Exact segment style remains subject to convention/policy authority before the first repointed slice (`doc/ConventionRoutines/FileNamingMasterList-V1_1.md`, `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`).
+> Provisional pattern note: `cfg-buildSurface-<semantic-slice>.md` is a shape-level placeholder (semantic-first, low-churn). Exact segment style remains subject to convention/policy authority before the first repointed slice (`calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`, `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`).
 > Binding-level note: **Binding Level** classifies row authoritativeness (`placeholder`/`planned`/`provisional`/`canonical`/`retired`) and is separate from migration lifecycle status.
 
 | Target NL Doc (planned) | Scope Intent | Migration status | Binding Level | Notes |
@@ -24,7 +24,7 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 
 ## Legacy-to-Canonical Mapping Scaffold
 
-> Terminology scoping note (V1): where determinism matters, this doc uses scoped labels from `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md` (for example `canonical_source` vs `canonical_target`) instead of overloaded plain "canonical".
+> Terminology scoping note (V1): where determinism matters, this doc uses scoped labels from `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md` (for example `canonical_source` vs `canonical_target`) instead of overloaded plain "canonical".
 > Slice-by-slice migration tracker. Use one row per migrated section group; keep provenance explicit.
 > Placeholder target labels in this table are planning scaffolds only and should be finalized per convention/policy authority before repointed status is claimed; they follow the same temporary, non-authoritative guidance class as the `canonical_target` placeholder examples above.
 > Migration lifecycle status and binding level are intentionally tracked as separate dimensions in this scaffold.

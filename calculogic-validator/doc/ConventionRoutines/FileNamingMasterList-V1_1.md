@@ -14,11 +14,11 @@
 
 ## Related Documents
 
-- **Validator / Naming Check Script Spec:** *(add path when created; suggested future path: `doc/ConventionRoutines/NamingValidatorSpec.md`)*
+- **Validator / Naming Check Script Spec:** *(add path when created; suggested future path: `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`)*
 - **Provenance Token Spec (NL/C):** *(add path if separated later; otherwise this document is currently the source for filename normalization rules)*
 - **Architecture / Module Boundary Docs:**
-  - `doc/ConventionRoutines/CSCS.md`
-  - `doc/ConventionRoutines/CCPP.md`
+  - `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+  - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `doc/ConventionRoutines/NL-First-Workflow.md`
 - **Health Check / Reconciliation Docs (naming-related findings):** *(add specific `doc/HealthChecks/...` and/or reconciliation docs when a naming-focused pass exists)*

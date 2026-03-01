@@ -63,7 +63,7 @@ const assertDeterministicScope = (repositoryRoot, scope) => {
 
 const assertAppScopeDocs = repositoryRoot => {
   const docsToValidate = [
-    path.resolve(repositoryRoot, 'doc/ConventionRoutines/NamingValidatorSpec.md'),
+    path.resolve(repositoryRoot, 'calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md'),
     path.resolve(repositoryRoot, 'doc/nl-config/cfg-namingValidator.md'),
   ];
 
