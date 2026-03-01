@@ -1,20 +1,20 @@
 /**
- * Configuration: cfg-contentDrawer (Content Drawer Configuration)
+ * Configuration: cfg-contentNodeSchema (Doc Engine ContentNode Schema Configuration)
  * Concern File: Knowledge
- * Source NL: doc/nl-doc-engine/cfg-contentDrawer.md
- * Responsibility: Define normalized content node schemas and block primitives consumed by drawer concerns.
+ * Source NL: calculogic-doc-engine/doc/NL/cfg-contentNodeSchema.md
+ * Responsibility: Define normalized content node schemas and block primitives used by doc-engine consumers.
  * Invariants: Every content node includes metadata and either top-level blocks or section collections.
  */
 
 // ─────────────────────────────────────────────
-// 6. Knowledge – cfg-contentDrawer (Content Drawer Configuration)
-// NL Sections: §6.1 in cfg-contentDrawer.md
+// 6. Knowledge – cfg-contentNodeSchema (Doc Engine ContentNode Schema Configuration)
+// NL Sections: §6.1 in cfg-contentNodeSchema.md
 // Purpose: Capture shared type contracts for content payload normalization.
 // Constraints: Keep schema framework-agnostic and serializable.
 // ─────────────────────────────────────────────
 
-// [6.1] cfg-contentDrawer · Container · "ContentNode Schema"
-// Concern: Knowledge · Parent: "Content Drawer Configuration" · Catalog: schema.metadata
+// [6.1] cfg-contentNodeSchema · Container · "ContentNode Schema"
+// Concern: Knowledge · Parent: "Doc Engine ContentNode Schema Configuration" · Catalog: schema.metadata
 // Notes: Metadata model enables retrieval, ranking, and governance attributes.
 export type ContentMeta = {
   tags: string[];

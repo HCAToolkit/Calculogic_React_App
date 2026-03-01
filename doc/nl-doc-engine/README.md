@@ -1,11 +1,6 @@
 # Doc Engine NL Skeletons
 
-This directory contains planning-level NL configuration skeletons for the Doc Engine domain.
+This directory contains host-owned and host-stub NL documents for doc-engine boundaries.
 
-## Included configurations
-- `cfg-contentDrawer.md`
-- `cfg-contentResolver.md`
-- `cfg-providerRegistry.md`
-- `cfg-contentNodeSchema.md`
-
-Each config skeleton explicitly enumerates atomic components as Containers, Subcontainers, and Primitives so CCPP atomic comments can map consistently.
+- `cfg-contentDrawer.md` is host-owned (UI + host behavior).
+- `cfg-contentResolver.md`, `cfg-providerRegistry.md`, and `cfg-contentNodeSchema.md` are host stubs that point to canonical package NL docs under `calculogic-doc-engine/doc/NL/`.
