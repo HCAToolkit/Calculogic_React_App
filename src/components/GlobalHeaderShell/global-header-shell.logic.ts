@@ -21,7 +21,7 @@ import {
   type HeaderModeSequence,
   type HeaderTabDefinition,
   type HeaderTabId,
-} from './GlobalHeaderShell.knowledge';
+} from './global-header-shell.knowledge';
 
 // ─────────────────────────────────────────────
 // 5. Logic – shell-globalHeader (Global Header Shell)

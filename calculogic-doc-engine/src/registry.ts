@@ -1,7 +1,7 @@
 /**
  * Configuration: cfg-contentResolver (Doc Engine Content Resolver Configuration)
  * Concern File: Build
- * Source NL: doc/nl-doc-engine/cfg-contentResolver.md
+ * Source NL: calculogic-doc-engine/doc/NL/cfg-contentResolver.md
  * Responsibility: Provide a namespaced provider registry and resolver pipeline for normalized content outcomes.
  * Invariants: Content ids must include namespace prefix, registered providers are keyed by namespace, resolver never returns null.
  */

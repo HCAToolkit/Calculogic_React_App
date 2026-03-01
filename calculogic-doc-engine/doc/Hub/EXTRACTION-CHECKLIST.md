@@ -1,17 +1,19 @@
 # Doc Engine Core Package Extraction + Repoint Imports Checklist
 
-Use this checklist when moving doc-engine **core package boundaries** into an external package (planned name: `@calculogic/doc-engine`).
+Use this checklist for doc-engine **core package boundaries** now that local package extraction is complete. Publishing/consumption as `@calculogic/doc-engine` is a later phase.
 
 ## 1) Public API surface to preserve
 
-The core package should export the same API currently provided by `src/doc-engine/index.ts`:
+The core package should preserve the API currently exported by `calculogic-doc-engine/src/index.ts`:
 
 - `ContentProviderRegistry`
+- `parseContentRef`
 - `splitNamespace`
-- `ContentNode`
 - `ContentProvider`
 - `ContentResolutionRequest`
+- `ContentResolutionResult`
 - `NotFound`
+- `FoundContent`, `MissingContent`, `NoProvider`, `InvalidRef`, `ParsedContentRef`
 
 ## 2) Interface import rule after extraction
 
@@ -21,7 +23,7 @@ In the interface app, import doc-engine APIs from the package root only:
 - ❌ `import { ContentProviderRegistry } from '@calculogic/doc-engine/registry';`
 - ❌ `import type { ContentProvider } from '@calculogic/doc-engine/types';`
 
-Until extraction is complete, keep using the same discipline with the local barrel:
+The host app currently still uses shims under `src/doc-engine/*` (thin re-exports). Until host imports are repointed, keep using the same discipline with the local barrel:
 
 - ✅ `from '../doc-engine/index.ts'`
 - ❌ `from '../doc-engine/registry.ts'`
@@ -38,11 +40,11 @@ Do **not** move these into `@calculogic/doc-engine` core package:
 
 These are host-app responsibilities that consume doc-engine contracts.
 
-## 4) Repointing steps (core package)
+## 4) Repointing steps (host import migration)
 
-1. Create `@calculogic/doc-engine` with the `src/doc-engine/*` **core** module contents.
-2. Publish/consume package in the interface repository.
-3. Replace local imports from `src/doc-engine/index.ts` with `@calculogic/doc-engine`.
+1. Keep `calculogic-doc-engine/src/*` as the source of truth for core modules.
+2. Publish/consume package in the interface repository when ready.
+3. Replace host imports from `src/doc-engine/index.ts` shims with `@calculogic/doc-engine`.
 4. Keep provider registration in app composition (for example, `src/content/contentEngine.ts`).
 5. Run tests to ensure registry behavior (`namespaced ids`, provider resolution, normalized misses) still passes.
 

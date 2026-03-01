@@ -17,7 +17,7 @@ import {
   serializeSectionStatePayload,
   type VersionedRightPanelStatePayload,
   type VersionedSectionStatePayload,
-} from './buildSurfacePersistence.contracts.ts';
+} from './build-surface-persistence.contracts.ts';
 import {
   defaultBuildSurfacePersistenceReporter,
   readBuildSurfaceStorage,

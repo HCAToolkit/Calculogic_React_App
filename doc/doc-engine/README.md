@@ -2,6 +2,8 @@
 
 This hub defines the in-repo standards and architecture for the Interface/Builder doc engine before extraction into a dedicated repository.
 
+Doc-engine package-owned docs live under `calculogic-doc-engine/doc/` (including `calculogic-doc-engine/doc/Hub/EXTRACTION-CHECKLIST.md`).
+
 ## Scope
 - Generic right-side Content Drawer
 - Provider/Resolver contract with namespace routing

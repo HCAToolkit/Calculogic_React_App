@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { resolveDrawerContent } from '../../content/contentResolutionAdapter';
 import type { HeaderDocDefinition } from '../../content';
-import { toAnchorId } from './ContentDrawer.anchor';
+import { toAnchorId } from './content-drawer.logic';
 import { useContentState } from '../../content/ContentContext';
 import './ContentDrawer.css';
 

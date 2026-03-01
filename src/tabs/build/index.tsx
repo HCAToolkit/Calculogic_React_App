@@ -5,9 +5,9 @@
  * Responsibility: Bind the Build surface view to its logic and scoped styles.
  * Invariants: BuildSurface receives a full binding object; stylesheet import remains colocated.
  */
-import { BuildSurface } from './BuildSurface.build';
-import { useBuildSurfaceLogic } from './BuildSurface.logic';
-import './BuildSurface.view.css';
+import { BuildSurface } from './build-surface.build';
+import { useBuildSurfaceLogic } from './build-surface.logic';
+import './build-surface.build-style.css';
 
 // ─────────────────────────────────────────────
 // 3. Build – cfg-buildSurface (Build Surface Configuration)
