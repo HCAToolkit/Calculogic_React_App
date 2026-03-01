@@ -1,7 +1,7 @@
 # Repository Health Review — 2026-02-11
 
 ## Scope and method
-- Reviewed project-level setup and architecture docs: `README.md`, `package.json`, and representative standards docs under `docs/doc-engine/standards/`.
+- Reviewed project-level setup and architecture docs: `README.md`, `package.json`, and representative standards docs under `calculogic-doc-engine/doc/Standards/`.
 - Sampled representative runtime modules across app frame, global header shell, build surface, content drawer, and content resolver subsystems.
 - Reviewed existing tests under `test/` and ran lint/build/test checks.
 
@@ -23,10 +23,10 @@
    - Files: `src/components/ContentDrawer/*`, `src/content/ContentContext.tsx`.
    - Responsibility: global drawer open/close state and rendering of resolved docs content.
 5. **Content resolution layer(s)**
-   - Files: `src/content/contentProviders.ts`, `src/content/ContentProviderRegistry.ts`, `src/content-drawer/providers/docsProvider.ts`.
+   - Files: `src/content/contentProviders.ts`, `src/content/ContentProviderRegistry.ts`, `calculogic-doc-engine/src/providers/docsProvider.ts`.
    - Responsibility: map namespaced content IDs to payloads.
 6. **Knowledge catalogs / static metadata**
-   - Files: `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`, `src/tabs/build/anchors.ts`, `src/content-drawer/contentTypes.ts`.
+   - Files: `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`, `src/tabs/build/anchors.ts`, `calculogic-doc-engine/src/content-node.types.ts`.
    - Responsibility: static tab/mode metadata, docs corpus, anchor contracts, and content schemas.
 
 ### Data and control flow (current)

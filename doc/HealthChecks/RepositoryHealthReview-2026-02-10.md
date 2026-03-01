@@ -17,7 +17,7 @@
    - Build file renders layout and sections.
    - Logic file manages section heights, drag interactions, keyboard resizing, and localStorage persistence.
    - Anchors file centralizes public anchor ids.
-4. **Content drawer runtime** (`src/content/*`, `src/content-drawer/*`, `src/components/ContentDrawer/*`)
+4. **Content drawer runtime** (`src/content/*`, `calculogic-doc-engine/src/*`, `src/components/ContentDrawer/*`)
    - Context tracks active content and anchor.
    - `contentProviders.ts` resolves docs content for the drawer.
    - `ContentProviderRegistry.ts` implements a parallel provider-registry abstraction (currently not used by drawer view).
