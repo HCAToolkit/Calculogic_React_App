@@ -6,7 +6,7 @@
 - Mode: `report` only (no enforcement)
 - Scope profile: `repo`
 - Command: `npm run validate:naming -- --scope=repo`
-- Source authority: `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+- Source authority: `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
 
 ## Baseline Summary
 

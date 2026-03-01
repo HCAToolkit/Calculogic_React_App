@@ -1,7 +1,7 @@
 # Build Surface Global Host Slice Execution Playbook
 
 ## Document Status
-> Terminology note: in this architecture/playbook context, `host` refers to the `ui_host_surface` concept (UI composition shell) and `host_owner` boundary assignments where stated, not the `address_host` namespace token semantics used by structural addressing grammar. See `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`.
+> Terminology note: in this architecture/playbook context, `host` refers to the `ui_host_surface` concept (UI composition shell) and `host_owner` boundary assignments where stated, not the `address_host` namespace token semantics used by structural addressing grammar. See `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`.
 
 
 - **Document Type:** Architecture Execution Playbook
@@ -11,9 +11,9 @@
 - **Related Docs:**
   - `doc/Architecture/BuildSurfaceGlobalHostDraftInventoryPlan.md`
   - `doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md`
-  - `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
-  - `doc/ConventionRoutines/CSCS.md`
-  - `doc/ConventionRoutines/CCPP.md`
+  - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+  - `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+  - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `doc/ConventionRoutines/NL-First-Workflow.md`
   - `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`

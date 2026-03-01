@@ -4,8 +4,8 @@ This page indexes standards documents used by the Doc Engine workstream.
 
 ## Current links
 
-- CCPP (Calculogic Core Principles Pack): [`doc/ConventionRoutines/CCPP.md`](../ConventionRoutines/CCPP.md)
-- CSCS (Calculogic Style and Conventions Set): [`doc/ConventionRoutines/CSCS.md`](../ConventionRoutines/CSCS.md)
+- CCPP (Calculogic Core Principles Pack): [`calculogic-validator/doc/ConventionRoutines/CCPP.md`](../ConventionRoutines/CCPP.md)
+- CSCS (Calculogic Style and Conventions Set): [`calculogic-validator/doc/ConventionRoutines/CSCS.md`](../ConventionRoutines/CSCS.md)
 - Configuration architecture summary: [`doc/Architecture/ConfigurationArchitectureSummary.md`](../Architecture/ConfigurationArchitectureSummary.md)
 - NL-first workflow: [`doc/ConventionRoutines/NL-First-Workflow.md`](../ConventionRoutines/NL-First-Workflow.md)
 

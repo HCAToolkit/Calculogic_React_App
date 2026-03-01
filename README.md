@@ -125,11 +125,11 @@ npm run preview  # Preview the built app locally
 
 The CSCS defines concern boundaries and dependency direction across Build / BuildStyle / Logic / Knowledge / Results.
 
-- Spec: `doc/ConventionRoutines/CSCS.md`
+- Spec: `calculogic-validator/doc/ConventionRoutines/CSCS.md`
 - Doc-engine mapping: `doc/Architecture/DocEngine-CSCS-Mapping.md`
 
 ## Comment & Provenance Protocol (CCPP)
 
 CCPP defines file headers, section/atomic comments, decision notes, and provenance annotations.
 
-- Spec: `doc/ConventionRoutines/CCPP.md`
+- Spec: `calculogic-validator/doc/ConventionRoutines/CCPP.md`

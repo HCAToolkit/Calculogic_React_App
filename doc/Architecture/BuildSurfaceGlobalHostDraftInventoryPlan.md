@@ -1,7 +1,7 @@
 # Build Surface Global Host Draft Inventory Plan
 
 ## Document Status
-> Terminology note: in this architecture/playbook context, `host` refers to the `ui_host_surface` concept (UI composition shell) and `host_owner` boundary assignments where stated, not the `address_host` namespace token semantics used by structural addressing grammar. See `doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`.
+> Terminology note: in this architecture/playbook context, `host` refers to the `ui_host_surface` concept (UI composition shell) and `host_owner` boundary assignments where stated, not the `address_host` namespace token semantics used by structural addressing grammar. See `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`.
 
 
 - **Document Type:** Architecture Planning + Draft Inventory
@@ -10,10 +10,10 @@
 - **Scope:** Planning + naming alignment only (no `src/` implementation changes in this pass).
 - **Related Docs:**
   - `doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md`
-  - `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
-  - `doc/ConventionRoutines/CSCS.md`
+  - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+  - `calculogic-validator/doc/ConventionRoutines/CSCS.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
-  - `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
+  - `calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
   - `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`
 
 ## Purpose
@@ -95,7 +95,7 @@ Use this scaffold alongside the draft file inventory so each semantic slice trac
 
 Notes:
 - The NL target filenames above are **illustrative placeholders** to support planning vocabulary; adopt concrete paths only when slice work is approved.
-- Final NL split filename/pattern authority for placeholders belongs to `doc/ConventionRoutines/FileNamingMasterList-V1_1.md` and `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`; this inventory is guidance, not naming law.
+- Final NL split filename/pattern authority for placeholders belongs to `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` and `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`; this inventory is guidance, not naming law.
 - Lifecycle values can use the same migration vocabulary as code inventory tracking (`planned`, `in-progress`, `extracted`, `repointed`, `legacy-wrapper`, `retired`, `deferred`) with NL-aware interpretation.
 - This scaffold is intentionally additive and low-churn; expand per-slice rows as work is scheduled, not as a full up-front enumeration requirement.
 

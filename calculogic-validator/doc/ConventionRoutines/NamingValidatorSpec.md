@@ -21,13 +21,13 @@ Out of scope for V0.1.2:
 ## Source-of-Truth References
 
 Primary naming authority:
-- `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
-- Role categories, role status values, role semantics, and provisional-role policy are authoritative in the `Role Registry Master List V1` section of `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`.
+- `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+- Role categories, role status values, role semantics, and provisional-role policy are authoritative in the `Role Registry Master List V1` section of `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`.
 
 Supporting workflow alignment:
 - `doc/ConventionRoutines/NL-First-Workflow.md`
-- `doc/ConventionRoutines/CSCS.md`
-- `doc/ConventionRoutines/CCPP.md`
+- `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+- `calculogic-validator/doc/ConventionRoutines/CCPP.md`
 
 ## Canonical Filename Contract (V0.1.2)
 

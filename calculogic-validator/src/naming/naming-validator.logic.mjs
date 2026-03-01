@@ -242,7 +242,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       path: normalizedPath,
       classification: 'allowed-special-case',
       message: 'Filename matches an allowed reserved/special-case pattern.',
-      ruleRef: 'FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12',
+      ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12',
       details: { specialCaseType },
     };
   }
@@ -257,7 +257,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
         path: normalizedPath,
         classification: 'legacy-exception',
         message: 'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
-        ruleRef: 'doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
+        ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
         suggestedFix: 'Rename to <semantic-name>.<role>.<ext> using an active role.',
         details: missingRoleCandidate,
       };
@@ -273,7 +273,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
           path: normalizedPath,
           classification: 'invalid-ambiguous',
           message: `Role segment "${parsed.role}" is deprecated and requires manual migration planning.`,
-          ruleRef: 'FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
+          ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
           suggestedFix: 'Replace deprecated roles manually using current active role taxonomy.',
           details: {
             ...parsed,
@@ -290,7 +290,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
         path: normalizedPath,
         classification: 'invalid-ambiguous',
         message: `Unknown role segment "${parsed.role}" in canonical position.`,
-        ruleRef: 'FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
+        ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
         suggestedFix: 'Use a role from the active role registry.',
         details: parsed,
       };
@@ -303,7 +303,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
         path: normalizedPath,
         classification: 'invalid-ambiguous',
         message: 'Semantic name must use kebab-case for canonical filenames.',
-        ruleRef: 'FileNamingMasterList-V1_1.md#semantic-name',
+        ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#semantic-name',
         suggestedFix: `Rename semantic name "${parsed.semanticName}" to kebab-case.`,
         details: {
           ...parsed,
@@ -319,7 +319,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       path: normalizedPath,
       classification: 'canonical',
       message: 'Filename is canonical.',
-      ruleRef: 'FileNamingMasterList-V1_1.md#core-filename-grammar',
+      ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#core-filename-grammar',
       details: {
         ...parsed,
         roleStatus: roleMetadata.status,
@@ -336,7 +336,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       path: normalizedPath,
       classification: 'invalid-ambiguous',
       message: `Role "${ambiguity.role}" appears hyphen-appended instead of dot-separated.`,
-      ruleRef: 'FileNamingMasterList-V1_1.md#role-suffix-separation-rule-important',
+      ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-suffix-separation-rule-important',
       suggestedFix: 'Rename using <semantic-name>.<role>.<ext>.',
     };
   }
@@ -349,7 +349,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       path: normalizedPath,
       classification: 'legacy-exception',
       message: 'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
-      ruleRef: 'doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
+      ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
       suggestedFix: 'Rename to <semantic-name>.<role>.<ext> using an active role.',
       details: missingRoleCandidate,
     };
@@ -361,7 +361,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
     path: normalizedPath,
     classification: 'legacy-exception',
     message: 'Filename does not match canonical format and is treated as incremental legacy exception in report mode.',
-    ruleRef: 'FileNamingMasterList-V1_1.md#legacy-file-reality-important',
+    ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#legacy-file-reality-important',
   };
 };
 
