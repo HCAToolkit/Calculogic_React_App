@@ -7,7 +7,7 @@
  */
 import BuildTab from './tabs/BuildTab';
 import GlobalHeaderShell from './components/GlobalHeaderShell';
-import { useAppFrameLogic } from './App.logic';
+import { useAppFrameLogic } from './app.logic';
 import { ContentProvider } from './content/ContentContext';
 import ContentDrawer from './components/ContentDrawer/ContentDrawer';
 import './App.css';

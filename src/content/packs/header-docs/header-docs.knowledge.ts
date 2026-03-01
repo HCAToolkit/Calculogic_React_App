@@ -6,7 +6,7 @@
  * Invariants: Doc ids remain stable, default content metadata is deterministic, unknown doc ids resolve to null.
  */
 
-import { HEADER_DOC_IDS, isHeaderDocId, type HeaderDocId } from './header-doc.ids.ts';
+import { HEADER_DOC_IDS, isHeaderDocId, type HeaderDocId } from './header-doc.knowledge.ts';
 
 // [6.5.a] shell-globalHeader · Primitive · "Header Documentation Link Schema"
 // Concern: Knowledge · Catalog: schema.definition

@@ -6,7 +6,7 @@
  * Invariants: Preserve tab order, retain ARIA roles, keep publish CTA as button element.
  */
 import { toDocsContentId } from '../../content';
-import type { GlobalHeaderShellBuildBindings } from './GlobalHeaderShell.logic';
+import type { GlobalHeaderShellBuildBindings } from './global-header-shell.logic';
 
 type HeaderMode = GlobalHeaderShellBuildBindings['activeModeByTab']['build'];
 type ModeDefinition = GlobalHeaderShellBuildBindings['modeMetadata']['build'][HeaderMode];

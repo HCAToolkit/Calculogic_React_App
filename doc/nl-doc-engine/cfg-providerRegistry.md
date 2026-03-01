@@ -141,4 +141,4 @@ Map/set operations, validation guards, optional event emitter for registry chang
 ### 10.2 Export Checklist
 - Atomic hierarchy is explicit for CCPP annotation mapping.
 - Provider definitions include schema compatibility metadata.
-- Extraction checklist is documented next to `src/doc-engine` to guide repointing host imports to `@calculogic/doc-engine`.
+- Extraction checklist is documented under `calculogic-doc-engine/doc/Hub/` to guide repointing host imports to `@calculogic/doc-engine`.

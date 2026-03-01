@@ -7,8 +7,8 @@
  */
 import type { ReactNode } from 'react';
 import { BUILD_ANCHORS } from './anchors';
-import type { BuildSurfaceBindings, SectionId, SectionLogicBinding } from './BuildSurface.logic';
-import { sectionTitle } from './BuildSurface.logic';
+import type { BuildSurfaceBindings, SectionId, SectionLogicBinding } from './build-surface.logic';
+import { sectionTitle } from './build-surface.logic';
 
 // ─────────────────────────────────────────────
 // 3. Build – cfg-buildSurface (Build Surface Configuration)

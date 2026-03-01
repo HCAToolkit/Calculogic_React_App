@@ -6,7 +6,7 @@
  * Invariants: Debug remains hidden unless enabled; output stays read-only diagnostic copy.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { GlobalHeaderShellResultsBindings } from './GlobalHeaderShell.logic';
+import type { GlobalHeaderShellResultsBindings } from './global-header-shell.logic';
 
 // ─────────────────────────────────────────────
 // 7. Results – shell-globalHeader (Global Header Shell)

@@ -7,7 +7,7 @@
  */
 
 import { ContentProviderRegistry } from '../doc-engine/index.ts';
-import { DOCS_PROVIDER } from './providers/docs.provider.ts';
+import { DOCS_PROVIDER } from './providers/docs.logic.ts';
 
 // ─────────────────────────────────────────────
 // 5. Logic – cfg-providerRegistry (Doc Engine Provider Registry Configuration)

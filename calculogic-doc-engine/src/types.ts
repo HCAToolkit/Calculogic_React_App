@@ -1,7 +1,7 @@
 /**
  * Configuration: cfg-contentResolver (Doc Engine Content Resolver Configuration)
  * Concern File: Knowledge
- * Source NL: doc/nl-doc-engine/cfg-contentResolver.md
+ * Source NL: calculogic-doc-engine/doc/NL/cfg-contentResolver.md
  * Responsibility: Define normalized contracts for content resolution requests and typed resolution outcomes.
  * Invariants: Types preserve namespace-prefixed content addressing and deterministic resolver response union.
  */

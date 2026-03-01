@@ -8,12 +8,12 @@ import {
 } from '../src/tabs/build/buildSurfacePersistence.ts';
 import {
   clamp,
-} from '../src/tabs/build/BuildSurface.logic.ts';
+} from '../src/tabs/build/build-surface.logic.ts';
 import {
   parseRightPanelStatePayload,
   parseSectionStatePayload,
   serializeSectionStatePayload,
-} from '../src/tabs/build/buildSurfacePersistence.contracts.ts';
+} from '../src/tabs/build/build-surface-persistence.contracts.ts';
 
 test('clamp enforces lower and upper boundaries', () => {
   assert.equal(clamp(100, 120, 240), 120);
