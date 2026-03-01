@@ -12,7 +12,7 @@ import type {
   InvalidRef,
   MissingContent,
   NoProvider,
-} from '../doc-engine/index.ts';
+} from '@calculogic/doc-engine';
 import { contentProviderRegistry } from './contentEngine';
 
 export type DrawerContentResolution =

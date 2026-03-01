@@ -1,6 +1,6 @@
 # @calculogic/doc-engine
 
-Doc-engine core package extracted from app; app currently consumes via shims in `src/doc-engine/*`.
+Doc-engine core package extracted from app; host app consumes it via `@calculogic/doc-engine`.
 
 ## Public exports
 

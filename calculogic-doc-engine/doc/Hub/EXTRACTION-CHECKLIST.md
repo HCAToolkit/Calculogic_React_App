@@ -1,6 +1,6 @@
 # Doc Engine Core Package Extraction + Repoint Imports Checklist
 
-Use this checklist for doc-engine **core package boundaries** now that local package extraction is complete. Publishing/consumption as `@calculogic/doc-engine` is a later phase.
+Use this checklist for doc-engine **core package boundaries** now that local package extraction is complete and host consumption is through `@calculogic/doc-engine`.
 
 ## 1) Public API surface to preserve
 
@@ -23,12 +23,6 @@ In the interface app, import doc-engine APIs from the package root only:
 - ❌ `import { ContentProviderRegistry } from '@calculogic/doc-engine/registry';`
 - ❌ `import type { ContentProvider } from '@calculogic/doc-engine/types';`
 
-The host app currently still uses shims under `src/doc-engine/*` (thin re-exports). Until host imports are repointed, keep using the same discipline with the local barrel:
-
-- ✅ `from '../doc-engine/index.ts'`
-- ❌ `from '../doc-engine/registry.ts'`
-- ❌ `from '../doc-engine/types.ts'`
-
 ## 3) Explicitly not part of core package
 
 Do **not** move these into `@calculogic/doc-engine` core package:
@@ -44,7 +38,7 @@ These are host-app responsibilities that consume doc-engine contracts.
 
 1. Keep `calculogic-doc-engine/src/*` as the source of truth for core modules.
 2. Publish/consume package in the interface repository when ready.
-3. Replace host imports from `src/doc-engine/index.ts` shims with `@calculogic/doc-engine`.
+3. Ensure host imports use `@calculogic/doc-engine` package-root APIs only (no host shims, no deep imports).
 4. Keep provider registration in app composition (for example, `src/content/contentEngine.ts`).
 5. Run tests to ensure registry behavior (`namespaced ids`, provider resolution, normalized misses) still passes.
 
