@@ -61,7 +61,7 @@ These are intentionally planned but not yet baseline in this repository:
 ### Install
 
 ```bash
-git clone https://github.com/your-org/Calculogic_React_App.git
+git clone https://github.com/HCAToolkit/Calculogic_React_App.git
 cd Calculogic_React_App
 npm install
 ```
@@ -90,6 +90,8 @@ npm run preview  # Preview the built app locally
 /
 ├─ calculogic-doc-engine/              # @calculogic/doc-engine package root
 │  ├─ doc/                             # Canonical package docs for doc-engine
+│  │  ├─ Hub/                          # Package-owned integration and governance docs
+│  │  └─ Standards/                    # Package-owned standards docs
 │  ├─ src/
 │  └─ test/
 ├─ calculogic-validator/               # @calculogic/validator package + tooling
@@ -100,7 +102,6 @@ npm run preview  # Preview the built app locally
 │  ├─ tools/
 │  └─ scripts/
 ├─ doc/                                # Host app docs and architecture notes
-├─ docs/                               # Additional host-facing docs
 ├─ public/                             # Static assets copied by Vite
 ├─ src/
 │  ├─ assets/
@@ -110,7 +111,6 @@ npm run preview  # Preview the built app locally
 │  ├─ content/
 │  │  ├─ packs/
 │  │  └─ providers/
-│  ├─ content-drawer/
 │  ├─ shared/
 │  ├─ tabs/
 │  │  ├─ BuildTab.tsx                  # Build tab entry

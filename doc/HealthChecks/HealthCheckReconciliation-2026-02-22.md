@@ -15,7 +15,7 @@
   - UI shell/features: `src/components/`, `src/tabs/`, `src/App.tsx`
   - Doc-engine runtime boundary: `src/doc-engine/`
   - App-side content composition/adapters/providers: `src/content/`
-  - Legacy content constants: `src/content-drawer/`
+  - Legacy content constants: `calculogic-doc-engine/src/`
   - Architecture + conventions: `doc/Architecture/`, `doc/ConventionRoutines/`, `doc/nl-*`
 
 ### Repo-evolution notes affecting reconciliation

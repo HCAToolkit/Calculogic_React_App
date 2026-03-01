@@ -10,7 +10,7 @@ Scope: `doc/nl-doc-engine/` NL atomics vs currently implemented doc-engine code 
 ## Findings (mismatches)
 1. **Concern-file mismatch (all configs)**
    - NL assembly paths for concern files under `src/docEngine/...` are not present yet.
-   - Current implementation lives under `src/content/...`, `src/content-drawer/...`, and `src/components/ContentDrawer/...`.
+   - Current implementation lives under `src/content/...`, `calculogic-doc-engine/src/...`, and `src/components/ContentDrawer/...`.
 
 2. **NL → Code atomic mapping gap (all configs)**
    - `cfg-contentNodeSchema.md`: declared atomics exist in NL, but there are **no matching CCPP atomic comments** in implementation files.

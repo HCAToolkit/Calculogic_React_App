@@ -2,6 +2,19 @@ import { ContentProviderRegistry, parseContentRef, splitNamespace } from './regi
 
 export { ContentProviderRegistry, parseContentRef, splitNamespace };
 export type {
+  CalloutBlock,
+  CodeBlock,
+  ContentBlock,
+  ContentMeta,
+  ContentNode,
+  ContentSection,
+  GlossaryRefBlock,
+  HeadingBlock,
+  ParagraphBlock,
+  StepsBlock,
+} from './content-node.types.ts';
+
+export type {
   ContentProvider,
   ContentResolutionRequest,
   ContentResolutionResult,

@@ -19,7 +19,9 @@
 - [Configuration Architecture Summary](./Architecture/ConfigurationArchitectureSummary.md)
 - [Doc Engine CSCS Mapping](./Architecture/DocEngine-CSCS-Mapping.md)
 - [Doc Engine Extraction Plan](./Architecture/DocEngineExtractionPlan.md)
+- [Doc Engine ↔ Host Ownership Map](./Architecture/DocEngine-Host-Ownership-Map.md)
+- [Doc Engine ↔ Host Integration Map](./Architecture/DocEngine-Host-Integration.md)
 
 ## Engine Documentation
 - [doc-engine (canonical directory)](./doc-engine/README.md)
-- [Doc-engine standards pack in `docs/`](../docs/doc-engine/standards/README.md)
+- [Doc-engine standards pack (package-owned)](../calculogic-doc-engine/doc/Standards/README.md)

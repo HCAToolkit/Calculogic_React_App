@@ -19,7 +19,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 - `src/components/GlobalHeaderShell/` — app shell UI and shell knowledge/logic/results composition.
 - `src/components/ContentDrawer/` — drawer UI adapter/presenter + anchor helper + styles.
 - `src/tabs/` — tab-level app UI features (currently Build tab).
-- `src/content-drawer/` — legacy/shared content type constants.
+- `calculogic-doc-engine/src/` — legacy/shared content type constants.
 - `src/assets/` — static assets.
 
 ### `doc/` major folders
@@ -144,7 +144,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 
 ## Verification checks captured in this audit
 - `rg "src/doc-engine.*src/components" src` → 0 matches.
-- `rg "GlobalHeaderShell\.knowledge" src/content src/doc-engine src/content-drawer test` → 0 matches (resolver plumbing scope).
+- `rg "GlobalHeaderShell\.knowledge" src/content src/doc-engine calculogic-doc-engine/src test` → 0 matches (resolver plumbing scope).
 - `rg "GlobalHeaderShell\.knowledge" src/components/GlobalHeaderShell` → allowed local shell usage (2 matches in shell files).
 - `npm test -- --runInBand` → pass.
 - `npm run build` → pass.

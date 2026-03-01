@@ -38,7 +38,7 @@
 6. The docs content catalog has strong typing, but it is tightly coupled to header semantics through naming/comments.
 7. There is no obvious circular import cycle in sampled runtime modules; dependency direction is mostly top-down from app shell to feature logic.
 8. Documentation surface is duplicated across `doc/` and `docs/` trees, increasing “source of truth” ambiguity.
-9. `src/content-drawer/contentTypes.ts` appears effectively unused by runtime and tests, suggesting stale domain model drift.
+9. `calculogic-doc-engine/src/content-node.types.ts` appears effectively unused by runtime and tests, suggesting stale domain model drift.
 
 ---
 
@@ -60,7 +60,7 @@
 3. **Cast-heavy event listeners:** repeated `as unknown as EventListener` blocks reduce type safety confidence.
 4. **Duplicated persistence patterns:** same parse/validate/write logic repeated for sections and side panels.
 5. **Ambiguous docs ownership:** both `doc/` and `docs/` include standards packs with overlapping intent.
-6. **Potential dead code:** `src/content-drawer/contentTypes.ts` is not referenced by runtime features.
+6. **Potential dead code:** `calculogic-doc-engine/src/content-node.types.ts` is not referenced by runtime features.
 
 ---
 
@@ -167,7 +167,7 @@
 - **Safe sequence:**
   1. Declare canonical docs path in `doc/README.md`.
   2. Mark mirror docs directory as generated/legacy or remove duplication.
-  3. Either wire `src/content-drawer/contentTypes.ts` into runtime contracts or delete after confirming no external dependency.
+  3. Either wire `calculogic-doc-engine/src/content-node.types.ts` into runtime contracts or delete after confirming no external dependency.
 
 ---
 
@@ -201,7 +201,7 @@
    - Where: `src/components/ContentDrawer/index.tsx`, `src/content/ContentContext.tsx`.
    - Rationale: non-blocking but indicates mixed module responsibilities.
 10. **Low — Potentially stale/unused schema module**
-    - Where: `src/content-drawer/contentTypes.ts`.
+    - Where: `calculogic-doc-engine/src/content-node.types.ts`.
     - Rationale: appears disconnected from active resolver contracts.
 
 ---

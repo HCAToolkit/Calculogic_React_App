@@ -37,8 +37,8 @@
 5. Persistence/parsing code shape is repeated in multiple hooks despite having a shared safety wrapper (`readBuildSurfaceStorage`/`writeBuildSurfaceStorage`).
 6. Header shell logic is coherent but broad; it includes breakpoint subscription, tab/mode state machine, and content-context wiring in one file.
 7. There are no obvious circular dependency cycles in sampled runtime modules.
-8. Documentation has multiple plausible “source of truth” locations (`doc/DocEngine`, `doc/doc-engine`, `docs/doc-engine/standards`) that can confuse onboarding.
-9. `src/content-drawer/contentTypes.ts` appears disconnected from active resolver contracts and runtime rendering paths.
+8. Documentation has multiple plausible “source of truth” locations (`doc/DocEngine`, `doc/doc-engine`, `calculogic-doc-engine/doc/Standards`) that can confuse onboarding.
+9. `calculogic-doc-engine/src/content-node.types.ts` appears disconnected from active resolver contracts and runtime rendering paths.
 
 ---
 
@@ -59,8 +59,8 @@
 2. Repeated listener registration/removal blocks with cast-heavy event typing (`as unknown as EventListener`).
 3. Repeated localStorage parse/validate/fallback snippets across section and panel states.
 4. Mixed responsibilities in `ContentDrawer.tsx` (resolution policy + rendering + navigation effect).
-5. Duplicate/overlapping docs directories (`doc/DocEngine`, `doc/doc-engine`, `docs/doc-engine/standards`).
-6. Likely stale type surface (`src/content-drawer/contentTypes.ts`) that does not appear in runtime import paths.
+5. Duplicate/overlapping docs directories (`doc/DocEngine`, `doc/doc-engine`, `calculogic-doc-engine/doc/Standards`).
+6. Likely stale type surface (`calculogic-doc-engine/src/content-node.types.ts`) that does not appear in runtime import paths.
 
 ---
 
@@ -209,10 +209,10 @@ export function resolveDrawerViewModel(contentId: string, anchorId?: string): Dr
    - Where: build surface drag/keyboard flows and header tab/mode transitions.
    - Rationale: highest user-facing behavior has sparse automated checks.
 7. **Low/Medium — Canonical doc source is ambiguous**
-   - Where: `doc/README.md` links both `doc/DocEngine`, `doc/doc-engine`, and `docs/doc-engine/standards`.
+   - Where: `doc/README.md` links both `doc/DocEngine`, `doc/doc-engine`, and `calculogic-doc-engine/doc/Standards`.
    - Rationale: onboarding and maintenance confusion.
 8. **Low — Potential stale type module**
-   - Where: `src/content-drawer/contentTypes.ts`.
+   - Where: `calculogic-doc-engine/src/content-node.types.ts`.
    - Rationale: not obviously used by runtime contracts.
 9. **Low — Root mount uses non-null assertion**
    - Where: `src/main.tsx` (`createRoot(document.getElementById('root')!)`).
@@ -239,7 +239,7 @@ export function resolveDrawerViewModel(contentId: string, anchorId?: string): Dr
 
 ### Longer-term
 1. Add CI gate that enforces lint/build/test per PR.
-2. Decide fate of `src/content-drawer/contentTypes.ts` (adopt or remove).
+2. Decide fate of `calculogic-doc-engine/src/content-node.types.ts` (adopt or remove).
 3. Add ADR index for resolver contracts, docs ownership, and interaction model decisions.
 
 ---
@@ -257,6 +257,6 @@ export function resolveDrawerViewModel(contentId: string, anchorId?: string): Dr
 ---
 
 ## 10) Open questions (short)
-1. Should `src/content-drawer/contentTypes.ts` become the canonical drawer payload contract, or should it be removed?
+1. Should `calculogic-doc-engine/src/content-node.types.ts` become the canonical drawer payload contract, or should it be removed?
 2. Which doc-engine directory is canonical for active engineering work: `doc/DocEngine` or `doc/doc-engine`?
 3. Are header mode-menu behaviors expected to be keyboard-navigable beyond current click/hover semantics?
