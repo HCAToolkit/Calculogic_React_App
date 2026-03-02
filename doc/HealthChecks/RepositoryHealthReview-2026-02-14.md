@@ -52,7 +52,7 @@
 - **Coupling concerns:**
   - Drawer rendering is coupled to resolver return contract details rather than a stable normalized view model.
   - Header logic reaches directly into content context API, which is acceptable, but further expansion risks a central orchestrator anti-pattern.
-- **Layering:** CSCS-style separation is present, but some files are overgrown enough that boundary clarity is eroding.
+- **Layering:** CCS-style separation is present, but some files are overgrown enough that boundary clarity is eroding.
 
 ### Code smell highlights
 1. **Contract drift:** `resolveDrawerContent` returns `{kind: ...}` while `ContentDrawer` expects `{type: ...}` union.

@@ -1,4 +1,4 @@
-# Compliance Audit — CSCS / CCPP / General NL Skeletons / NL-First
+# Compliance Audit — CCS / CCPP / General NL Skeletons / NL-First
 
 Date: 2026-02-10  
 Scope: recently changed configurations/shells identified from git history and mapped to current project paths.
@@ -61,7 +61,7 @@ Scope: recently changed configurations/shells identified from git history and ma
   - File: `src/tabs/build/BuildSurface.build.tsx`
   - NL section affected: `[3.2.2] Header Chrome`
   - NL declares Header Chrome, but Build file renders no header chrome node.
-- **BuildStyle attachment leak (CSCS concern dependency)**
+- **BuildStyle attachment leak (CCS concern dependency)**
   - File: `src/tabs/build/BuildSurface.view.css`
   - NL/Code sections affected: `[4.2.2]..[4.2.7]` targeting `builder-header`, `builder-tabs`, publish CTA.
   - Build concern does not emit those anchors, so BuildStyle contains orphan selectors not attached to Build structure.
@@ -147,5 +147,5 @@ Scope: recently changed configurations/shells identified from git history and ma
 ### Step C — Verification gates
 - NL → Code section-by-section parity check.
 - Code → NL drift check (no undeclared atoms).
-- CSCS dependency/purity check (Build anchors as attach sources; no upward concern dependencies).
+- CCS dependency/purity check (Build anchors as attach sources; no upward concern dependencies).
 - CCPP header/section/atomic format check.

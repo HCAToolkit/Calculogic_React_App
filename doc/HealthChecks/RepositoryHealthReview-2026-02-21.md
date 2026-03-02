@@ -12,7 +12,7 @@
 - **App shell composition** (`src/App.tsx`, `src/App.logic.ts`, `src/main.tsx`)
   - Responsibility: top-level mounting, theme state, and shell composition.
   - Flow: `App` wraps runtime in `ContentProvider`, renders `GlobalHeaderShell`, `BuildTab`, `ContentDrawer`.
-- **Global header shell (CSCS-separated concerns)** (`src/components/GlobalHeaderShell/*.tsx|*.ts|*.css`)
+- **Global header shell (CCS-separated concerns)** (`src/components/GlobalHeaderShell/*.tsx|*.ts|*.css`)
   - Responsibility: tab/mode UI, publish action, viewport breakpoint state, debug results panel.
   - Flow: build/results structure consumes bindings from `useGlobalHeaderShellLogic`; knowledge defines catalog defaults.
 - **Build surface workspace** (`src/tabs/build/BuildSurface.build.tsx`, `BuildSurface.logic.ts`, `buildSurfacePersistence*.ts`)
@@ -47,7 +47,7 @@
 - **Coupling hotspots:**
   - `BuildSurface.logic.ts` couples UI semantics (ARIA labels/titles), persistence keys, drag behavior, and section domain constants.
   - `ContentDrawer.tsx` couples resolution-state branching, in-drawer navigation, and docs payload rendering in one component.
-- **Layering:** generally follows CSCS direction, but there is still **adapter glue** in `src/content/contentResolutionAdapter.ts` doing policy conversion that may belong in a dedicated resolver domain module.
+- **Layering:** generally follows CCS direction, but there is still **adapter glue** in `src/content/contentResolutionAdapter.ts` doing policy conversion that may belong in a dedicated resolver domain module.
 
 ### Code-smell scan (representative)
 - **Overly broad modules:** `BuildSurface.logic.ts`, `GlobalHeaderShell.logic.ts`.
@@ -109,7 +109,7 @@
 
 ### What is good
 - README is clear on scripts and structure.
-- Convention docs are explicit (CSCS/CCPP/NL-first), which reduces ambiguity for contributors.
+- Convention docs are explicit (CCS/CCPP/NL-first), which reduces ambiguity for contributors.
 - Historical health-check docs exist and provide continuity.
 
 ### Gaps

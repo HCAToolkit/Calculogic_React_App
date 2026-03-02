@@ -5,7 +5,7 @@ Use this checklist before opening or approving a doc-engine PR.
 ## Linked Standards (Required)
 
 - [ ] **CCPP** reviewed and applied: `calculogic-validator/doc/ConventionRoutines/CCPP.md`
-- [ ] **CSCS** reviewed and applied: `calculogic-validator/doc/ConventionRoutines/CCS.md`
+- [ ] **CCS** reviewed and applied: `calculogic-validator/doc/ConventionRoutines/CCS.md`
 - [ ] **General NL Skeletons** template/numbering followed: `doc/ConventionRoutines/General-NL-Skeletons.md`
 - [ ] **NL-First Workflow** enforced (NL updated before code): `doc/ConventionRoutines/NL-First-Workflow.md`
 
@@ -23,7 +23,7 @@ Use this checklist before opening or approving a doc-engine PR.
 - [ ] Atomic comments use the required three-line structure and correct section IDs.
 - [ ] TODO comments include owner + date when used.
 
-## CSCS Concern Purity
+## CCS Concern Purity
 
 - [ ] Build files contain structure only.
 - [ ] BuildStyle/ResultsStyle files contain style rules only.

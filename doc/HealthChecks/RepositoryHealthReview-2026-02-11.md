@@ -122,7 +122,7 @@
 
 ### Strengths
 - README explains stack, scripts, and structure clearly.
-- CSCS/CCPP/NL-first conventions are documented and visibly enforced in source comments.
+- CCS/CCPP/NL-first conventions are documented and visibly enforced in source comments.
 
 ### Gaps
 1. **Missing “single source of truth” migration status doc** for resolver architecture (adapter vs registry).

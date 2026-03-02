@@ -68,7 +68,7 @@ Reference shape:
 // Notes: <intent / constraints>
 ```
 
-## 4) Doc-Engine Concern Boundaries (CSCS)
+## 4) Doc-Engine Concern Boundaries (CCS)
 
 Keep concern purity strict:
 

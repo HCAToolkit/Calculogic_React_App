@@ -8,7 +8,7 @@ Doc-engine package-owned docs live under `calculogic-doc-engine/doc/` (including
 - Generic right-side Content Drawer
 - Provider/Resolver contract with namespace routing
 - Normalized `ContentNode` schema
-- CCPP/CSCS/NL-first governance for all doc-engine modules
+- CCPP/CCS/NL-first governance for all doc-engine modules
 
 ## Standards References
 - `calculogic-validator/doc/ConventionRoutines/CCPP.md`

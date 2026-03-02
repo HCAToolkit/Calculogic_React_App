@@ -99,7 +99,7 @@ This prevents confusing “A” with anything global.
 
 ### Lane index mapping (V0.0.1)
 
-This slice must preserve the existing concern slot semantics where applicable while allowing non-CSCS lanes.
+This slice must preserve the existing concern slot semantics where applicable while allowing non-CCS lanes.
 
 **Concern-aligned lanes (match existing concern indices):**
 - `3` Build
@@ -109,7 +109,7 @@ This slice must preserve the existing concern slot semantics where applicable wh
 - `7` Results
 - `8` ResultsStyle
 
-**Non-concern lanes (tree advisor only; not CSCS concerns):**
+**Non-concern lanes (tree advisor only; not CCS concerns):**
 - `2` ArchitectureSupport (roles like `host`, `wiring`, `contracts`)
 - `10` Tests (test-only surfaces and fixtures clusters)
 - `11` ToolingSurface (bin/scripts/tool wrappers; report-only lane)

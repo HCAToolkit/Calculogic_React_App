@@ -23,7 +23,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 - `src/assets/` — static assets.
 
 ### `doc/` major folders
-- `doc/ConventionRoutines/` — binding conventions (CCPP/CSCS/NL-first templates/workflow).
+- `doc/ConventionRoutines/` — binding conventions (CCPP/CCS/NL-first templates/workflow).
 - `doc/doc-engine/` — canonical architecture/contracts/MVP docs for doc-engine.
 - `doc/nl-doc-engine/` — NL skeletons for doc-engine configs.
 - `doc/nl-config/` and `doc/nl-shell/` — app configuration/shell NL skeletons.

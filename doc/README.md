@@ -17,7 +17,7 @@
 
 ## Architecture
 - [Configuration Architecture Summary](./Architecture/ConfigurationArchitectureSummary.md)
-- [Doc Engine CSCS Mapping](./Architecture/DocEngine-CSCS-Mapping.md)
+- [Doc Engine CCS Mapping](./Architecture/DocEngine-CCS-Mapping.md)
 - [Doc Engine Extraction Plan](./Architecture/DocEngineExtractionPlan.md)
 - [Doc Engine ↔ Host Ownership Map](./Architecture/DocEngine-Host-Ownership-Map.md)
 - [Doc Engine ↔ Host Integration Map](./Architecture/DocEngine-Host-Integration.md)

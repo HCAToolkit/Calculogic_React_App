@@ -37,7 +37,7 @@ test('classifies canonical valid example', () => {
 });
 
 test('classifies documentation spec role as canonical with role metadata', () => {
-  const finding = classifyPath('doc/ConventionRoutines/cscs.spec.md');
+  const finding = classifyPath('doc/ConventionRoutines/CCS.spec.md');
   assert.equal(finding.classification, 'canonical');
   assert.equal(finding.code, 'NAMING_CANONICAL');
   assert.equal(finding.details?.roleCategory, 'documentation');

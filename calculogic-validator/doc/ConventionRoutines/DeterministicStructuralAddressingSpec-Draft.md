@@ -22,7 +22,7 @@ This document defines the **deterministic structural addressing layer** used to 
 
 This layer **complements and does not replace**:
 
-- CCS/CSCS concern ordering and purity constraints
+- CCS/CCS concern ordering and purity constraints
 - CCPP comment/provenance format
 - NL-first workflow requirements
 - General NL skeleton numbering conventions
@@ -179,11 +179,11 @@ Within same host (or same no-host artifact), sort by numeric segment tuple.
 1. Concern is always a **fixed positional slot** in the address sequence.
 2. Host-present: concern appears in segment position 3.
 3. No-host: concern appears in segment position 2.
-4. Concern slot values align with CSCS/General-NL canonical ordering (`3` Build, `4` BuildStyle, `5` Logic, `6` Knowledge, `7` Results, `8` ResultsStyle).
+4. Concern slot values align with CCS/General-NL canonical ordering (`3` Build, `4` BuildStyle, `5` Logic, `6` Knowledge, `7` Results, `8` ResultsStyle).
 5. Concern numbering semantics are shared across codebase and future program/engine scopes (same foundation, different scope).
 6. This spec does not redefine concern purity or dependency rules; it only fixes concern-slot position in structural addresses.
 
-> Clarifying note: concern slots are `3`–`8` (not `1`-based) because earlier positions are reserved for structural scope/placement segments (`HostLetter` + host-local structure index in host-present mode, vs artifact-local root structure index in no-host mode). Canonical CSCS/CCS concern numbering is preserved across both layouts rather than renumbered per mode.
+> Clarifying note: concern slots are `3`–`8` (not `1`-based) because earlier positions are reserved for structural scope/placement segments (`HostLetter` + host-local structure index in host-present mode, vs artifact-local root structure index in no-host mode). Canonical CCS/CCS concern numbering is preserved across both layouts rather than renumbered per mode.
 
 ## 8. Deep Nesting Rules (Required)
 

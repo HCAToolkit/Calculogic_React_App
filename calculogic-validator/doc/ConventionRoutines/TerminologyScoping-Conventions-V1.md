@@ -28,7 +28,7 @@ Use the following scoped forms when determinism depends on exact meaning.
 ### 2.4 `canonical_order`
 - Refers to: required stable ordering (for concerns, slots, sequence-sensitive tables, etc.).
 - Does **not** refer to: syntax/notation grammar or source-of-truth ownership.
-- Example: fixed CSCS concern slot ordering.
+- Example: fixed CCS concern slot ordering.
 
 ### 2.5 `canonical_grammar`
 - Refers to: authoritative syntax/format rules for a notation.

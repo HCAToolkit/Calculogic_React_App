@@ -1,10 +1,10 @@
-# Doc Engine ↔ CSCS Concern Mapping
+# Doc Engine ↔ CCS Concern Mapping
 
-This note defines how **doc-engine modules** map to CSCS concerns so file naming and layer boundaries stay consistent.
+This note defines how **doc-engine modules** map to CCS concerns so file naming and layer boundaries stay consistent.
 
 ## 1) Mapping Table
 
-| CSCS Concern | Doc-engine modules | Scope |
+| CCS Concern | Doc-engine modules | Scope |
 | --- | --- | --- |
 | **Build** | `drawer`, `renderer` | UI composition, anchors, visible structure only. |
 | **Logic** | `resolver`, `providerRegistry`, `useOrchestration*` hooks | Dependency resolution, provider lookup, orchestration flow/state. |

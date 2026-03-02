@@ -1,4 +1,4 @@
-# CSCS (Concern Separation & Coupling Standard)
+# CCS (Concern Separation & Coupling Standard)
 
 ## Purpose
 Maintain clean dependency direction and concern purity.

@@ -146,7 +146,7 @@ Legend:
    - Source refs: 2026-02-10 conventions drift notes.
    - **Status:** **Unclear / Needs Fresh Baseline Review**
    - **Confidence:** **Not Checked**
-   - **Current evidence:** this pass focused on prior specific findings and did not re-run a full CCPP/CSCS/NL parity census across all configurations.
+   - **Current evidence:** this pass focused on prior specific findings and did not re-run a full CCPP/CCS/NL parity census across all configurations.
 
 ---
 
@@ -198,7 +198,7 @@ Legend:
 
 ## 7) Traceability / Ambiguity Notes (Optional)
 
-- The broad “conventions drift” claim in earliest baseline docs is too general to reclassify confidently without a fresh full NL/CCPP/CSCS parity sweep.
+- The broad “conventions drift” claim in earliest baseline docs is too general to reclassify confidently without a fresh full NL/CCPP/CCS parity sweep.
 - If that drift status must be definitive, run a **fresh Long Health Check baseline** focused on convention parity mapping by configuration/shell.
 
 ---
@@ -228,7 +228,7 @@ Legend:
 - `doc/Architecture/` index of current architecture docs
 
 ### Not checked
-- Full project-wide CCPP/CSCS/NL parity audit for every config/shell.
+- Full project-wide CCPP/CCS/NL parity audit for every config/shell.
 - UI-level manual regression pass of all interaction flows.
 
 ---

@@ -13,7 +13,7 @@
 1. **SPA host + app frame composition**
    - Files: `src/main.tsx`, `src/App.tsx`, `src/App.logic.ts`
    - Responsibilities: root mount, app-level composition, dark mode preference state.
-2. **Global Header Shell (CSCS split)**
+2. **Global Header Shell (CCS split)**
    - Files: `src/components/GlobalHeaderShell/GlobalHeaderShell.build.tsx`, `GlobalHeaderShell.logic.ts`, `GlobalHeaderShell.knowledge.ts`, `GlobalHeaderShell.results.tsx`, plus style peers.
    - Responsibilities: tab/mode UI, responsive breakpoint behavior, content-open triggers, and debug state projection.
 3. **Build workspace surface**

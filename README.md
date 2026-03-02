@@ -24,7 +24,7 @@ A modular React + TypeScript builder shell for composing configuration-driven wo
 - Global header shell with Build / Logic / Knowledge / Results tabs and mode controls.
 - Build tab layout with draggable/resizable panels and persisted dimensions.
 - Context-driven content drawer that resolves `docs:<id>` payloads.
-- Type-safe configuration-oriented structure following CSCS + CCPP conventions.
+- Type-safe configuration-oriented structure following CCS + CCPP conventions.
 
 ## Current Tech Stack (Implemented)
 
@@ -165,7 +165,7 @@ For validator workflow details and report commands, see `calculogic-validator/RE
 The CCS defines concern boundaries and dependency direction across Build / BuildStyle / Logic / Knowledge / Results.
 
 - Spec: `calculogic-validator/doc/ConventionRoutines/CCS.md`
-- Doc-engine mapping: `doc/Architecture/DocEngine-CSCS-Mapping.md`
+- Doc-engine mapping: `doc/Architecture/DocEngine-CCS-Mapping.md`
 
 Conventions are validator-owned so they can be reused across future repos by installing the validator suite. Host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not canonical rule sources.
 

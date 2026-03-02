@@ -68,7 +68,7 @@ This spec is intentionally explicit and semantic (no guessing/inference required
   - [`role`](#role)
   - [`ext`](#ext)
   - [Concern vs Role vs Format (Important)](#concern-vs-role-vs-format-important)
-  - [Concern (CSCS meaning)](#concern-cscs-meaning)
+  - [Concern (CCS meaning)](#concern-CCS-meaning)
   - [Filename role (this document)](#filename-role-this-document)
   - [Extension/format (implementation detail)](#extensionformat-implementation-detail)
 - [Delimiter Rules](#delimiter-rules)
@@ -303,11 +303,11 @@ The file extension / implementation format/language.
 ## Concern vs Role vs Format (Important)
 
 This document uses **role** for filename classification.  
-That is related to, but not always identical to, CSCS concern naming.
+That is related to, but not always identical to, CCS concern naming.
 
-### Concern (CSCS meaning)
+### Concern (CCS meaning)
 
-A **concern** is an architectural responsibility category in the Calculogic concern system (CSCS), such as:
+A **concern** is an architectural responsibility category in the Calculogic concern system (CCS), such as:
 
 - `build`
 - `build-style`
@@ -322,9 +322,9 @@ These describe the primary kind of responsibility a file/module handles.
 
 A **filename role** is the canonical role segment used in `<semantic-name>.<role>.<ext>`.
 
-Some filename roles map directly to CSCS concerns (for example `build`, `logic`, `results-style`).
+Some filename roles map directly to CCS concerns (for example `build`, `logic`, `results-style`).
 
-Other filename roles are **structural/support roles** and are not additional CSCS concerns, such as:
+Other filename roles are **structural/support roles** and are not additional CCS concerns, such as:
 
 - `host`
 - `wiring`
