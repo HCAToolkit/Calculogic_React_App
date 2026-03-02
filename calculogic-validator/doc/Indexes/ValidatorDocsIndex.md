@@ -5,7 +5,7 @@ Purpose: quick routing map for validator documentation so readers can distinguis
 ## 1) Canonical suite contracts
 
 - `doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`  
-  Canonical suite-wide contract for report-first semantics, mode vocabulary, report envelope, and exit-policy framing. Read this first when interpreting validator behavior.
+  Canonical suite-wide contract for report-first semantics, mode vocabulary, report envelope, and exit-policy framing, including canonical-envelope-to-current naming-slice report mapping notes. Read this first when interpreting validator behavior.
 
 ## 2) Naming
 
@@ -13,7 +13,7 @@ Purpose: quick routing map for validator documentation so readers can distinguis
   Canonical naming authority (roles, grammar, exception policy, rollout guidance). Read when defining or reviewing naming rules.
 
 - `doc/ConventionRoutines/NamingValidatorSpec.md`  
-  Naming-slice validator spec (scope profiles, classification contract, report details, current report/strict exit behavior). Read when implementing or validating naming checks.
+  Naming-slice validator spec (scope profiles, classification contract, report details, current report/strict exit behavior), including the current runtime category vocabulary for naming role metadata. Read when implementing or validating naming checks.
 
 ## 3) Tree advisor
 

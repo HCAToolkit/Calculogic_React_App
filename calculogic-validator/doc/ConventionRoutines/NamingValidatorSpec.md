@@ -53,11 +53,11 @@ V0.1.2 uses a structured role registry with metadata:
 The role registry source-of-truth is `FileNamingMasterList-V1_1.md`.
 
 - `role`
-- `category` (`concern-core` | `architecture-support` | `deprecated`)
+- `category` (`concern-core` | `architecture-support` | `documentation` | `deprecated`)
 - `status` (`active` | `deprecated`)
 - `notes` (optional)
 
-Implemented roles in the current naming slice:
+Default runtime registry roles in the naming slice:
 - `host` (`architecture-support`, `active`)
 - `wiring` (`architecture-support`, `active`)
 - `contracts` (`architecture-support`, `active`)
@@ -67,8 +67,17 @@ Implemented roles in the current naming slice:
 - `knowledge` (`concern-core`, `active`)
 - `results` (`concern-core`, `active`)
 - `results-style` (`concern-core`, `active`)
+- `spec` (`documentation`, `active`)
+- `policy` (`documentation`, `active`)
+- `workflow` (`documentation`, `active`)
+- `plan` (`documentation`, `active`)
+- `audit` (`documentation`, `active`)
+- `healthcheck` (`documentation`, `active`)
 
-Registry vocabulary may expand beyond the currently implemented subset; report-first behavior remains default and no enforcement is applied by default.
+Registry vocabulary vs config additions:
+- The default role registry is the runtime baseline used by naming validation.
+- Config can add roles (add-only).
+- `FileNamingMasterList-V1_1.md` remains the source-of-truth taxonomy, while the naming slice currently uses a bounded category vocabulary for deterministic checks.
 
 Deprecated historical roles:
 - `view` (`deprecated`, `deprecated`) — historical pre-current concern split term.

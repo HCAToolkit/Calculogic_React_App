@@ -75,6 +75,16 @@ Each validator slice should emit a stable high-level report envelope:
 
 This contract is intentionally shape-level so slices can add deterministic details while preserving suite-wide comparability.
 
+### Current report mapping (naming slice)
+
+Canonical envelope is the stable suite contract; some slices currently emit equivalent fields under different names until runner unification.
+
+- `validatorVersion` → `toolVersion`
+- `configFingerprint` → `configDigest`
+- `summary` → `counts` + `codeCounts` (plus deterministic naming-specific breakdowns such as `specialCaseTypeCounts` and warning-category/status counts)
+- `findings[]` → `findings[]`
+- `sourceSnapshot` → not yet emitted by the naming report (deferred)
+
 ## 7) Shared Determinism Rules (Canonical)
 
 All slices should follow these deterministic rules:
