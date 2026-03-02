@@ -16,7 +16,7 @@ Canonical terms:
 
 Suite-wide policies over the same findings:
 
-- `report`: report findings only; non-usage findings do not fail by default.
+- `report`: report findings first; exit behavior may still be policy-driven.
 - `soft-fail`: report findings and fail only under configured soft-fail thresholds/scope gates.
 - `hard-fail`: report findings and fail deterministically on configured hard-fail conditions.
 - `correct`: execute explicitly allowed safe fix plans in addition to reporting.
@@ -28,7 +28,34 @@ Normative rule:
   1. exit code policy, and
   2. whether a deterministic fix plan is executed.
 
-## 3) Shared Report Envelope (Canonical)
+## 3) Report-first does not imply exit 0 (Canonical)
+
+Report-first means findings are emitted deterministically before enforcement/fixes. It does **not** require a success exit code. Exit behavior may still be policy-driven (for example, to keep CI visibility) without changing detection or report ordering.
+
+## 4) Current exit-code policy (as implemented today)
+
+Current implementation policy:
+
+- any `warn` findings => exit `2`
+- when no `warn` findings exist, `--strict` with any `legacy-exception` findings => exit `1`
+- otherwise => exit `0`
+- invalid CLI usage => exit `1`
+
+This is the current implementation policy and may later be generalized under suite modes (`soft-fail` / `hard-fail` / `correct` / `replace`), while detection remains unchanged.
+
+## 5) Shared scope vocabulary (Canonical)
+
+Current supported scope names are:
+
+- `repo`
+- `app`
+- `docs`
+- `validator`
+- `system`
+
+Slices may implement scope-specific include/exclude details, but the scope vocabulary should remain consistent across suite docs and slice specs.
+
+## 6) Shared Report Envelope (Canonical)
 
 Each validator slice should emit a stable high-level report envelope:
 
@@ -37,16 +64,18 @@ Each validator slice should emit a stable high-level report envelope:
 - `mode`
 - `scope`
 - `targets[]` (optional)
-- `sourceSnapshot` (filesystem/git reference data; dirty/untracked diagnostics are metadata)
+- `sourceSnapshot` (snapshot metadata only: filesystem state and/or git reference such as `HEAD`; dirty/untracked diagnostics are metadata)
 - `configFingerprint` (hash/fingerprint of resolved config)
 - `summary` (stable counts)
 - `findings[]` (deterministically sorted)
 - `suggestedFix[]` (optional; when fix planning is enabled)
 - `appliedFix[]` (optional; only when fixes are actually executed)
 
+`sourceSnapshot` values are environment metadata for reproducibility and comparison, not naming roles and not detection categories.
+
 This contract is intentionally shape-level so slices can add deterministic details while preserving suite-wide comparability.
 
-## 4) Shared Determinism Rules (Canonical)
+## 7) Shared Determinism Rules (Canonical)
 
 All slices should follow these deterministic rules:
 

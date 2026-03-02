@@ -24,7 +24,7 @@ Out of scope for V0.1.6:
 
 ## Version labeling note
 
-Subsections labeled `(V0.1.2)` indicate the last version where that subsection materially changed; the overall document version remains V0.1.6.
+Subsection version tags (for example `(V0.1.2)`) reflect the last material change for that subsection; the document version reflects the overall spec revision.
 
 ## Source-of-Truth References
 
@@ -90,34 +90,32 @@ V0.1.2 implements deterministic scope profiles selected by CLI.
 - default scope is `repo`
 
 ### `repo` scope
-- current repository-wide behavior
+- repository-wide behavior
 - includes all reportable files under repository root, excluding explicit walk exclusions (`.git`, `node_modules`, `dist`, `coverage`, `.vite`)
 
 ### `app` scope
-- includes explicit roots:
+- includes application-focused roots:
   - `src/`
   - `test/`
-  - `calculogic-validator/`
-- includes explicit root tooling files (when present):
-  - `package.json`
-  - `package-lock.json`
-  - `eslint.config.js`
-  - `eslint.config.mjs`
-  - `vite.config.ts`
-  - `vite.config.js`
-  - `vite.config.mjs`
-  - `tsconfig.json`
-  - `tsconfig.app.json`
-  - `tsconfig.node.json`
-- excludes docs roots by profile definition
+- excludes docs, validator, and system-only roots by profile definition
 
 ### `docs` scope
-- includes explicit roots:
+- includes docs-focused roots:
   - `doc/`
   - `docs/`
-- includes explicit root doc file:
-  - `README.md`
-- excludes `src/` by profile definition
+- includes selected root conventional docs currently limited to `README.md`
+
+### `validator` scope
+- includes validator implementation root:
+  - `calculogic-validator/`
+
+### `system` scope
+- includes root tooling/system files:
+  - `package.json`
+  - `package-lock.json`
+  - `tsconfig*.json`
+  - `eslint.config.*`
+  - `vite.config.*`
 
 ### Invalid scope behavior
 - invalid scope values are treated as deterministic CLI usage errors
@@ -129,14 +127,18 @@ Supported scopes:
 - `repo`
 - `app`
 - `docs`
+- `validator`
+- `system`
 
 Default behavior:
 - No `--scope` input is equivalent to `--scope=repo`.
 
 Inclusion/exclusion summary:
 - `repo`: all reportable files under repository root (minus explicit walker exclusions).
-- `app`: includes `src/**`, `test/**`, `calculogic-validator/**`, and explicit root tooling files; excludes `doc/**` and `docs/**`.
-- `docs`: includes `doc/**`, `docs/**`, and selected root conventional docs currently limited to `README.md`; excludes `src/**` by profile definition.
+- `app`: includes `src/**` and `test/**`; excludes docs, validator, and system-only roots by profile definition.
+- `docs`: includes `doc/**`, `docs/**`, and selected root conventional docs currently limited to `README.md`.
+- `validator`: includes `calculogic-validator/**`.
+- `system`: includes root tooling files (`package.json`, `package-lock.json`, `tsconfig*.json`, `eslint.config.*`, `vite.config.*`).
 
 Invalid scope behavior:
 - Unknown scope values are usage errors with non-zero exit and valid-scope usage text.
@@ -147,6 +149,8 @@ Invalid scope behavior:
 - `npm run validate:naming -- --scope=repo`
 - `npm run validate:naming -- --scope=app`
 - `npm run validate:naming -- --scope=docs`
+- `npm run validate:naming -- --scope=validator`
+- `npm run validate:naming -- --scope=system`
 - `npm run validate:naming -- --scope=app --target src/buildsurface`
 - `npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared`
 
@@ -244,11 +248,15 @@ When a canonical-like parse resolves to a known deprecated role (currently `view
 Mode semantics are centralized in the suite-wide matrix in [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md).
 
 Naming V0.1.6 currently implements:
-- `report` only (default behavior)
-  - always emits findings and summary
-  - valid runs exit `0`
-  - naming invalid findings are reported but do not fail command
-  - invalid CLI usage (e.g., unknown `--scope`) exits non-zero
+- `report` only (slice behavior)
+  - emits findings and summary deterministically before any enforcement/fix behavior
+  - exit code is policy-driven in current implementation:
+    - exit `2` when any finding has `severity="warn"`
+    - when no warnings exist, `--strict` exits `1` when any finding has `classification="legacy-exception"`
+    - otherwise exit `0`
+  - invalid CLI usage (e.g., unknown `--scope`) exits `1`
+
+`--strict` in this naming slice is an exit-policy modifier, not a separate detection mode. See [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md) for canonical policy framing.
 
 Suite policy options are shared contracts but deferred for naming implementation:
 - `soft-fail`
@@ -293,8 +301,10 @@ A file is `invalid-ambiguous` instead of `legacy-exception` when it presents can
 ## Summary / Reporting Expectations by Scope
 
 - `repo`: full baseline for complete repository migration visibility
-- `app`: app-focused baseline to reduce docs-driven legacy-exception noise
+- `app`: app-focused baseline to reduce non-app noise
 - `docs`: docs-focused baseline for documentation naming profile visibility
+- `validator`: validator-focused baseline for validator package and scripts
+- `system`: root-tooling baseline for system-level configuration files
 
 ## Non-Goals (V0.1.2)
 

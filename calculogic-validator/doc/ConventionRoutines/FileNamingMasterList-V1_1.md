@@ -1100,7 +1100,7 @@ Validation should support incremental adoption.
 
 Mode semantics are centralized in `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` (`report`, `soft-fail`, `hard-fail`, `correct`, `replace`).
 
-Report-first remains the default adoption posture; enforcement should be introduced incrementally.
+Report-first remains the default adoption posture; enforcement should be introduced incrementally, and report-mode exit behavior is policy-driven per the suite contract.
 
 ### Recommended validator modes
 
