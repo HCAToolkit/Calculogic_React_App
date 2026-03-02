@@ -339,3 +339,4 @@ This draft establishes grammar first. Later passes should synchronize wording/ex
    - new comment patterns where applicable
 4. Backfill legacy material incrementally during normal touchpoints.
 5. Validator/tooling enforcement remains intentionally deferred until draft grammar decisions are closed and convention wording is stabilized; this document does not define validator modes, parser APIs, or implementation behavior in this closure pass.
+6. Structural-address validation is expected to arrive as a future validator slice; when that slice is introduced, suite mode/policy semantics must follow the shared contract in [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md).

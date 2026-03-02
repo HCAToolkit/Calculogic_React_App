@@ -2,13 +2,13 @@
 
 ## 1) Overview
 
-`calculogic-validator` is the repository-local validator package in `calculogic-validator/`, including CLI binaries, host scripts, schema, and tests for naming and full validation workflows. In this repo, the recommended way to run it is from the **repo root** via npm scripts so command behavior, arguments, and report capture stay consistent with CI and team workflows.
+`calculogic-validator` is a repository-local, **modular, configurable, policy-driven validator suite** in `calculogic-validator/`, including CLI binaries, host scripts, schema, and tests for naming and full validation workflows. The suite is **report-first by default** and can escalate through policy modes when explicitly configured. Canonical suite contract and mode semantics are centralized in [`doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`](./doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md). In this repo, the recommended way to run it is from the **repo root** via npm scripts so command behavior, arguments, and report capture stay consistent with CI and team workflows.
 
 ## 2) Projected package layout (target)
 
 This is the intended target structure for the validator suite as refactors continue.
 Some folders and files shown below may not exist yet in the current state.
-The naming reflects suite-core boundaries, mini-scope roots (`naming/` now and `tree/` planned), and shared tools ownership.
+The naming reflects modular suite-core boundaries, slice roots (`naming/` now and `tree/` planned), configurable policy surfaces, and shared tools ownership.
 
 ```text
 calculogic-validator/
