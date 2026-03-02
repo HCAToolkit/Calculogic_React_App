@@ -411,6 +411,15 @@ All role registry entries MUST declare one status from the bounded list below.
 - Deprecated roles MUST include a deprecation note and migration intent (manual migration intent is acceptable; no automatic mapping promise required).
 - Role meaning changes MUST update the semantics definition block in this document first, then any downstream validator/spec references.
 
+#### Validator taxonomy compatibility (naming slice)
+
+- This master list defines the full intended taxonomy, including richer categories such as `concern-style`, `indexing-registry`, and `integration-adapter`.
+- The current naming validator runtime uses a bounded subset of category values for deterministic checks (`concern-core`, `architecture-support`, `documentation`, `deprecated`).
+- Adoption path for runtime compatibility:
+  - use config to add roles and map them to currently supported runtime categories where needed
+  - treat richer master-list categories as governance/semantic intent until validator category handling expands
+- Current slice taxonomy constraint note: runtime currently treats `build-style` and `results-style` as concern-aligned roles under `concern-core` for deterministic naming checks. This is an implementation taxonomy constraint in the naming slice today, not a semantic redefinition of those roles in this master list.
+
 ### Role Semantics Definitions
 
 Each role below has an explicit deterministic definition: meaning, purpose/use-cases, non-goals, category, and status.
