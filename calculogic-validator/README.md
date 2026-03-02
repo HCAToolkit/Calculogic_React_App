@@ -226,6 +226,33 @@ Example:
 - Use `npm run report:verify` after setup changes.
 - Use `npm run report:summarize` for a concise overview of recent captures.
 
-## 9) Compatibility note
+
+## 9) Report output (JSON)
+
+Validator reports include stable metadata fields for report envelope identity and reproducibility:
+
+- `validatorId`
+- `validatorVersion`
+- `sourceSnapshot`
+
+Tiny `sourceSnapshot` example shape:
+
+```json
+{
+  "sourceSnapshot": {
+    "source": "fs",
+    "gitRef": "HEAD",
+    "gitHeadSha": "abc123def456",
+    "diagnostics": {
+      "dirty": false,
+      "untrackedCount": 0
+    }
+  }
+}
+```
+
+`gitRef`, `gitHeadSha`, and `diagnostics` are optional and may vary by environment and capture mode.
+
+## 10) Compatibility note
 
 Legacy imports from `src/validators/naming-validator.logic.mjs` remain supported via a thin re-export shim to the canonical naming validator host entrypoint.

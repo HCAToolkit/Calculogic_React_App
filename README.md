@@ -77,12 +77,20 @@ Open `http://localhost:5173`.
 ## Current Scripts
 
 ```bash
-npm run dev      # Start Vite dev server
-npm run lint     # Run ESLint
-npm run build    # Type-check + production build
-npm test         # Run unit tests with node:test
-npm run preview  # Preview the built app locally
+npm run dev              # Start Vite dev server
+npm run lint             # Run ESLint
+npm run build            # Type-check + production build
+npm test                 # Run unit tests with node:test
+npm run preview          # Preview the built app locally
+npm run validate:naming  # Run validator naming workflow
+npm run validate:all     # Run full validator suite workflow
+npm run health:validator # Run validator environment/health checks
+# Optional report capture workflows:
+# npm run report:naming:*
+# npm run report:all:*
 ```
+
+For validator workflow details and report commands, see `calculogic-validator/README.md`.
 
 ## Project Structure (Current)
 
