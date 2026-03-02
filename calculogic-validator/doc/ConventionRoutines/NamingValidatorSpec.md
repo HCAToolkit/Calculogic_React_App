@@ -78,6 +78,7 @@ Registry vocabulary vs config additions:
 - The default role registry is the runtime baseline used by naming validation.
 - Config can add roles (add-only).
 - `FileNamingMasterList-V1_1.md` remains the source-of-truth taxonomy, while the naming slice currently uses a bounded category vocabulary for deterministic checks.
+- If runtime-supported category values expand beyond the bounded set listed here, update this section and the master-list compatibility note accordingly.
 
 Deprecated historical roles:
 - `view` (`deprecated`, `deprecated`) — historical pre-current concern split term.
