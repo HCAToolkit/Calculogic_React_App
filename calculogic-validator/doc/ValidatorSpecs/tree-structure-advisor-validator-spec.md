@@ -10,6 +10,10 @@ This document defines a **Tree Structure Advisor** validator slice whose output 
 
 This slice exists to reduce “tree drift” as additional validators beyond naming are added.
 
+## Suite Contract Alignment
+
+This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md): the validator suite is modular, configurable, policy-driven, and report-first by default. Tree advisor Draft V0.0.1 remains report-only even though additional policy modes exist suite-wide.
+
 ### In scope (V0.0.1)
 - Parse `<semantic-name>.<role>.<ext>` metadata when applicable
 - Use role registry metadata (role category/status) as structured signal
@@ -241,13 +245,14 @@ Report object SHOULD include:
 
 ## Rollout Modes
 
-V0.0.1:
+Mode semantics are centralized in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md).
+
+Tree advisor V0.0.1 implementation status:
 - `report` only
   - never fails due to tree findings
   - fails only on invalid CLI usage (unknown scope, nonexistent target)
 
-Deferred:
-- `soft-fail` / `hard-fail` modes for structural guidance (only after long stabilization)
+Suite policy options (`soft-fail`, `hard-fail`, `correct`, `replace`) are contract-level modes and are deferred for this slice.
 
 ---
 

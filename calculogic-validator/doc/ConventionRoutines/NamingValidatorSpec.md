@@ -2,16 +2,20 @@
 
 ## Purpose and Scope
 
-This document defines the V0.1.2 filename naming validator slice for deterministic automation.
+This document defines the V0.1.6 filename naming validator slice for deterministic automation.
 
-V0.1.2 scope is intentionally narrow:
+## Suite Contract Alignment
+
+This naming slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md): Calculogic Validator is modular, configurable, policy-driven, and report-first by default. Mode policy changes exit behavior and optional fix execution, not detection.
+
+V0.1.6 scope is intentionally narrow:
 - filename validation only
 - report mode only
 - deterministic findings output
 - deterministic scope profiles for migration planning
 - no rename enforcement
 
-Out of scope for V0.1.2:
+Out of scope for V0.1.6:
 - structural addressing validation
 - NL↔Code numbering/parity validation
 - provenance token consistency checks
@@ -229,18 +233,20 @@ When a canonical-like parse resolves to a known deprecated role (currently `view
 
 ## Rollout Modes
 
-- `report` (V0.1.2 behavior)
+Mode semantics are centralized in the suite-wide matrix in [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md).
+
+Naming V0.1.6 currently implements:
+- `report` only (default behavior)
   - always emits findings and summary
-  - never fails build for naming findings in V0.1.2
-- `soft-fail` (deferred)
-- `hard-fail` (deferred)
+  - valid runs exit `0`
+  - naming invalid findings are reported but do not fail command
+  - invalid CLI usage (e.g., unknown `--scope`) exits non-zero
 
-## Exit Code Behavior
-
-V0.1.2 report mode exit behavior:
-- valid runs exit `0`
-- naming invalid findings are reported but do not fail command
-- invalid CLI usage (e.g., unknown `--scope`) exits non-zero
+Suite policy options are shared contracts but deferred for naming implementation:
+- `soft-fail`
+- `hard-fail`
+- `correct`
+- `replace`
 
 ## Allowed Special-Case Handling Rules
 
