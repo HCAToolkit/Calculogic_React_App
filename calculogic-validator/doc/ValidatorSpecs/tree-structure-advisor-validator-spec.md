@@ -122,6 +122,42 @@ Notes:
 
 ---
 
+## Tree Snapshot Inputs (TreeManifest / TreeSnapshot)
+
+Tree advisor analysis input is a deterministic **TreeSnapshot** (also called a TreeManifest): a stable list of repo-relative paths selected for analysis.
+
+### Snapshot sources
+
+TreeSnapshot may come from one of two sources:
+- `fs` snapshot (always available): filesystem walk results after scope + target filtering
+- `git` snapshot (optional): committed tree listing for a selected git ref when `.git` is present
+
+Typical `git` usage is `gitRef=HEAD`.
+
+Important metadata clarifications:
+- `HEAD` is a git ref / snapshot selector, not a filename role
+- `git status --porcelain` is optional diagnostics metadata (for dirty/untracked visibility) and is not required for basic tree-advisor operation
+
+### Determinism rules (snapshot-specific)
+
+- normalize all paths to `/`
+- stably sort snapshot entries
+- same snapshot inputs and same options => same report output
+
+### Recommended shape-level schema (doc-only)
+
+- `sourceSnapshot.source`: `fs | git`
+- `sourceSnapshot.gitRef`: optional string (for example `HEAD`)
+- `sourceSnapshot.diagnostics`: optional object (dirty/untracked counts or booleans)
+- `entries[]`:
+  - `path`
+  - `kind`: `file | dir` (optional)
+  - `parsed`: optional naming metadata
+    - `semanticName`
+    - `role`
+
+---
+
 ## Input Scope Profiles
 
 Tree advisor scope selection should reuse the existing validator scope discovery model (repo/app/docs/validator/system), plus optional target filtering.
@@ -155,6 +191,41 @@ Detect when one validator subsystem has a rich internal namespace (`rules/`, `re
 Detect when subpackages (e.g., `tools/report-capture`) contain mixed surfaces that should remain isolated from library code.
 
 All scoring thresholds MUST be explicit constants in code and reported in `details`.
+
+## Recommendation Patterns (Advisory Only)
+
+The following outputs are advisory recommendation patterns only. They are not mandatory rules and should be emitted as explainable `suggested-reorg` findings.
+
+### 1) Semantic-family folder recommendation
+
+When one semantic family is scattered across unrelated folders beyond configured thresholds, recommend consolidation under a family root such as:
+- `<semantic-name>/...`
+- `<semantic-family>/...`
+
+This is recommendation output (`suggested-reorg`) and not an enforcement requirement.
+
+### 2) Concern subfolder recommendation under a family
+
+When a semantic family has multi-file and multi-lane presence and is not already cleanly scoped by a higher family folder, recommend concern subfolders such as:
+- `<semantic-family>/build/...`
+- `<semantic-family>/logic/...`
+- `<semantic-family>/knowledge/...`
+
+This recommendation should trigger only when it reduces lane entropy or improves navigation, and remains advisory-only.
+
+Naming metadata reuse note:
+- Treat parsed naming metadata (`<semantic-name>.<role>.<ext>`) as a primary lane signal.
+
+## Compat / Shim Health Signals (Advisory Diagnostics)
+
+Shim/compat detection is a tree-health diagnostic layer in report-first mode:
+- detect shim-like files via folder signals (`compat/`, `shims/`, `adapters/`) and/or naming needles (`shim`, `compat`, `adapter`, `bridge`, `migration`)
+- detect scatter when shim-like entries appear across many unrelated folders
+- recommend a discoverable surface (for example `src/compat/` or `src/compat/shims/`) only when shim-like files already exist
+
+Constraints:
+- do not require creation of empty `compat/` folders
+- report findings are advisory diagnostics only (not pass/fail by default)
 
 ---
 
@@ -213,6 +284,9 @@ Suggested codes (V0.0.1):
 - `TREE_MISSING_NAMESPACE_ROOT`
 - `TREE_SUBSYSTEM_SCAFFOLD_ASYMMETRY`
 - `TREE_TOOL_SURFACE_MIX`
+- `TREE_SHIM_SURFACE_PRESENT` (`info`)
+- `TREE_SHIM_SCATTERED` (`warn`/`info`)
+- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`/`info`)
 
 ---
 

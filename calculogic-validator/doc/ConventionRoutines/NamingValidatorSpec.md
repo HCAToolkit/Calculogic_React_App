@@ -22,6 +22,10 @@ Out of scope for V0.1.6:
 - auto-fix or rename execution
 - broad migration/cleanup enforcement
 
+## Version labeling note
+
+Subsections labeled `(V0.1.2)` indicate the last version where that subsection materially changed; the overall document version remains V0.1.6.
+
 ## Source-of-Truth References
 
 Primary naming authority:
@@ -46,12 +50,14 @@ Filename grammar is unchanged from V0.1.1.
 ## Role Registry Metadata (V0.1.2)
 
 V0.1.2 uses a structured role registry with metadata:
+The role registry source-of-truth is `FileNamingMasterList-V1_1.md`.
+
 - `role`
 - `category` (`concern-core` | `architecture-support` | `deprecated`)
 - `status` (`active` | `deprecated`)
 - `notes` (optional)
 
-Active roles:
+Implemented roles in the current naming slice:
 - `host` (`architecture-support`, `active`)
 - `wiring` (`architecture-support`, `active`)
 - `contracts` (`architecture-support`, `active`)
@@ -61,6 +67,8 @@ Active roles:
 - `knowledge` (`concern-core`, `active`)
 - `results` (`concern-core`, `active`)
 - `results-style` (`concern-core`, `active`)
+
+Registry vocabulary may expand beyond the currently implemented subset; report-first behavior remains default and no enforcement is applied by default.
 
 Deprecated historical roles:
 - `view` (`deprecated`, `deprecated`) — historical pre-current concern split term.
