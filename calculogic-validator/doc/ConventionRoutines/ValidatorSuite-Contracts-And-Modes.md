@@ -80,6 +80,7 @@ This contract is intentionally shape-level so slices can add deterministic detai
 Canonical envelope is the stable suite contract; some slices currently emit equivalent fields under different names until runner unification.
 
 - `validatorVersion` → `toolVersion`
+- `validatorId` → not yet emitted by the naming report (deferred)
 - `configFingerprint` → `configDigest`
 - `summary` → `counts` + `codeCounts` (plus deterministic naming-specific breakdowns such as `specialCaseTypeCounts` and warning-category/status counts)
 - `findings[]` → `findings[]`
