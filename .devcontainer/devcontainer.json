@@ -1,7 +1,7 @@
 {
   "name": "Calculogic React App",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-  "postCreateCommand": "npm install && npm run build",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y ripgrep && npm install && npm run build",
   "forwardPorts": [5173],
   "portsAttributes": {
     "5173": {

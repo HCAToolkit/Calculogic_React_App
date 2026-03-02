@@ -58,6 +58,8 @@ These are intentionally planned but not yet baseline in this repository:
 - Node.js 22+
 - npm
 
+Codespaces/devcontainer baseline is documented in `.devcontainer/README.md`.
+
 ### Install
 
 ```bash
