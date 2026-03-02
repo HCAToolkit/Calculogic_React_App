@@ -164,7 +164,7 @@ For validator workflow details and report commands, see `calculogic-validator/RE
 
 The CCS defines concern boundaries and dependency direction across Build / BuildStyle / Logic / Knowledge / Results.
 
-- Spec: `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+- Spec: `calculogic-validator/doc/ConventionRoutines/CCS.md`
 - Doc-engine mapping: `doc/Architecture/DocEngine-CSCS-Mapping.md`
 
 Conventions are validator-owned so they can be reused across future repos by installing the validator suite. Host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not canonical rule sources.

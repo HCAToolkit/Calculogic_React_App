@@ -61,4 +61,4 @@ A slice is considered done when all of the following are true:
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
 - `doc/ConventionRoutines/NL-First-Workflow.md`
 - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
-- `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+- `calculogic-validator/doc/ConventionRoutines/CCS.md`

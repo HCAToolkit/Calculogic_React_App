@@ -6,7 +6,7 @@
 - **Purpose:** Define a deterministic structural addressing grammar usable across Calculogic docs, NL skeletons, comments, and future JSON/engine representations.
 - **Scope:** Host-letter rules, no-host rules, concern-slot positioning, deep nesting extension, parse/sort assumptions, examples, and deferred decisions.
 - **Related docs:**
-  - `calculogic-validator/doc/ConventionRoutines/CSCS.md` (canonical concern model/order)
+  - `calculogic-validator/doc/ConventionRoutines/CCS.md` (canonical concern model/order)
   - `calculogic-validator/doc/ConventionRoutines/CCPP.md` (comment/provenance conventions)
   - `doc/ConventionRoutines/General-NL-Skeletons.md` (NL section structure/order)
   - `doc/ConventionRoutines/NL-First-Workflow.md` (workflow precedence)
@@ -326,7 +326,7 @@ This draft establishes grammar first. Later passes should synchronize wording/ex
 - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
 - `doc/ConventionRoutines/NL-First-Workflow.md` (if workflow steps should explicitly reference structural address validation checkpoints)
-- `calculogic-validator/doc/ConventionRoutines/CSCS.md` (only if cross-reference section is needed; concern ordering itself remains canonical there)
+- `calculogic-validator/doc/ConventionRoutines/CCS.md` (only if cross-reference section is needed; concern ordering itself remains canonical there)
 - Relevant architecture docs where host/address references should be explicit (starting with `doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md`)
 
 ## 12. Change Control / Adoption Guidance (Draft)

@@ -1,7 +1,6 @@
 # Calculogic Concern System (CCS, NL-aligned)
 
-> **Canonical source (validator-owned):** `calculogic-validator/doc/ConventionRoutines/CSCS.md`  
-> **Compatibility note:** the validator filename remains `CSCS.md` for compatibility, while the canonical acronym is **CCS**.
+> **Canonical source (validator-owned):** `calculogic-validator/doc/ConventionRoutines/CCS.md`  
 
 ## Repo usage
 

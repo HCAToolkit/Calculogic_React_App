@@ -34,7 +34,7 @@ Primary naming authority:
 
 Supporting workflow alignment:
 - `doc/ConventionRoutines/NL-First-Workflow.md`
-- `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+- `calculogic-validator/doc/ConventionRoutines/CCS.md`
 - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
 
 ## Canonical Filename Contract (V0.1.2)

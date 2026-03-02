@@ -1,7 +1,7 @@
 # Alignment Audit – 2026-02-21
 
 ## Scope and method
-- Binding routines reviewed first: `calculogic-validator/doc/ConventionRoutines/CCPP.md`, `calculogic-validator/doc/ConventionRoutines/CSCS.md`, `doc/ConventionRoutines/General-NL-Skeletons.md`, and `doc/ConventionRoutines/NL-First-Workflow.md`.
+- Binding routines reviewed first: `calculogic-validator/doc/ConventionRoutines/CCPP.md`, `calculogic-validator/doc/ConventionRoutines/CCS.md`, `doc/ConventionRoutines/General-NL-Skeletons.md`, and `doc/ConventionRoutines/NL-First-Workflow.md`.
 - Recently changed configuration/shell surfaces were identified from git history focused on active config/shell paths.
 - Audited targets:
   - `cfg-buildSurface`

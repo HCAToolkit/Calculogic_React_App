@@ -44,7 +44,7 @@ Calculogic transforms form building into a hands-on coding lesson. Each tab enfo
 
 ## Related Docs / Reading Order
 1. ConfigurationArchitectureSummary.md (this document)
-2. CSCS.md (Concern semantics and file mappings)
+2. CCS.md (Concern semantics and file mappings)
 3. General-NL-Skeletons.md (Canonical NL skeleton templates)
 4. NL-First-Workflow.md (Authoring workflow)
 5. CCPP.md (Comment and provenance protocol)

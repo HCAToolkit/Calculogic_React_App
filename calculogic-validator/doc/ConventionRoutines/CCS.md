@@ -1,6 +1,5 @@
 # Calculogic Concern System (CCS, NL-Aligned, Codebase-Level)
 
-> Note: This document filename remains `CSCS.md` for compatibility in this pass. In content, the canonical acronym is **CCS** (Calculogic Concern System).
 
 ## 1. First Principles
 

@@ -4,7 +4,7 @@ Date: 2026-02-10
 Scope: recently changed configurations/shells identified from git history and mapped to current project paths.
 
 ## Inputs reviewed
-- `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+- `calculogic-validator/doc/ConventionRoutines/CCS.md`
 - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
 - `doc/ConventionRoutines/NL-First-Workflow.md`

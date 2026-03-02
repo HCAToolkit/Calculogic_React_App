@@ -12,7 +12,7 @@
   - `doc/Architecture/BuildSurfaceGlobalHostDraftInventoryPlan.md`
   - `doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md`
   - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
-  - `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+  - `calculogic-validator/doc/ConventionRoutines/CCS.md`
   - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `doc/ConventionRoutines/NL-First-Workflow.md`
