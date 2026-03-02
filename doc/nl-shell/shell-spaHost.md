@@ -116,6 +116,8 @@ Coordinates with build tooling to ensure hydration entry points, but delegates n
 
 ### 9.3 Integration
 - Entry point referenced by src/main.tsx (or equivalent) to bootstrap the Calculogic application.
+- Vite alias contract: `@calculogic/doc-engine` resolves via an absolute path derived from `import.meta.url` so import-analysis is deterministic across importer locations.
+- Runtime package contract: `@calculogic/doc-engine` is declared under `dependencies` because SPA host runtime modules import it during app execution.
 
 ## 10. Implementation Passes
 ### 10.1 Pass Mapping
