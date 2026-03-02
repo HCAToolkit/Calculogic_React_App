@@ -27,7 +27,7 @@ This doc defines the canonical NL skeleton templates used by all configuration (
 
 ## Changing This Doc
 
-If you change top-level sections or numbering here, you must also update `NL-First-Workflow.md`, `CSCS.md`, and `CCPP.md` to keep the system consistent.
+If you change top-level sections or numbering here, you must also update `NL-First-Workflow.md`, `CCS.md`, and `CCPP.md` to keep the system consistent.
 
 ---
 

@@ -11,7 +11,7 @@
 - **Related Docs:**
   - `doc/Architecture/BuildSurfaceGlobalHostSequencePlan.md`
   - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
-  - `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+  - `calculogic-validator/doc/ConventionRoutines/CCS.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
   - `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`

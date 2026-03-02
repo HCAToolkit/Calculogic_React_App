@@ -3,7 +3,6 @@
 ## Convention Routines
 - [CCPP](./ConventionRoutines/CCPP.md)
 - [CCS](./ConventionRoutines/CCS.md)
-- [CSCS (legacy alias)](./ConventionRoutines/CSCS.md)
 - [General NL Skeletons](./ConventionRoutines/General-NL-Skeletons.md)
 - [NL-First Workflow](./ConventionRoutines/NL-First-Workflow.md)
 

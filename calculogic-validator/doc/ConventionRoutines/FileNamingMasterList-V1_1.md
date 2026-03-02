@@ -18,7 +18,7 @@
 - **Validator Suite Contracts / Modes:** `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
 - **Provenance Token Spec (NL/C):** Deferred as a separate spec; this document is currently the source for filename normalization rules.
 - **Architecture / Module Boundary Docs:**
-  - `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+  - `calculogic-validator/doc/ConventionRoutines/CCS.md`
   - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `doc/ConventionRoutines/NL-First-Workflow.md`

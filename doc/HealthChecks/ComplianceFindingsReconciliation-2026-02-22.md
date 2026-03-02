@@ -17,7 +17,7 @@
 ### 1.3 Current validation document locations
 - Convention routines used as binding validation baseline:
   - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
-  - `calculogic-validator/doc/ConventionRoutines/CSCS.md`
+  - `calculogic-validator/doc/ConventionRoutines/CCS.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `doc/ConventionRoutines/NL-First-Workflow.md`
 - Active NL skeleton references used during reconciliation checks:
