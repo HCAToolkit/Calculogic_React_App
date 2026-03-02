@@ -3,6 +3,7 @@ import {
   VALIDATOR_REGISTRY,
   getValidatorById,
 } from './validator-registry.knowledge.mjs';
+import { getSourceSnapshot } from './source-snapshot.logic.mjs';
 
 const toValidatorReportEntry = (registryEntry, validatorResult) => {
   const summary = validatorResult.summary ?? null;
@@ -13,6 +14,7 @@ const toValidatorReportEntry = (registryEntry, validatorResult) => {
 
   return {
     id: registryEntry.id,
+    validatorId: registryEntry.id,
     description: registryEntry.description,
     scope: validatorResult.scope,
     totalFilesScanned: validatorResult.totalFilesScanned,
@@ -51,13 +53,17 @@ export const runValidatorRunner = (repositoryRoot, options = {}) => {
   });
 
   const endedAtDate = new Date();
+  const sourceSnapshot = getSourceSnapshot({ cwd: repositoryRoot });
 
   return {
     version: CALCULOGIC_VALIDATOR_REPORT_VERSION,
     mode: 'report',
     ...(scope ? { scope } : {}),
+    validatorId: 'runner',
     ...(options.toolVersion ? { toolVersion: options.toolVersion } : {}),
+    ...(options.toolVersion ? { validatorVersion: options.toolVersion } : {}),
     ...(options.configDigest ? { configDigest: options.configDigest } : {}),
+    sourceSnapshot,
     startedAt: startedAtDate.toISOString(),
     endedAt: endedAtDate.toISOString(),
     durationMs: endedAtDate.getTime() - startedAtDate.getTime(),

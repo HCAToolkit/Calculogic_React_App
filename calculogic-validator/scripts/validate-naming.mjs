@@ -9,6 +9,7 @@ import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromFindings } from '../src/validator-exit-code.logic.mjs';
 import { detectNpmArgForwardingFootgun } from '../src/npm-arg-forwarding-guard.logic.mjs';
+import { getSourceSnapshot } from '../src/source-snapshot.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
@@ -148,8 +149,11 @@ const summary = summarizeFindings(findings);
 
 const report = {
   mode: 'report',
+  validatorId: 'naming',
   toolVersion,
+  ...(toolVersion ? { validatorVersion: toolVersion } : {}),
   ...(configDigest ? { configDigest } : {}),
+  sourceSnapshot: getSourceSnapshot({ cwd: repositoryRoot }),
   startedAt: startedAtDate.toISOString(),
   endedAt: endedAtDate.toISOString(),
   durationMs: endedAtDate.getTime() - startedAtDate.getTime(),

@@ -1,7 +1,7 @@
 # cfg-validatorRunner
 
 ## 0.0 Version
-Current implementation target: **V0.1.4** (deterministic multi-validator runner target pass-through and per-validator filter metadata).
+Current implementation target: **V0.1.5** (canonical report-envelope aliases and source snapshot metadata).
 
 ## 1.0 Purpose
 Provide a deterministic runner that executes one or more registered validators and returns a single versioned combined report.
@@ -30,13 +30,17 @@ Runner accepts optional host-provided report metadata:
 - `mode` (`report`)
 - optional `scope`
 - optional `toolVersion`
+- optional `validatorId` (canonical alias, stable runner identity)
+- optional `validatorVersion` (canonical alias of tool version when provided)
 - optional `configDigest`
+- optional `sourceSnapshot` (`source = "fs"` plus optional git metadata/diagnostics)
 - `startedAt`, `endedAt`, `durationMs`
 - `validators` (deterministic execution order)
 
 ### 3.2 Validator entry shape
 Each validator entry includes:
 - `id`
+- optional `validatorId` (canonical alias of `id`)
 - `description`
 - `scope`
 - `totalFilesScanned`

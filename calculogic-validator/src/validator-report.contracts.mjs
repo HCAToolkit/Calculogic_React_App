@@ -7,12 +7,25 @@ export const CALCULOGIC_VALIDATOR_REPORT_VERSION = '0.1.0';
  *   mode: 'report',
  *   scope?: string,
  *   toolVersion?: string,
+ *   validatorId?: string,
+ *   validatorVersion?: string,
  *   configDigest?: string,
+ *   sourceSnapshot?: {
+ *     source: 'fs',
+ *     gitRef?: 'HEAD',
+ *     gitHeadSha?: string,
+ *     diagnostics?: {
+ *       isDirty: boolean,
+ *       changedCount: number,
+ *       untrackedCount: number
+ *     }
+ *   },
  *   startedAt: string,
  *   endedAt: string,
  *   durationMs: number,
  *   validators: Array<{
  *     id: string,
+ *     validatorId?: string,
  *     description: string,
  *     scope?: string,
  *     totalFilesScanned?: number,

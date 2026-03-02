@@ -16,9 +16,12 @@ test('runner report includes naming validator in deterministic order', () => {
   const report = runValidatorRunner(process.cwd(), { scope: 'app' });
 
   assert.ok(report.version);
+  assert.equal(report.validatorId, 'runner');
+  assert.equal(report.sourceSnapshot?.source, 'fs');
   assert.ok(Array.isArray(report.validators));
   assert.equal(report.validators.length, 1);
   assert.equal(report.validators[0].id, 'naming');
+  assert.equal(report.validators[0].validatorId, 'naming');
   assert.equal(report.validators[0].scope, 'app');
   assert.equal(typeof report.validators[0].totalFilesScanned, 'number');
   assert.ok(Array.isArray(report.validators[0].findings));
@@ -34,6 +37,7 @@ test('validate-all CLI runs and returns naming validator report', () => {
   assert.equal(result.status, 0);
   const report = JSON.parse(result.stdout);
   assert.equal(report.validators[0].id, 'naming');
+  assert.equal(report.validators[0].validatorId, 'naming');
   assert.equal(report.validators[0].scope, 'docs');
 });
 
@@ -41,6 +45,7 @@ test('runner forwards targets and includes naming filter meta when filtering is 
   const report = runValidatorRunner(process.cwd(), { scope: 'app', validators: ['naming'], targets: ['src'] });
 
   assert.equal(report.validators[0].id, 'naming');
+  assert.equal(report.validators[0].validatorId, 'naming');
   assert.equal(report.validators[0].meta?.filters?.isFiltered, true);
   assert.deepEqual(report.validators[0].meta?.filters?.targets, ['src']);
 });
@@ -49,5 +54,6 @@ test('runner omits naming filter meta when no targets are provided', () => {
   const report = runValidatorRunner(process.cwd(), { scope: 'app', validators: ['naming'] });
 
   assert.equal(report.validators[0].id, 'naming');
+  assert.equal(report.validators[0].validatorId, 'naming');
   assert.equal(report.validators[0].meta?.filters, undefined);
 });

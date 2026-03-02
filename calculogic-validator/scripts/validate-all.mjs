@@ -134,12 +134,14 @@ try {
     ? loadValidatorConfigFromFile(parsed.configPath, { cwd: process.cwd() })
     : undefined;
 
+  const toolVersion = getValidatorToolVersion();
+
   const report = runValidatorRunner(repositoryRoot, {
     scope: parsed.selectedScope,
     validators: parsed.validators,
     config,
     targets: parsed.targets,
-    toolVersion: getValidatorToolVersion(),
+    toolVersion,
     ...(config ? { configDigest: computeConfigDigest(config) } : {}),
   });
 
