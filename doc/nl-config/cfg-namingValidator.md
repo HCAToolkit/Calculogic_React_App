@@ -8,7 +8,7 @@
 > - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
 
 ## 0.0 Version
-Current implementation target: **V0.1.15** (optional --target path/folder filtering within scope).
+Current implementation target: **V0.1.16** (canonical report-envelope aliases and source snapshot metadata).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
@@ -199,6 +199,16 @@ Priority order is deterministic:
 3. otherwise success is exit `0`.
 
 Invalid CLI usage and argument parse errors remain exit `1`.
+
+### 4.7 Canonical envelope aliases and source snapshot metadata (V0.1.16)
+Naming CLI report output remains backward compatible and additive while exposing canonical envelope aliases:
+- `validatorId = "naming"`
+- `validatorVersion = toolVersion` (when tool version is available)
+- `sourceSnapshot` for deterministic runtime source observability with at least:
+  - `source = "fs"`
+  - optional git metadata when available (`gitRef = "HEAD"`, `gitHeadSha`, and `diagnostics` containing `isDirty`, `changedCount`, `untrackedCount`)
+
+When git is unavailable or repository git metadata cannot be resolved, report output still includes `sourceSnapshot.source = "fs"` and omits git-only fields.
 
 ## 5.0 Deferred Behavior
 Deferred to later slices:
