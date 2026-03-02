@@ -14,14 +14,15 @@
 
 ## Related Documents
 
-- **Validator / Naming Check Script Spec:** *(add path when created; suggested future path: `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`)*
-- **Provenance Token Spec (NL/C):** *(add path if separated later; otherwise this document is currently the source for filename normalization rules)*
+- **Validator / Naming Check Script Spec:** `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
+- **Validator Suite Contracts / Modes:** `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
+- **Provenance Token Spec (NL/C):** Deferred as a separate spec; this document is currently the source for filename normalization rules.
 - **Architecture / Module Boundary Docs:**
   - `calculogic-validator/doc/ConventionRoutines/CSCS.md`
   - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
   - `doc/ConventionRoutines/General-NL-Skeletons.md`
   - `doc/ConventionRoutines/NL-First-Workflow.md`
-- **Health Check / Reconciliation Docs (naming-related findings):** *(add specific `doc/HealthChecks/...` and/or reconciliation docs when a naming-focused pass exists)*
+- **Health Check / Reconciliation Docs (naming-related findings):** Deferred until a naming-focused pass is published under `doc/HealthChecks/...`.
 
 ## Change Control Rules
 
@@ -1096,6 +1097,10 @@ When adding a new role, explicitly classify whether it is a concern-aligned role
 ## Validator Rollout Guidance (V1.2)
 
 Validation should support incremental adoption.
+
+Mode semantics are centralized in `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` (`report`, `soft-fail`, `hard-fail`, `correct`, `replace`).
+
+Report-first remains the default adoption posture; enforcement should be introduced incrementally.
 
 ### Recommended validator modes
 
