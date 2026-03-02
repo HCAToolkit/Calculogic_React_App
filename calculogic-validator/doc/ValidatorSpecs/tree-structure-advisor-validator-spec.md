@@ -117,7 +117,7 @@ This slice must preserve the existing concern slot semantics where applicable wh
 
 Notes:
 - This lane extension is permitted only because these Tree Addresses are report-only.
-- When a filename role is concern-core, it MUST map to its concern index (3–8).
+- When a filename role’s category is concern-core or concern-style, it MUST map to its concern index (3–8).
 - When a filename role is architecture-support, it MUST map to lane `2`.
 
 ---
@@ -192,6 +192,12 @@ Detect when subpackages (e.g., `tools/report-capture`) contain mixed surfaces th
 
 All scoring thresholds MUST be explicit constants in code and reported in `details`.
 
+### Explicit thresholds (V0.0.1 defaults)
+
+- `MIN_LANE_PARTITIONS_FOR_SCATTER = 2`
+- `MIN_FILES_IN_FAMILY_FOR_RECOMMENDATION = 2`
+- `LANE_FIRST_FOLDER_SIGNAL_SET = { build, build-style, logic, knowledge, results, results-style, tests, docs }`
+
 ## Recommendation Patterns (Advisory Only)
 
 The following outputs are advisory recommendation patterns only. They are not mandatory rules and should be emitted as explainable `suggested-reorg` findings.
@@ -213,8 +219,45 @@ When a semantic family has multi-file and multi-lane presence and is not already
 
 This recommendation should trigger only when it reduces lane entropy or improves navigation, and remains advisory-only.
 
+Constraint (shared-root):
+- Do not recommend creating or expanding lane-first folders directly under a shared root (for example, `src/shared/logic/`).
+- Lane/role subfolders are only recommended inside a semantic family folder (for example, `src/shared/<semantic-family>/logic/...`).
+
 Naming metadata reuse note:
 - Treat parsed naming metadata (`<semantic-name>.<role>.<ext>`) as a primary lane signal.
+
+### 3) Shared-root semantic-first grouping (advisory-only)
+
+Intent:
+- At shared-root level (default example: `src/shared/`), prefer semantic-first grouping.
+- Preferred target: `src/shared/<semantic-family>/...`
+- Avoid recommending: `src/shared/<lane>/...` as the target structure.
+
+Detect (deterministic):
+- A shared root is one of a configured set (V0.0.1 default example: `src/shared`).
+- The shared root contains lane-first partitions as immediate child folders (examples):
+  - `logic`, `knowledge`, `results`, `build`, `build-style`, `results-style`, `tests`, `docs`
+- A semantic family (derived from parsed `<semantic-name>`) appears under >= 2 distinct lane-first partitions within that shared root.
+- Guardrail: only recommend when the family has >= 2 files (reduces churn/noise).
+
+Recommend (advisory):
+- Consolidate to: `src/shared/<semantic-family>/...`
+- Within `src/shared/<semantic-family>/`, lane/role subfolders are allowed only when needed to reduce clutter/entropy:
+  - `src/shared/<semantic-family>/logic/...`
+  - `src/shared/<semantic-family>/knowledge/...`
+  - etc.
+
+No-inference constraint (V0.0.1):
+- The advisor must not require or assume folder-name case transforms (no kebab↔Pascal conversion).
+- Use the derived `familyKey` as-is for suggested target paths.
+
+Example:
+- Before:
+  - `src/shared/logic/selection.logic.ts`
+  - `src/shared/knowledge/selection.knowledge.ts`
+- Suggested target:
+  - `src/shared/selection/selection.logic.ts`
+  - `src/shared/selection/selection.knowledge.ts`
 
 ## Compat / Shim Health Signals (Advisory Diagnostics)
 
@@ -263,6 +306,11 @@ Each finding uses the same stable envelope shape used by existing validators:
   - `parsed.role` (string|null)
   - `parsed.roleCategory` (string|null)
   - `familyKey` (string|null)
+  - `sharedRoot` (string|null)
+  - `isSharedRootContext` (boolean)
+  - `isLaneFirstPartition` (boolean)
+  - `laneFirstFolderName` (string|null)
+  - `semanticFamilyKey` (string|null; `familyKey` when in shared-root context)
 - `metrics`
   - `familyScatterCount` (number)
   - `laneEntropy` (number)
@@ -287,6 +335,9 @@ Suggested codes (V0.0.1):
 - `TREE_SHIM_SURFACE_PRESENT` (`info`)
 - `TREE_SHIM_SCATTERED` (`warn`/`info`)
 - `TREE_SHIM_OUTSIDE_COMPAT` (`warn`/`info`)
+- `TREE_SHARED_LANE_FIRST_PARTITION_PRESENT` (`info`)
+- `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (`warn`/`info`)
+- `TREE_SHARED_SEMANTIC_ROOT_RECOMMENDED` (`warn`/`info`)
 
 ---
 
