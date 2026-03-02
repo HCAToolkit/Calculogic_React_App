@@ -1,12 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath, URL } from 'node:url'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@calculogic/doc-engine': './calculogic-doc-engine/src/index.ts',
+      '@calculogic/doc-engine': fileURLToPath(
+        new URL('./calculogic-doc-engine/src/index.ts', import.meta.url),
+      ),
     },
   },
 })
