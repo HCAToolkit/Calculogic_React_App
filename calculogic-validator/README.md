@@ -244,7 +244,8 @@ Tiny `sourceSnapshot` example shape:
     "gitRef": "HEAD",
     "gitHeadSha": "abc123def456",
     "diagnostics": {
-      "dirty": false,
+      "isDirty": false,
+      "changedCount": 0,
       "untrackedCount": 0
     }
   }
