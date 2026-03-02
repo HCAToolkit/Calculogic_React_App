@@ -1,11 +1,10 @@
-# CCPP (Concern/Code Provenance Policy)
+# Calculogic Comment & Provenance Protocol (CCPP)
 
-## Purpose
-Define lightweight provenance and comment rules for Calculogic repositories.
+> **Canonical source (validator-owned):** `calculogic-validator/doc/ConventionRoutines/CCPP.md`  
+> This host document is a convenience pointer. To change protocol rules, update the canonical validator source (not this wrapper).
 
-## Rules
-1. Keep comments focused on intent, constraints, and invariants.
-2. Avoid stale implementation comments; prefer self-descriptive names and tests.
-3. When behavior is governed by architecture/docs, reference the source doc in nearby comments or commit/PR notes.
-4. Preserve public behavior unless a task explicitly changes it.
-5. Keep changes minimal and scoped to the concern being modified.
+## What is this used for in this repo?
+
+- Quick entrypoint for contributors working in the host app repo.
+- Shared reference for comment/provenance expectations during local implementation and reviews.
+- Redirect to validator-owned canon so rule changes stay centralized.

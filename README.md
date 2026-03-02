@@ -14,7 +14,7 @@ A modular React + TypeScript builder shell for composing configuration-driven wo
 6. [Project Structure (Current)](#project-structure-current)
 7. [Roadmap (Planned)](#roadmap-planned)
 8. [Configuration Architecture](#configuration-architecture)
-9. [Calculogic-Style Concern System (CSCS)](#calculogic-style-concern-system-cscs)
+9. [Calculogic Concern System (CCS)](#calculogic-concern-system-ccs)
 10. [Comment & Provenance Protocol (CCPP)](#comment--provenance-protocol-ccpp)
 
 ---
@@ -160,15 +160,19 @@ For validator workflow details and report commands, see `calculogic-validator/RE
 - External architecture document: <https://docs.google.com/document/d/1UNlEDQTqWKbuq2QIFNIhYWxzMzj_opopgXu4QIScZKA/edit>
 - Local summary: `doc/Architecture/ConfigurationArchitectureSummary.md`
 
-## Calculogic-Style Concern System (CSCS)
+## Calculogic Concern System (CCS)
 
-The CSCS defines concern boundaries and dependency direction across Build / BuildStyle / Logic / Knowledge / Results.
+The CCS defines concern boundaries and dependency direction across Build / BuildStyle / Logic / Knowledge / Results.
 
 - Spec: `calculogic-validator/doc/ConventionRoutines/CSCS.md`
 - Doc-engine mapping: `doc/Architecture/DocEngine-CSCS-Mapping.md`
 
+Conventions are validator-owned so they can be reused across future repos by installing the validator suite. Host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not canonical rule sources.
+
 ## Comment & Provenance Protocol (CCPP)
 
 CCPP defines file headers, section/atomic comments, decision notes, and provenance annotations.
+
+Conventions are validator-owned so they can be reused across future repos by installing the validator suite. Host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not canonical rule sources.
 
 - Spec: `calculogic-validator/doc/ConventionRoutines/CCPP.md`

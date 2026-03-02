@@ -1,11 +1,6 @@
-# CSCS (Concern Separation & Coupling Standard)
+# Legacy Alias: CSCS → CCS
 
-## Purpose
-Maintain clean dependency direction and concern purity.
+This file is retained as a legacy alias for link stability.
 
-## Rules
-1. Runtime/domain modules must not depend on feature UI modules.
-2. Feature UI modules may depend on runtime/domain modules.
-3. Shared primitives/types live in neutral modules; avoid circular dependencies.
-4. Side-effect wiring should be isolated at composition boundaries.
-5. Prefer explicit interfaces between concerns.
+- Host canonical wrapper name: `doc/ConventionRoutines/CCS.md`
+- Canonical validator source: `calculogic-validator/doc/ConventionRoutines/CSCS.md`
