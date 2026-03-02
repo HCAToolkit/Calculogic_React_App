@@ -1,14 +1,21 @@
 # cfg-namingValidator
 
+> [!IMPORTANT]
+> This file is **implementation notes / NL-config context** for this repository and is **not** the canonical validator contract source.
+> Canonical validator-owned docs:
+> - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
+> - `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
+> - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+
 ## 0.0 Version
 Current implementation target: **V0.1.15** (optional --target path/folder filtering within scope).
 
 ## 1.0 Purpose
 Define a deterministic V0.1 filename naming validator that runs in report mode only and classifies repository filenames against the canonical naming contract.
 
-## 2.0 Inputs and Source of Truth
+## 2.0 Inputs and Implementation References
 ### 2.1 Naming authority
-The validator reads rules from `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` as authoritative naming guidance.
+Summary only: naming rules are consumed from canonical docs. For normative role/grammar policy, see `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` and `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`.
 
 ### 2.2 Scope mode (V0.1.11)
 ### 2.2.1 Target filter mode (V0.1.15)
@@ -180,7 +187,8 @@ Report output includes additive scope observability metadata:
 This metadata is additive and does not alter legacy report-mode findings behavior.
 
 ### 4.6 Exit behavior (report mode, V0.1.13)
-Report mode always prints full JSON report payload to stdout in non-usage-error flows, then exits with deterministic CI-oriented status:
+Summary only (canonical policy is defined in `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` and mirrored by `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`):
+Report mode prints full JSON report payload to stdout in non-usage-error flows, then exits with deterministic CI-oriented status:
 - default mode: exit `2` when any finding has `severity="warn"`.
 - strict mode (`--strict`): exit `2` when any warning exists; otherwise exit `1` when any finding has `classification="legacy-exception"`.
 - exit `0` when neither warning criteria nor strict legacy criteria are present.
