@@ -8,6 +8,14 @@ import { stableStringify, sha256Hex } from '../../validator-report-meta.logic.mj
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 
+const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
+const ALLOWED_ROLE_CATEGORIES = new Set([
+  'concern-core',
+  'architecture-support',
+  'documentation',
+  'deprecated',
+]);
+
 const canonicalizeRole = roleEntry => {
   if (!roleEntry || typeof roleEntry !== 'object' || Array.isArray(roleEntry)) {
     throw new Error('Invalid custom roles registry: each entry must be an object.');
@@ -19,6 +27,16 @@ const canonicalizeRole = roleEntry => {
 
   if (!role || !category || !status) {
     throw new Error('Invalid custom roles registry: role, category, and status must be non-empty strings.');
+  }
+
+  if (!ALLOWED_ROLE_CATEGORIES.has(category)) {
+    throw new Error(
+      'Invalid custom roles registry: category must be one of concern-core, architecture-support, documentation, deprecated.',
+    );
+  }
+
+  if (!ALLOWED_ROLE_STATUSES.has(status)) {
+    throw new Error('Invalid custom roles registry: status must be "active" or "deprecated".');
   }
 
   const canonicalRole = { role, category, status };
@@ -65,6 +83,10 @@ const canonicalizeExtensions = extensions => {
     const extension = extensionValue.trim();
     if (!extension) {
       throw new Error('Invalid custom reportable extensions registry: each extension must be a non-empty string.');
+    }
+
+    if (!extension.startsWith('.')) {
+      throw new Error('Invalid custom reportable extensions registry: each extension must start with ".".');
     }
 
     deduped.add(extension);
