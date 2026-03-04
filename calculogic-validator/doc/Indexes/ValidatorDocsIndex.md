@@ -7,6 +7,12 @@ Purpose: quick routing map for validator documentation so readers can distinguis
 - `doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
   Canonical suite-wide contract for report-first semantics, mode vocabulary, report envelope, and exit-policy framing, including canonical-envelope-to-current naming-slice report mapping notes. Read this first when interpreting validator behavior.
 
+- `doc/ConventionRoutines/ValidatorReportSchema-V0_1.md`
+  Canonical schema reference for validator JSON output envelopes (slice report and runner report), including deterministic field and ordering expectations.
+
+- `doc/ConventionRoutines/ValidatorRuleIds-Contract.md`
+  Canonical rule ID contract for stable finding identifiers and rule-to-document linkage via `ruleRef`.
+
 ## 2) Canonical config contract
 
 - `doc/ValidatorSpecs/validator-config-spec.md`

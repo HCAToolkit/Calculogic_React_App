@@ -57,6 +57,8 @@ Slices may implement scope-specific include/exclude details, but the scope vocab
 
 ## 6) Shared Report Envelope (Canonical)
 
+This document defines the suite-level shape contract. For the canonical full schema reference (including slice report vs runner report envelopes, finding baseline shape, and deterministic ordering rules), see [`ValidatorReportSchema-V0_1.md`](./ValidatorReportSchema-V0_1.md).
+
 Each validator slice should emit a stable high-level report envelope:
 
 - `validatorId`

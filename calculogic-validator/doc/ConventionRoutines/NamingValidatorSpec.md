@@ -232,6 +232,11 @@ Each finding uses a stable object shape:
 - `suggestedFix` (optional)
 - `details` (optional object)
 
+Rule ID note (canonical linkage):
+- naming currently emits `code` values (`NAMING_*`) as the stable finding identifiers
+- map `code` to canonical `ruleId` for suite-wide contracts and future slice alignment
+- canonical contract reference: [`ValidatorRuleIds-Contract.md`](./ValidatorRuleIds-Contract.md)
+
 Report object includes:
 - `mode`
 - `scope`
