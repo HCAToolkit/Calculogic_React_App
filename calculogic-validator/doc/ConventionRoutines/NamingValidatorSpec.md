@@ -1,8 +1,8 @@
-# Naming Validator Spec (V0.1.6)
+# Naming Validator Spec (V0.1.7)
 
 ## Purpose and Scope
 
-This document defines the V0.1.6 filename naming validator slice for deterministic automation.
+This document defines the V0.1.7 filename naming validator slice for deterministic automation.
 
 ## Suite Contract Alignment
 
@@ -153,6 +153,18 @@ Inclusion/exclusion summary:
 Invalid scope behavior:
 - Unknown scope values are usage errors with non-zero exit and valid-scope usage text.
 
+## Validator Config Input (Report-only, V0.1.7)
+
+Config reference: [`validator-config-spec.md`](../ValidatorSpecs/validator-config-spec.md).
+
+Current naming behavior remains report-only in implementation. Passing `--config=<path>` does **not** enable enforcement or fix execution in the naming slice.
+
+When provided, config only affects naming report inputs for:
+- reportable extension set (defaults ∪ additions)
+- naming role registry runtime (defaults + add-only role additions)
+
+Config does not change detection mode/scope semantics and does not introduce enforcement/fix execution. Current exit policy remains policy-driven as documented in this spec.
+
 ## CLI Usage (V0.1.6)
 
 - `npm run validate:naming` (defaults to `--scope=repo`)
@@ -163,6 +175,8 @@ Invalid scope behavior:
 - `npm run validate:naming -- --scope=system`
 - `npm run validate:naming -- --scope=app --target src/buildsurface`
 - `npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared`
+- `npm run validate:naming -- --scope=app --config=./path/to/validator-config.json`
+- `node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app --config=./path/to/validator-config.json`
 
 
 npm argument forwarding note:
@@ -222,6 +236,9 @@ Report object includes:
 - `totalFilesScanned`
 - summary count objects
 - `findings`
+
+When `--config=<path>` is supplied, report metadata may also include:
+- `configDigest`
 
 ### Special-case subtype metadata
 
