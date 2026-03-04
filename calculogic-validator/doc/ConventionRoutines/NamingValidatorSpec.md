@@ -8,14 +8,14 @@ This document defines the V0.1.7 filename naming validator slice for determinist
 
 This naming slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md): Calculogic Validator is modular, configurable, policy-driven, and report-first by default. Mode policy changes exit behavior and optional fix execution, not detection.
 
-V0.1.6 scope is intentionally narrow:
+V0.1.7 scope is intentionally narrow:
 - filename validation only
 - report mode only
 - deterministic findings output
 - deterministic scope profiles for migration planning
 - no rename enforcement
 
-Out of scope for V0.1.6:
+Out of scope for V0.1.7:
 - structural addressing validation
 - NL↔Code numbering/parity validation
 - provenance token consistency checks
@@ -277,7 +277,7 @@ When a canonical-like parse resolves to a known deprecated role (currently `view
 
 Mode semantics are centralized in the suite-wide matrix in [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md).
 
-Naming V0.1.6 currently implements:
+Naming V0.1.7 currently implements:
 - `report` only (slice behavior)
   - emits findings and summary deterministically before any enforcement/fix behavior
   - exit code is policy-driven in current implementation:
