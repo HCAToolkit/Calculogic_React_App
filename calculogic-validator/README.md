@@ -199,6 +199,17 @@ Validator config schema:
 
 Runtime behavior is strict and rejects unknown keys where the schema disallows them. Root-level `$schema` is allowed as an editor hint.
 
+**Report-only note (current CLI behavior):** Config currently affects report classification/metadata only. Enforcement/fix modes are not implemented in naming CLI behavior yet.
+
+Use `--config=<path>` to pass a config file explicitly:
+
+```bash
+npm run validate:naming -- --scope=app --config=./.calculogic/validator/config.json
+node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=docs --config=./.calculogic/validator/config.json
+```
+
+Canonical config spec: `doc/ValidatorSpecs/validator-config-spec.md`.
+
 Example:
 
 ```json
