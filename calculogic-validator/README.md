@@ -240,6 +240,16 @@ Example:
 
 ## 9) Report output (JSON)
 
+Canonical report contracts:
+
+- `doc/ConventionRoutines/ValidatorReportSchema-V0_1.md` (canonical schema for slice and runner envelopes)
+- `doc/ConventionRoutines/ValidatorRuleIds-Contract.md` (canonical rule ID and `ruleRef` linkage contract)
+
+There are two report envelopes:
+
+- slice output (single-slice CLI, for example `validate:naming`)
+- runner output (multi-slice CLI, for example `validate:all`)
+
 Validator reports include stable metadata fields for report envelope identity and reproducibility:
 
 - `validatorId`
