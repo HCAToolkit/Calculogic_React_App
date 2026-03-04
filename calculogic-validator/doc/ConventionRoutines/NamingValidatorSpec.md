@@ -163,9 +163,11 @@ When provided, config only affects naming report inputs for:
 - reportable extension set (defaults ∪ additions)
 - naming role registry runtime (defaults + add-only role additions)
 
+In current behavior, these config effects are limited to classification/runtime registries only for report generation.
+
 Config does not change detection mode/scope semantics and does not introduce enforcement/fix execution. Current exit policy remains policy-driven as documented in this spec.
 
-## CLI Usage (V0.1.6)
+## CLI Usage (V0.1.7)
 
 - `npm run validate:naming` (defaults to `--scope=repo`)
 - `npm run validate:naming -- --scope=repo`
@@ -239,6 +241,7 @@ Report object includes:
 
 When `--config=<path>` is supplied, report metadata may also include:
 - `configDigest`
+  - emitted by the CLI when config input is active
 
 ### Special-case subtype metadata
 
