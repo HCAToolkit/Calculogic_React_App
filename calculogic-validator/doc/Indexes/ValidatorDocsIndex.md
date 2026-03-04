@@ -7,7 +7,12 @@ Purpose: quick routing map for validator documentation so readers can distinguis
 - `doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
   Canonical suite-wide contract for report-first semantics, mode vocabulary, report envelope, and exit-policy framing, including canonical-envelope-to-current naming-slice report mapping notes. Read this first when interpreting validator behavior.
 
-## 2) Naming
+## 2) Canonical config contract
+
+- `doc/ValidatorSpecs/validator-config-spec.md`
+  Canonical config contract (report-only input, strict schema/validation, normalization + merge semantics, CLI `--config` behavior).
+
+## 3) Naming
 
 - `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
   Canonical naming authority (roles, grammar, exception policy, rollout guidance). Read when defining or reviewing naming rules.
@@ -15,22 +20,22 @@ Purpose: quick routing map for validator documentation so readers can distinguis
 - `doc/ConventionRoutines/NamingValidatorSpec.md`
   Naming-slice validator spec (scope profiles, classification contract, report details, current report/strict exit behavior), including the current runtime category vocabulary for naming role metadata. Read when implementing or validating naming checks.
 
-## 3) Tree advisor
+## 4) Tree advisor
 
 - `doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
   Tree-structure advisor validator spec. Read when working on tree diagnostics and snapshot-driven structure checks.
 
-## 4) Structural addressing
+## 5) Structural addressing
 
 - `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
   Draft structural-addressing spec. Read for addressing model details; treat as draft/governance-in-progress, not naming authority.
 
-## 5) Implementation notes (non-canonical / external)
+## 6) Implementation notes (non-canonical / external)
 
 - `doc/nl-config/cfg-namingValidator.md`
   Non-canonical implementation notes for NL/config context in this repo. Use for implementation context only; defer normative behavior to canonical validator-owned docs under `calculogic-validator/doc/...`.
 
-## 6) Drafts / ValidatorSpecs
+## 7) Drafts / ValidatorSpecs
 
 - `doc/ValidatorSpecs/registry-customization-state-system-draft.md`
   Draft spec for built-in vs custom registry state, customization commands, and digest-based default/custom switching (report-only).
