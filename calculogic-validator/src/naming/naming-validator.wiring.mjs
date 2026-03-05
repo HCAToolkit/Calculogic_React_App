@@ -1,7 +1,4 @@
-import { REPORTABLE_EXTENSIONS } from './registries/naming-extensions.knowledge.mjs';
-import {
-  ROLE_METADATA,
-} from './registries/naming-roles.knowledge.mjs';
+import { resolveNamingRegistryInputs } from './registries/registry-state.logic.mjs';
 import {
   parseCanonicalName,
   getSpecialCaseType,
@@ -15,16 +12,12 @@ import {
   summarizeFindings,
 } from './naming-validator.logic.mjs';
 
-const deriveReportableExtensions = config => {
-  const additions = config?.naming?.reportableExtensions?.add ?? [];
-  return new Set([...REPORTABLE_EXTENSIONS, ...additions]);
-};
+const toReportableExtensionsSet = extensionArray => new Set(extensionArray);
 
-const deriveNamingRolesRuntime = config => {
-  const additions = config?.naming?.roles?.add ?? [];
-  const roleMetadata = new Map(ROLE_METADATA);
+const toNamingRolesRuntime = rolesArray => {
+  const roleMetadata = new Map();
 
-  additions.forEach(entry => {
+  rolesArray.forEach(entry => {
     if (!roleMetadata.has(entry.role)) {
       roleMetadata.set(entry.role, entry);
     }
@@ -45,13 +38,27 @@ const deriveNamingRolesRuntime = config => {
   };
 };
 
-export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) =>
-  runNamingValidatorRuntime(repositoryRoot, {
+export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) => {
+  const registryInputs = resolveNamingRegistryInputs({ config });
+  const reportableExtensions = toReportableExtensionsSet(registryInputs.reportableExtensions);
+  const namingRolesRuntime = toNamingRolesRuntime(registryInputs.roles);
+
+  const result = runNamingValidatorRuntime(repositoryRoot, {
     scope,
     targets,
-    reportableExtensions: deriveReportableExtensions(config),
-    namingRolesRuntime: deriveNamingRolesRuntime(config),
+    reportableExtensions,
+    namingRolesRuntime,
   });
+
+  return {
+    ...result,
+    registry: {
+      registryState: registryInputs.registryState,
+      registrySource: registryInputs.registrySource,
+      registryDigests: registryInputs.registryDigests,
+    },
+  };
+};
 
 export {
   parseCanonicalName,
