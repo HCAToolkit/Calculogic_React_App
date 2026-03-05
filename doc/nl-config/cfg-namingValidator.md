@@ -111,15 +111,18 @@ Normalization and merge semantics for `naming.roles.add` are deterministic and a
 - duplicate role entries in config are dropped by first occurrence (input-order stable)
 - entries whose role already exists in default role registry are treated as no-op at runtime
 
-Runtime behavior in this slice is additive-only for reportable extension collection:
-- derived reportable extensions = default registry union `config.naming.reportableExtensions.add`
-- defaults remain unchanged when config is omitted
+Runtime behavior in this slice resolves naming registries via registry-state logic:
+- wiring resolves inputs through `resolveNamingRegistryInputs({ config })`
+- resolver returns normalized arrays for `reportableExtensions` and `roles`
+- wiring converts arrays into runtime structures expected by naming runtime:
+  - `reportableExtensions` → `Set`
+  - `roles` → `{ roleMetadata: Map, activeRoles: Set, roleSuffixes: string[] }` where role suffixes are length-desc sorted
+- duplicate roles remain first-wins during map conversion
 
-Runtime behavior for role additions:
-- runtime role metadata map = default metadata map + config role additions (add-only)
-- runtime active role set = roles with `status=active` from runtime role metadata
-- runtime role suffix list = runtime role keys sorted by descending length for hyphen-role ambiguity detection
-- filename classification uses the runtime role structures when supplied, and default registries when omitted
+Runtime output for host-wiring now includes additive registry metadata for observability:
+- `registry.registryState` from registry-state selection (`builtin | custom`)
+- `registry.registrySource` to indicate effective source (`builtin | custom | config`)
+- `registry.registryDigests` with deterministic digest entries (`builtin`, `custom`, `resolved`)
 
 Validator config contract includes a publishable JSON Schema for editor/tool integration:
 - schema path: `calculogic-validator/src/validator-config.schema.json`
