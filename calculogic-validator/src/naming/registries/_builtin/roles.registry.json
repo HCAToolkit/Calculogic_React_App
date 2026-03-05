@@ -1,0 +1,68 @@
+{
+  "version": "1",
+  "rolesByCategory": {
+    "architecture-support": [
+      { "role": "boundary", "status": "active" },
+      { "role": "cli", "status": "active" },
+      { "role": "contracts", "status": "active" },
+      { "role": "wiring", "status": "active" }
+    ],
+    "concern-core": [
+      { "role": "build", "status": "active" },
+      { "role": "knowledge", "status": "active" },
+      { "role": "logic", "status": "active" },
+      { "role": "results", "status": "active" }
+    ],
+    "concern-style": [
+      { "role": "build-style", "status": "active" },
+      { "role": "results-style", "status": "active" }
+    ],
+    "data-model": [
+      { "role": "dto", "status": "active" },
+      { "role": "schema", "status": "active" },
+      { "role": "types", "status": "active" }
+    ],
+    "deprecated": [
+      {
+        "role": "view",
+        "status": "deprecated",
+        "notes": "Historical role from pre-current concern split; manual migration required."
+      }
+    ],
+    "documentation": [
+      { "role": "audit", "status": "active" },
+      { "role": "healthcheck", "status": "active" },
+      { "role": "plan", "status": "active" },
+      { "role": "policy", "status": "active" },
+      { "role": "spec", "status": "active" },
+      { "role": "workflow", "status": "active" }
+    ],
+    "indexing-registry": [
+      { "role": "anchor", "status": "active" },
+      { "role": "catalog", "status": "active" },
+      { "role": "ids", "status": "active" },
+      { "role": "index", "status": "active" },
+      { "role": "manifest", "status": "active" },
+      { "role": "registry", "status": "active" },
+      { "role": "tokens", "status": "active" }
+    ],
+    "integration-adapter": [
+      { "role": "adapter", "status": "active" },
+      { "role": "client", "status": "active" },
+      { "role": "gateway", "status": "active" },
+      { "role": "mapper", "status": "active" },
+      { "role": "resolver", "status": "active" }
+    ],
+    "quality-support": [
+      { "role": "benchmark", "status": "active" },
+      { "role": "fixture", "status": "active" },
+      { "role": "mock", "status": "active" },
+      { "role": "test", "status": "active" }
+    ],
+    "surface-system": [
+      { "role": "entry", "status": "active" },
+      { "role": "host", "status": "active" },
+      { "role": "router", "status": "active" }
+    ]
+  }
+}

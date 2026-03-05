@@ -1,0 +1,31 @@
+{
+  "version": "1",
+  "profiles": {
+    "app": {
+      "includeRoots": ["src", "test"],
+      "includeRootFiles": []
+    },
+    "docs": {
+      "includeRoots": ["doc", "docs"],
+      "includeRootFiles": ["README.md"]
+    },
+    "repo": {
+      "includeRoots": ["."],
+      "includeRootFiles": []
+    },
+    "system": {
+      "includeRoots": [],
+      "includeRootFiles": [
+        "eslint.config.*",
+        "package-lock.json",
+        "package.json",
+        "tsconfig*.json",
+        "vite.config.*"
+      ]
+    },
+    "validator": {
+      "includeRoots": ["calculogic-validator"],
+      "includeRootFiles": []
+    }
+  }
+}

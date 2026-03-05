@@ -1,0 +1,31 @@
+{
+  "version": "1",
+  "categories": [
+    { "category": "architecture-support", "status": "active" },
+    { "category": "build-system", "status": "active" },
+    { "category": "concern-core", "status": "active" },
+    { "category": "concern-style", "status": "active" },
+    { "category": "concurrency", "status": "active" },
+    { "category": "configuration", "status": "active" },
+    { "category": "data-model", "status": "active" },
+    { "category": "deprecated", "status": "active" },
+    { "category": "documentation", "status": "active" },
+    { "category": "examples", "status": "active" },
+    { "category": "experimental", "status": "active" },
+    { "category": "generated", "status": "active" },
+    { "category": "indexing-registry", "status": "active" },
+    { "category": "integration-adapter", "status": "active" },
+    { "category": "localization", "status": "active" },
+    { "category": "migration", "status": "active" },
+    { "category": "networking", "status": "active" },
+    { "category": "observability", "status": "active" },
+    { "category": "operations-support", "status": "active" },
+    { "category": "performance", "status": "active" },
+    { "category": "persistence", "status": "active" },
+    { "category": "quality-support", "status": "active" },
+    { "category": "security", "status": "active" },
+    { "category": "surface-system", "status": "active" },
+    { "category": "tooling", "status": "active" },
+    { "category": "vendor", "status": "active" }
+  ]
+}

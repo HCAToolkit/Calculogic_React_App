@@ -1,0 +1,6 @@
+{
+  "version": "1",
+  "excludedDirectories": [".git", ".vite", "coverage", "dist", "node_modules"],
+  "skipDotDirectories": true,
+  "allowDotFiles": [".eslintrc"]
+}
