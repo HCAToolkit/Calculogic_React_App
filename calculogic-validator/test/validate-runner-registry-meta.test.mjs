@@ -11,7 +11,9 @@ test('validate runner includes naming meta.registry with digest metadata', () =>
 
   assert.ok([0, 1, 2].includes(result.status));
   const report = JSON.parse(result.stdout);
-  const namingEntry = report.validators.find(entry => entry.id === 'naming' || entry.validatorId === 'naming');
+  const namingEntry = report.validators.find(
+    (entry) => entry.id === 'naming' || entry.validatorId === 'naming',
+  );
 
   assert.ok(namingEntry);
   assert.ok(namingEntry.meta?.registry);

@@ -6,7 +6,7 @@ import {
   TOOLING_CONFIG_PATTERN,
 } from '../registries/naming-special-cases.knowledge.mjs';
 
-export const getSpecialCaseType = normalizedPath => {
+export const getSpecialCaseType = (normalizedPath) => {
   const basename = path.posix.basename(normalizedPath);
 
   if (basename === 'README.md') {
@@ -40,4 +40,4 @@ export const getSpecialCaseType = normalizedPath => {
   return null;
 };
 
-export const isAllowedSpecialCase = normalizedPath => getSpecialCaseType(normalizedPath) !== null;
+export const isAllowedSpecialCase = (normalizedPath) => getSpecialCaseType(normalizedPath) !== null;

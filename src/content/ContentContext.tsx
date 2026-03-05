@@ -45,7 +45,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   // Concern: Logic · Parent: "Drawer State Orchestrator" · Catalog: state.mutation
   // Notes: Deduplicates id/anchor updates to avoid unnecessary rerender churn.
   const openContent = useCallback(({ contentId, anchorId }: ActiveContentPayload) => {
-    setState(prev => {
+    setState((prev) => {
       if (prev.activeContentId === contentId && prev.activeContentAnchorId === (anchorId ?? null)) {
         return prev;
       }
@@ -60,7 +60,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   // Concern: Logic · Parent: "Drawer State Orchestrator" · Catalog: state.mutation
   // Notes: Resets both identifiers atomically so consumers observe a clean close transition.
   const closeContent = useCallback(() => {
-    setState(prev => {
+    setState((prev) => {
       if (!prev.activeContentId && !prev.activeContentAnchorId) {
         return prev;
       }

@@ -20,10 +20,7 @@ This guide describes how a host application integrates with `@calculogic/doc-eng
 ## Minimal integration example
 
 ```ts
-import {
-  ContentProviderRegistry,
-  type ContentProvider,
-} from '@calculogic/doc-engine';
+import { ContentProviderRegistry, type ContentProvider } from '@calculogic/doc-engine';
 
 const docsProvider: ContentProvider = {
   resolveContent: ({ contentId, anchorId }) => {

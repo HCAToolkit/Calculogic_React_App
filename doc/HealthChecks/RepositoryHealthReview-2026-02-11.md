@@ -1,6 +1,7 @@
 # Repository Health Review — 2026-02-11
 
 ## Scope and method
+
 - Reviewed project-level setup and architecture docs: `README.md`, `package.json`, and representative standards docs under `calculogic-doc-engine/doc/Standards/`.
 - Sampled representative runtime modules across app frame, global header shell, build surface, content drawer, and content resolver subsystems.
 - Reviewed existing tests under `test/` and ran lint/build/test checks.
@@ -10,6 +11,7 @@
 ## 1) Architecture map
 
 ### Subsystems and responsibilities
+
 1. **Application shell / composition root**
    - Files: `src/main.tsx`, `src/App.tsx`, `src/App.logic.ts`.
    - Responsibility: mount the React app, provide top-level frame, theme toggle logic, and root-level providers.
@@ -30,6 +32,7 @@
    - Responsibility: static tab/mode metadata, docs corpus, anchor contracts, and content schemas.
 
 ### Data and control flow (current)
+
 1. `main.tsx` mounts `<App />`.
 2. `App` renders `GlobalHeaderShell`, `BuildTab`, and `ContentDrawer` inside `ContentProvider`.
 3. `GlobalHeaderShell.logic` controls tab/mode/breakpoint state and can call `openContent(...)` from `ContentContext`.
@@ -37,6 +40,7 @@
 5. Build workspace logic in `BuildSurface.logic.ts` manages drag/collapse state and persists view state to `localStorage`.
 
 ### Key architecture observations (8)
+
 1. **Strong concern-driven decomposition exists at file naming level** (`*.build.tsx`, `*.logic.ts`, `*.knowledge.ts`) and is applied consistently in core modules.
 2. **A resolver split-brain exists**: UI currently uses `contentProviders.ts` while a richer registry implementation exists in `ContentProviderRegistry.ts`; this duplicates contracts and parsing logic.
 3. **GlobalHeader knowledge module is becoming a mixed “catalog + corpus + schema” hub**, increasing blast radius of changes.
@@ -51,6 +55,7 @@
 ## 2) Code health assessment
 
 ### Naming, cohesion, coupling, layering
+
 - **Naming quality: good overall**, especially concern and config labels that map to NL docs.
 - **Cohesion concerns:**
   - `GlobalHeaderShell.build.tsx` combines multiple UI primitives and menu variants in a single large file.
@@ -60,6 +65,7 @@
 - **Layering direction is mostly good** (build components consume logic bindings), but content resolution currently bypasses the canonical registry API.
 
 ### Code smell findings
+
 1. **Duplicated resolver patterns** (`resolveContent` adapter vs `ContentProviderRegistry.resolveContent`).
 2. **Hidden side effects without diagnostics**: repeated `localStorage` parse/write `try/catch {}` blocks suppress root-cause context.
 3. **Overly large “knowledge” surface** in header module (types + constants + full docs content).
@@ -72,6 +78,7 @@
 ## 3) Stability & correctness risk scan
 
 ### High-probability/impact risks
+
 1. **Silent persistence failures**
    - Multiple persistence points ignore parse/write failures; corrupted payloads can reset state with no diagnostics.
    - Affected symbols: `useSectionLogic`, `useLeftPanelLogic`, `useRightPanelLogic` in `BuildSurface.logic.ts`.
@@ -83,6 +90,7 @@
    - Affected symbols: `resolveContent(...)` in `contentProviders.ts`, `ContentProviderRegistry.resolveContent(...)`.
 
 ### Additional boundary/error-handling notes
+
 - `useInitialDarkPreference` uses `window.matchMedia` with no availability guard in the helper (works in browser runtime, but brittle in non-browser test harnesses).
 - `main.tsx` uses non-null assertion on root element; acceptable for Vite default shell but still a hard assumption.
 - Drawer anchor scroll logic has no fallback when selector misses target (safe, but silent).
@@ -92,17 +100,20 @@
 ## 4) Test strategy and coverage gaps
 
 ### Current tested surface
+
 - `splitNamespace` and registry docs resolution basics.
 - `clamp` utility behavior.
 - `toAnchorId` normalization behavior.
 
 ### Highest-risk coverage gaps
+
 - No tests for drag/resize keyboard + pointer flows.
 - No tests for localStorage corruption recovery behavior.
 - No tests for content drawer branch rendering behavior.
 - No tests for header mode/tab state transitions or accessibility announcements.
 
 ### Prioritized test backlog (12 items)
+
 1. **Unit:** `useSectionLogic` state restore with malformed JSON + fallback defaults.
 2. **Unit:** left panel width clamping against viewport min/max boundaries.
 3. **Unit:** right panel collapse/restore remembers previous width correctly.
@@ -121,10 +132,12 @@
 ## 5) Documentation & developer experience
 
 ### Strengths
+
 - README explains stack, scripts, and structure clearly.
 - CCS/CCPP/NL-first conventions are documented and visibly enforced in source comments.
 
 ### Gaps
+
 1. **Missing “single source of truth” migration status doc** for resolver architecture (adapter vs registry).
 2. **No explicit contribution/testing strategy doc** in root for when to write unit vs integration tests.
 3. **No architecture decision log (ADR) index** for key design choices (e.g., why docs content currently lives in header knowledge).
@@ -135,6 +148,7 @@
 ## 6) Refactoring opportunities (incremental only)
 
 ### Refactor A — Converge content resolution on registry
+
 - **Impact:** reduces duplicated contracts and clarifies dependency direction.
 - **Risk:** low/medium (API adaptation touchpoints in drawer).
 - **Effort:** 0.5–1 day.
@@ -149,6 +163,7 @@
   - `resolveDrawerContent({ contentId, anchorId }): DrawerResolution` (internally delegates to registry).
 
 ### Refactor B — Extract persistence utilities from BuildSurface.logic
+
 - **Impact:** removes repeated parse/write/catch blocks; improves observability.
 - **Risk:** low.
 - **Effort:** 1 day.
@@ -158,6 +173,7 @@
   3. Add unit tests for malformed payload handling.
 
 ### Refactor C — Split large hooks by concern
+
 - **Impact:** improves readability and testability.
 - **Risk:** medium (binding wiring changes).
 - **Effort:** 1–2 days.
@@ -167,6 +183,7 @@
   3. Keep public `useBuildSurfaceLogic` return contract unchanged.
 
 ### Refactor D — Isolate docs corpus from header knowledge module
+
 - **Impact:** clearer boundaries and smaller module churn.
 - **Risk:** medium.
 - **Effort:** 1–2 days.
@@ -215,18 +232,21 @@
 ## 8) Roadmap (prioritized)
 
 ### Immediate (1–2 days)
+
 1. Add diagnostics-capable persistence helper and replace silent catches in BuildSurface logic.
 2. Add contract tests for resolver parity and not-found behavior consistency.
 3. Add focused unit tests for right/left panel clamp and restore logic.
 4. Document resolver migration target (single source-of-truth) in `doc/`.
 
 ### Near-term (1–2 weeks)
+
 1. Converge drawer resolution path onto registry-backed wrapper.
 2. Split `BuildSurface.logic.ts` into concern-scoped hook files without API churn.
 3. Extract docs corpus to dedicated content catalog module and re-export for compatibility.
 4. Add component/integration tests for content drawer branch rendering and anchor jump behavior.
 
 ### Longer-term
+
 1. Introduce lightweight ADR index for architecture decisions.
 2. Establish CI policy for warning budget and quality gates.
 3. Expand integration tests for full header→drawer→content interaction loop.
@@ -234,6 +254,7 @@
 ---
 
 ## 9) Quick wins (8)
+
 1. Add `safeReadJson` helper and replace one `catch {}` block as template.
 2. Normalize resolver not-found shape with a shared type alias.
 3. Add JSDoc note in `contentProviders.ts` marking adapter as transitional.
@@ -246,6 +267,7 @@
 ---
 
 ## 10) Open questions
+
 1. Is `contentProviders.ts` intended as temporary compatibility shim, or is dual-path resolution a deliberate long-term design?
 2. Should docs content live with header knowledge permanently, or should it be owned by a dedicated doc-engine/content domain module?
 3. Should lint warnings become build-blocking in CI, or remain informational during current phase?

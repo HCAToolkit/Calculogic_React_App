@@ -3,11 +3,13 @@
 Scope: `doc/nl-doc-engine/` NL atomics vs currently implemented doc-engine code paths.
 
 ## Verification checks
+
 - Every NL atomic has a matching code atomic comment in the right concern file.
 - No code atomics exist without NL declaration.
 - Section order in code matches NL order.
 
 ## Findings (mismatches)
+
 1. **Concern-file mismatch (all configs)**
    - NL assembly paths for concern files under `src/docEngine/...` are not present yet.
    - Current implementation lives under `src/content/...`, `calculogic-doc-engine/src/...`, and `src/components/ContentDrawer/...`.
@@ -25,4 +27,5 @@ Scope: `doc/nl-doc-engine/` NL atomics vs currently implemented doc-engine code 
    - Section-order parity cannot be verified because required NL-numbered atomic comments are currently absent from code concern files.
 
 ## Merge gate note
+
 Before merge, add NL-numbered atomic comments to the corresponding concern files (Build / BuildStyle / Logic / Knowledge / Results / ResultsStyle) and keep comment ordering aligned with NL section ordering.

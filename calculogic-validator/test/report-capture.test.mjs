@@ -31,7 +31,10 @@ test('pruneReports keeps newest N reports by mtime', async () => {
     await pruneReports(tempDir, { prefix: 'report', keep: 2 });
 
     const remaining = (await fs.readdir(tempDir)).sort();
-    assert.deepEqual(remaining, ['report-2026-02-23_00-00-00.txt', 'report-2026-02-24_00-00-00.txt']);
+    assert.deepEqual(remaining, [
+      'report-2026-02-23_00-00-00.txt',
+      'report-2026-02-24_00-00-00.txt',
+    ]);
   } finally {
     await fs.rm(tempDir, { recursive: true, force: true });
   }
@@ -46,7 +49,9 @@ test('host propagates child exit code and writes report file', async () => {
   const tempDir = await createTempDir();
 
   try {
-    const hostPath = path.resolve('calculogic-validator/tools/report-capture/src/report-capture.host.mjs');
+    const hostPath = path.resolve(
+      'calculogic-validator/tools/report-capture/src/report-capture.host.mjs',
+    );
     const exitCode = await new Promise((resolve, reject) => {
       const child = spawn(process.execPath, [
         hostPath,
@@ -61,12 +66,14 @@ test('host propagates child exit code and writes report file', async () => {
       ]);
 
       child.on('error', reject);
-      child.on('close', code => resolve(code));
+      child.on('close', (code) => resolve(code));
     });
 
     assert.equal(exitCode, 7);
 
-    const reports = (await fs.readdir(tempDir)).filter(name => name.startsWith('report-') && name.endsWith('.txt'));
+    const reports = (await fs.readdir(tempDir)).filter(
+      (name) => name.startsWith('report-') && name.endsWith('.txt'),
+    );
     assert.equal(reports.length, 1);
   } finally {
     await fs.rm(tempDir, { recursive: true, force: true });

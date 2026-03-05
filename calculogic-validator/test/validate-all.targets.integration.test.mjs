@@ -6,7 +6,10 @@ import { spawnSync } from 'node:child_process';
 import { test } from 'node:test';
 
 const repositoryRoot = process.cwd();
-const validateAllScriptPath = path.resolve(repositoryRoot, 'calculogic-validator/scripts/validate-all.mjs');
+const validateAllScriptPath = path.resolve(
+  repositoryRoot,
+  'calculogic-validator/scripts/validate-all.mjs',
+);
 
 const runValidateAll = (fixtureDir, args) =>
   spawnSync(process.execPath, ['--experimental-strip-types', validateAllScriptPath, ...args], {
@@ -14,7 +17,7 @@ const runValidateAll = (fixtureDir, args) =>
     encoding: 'utf8',
   });
 
-const writeFixtureRepo = async fixtureDir => {
+const writeFixtureRepo = async (fixtureDir) => {
   await fs.mkdir(path.join(fixtureDir, 'src'), { recursive: true });
   await fs.mkdir(path.join(fixtureDir, 'test'), { recursive: true });
 
@@ -23,9 +26,21 @@ const writeFixtureRepo = async fixtureDir => {
     JSON.stringify({ name: 'validate-all-targets-fixture', version: '1.0.0' }, null, 2),
     'utf8',
   );
-  await fs.writeFile(path.join(fixtureDir, 'src/right-panel.widget.ts'), 'export const widget = {}\n', 'utf8');
-  await fs.writeFile(path.join(fixtureDir, 'src/app-shell.logic.ts'), 'export const logic = {}\n', 'utf8');
-  await fs.writeFile(path.join(fixtureDir, 'test/unit.spec.ts'), 'export const spec = true\n', 'utf8');
+  await fs.writeFile(
+    path.join(fixtureDir, 'src/right-panel.widget.ts'),
+    'export const widget = {}\n',
+    'utf8',
+  );
+  await fs.writeFile(
+    path.join(fixtureDir, 'src/app-shell.logic.ts'),
+    'export const logic = {}\n',
+    'utf8',
+  );
+  await fs.writeFile(
+    path.join(fixtureDir, 'test/unit.spec.ts'),
+    'export const spec = true\n',
+    'utf8',
+  );
 };
 
 test('validate-all accepts --target and emits naming validator filter metadata', async () => {
@@ -34,7 +49,12 @@ test('validate-all accepts --target and emits naming validator filter metadata',
   try {
     await writeFixtureRepo(fixtureDir);
 
-    const result = runValidateAll(fixtureDir, ['--validators=naming', '--scope=app', '--target', 'src']);
+    const result = runValidateAll(fixtureDir, [
+      '--validators=naming',
+      '--scope=app',
+      '--target',
+      'src',
+    ]);
 
     assert.equal(result.status, 2);
 
@@ -53,7 +73,12 @@ test('validate-all returns deterministic error for nonexistent --target', async 
   try {
     await writeFixtureRepo(fixtureDir);
 
-    const result = runValidateAll(fixtureDir, ['--validators=naming', '--scope=app', '--target', 'does-not-exist']);
+    const result = runValidateAll(fixtureDir, [
+      '--validators=naming',
+      '--scope=app',
+      '--target',
+      'does-not-exist',
+    ]);
 
     assert.equal(result.status, 1);
     assert.match(result.stderr, /Target path does not exist: does-not-exist/u);

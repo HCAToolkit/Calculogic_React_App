@@ -237,7 +237,6 @@ Example:
 - Use `npm run report:verify` after setup changes.
 - Use `npm run report:summarize` for a concise overview of recent captures.
 
-
 ## 9) Report output (JSON)
 
 Canonical report contracts:

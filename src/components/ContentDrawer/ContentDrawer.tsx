@@ -63,7 +63,6 @@ export default function ContentDrawer() {
     return null;
   }
 
-
   if (resolution.type === 'invalid_ref') {
     return (
       // [3.1] cfg-contentDrawer · Container · "Content Drawer Shell"
@@ -77,7 +76,9 @@ export default function ContentDrawer() {
           <div>
             <p className="content-drawer__eyebrow">Content</p>
             <h2 className="content-drawer__title">Bad link / malformed id</h2>
-            <p className="content-drawer__summary">The requested content reference ({resolution.contentId}) is malformed.</p>
+            <p className="content-drawer__summary">
+              The requested content reference ({resolution.contentId}) is malformed.
+            </p>
           </div>
           <button type="button" className="content-drawer__close" onClick={closeContent}>
             Close
@@ -94,7 +95,9 @@ export default function ContentDrawer() {
           <div>
             <p className="content-drawer__eyebrow">Content</p>
             <h2 className="content-drawer__title">Not supported in this drawer yet</h2>
-            <p className="content-drawer__summary">Namespace {resolution.namespace} is not supported in this drawer yet.</p>
+            <p className="content-drawer__summary">
+              Namespace {resolution.namespace} is not supported in this drawer yet.
+            </p>
           </div>
           <button type="button" className="content-drawer__close" onClick={closeContent}>
             Close
@@ -111,7 +114,9 @@ export default function ContentDrawer() {
           <div>
             <p className="content-drawer__eyebrow">Content</p>
             <h2 className="content-drawer__title">Content not found</h2>
-            <p className="content-drawer__summary">The provider could not resolve {resolution.namespace}:{resolution.contentId}.</p>
+            <p className="content-drawer__summary">
+              The provider could not resolve {resolution.namespace}:{resolution.contentId}.
+            </p>
           </div>
           <button type="button" className="content-drawer__close" onClick={closeContent}>
             Close
@@ -149,13 +154,13 @@ export default function ContentDrawer() {
             <div className="content-drawer__section" data-content-anchor="recommended-workflows">
               <h3 className="content-drawer__section-title">Recommended workflows</h3>
               <ul>
-                {doc.recommendedWorkflows.map(item => (
+                {doc.recommendedWorkflows.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
           ) : null}
-          {doc.sections.map(section => {
+          {doc.sections.map((section) => {
             const sectionAnchor = toAnchorId(section.heading);
             return (
               <div
@@ -176,7 +181,7 @@ export default function ContentDrawer() {
             <div className="content-drawer__section" data-content-anchor="related-links">
               <h3 className="content-drawer__section-title">Related content</h3>
               <ul>
-                {doc.links.map(link => (
+                {doc.links.map((link) => (
                   <li key={link.label}>
                     <button
                       type="button"
@@ -208,7 +213,9 @@ export default function ContentDrawer() {
         <div>
           <p className="content-drawer__eyebrow">Content</p>
           <h2 className="content-drawer__title">Not supported in this drawer yet</h2>
-          <p className="content-drawer__summary">Namespace {resolution.namespace} is not supported in this drawer yet.</p>
+          <p className="content-drawer__summary">
+            Namespace {resolution.namespace} is not supported in this drawer yet.
+          </p>
         </div>
         <button type="button" className="content-drawer__close" onClick={closeContent}>
           Close

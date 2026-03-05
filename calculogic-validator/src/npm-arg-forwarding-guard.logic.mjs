@@ -1,4 +1,4 @@
-const parseOriginalArgv = npmConfigArgvJson => {
+const parseOriginalArgv = (npmConfigArgvJson) => {
   if (!npmConfigArgvJson) {
     return null;
   }
@@ -29,9 +29,10 @@ const findFlagTokenIndex = (tokens, supportedFlagNames) => {
   return -1;
 };
 
-const hasForwardedSupportedFlag = (argv, supportedFlagNames) => findFlagTokenIndex(argv, supportedFlagNames) >= 0;
+const hasForwardedSupportedFlag = (argv, supportedFlagNames) =>
+  findFlagTokenIndex(argv, supportedFlagNames) >= 0;
 
-const isTruthyNpmConfig = value => {
+const isTruthyNpmConfig = (value) => {
   if (typeof value !== 'string') {
     return false;
   }
@@ -49,9 +50,9 @@ const getSuspiciousNpmConfigFlags = (env, supportedFlagNames) => {
   }
 
   if (
-    supported.has('validators')
-    && typeof env.npm_config_validators === 'string'
-    && env.npm_config_validators.trim() !== ''
+    supported.has('validators') &&
+    typeof env.npm_config_validators === 'string' &&
+    env.npm_config_validators.trim() !== ''
   ) {
     const validatorsValue = env.npm_config_validators.trim();
     if (/(^|,)\s*naming\s*(,|$)/iu.test(validatorsValue) || validatorsValue.includes(',')) {
@@ -59,11 +60,19 @@ const getSuspiciousNpmConfigFlags = (env, supportedFlagNames) => {
     }
   }
 
-  if (supported.has('target') && typeof env.npm_config_target === 'string' && env.npm_config_target.trim() !== '') {
+  if (
+    supported.has('target') &&
+    typeof env.npm_config_target === 'string' &&
+    env.npm_config_target.trim() !== ''
+  ) {
     detected.push('target');
   }
 
-  if (supported.has('config') && typeof env.npm_config_config === 'string' && env.npm_config_config.trim() !== '') {
+  if (
+    supported.has('config') &&
+    typeof env.npm_config_config === 'string' &&
+    env.npm_config_config.trim() !== ''
+  ) {
     detected.push('config');
   }
 
@@ -71,12 +80,12 @@ const getSuspiciousNpmConfigFlags = (env, supportedFlagNames) => {
     detected.push('strict');
   }
 
-  return DETECTION_ORDER.filter(flagName => detected.includes(flagName));
+  return DETECTION_ORDER.filter((flagName) => detected.includes(flagName));
 };
 
 const buildFallbackMessage = (scriptName, detectedFlags) => {
   const sampleFlag = detectedFlags[0] ?? 'scope';
-  const detectedSummary = detectedFlags.map(flagName => `--${flagName}`).join(', ');
+  const detectedSummary = detectedFlags.map((flagName) => `--${flagName}`).join(', ');
 
   return [
     'Detected npm argument forwarding issue: you passed validator flags to npm instead of the script. Use: npm run <script> -- <args>',

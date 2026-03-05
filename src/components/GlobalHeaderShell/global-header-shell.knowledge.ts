@@ -102,7 +102,8 @@ export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
     style: {
       id: 'style',
       label: 'Style',
-      description: 'Configure layout-affecting style for Build outputs (grouping, alignment, sizing).',
+      description:
+        'Configure layout-affecting style for Build outputs (grouping, alignment, sizing).',
       docId: HEADER_DOC_IDS.build,
       hoverSummary: 'Style the structural outputs without mutating the canonical container tree.',
     },
@@ -118,7 +119,8 @@ export const HEADER_MODE_DEFINITIONS: HeaderModeCatalog = {
     style: {
       id: 'style',
       label: 'Style',
-      description: 'Configure layout-affecting style for Results outputs (cards, grouping, highlight rules).',
+      description:
+        'Configure layout-affecting style for Results outputs (cards, grouping, highlight rules).',
       docId: HEADER_DOC_IDS.results,
       hoverSummary: 'Adjust the presentation for results without redefining calculations.',
     },
@@ -171,4 +173,3 @@ export const BRAND_TOOLTIP = 'Return to Calculogic home / dashboard.';
 // Concern: Knowledge · Catalog: content.copy
 // Notes: Publish CTA text consumed by build concern.
 export const PUBLISH_LABEL = 'Publish';
-

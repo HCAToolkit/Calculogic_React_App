@@ -116,18 +116,20 @@ export function serializeSectionStatePayload(
 function isVersionedSectionStatePayload(value: unknown): value is VersionedSectionStatePayload {
   const parsed = value as Partial<VersionedSectionStatePayload>;
   return (
-    parsed?.version === BUILD_SURFACE_PERSISTENCE_VERSION
-    && isFiniteNumber(parsed.height)
-    && typeof parsed.collapsed === 'boolean'
+    parsed?.version === BUILD_SURFACE_PERSISTENCE_VERSION &&
+    isFiniteNumber(parsed.height) &&
+    typeof parsed.collapsed === 'boolean'
   );
 }
 
-function isLegacySectionStatePayload(value: unknown): value is Omit<VersionedSectionStatePayload, 'version'> {
+function isLegacySectionStatePayload(
+  value: unknown,
+): value is Omit<VersionedSectionStatePayload, 'version'> {
   const parsed = value as Partial<VersionedSectionStatePayload>;
   return (
-    parsed?.version === undefined
-    && isFiniteNumber(parsed.height)
-    && typeof parsed.collapsed === 'boolean'
+    parsed?.version === undefined &&
+    isFiniteNumber(parsed.height) &&
+    typeof parsed.collapsed === 'boolean'
   );
 }
 
@@ -155,12 +157,14 @@ export function serializeRightPanelStatePayload(
   };
 }
 
-function isVersionedRightPanelStatePayload(value: unknown): value is VersionedRightPanelStatePayload {
+function isVersionedRightPanelStatePayload(
+  value: unknown,
+): value is VersionedRightPanelStatePayload {
   const parsed = value as Partial<VersionedRightPanelStatePayload>;
   return (
-    parsed?.version === BUILD_SURFACE_PERSISTENCE_VERSION
-    && isFiniteNumber(parsed.width)
-    && typeof parsed.collapsed === 'boolean'
+    parsed?.version === BUILD_SURFACE_PERSISTENCE_VERSION &&
+    isFiniteNumber(parsed.width) &&
+    typeof parsed.collapsed === 'boolean'
   );
 }
 
@@ -169,9 +173,9 @@ function isLegacyRightPanelStatePayload(
 ): value is Omit<VersionedRightPanelStatePayload, 'version'> {
   const parsed = value as Partial<VersionedRightPanelStatePayload>;
   return (
-    parsed?.version === undefined
-    && isFiniteNumber(parsed.width)
-    && typeof parsed.collapsed === 'boolean'
+    parsed?.version === undefined &&
+    isFiniteNumber(parsed.width) &&
+    typeof parsed.collapsed === 'boolean'
   );
 }
 

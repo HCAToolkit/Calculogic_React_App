@@ -3,6 +3,7 @@
 This summary applies CCPP, CCS, General NL Skeletons, and NL-First Workflow to doc-engine work in the Interface repository.
 
 ## CCPP requirements (mandatory)
+
 1. Every TS/TSX/CSS concern file includes a file header with:
    - Concern label
    - Source NL path
@@ -13,6 +14,7 @@ This summary applies CCPP, CCS, General NL Skeletons, and NL-First Workflow to d
 5. Provenance blocks are required when external references influence implementation decisions.
 
 ## CCS requirements (mandatory)
+
 - Build: drawer shell structure and anchors
 - BuildStyle: drawer visual layer
 - Logic: provider registry, resolver orchestration, open/close state
@@ -20,11 +22,13 @@ This summary applies CCPP, CCS, General NL Skeletons, and NL-First Workflow to d
 - Results: diagnostics panels, instrumentation readouts
 
 ## General NL Skeleton requirements
+
 - A dedicated NL config must exist for each doc-engine config before structural implementation.
 - NL hierarchy should be mirrored in code comments.
 - New structural primitives must be added to NL first.
 
 ## NL-First workflow requirements
+
 1. Draft/update NL skeleton.
 2. Implement/adjust concern files.
 3. Mirror NL numbering in CCPP comments.

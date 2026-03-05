@@ -4,6 +4,7 @@ Date: 2026-02-10
 Scope: recently changed configurations/shells identified from git history and mapped to current project paths.
 
 ## Inputs reviewed
+
 - `calculogic-validator/doc/ConventionRoutines/CCS.md`
 - `calculogic-validator/doc/ConventionRoutines/CCPP.md`
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
@@ -15,6 +16,7 @@ Scope: recently changed configurations/shells identified from git history and ma
 - Related concern files under `src/`
 
 ## Changed configurations/shells identified
+
 1. `cfg-appFrame`
 2. `cfg-buildSurface`
 3. `shell-globalHeader`
@@ -25,6 +27,7 @@ Scope: recently changed configurations/shells identified from git history and ma
 ## 1) cfg-appFrame
 
 ### Violations found
+
 - **Build (NL → Code numbering mismatch)**
   - File: `src/App.tsx`
   - NL sections affected: `[3.1.1]`, `[3.3.1]`, `[3.3.2]`
@@ -47,6 +50,7 @@ Scope: recently changed configurations/shells identified from git history and ma
   - Code comments use flattened numbering and do not mirror NL atomic ids.
 
 ### Minimal fix required
+
 1. Update `doc/nl-config/cfg-appFrame.md` only if contracts are intentionally changed.
 2. Add `src/App.knowledge.ts` for toggle copy/icon descriptors.
 3. Update `src/App.tsx` to import Knowledge constants and add `aria-pressed` on toggle.
@@ -57,6 +61,7 @@ Scope: recently changed configurations/shells identified from git history and ma
 ## 2) cfg-buildSurface
 
 ### Violations found
+
 - **Build (NL → Code missing declared subcontainer)**
   - File: `src/tabs/build/BuildSurface.build.tsx`
   - NL section affected: `[3.2.2] Header Chrome`
@@ -71,6 +76,7 @@ Scope: recently changed configurations/shells identified from git history and ma
   - Section labels/aria labels/placeholders are in Logic/Build inline strings instead of Knowledge module.
 
 ### Minimal fix required
+
 1. Update `doc/nl-config/cfg-buildSurface.md` first if Header Chrome is intentionally deferred/removed.
 2. Either:
    - implement `[3.2.2] Header Chrome` in Build and keep matching BuildStyle selectors, or
@@ -83,6 +89,7 @@ Scope: recently changed configurations/shells identified from git history and ma
 ## 3) shell-globalHeader
 
 ### Violations found
+
 - **Build (Code → NL drift)**
   - File: `src/components/GlobalHeaderShell/GlobalHeaderShell.build.tsx`
   - NL sections affected: `3.x`
@@ -105,6 +112,7 @@ Scope: recently changed configurations/shells identified from git history and ma
   - Code defines an additional `[8.2] Live Region Anchor` not represented in NL.
 
 ### Minimal fix required
+
 1. Update `doc/nl-shell/shell-globalHeader.md` first to include mode menus, doc resolution state, and live region style primitive.
 2. Keep concern purity by ensuring new knowledge/data structures remain in Knowledge and only consumed by Build/Logic.
 3. Align CCPP atomic numbering in all concern files to updated NL numbering.
@@ -114,6 +122,7 @@ Scope: recently changed configurations/shells identified from git history and ma
 ## 4) shell-spaHost
 
 ### Violations found
+
 - **CCPP file-header format violation**
   - Files: `src/main.tsx`, `src/index.css`
   - Current headers use abbreviated `CCPP:` style, not required file-header fields from CCPP.
@@ -124,6 +133,7 @@ Scope: recently changed configurations/shells identified from git history and ma
   - NL references `src/shells/spaHost/...`; implementation currently uses `src/main.tsx` + `src/index.css`.
 
 ### Minimal fix required
+
 1. Update `doc/nl-shell/shell-spaHost.md` assembly section to actual paths (or move files to NL paths).
 2. Rewrite `src/main.tsx` and `src/index.css` comment headers/sections/atomics to full CCPP format.
 3. Preserve shell purity (Build mount primitive only; BuildStyle global resets only).
@@ -133,18 +143,21 @@ Scope: recently changed configurations/shells identified from git history and ma
 ## Single Alignment PR change set (order enforced)
 
 ### Step A — NL-first updates
+
 1. Update `doc/nl-config/cfg-appFrame.md` (knowledge extraction + exact numbering expectations).
 2. Update `doc/nl-config/cfg-buildSurface.md` (header chrome presence decision + BuildStyle attachments).
 3. Update `doc/nl-shell/shell-globalHeader.md` (mode menu, doc state/resolution, live-region styling primitives).
 4. Update `doc/nl-shell/shell-spaHost.md` (actual assembly paths and comment expectations).
 
 ### Step B — Concern file alignment
+
 1. `cfg-appFrame`: `src/App.tsx`, `src/App.logic.ts`, `src/App.css`, add `src/App.knowledge.ts`.
 2. `cfg-buildSurface`: `src/tabs/build/BuildSurface.build.tsx`, `src/tabs/build/BuildSurface.view.css`, `src/tabs/build/BuildSurface.logic.ts`, `src/tabs/build/anchors.ts` (or new knowledge file).
 3. `shell-globalHeader`: all concern files under `src/components/GlobalHeaderShell/`.
 4. `shell-spaHost`: `src/main.tsx`, `src/index.css` (or move to shell path and update imports).
 
 ### Step C — Verification gates
+
 - NL → Code section-by-section parity check.
 - Code → NL drift check (no undeclared atoms).
 - CCS dependency/purity check (Build anchors as attach sources; no upward concern dependencies).

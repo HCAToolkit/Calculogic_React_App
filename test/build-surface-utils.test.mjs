@@ -6,9 +6,7 @@ import {
   readBuildSurfaceStorage,
   writeBuildSurfaceStorage,
 } from '../src/tabs/build/buildSurfacePersistence.ts';
-import {
-  clamp,
-} from '../src/tabs/build/build-surface.logic.ts';
+import { clamp } from '../src/tabs/build/build-surface.logic.ts';
 import {
   parseRightPanelStatePayload,
   parseSectionStatePayload,
@@ -31,7 +29,7 @@ test('readBuildSurfaceStorage falls back and reports on read failure', () => {
       throw new Error('localStorage unavailable');
     },
     fallback,
-    failure => reports.push(failure)
+    (failure) => reports.push(failure),
   );
 
   assert.deepEqual(result, fallback);
@@ -50,7 +48,7 @@ test('writeBuildSurfaceStorage reports on write failure without throwing', () =>
       () => {
         throw new Error('quota exceeded');
       },
-      failure => reports.push(failure)
+      (failure) => reports.push(failure),
     );
   });
 
@@ -59,7 +57,6 @@ test('writeBuildSurfaceStorage reports on write failure without throwing', () =>
   assert.equal(reports[0].storageKey, 'left-panel-width');
   assert.match(String(reports[0].error), /quota exceeded/);
 });
-
 
 test('parseSectionStatePayload falls back to versioned defaults on malformed payload', () => {
   const fallback = { height: 180, collapsed: false };
@@ -77,8 +74,6 @@ test('parseSectionStatePayload falls back to versioned defaults on malformed pay
     reason: 'Malformed persisted section state payload: invalid-shape',
   });
 });
-
-
 
 test('parseSectionStatePayload handles malformed JSON syntax via non-fatal fallback metadata', () => {
   const fallback = { height: 180, collapsed: false };
@@ -115,11 +110,12 @@ test('parseRightPanelStatePayload upgrades legacy payloads without version', () 
   });
 });
 
-
-
 test('parseRightPanelStatePayload resets unsupported versions with diagnosable reason', () => {
   const fallback = { width: 320, collapsed: false };
-  const parsed = parseRightPanelStatePayload('{"version":2,"width":500,"collapsed":false}', fallback);
+  const parsed = parseRightPanelStatePayload(
+    '{"version":2,"width":500,"collapsed":false}',
+    fallback,
+  );
 
   assert.deepEqual(parsed, {
     state: {

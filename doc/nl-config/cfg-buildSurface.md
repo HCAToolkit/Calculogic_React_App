@@ -3,6 +3,7 @@
 This document is an instance of the Configuration-Level NL Skeleton defined in ../ConventionRoutines/General-NL-Skeletons.md.
 
 ## Transition Migration Status (Build Surface NL Split)
+
 - **NL Migration Mode:** `hybrid-forwarding`
 - **State:** Planned / transition-ready scaffolding active.
 - **Current canonical_source:** This monolithic `cfg-buildSurface.md` document remains the authoritative NL reference until split migration slices are explicitly repointed.
@@ -11,16 +12,17 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 - **Mode meaning:** `hybrid-forwarding` means this monolith remains the `canonical_source` for current content while also serving as a transition wrapper/index for planned `canonical_target` entries.
 
 ## Canonical Split NL Targets (Planned / In-Progress)
+
 > Placeholder index for semantic split targets. Entries remain non-`canonical_source` until explicitly marked repointed.
 > Naming note: placeholder row filenames below are illustrative semantic examples only (planning vocabulary), not final segment-style commitments.
 > Provisional pattern note: `cfg-buildSurface-<semantic-slice>.md` is a shape-level placeholder (semantic-first, low-churn). Exact segment style remains subject to convention/policy authority before the first repointed slice (`calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`, `doc/ConventionRoutines/NL-SplitMigrationAndNumberingPolicy.md`).
 > Binding-level note: **Binding Level** classifies row authoritativeness (`placeholder`/`planned`/`provisional`/`canonical`/`retired`) and is separate from migration lifecycle status.
 
-| Target NL Doc (planned) | Scope Intent | Migration status | Binding Level | Notes |
-|---|---|---|---|---|
-| `doc/nl-config/cfg-buildSurface-layoutAndAnchors.md` | Build/BuildStyle layout anchors and panel topology | planned | placeholder | Placeholder only in this pass |
-| `doc/nl-config/cfg-buildSurface-panelStateAndPersistence.md` | Logic + Knowledge for resize/collapse persistence | planned | placeholder | Placeholder only in this pass |
-| `doc/nl-config/cfg-buildSurface-previewAndInspectorFlows.md` | Preview controls + inspector behavioral workflows | planned | placeholder | Placeholder only in this pass |
+| Target NL Doc (planned)                                      | Scope Intent                                       | Migration status | Binding Level | Notes                         |
+| ------------------------------------------------------------ | -------------------------------------------------- | ---------------- | ------------- | ----------------------------- |
+| `doc/nl-config/cfg-buildSurface-layoutAndAnchors.md`         | Build/BuildStyle layout anchors and panel topology | planned          | placeholder   | Placeholder only in this pass |
+| `doc/nl-config/cfg-buildSurface-panelStateAndPersistence.md` | Logic + Knowledge for resize/collapse persistence  | planned          | placeholder   | Placeholder only in this pass |
+| `doc/nl-config/cfg-buildSurface-previewAndInspectorFlows.md` | Preview controls + inspector behavioral workflows  | planned          | placeholder   | Placeholder only in this pass |
 
 ## Legacy-to-Canonical Mapping Scaffold
 
@@ -29,14 +31,15 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 > Placeholder target labels in this table are planning scaffolds only and should be finalized per convention/policy authority before repointed status is claimed; they follow the same temporary, non-authoritative guidance class as the `canonical_target` placeholder examples above.
 > Migration lifecycle status and binding level are intentionally tracked as separate dimensions in this scaffold.
 
-| Legacy section(s) in `cfg-buildSurface.md` | Canonical split target | Migration status (`planned`/`in-progress`/`repointed`/`retired`) | Binding Level | Provenance / continuity notes |
-|---|---|---|---|---|
-| `3.x` (Build concern) | `TBD semantic split doc` | planned | placeholder | Preserve direct traceability to existing `[3.*]` atoms |
-| `4.x` (BuildStyle concern) | `TBD semantic split doc` | planned | placeholder | Keep selector/anchor provenance tied to migrated Build slices |
-| `5.x–6.x` (Logic + Knowledge) | `TBD semantic split doc` | planned | placeholder | Keep persistence parser/version history references intact |
-| `7.x–8.x` (Results + ResultsStyle) | `TBD semantic split doc` | planned | placeholder | Repoint only when output contracts are fully documented |
+| Legacy section(s) in `cfg-buildSurface.md` | Canonical split target   | Migration status (`planned`/`in-progress`/`repointed`/`retired`) | Binding Level | Provenance / continuity notes                                 |
+| ------------------------------------------ | ------------------------ | ---------------------------------------------------------------- | ------------- | ------------------------------------------------------------- |
+| `3.x` (Build concern)                      | `TBD semantic split doc` | planned                                                          | placeholder   | Preserve direct traceability to existing `[3.*]` atoms        |
+| `4.x` (BuildStyle concern)                 | `TBD semantic split doc` | planned                                                          | placeholder   | Keep selector/anchor provenance tied to migrated Build slices |
+| `5.x–6.x` (Logic + Knowledge)              | `TBD semantic split doc` | planned                                                          | placeholder   | Keep persistence parser/version history references intact     |
+| `7.x–8.x` (Results + ResultsStyle)         | `TBD semantic split doc` | planned                                                          | placeholder   | Repoint only when output contracts are fully documented       |
 
 ## Monolith Behavior During Migration
+
 - This document currently acts as both:
   - the **temporary source of truth** for Build Surface NL content, and
   - a **transition wrapper/index** for upcoming semantic split `canonical_target` NL docs.
@@ -44,22 +47,29 @@ This document is an instance of the Configuration-Level NL Skeleton defined in .
 - Retirement rule: this monolith should be retired only after all mapped slices are repointed with explicit provenance continuity and no unresolved placeholders remain.
 
 ## 1. Purpose and Scope
+
 ### 1.1 Purpose
+
 Present the Calculogic Build tab surface, including navigation chrome, the catalog of configuration panels, the preview canvas, and the inspector column.
 
 ### 1.2 Context
+
 Mounted within cfg-appFrame and displayed when the Build tab is active inside shell-globalHeader navigation.
 
 ### 1.3 Interactions
+
 Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-spaHost for layout sizing, and consumes bindings from its Logic concern for interactive affordances.
 
 ## 2. Configuration Contracts
+
 ### 2.1 TypeScript Interfaces
+
 - `BuildSurfaceProps` – Props for initial section ordering, persisted dimensions, and injection points for nested configs.
 - `SectionBinding` – Contract describing collapse, grip, and content anchors for each catalog section.
 - `BuildSurfaceBindings` – Aggregate binding object returned by Logic for Build to consume.
 
 ### 2.2 Data & State Requirements
+
 - Local state: Panel widths/heights, collapse states per section, hover/focus state for grips.
 - Global context: Theme tokens inherited from cfg-appFrame; routing context determines active tab.
 - External data sources: `localStorage` for persistence of dimensions and collapse preferences.
@@ -68,17 +78,21 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
 - Left panel width intentionally remains the legacy primitive numeric string contract (`"<width>"`) to avoid unnecessary migration churn for a single scalar value; migrate to versioned JSON only when left-panel persistence needs additional fields/metadata.
 
 ### 2.3 Dependencies
+
 - UI libs: React, including `useState`, `useEffect`, and refs for DOM measurements.
 - Routing: shell-globalHeader tab state (read-only).
 - Shared hooks / utilities: `src/shared/interaction/usePointerDrag.ts` for pointer drag lifecycle + capture and `src/shared/interaction/pointerDrag.ts` clamp helpers for panel bounds.
 
 ## 3. Build Concern (Structure)
+
 ### 3.0 Dependencies & Hierarchy Notes
+
 - Requires anchors from cfg-appFrame for outer shell mounting.
 - Owns all `builder-*` anchors consumed by downstream concerns.
 - Reading / implementation guide: Implement Build first, then BuildStyle, Logic, Knowledge, Results, and ResultsStyle in numeric order to maintain anchor fidelity.
 
 ### 3.1 Atomic Components — Containers (Build)
+
 - **[3.1.1] Container – "Build Tab Forwarder"**
   - Catalog base: layout.shell
   - Responsibility: Barrel export that keeps `src/tabs/BuildTab.tsx` stable while delegating to the build folder.
@@ -88,6 +102,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Children: `[3.2.1] Build Surface Composer`, `[3.2.2] Header Chrome`, `[3.2.3] Catalog Column`, `[3.2.4] Preview Stage`, `[3.2.5] Inspector Column`.
 
 ### 3.2 Atomic Components — Subcontainers (Build)
+
 - **[3.2.1] Subcontainer – "Build Surface Composer"**
   - Location: src/tabs/build/index.tsx
   - Purpose: Default export binding Logic to Build surface view.
@@ -108,6 +123,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Purpose: Collapsible panel shell repeated for each catalog section.
 
 ### 3.3 Atomic Components — Primitives (Build)
+
 - **[3.3.1] Primitive – "Chevron Left Icon"**
   - Catalog base: ui.icon
   - File: src/tabs/build/BuildSurface.build.tsx (left collapse icon).
@@ -137,11 +153,14 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Provides preview-only viewport presets (`mobile` / `tablet` / `desktop`) for deterministic center-canvas sizing.
 
 ## 4. BuildStyle Concern (Visual Styling of Structure)
+
 ### 4.0 Dependencies
+
 - Consumes project tokens for colors, typography, spacing, and border radii.
 - Implemented in CSS or CSS-Module files that target anchors emitted by the Build concern.
 
 ### 4.1 Atomic Components — Containers / Groups (BuildStyle)
+
 - **[4.1.1] Container – "Surface Chrome Styling"**
   - Selector: `[data-anchor="builder-root"]`
   - Layout: Column flex with full-height shell.
@@ -156,6 +175,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Layout: Right column with stacked utilities.
 
 ### 4.2 Atomic Components — Primitives (BuildStyle)
+
 - **[4.2.1] Primitive – "Root Surface"**
   - Applies base background, typography, and gap rules.
 - **[4.2.2] Primitive – "Header Bar"**
@@ -196,20 +216,25 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - `body.dark` selectors align left panel, preview stage, inspector, and grip tones for coherent host-surface theming.
 
 ### 4.3 Responsive Rules
+
 - At min-width 1440px widen left/right panels and clamp preview canvas for readability.
 - At max-width 960px collapse inspector column by default while keeping anchors present.
 
 ### 4.4 Interaction Styles
+
 - Hover/focus states for grips reuse `[4.2.15]` pseudo-elements and include `touch-action: none` so touch drags do not scroll the page.
 - Tabs and buttons use focus outlines sourced from Knowledge-defined tokens.
 
 ## 5. Logic Concern (Workflow)
+
 ### 5.0 Dependencies
+
 - Relies on browser pointer and keyboard events for resizing.
 - Uses `localStorage` to persist panel states.
 - Uses shared payload parser/serializer helpers from `buildSurfacePersistence.contracts.ts` so section/right-panel keys enforce a stable versioned schema while left-panel width stays primitive.
 
 ### 5.1 Atomic Components — Containers (Logic)
+
 - **[5.1.1] Container – "Section Contracts"**
   - Defines section order constants, types, and helper utilities.
 - **[5.1.2] Container – "Section Logic Hook"**
@@ -222,6 +247,7 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - `useBuildSurfaceLogic` aggregator returning `BuildSurfaceBindings`.
 
 ### 5.2 Atomic Components — Primitives (Logic)
+
 - **[5.2.1] Primitive – "Clamp Utility"**
   - Helper ensuring panel sizes stay within min/max bounds and exported for boundary-value unit tests.
 - **[5.2.2] Primitive – "Keyboard Resize Handler"**
@@ -246,22 +272,28 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Tracks selected preview breakpoint and exposes the active preview width variant to Build bindings.
 
 ### 5.2.3 Derived Values
+
 - Derived booleans for collapsed states, computed widths/heights.
 
 ### 5.2.4 Side Effects
+
 - Pointer capture lifecycle inside `usePointerDrag`, including unmount cleanup and temporary `document.body.style.userSelect` suppression during active drag.
 - `localStorage` updates triggered by state changes.
 
 ### 5.2.5 Workflows
+
 - Resize workflow: Grip `onPointerDown` (touch-action disabled on handle) → `[5.2.3]` computes deltas and updates dimensions → `[5.2.4]` persists values → Build re-renders with new sizes.
 - Collapse workflow: Toggle click → Section state updates → `[5.2.5]` memo recalculates bindings for Build.
 
 ## 6. Knowledge Concern (Reference Data)
+
 ### 6.1 Maps / Dictionaries
+
 - **[6.1.1] Primitive – "Anchor Registry"**
   - `BUILD_ANCHORS` map exposing anchor factories for reuse across concerns.
 
 ### 6.2 Constants
+
 - **[6.2.1] Primitive – "Section Labels"**
   - Display strings for catalog section headers.
 - **[6.2.2] Primitive – "Grip Aria Labels"**
@@ -270,42 +302,53 @@ Coordinates with shell-globalHeader for tab selection, exposes anchors to shell-
   - Text for preview and inspector placeholder panels.
 
 ### 6.3 Shared / Global Reference
+
 - Provides canonical anchor string literals for use by other configurations.
 
 ## 7. Results Concern (Outputs)
+
 ### 7.0 Absence-State Vocabulary (v1)
+
 Absence-state labels distinguish intentional omission from planned future additions so reserved Results/ResultsStyle sections remain deterministic during incremental implementation.
 
-| Absence State | Meaning | Intent Type | Current Omission Expected? |
-|---|---|---|---|
-| `absent-by-design` | Intentionally not present in the current scope/design. | Intentional omission. | Yes — not an error/oversight. |
-| `deferred-planned` | Not present yet, but planned for a future iteration. | Planned future work. | Yes — pending a later pass. |
-| `not-applicable` | Concept/category does not apply to this artifact/section in its current form. | Non-applicable. | Yes — omission is structurally correct. |
-| `future-slot-reserved` | Section/slot intentionally reserved for structural continuity and provenance; content is expected later when triggering conditions exist. | Intentional structural reservation for future activation. | Yes — placeholder is deliberate. |
+| Absence State          | Meaning                                                                                                                                   | Intent Type                                               | Current Omission Expected?              |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------- |
+| `absent-by-design`     | Intentionally not present in the current scope/design.                                                                                    | Intentional omission.                                     | Yes — not an error/oversight.           |
+| `deferred-planned`     | Not present yet, but planned for a future iteration.                                                                                      | Planned future work.                                      | Yes — pending a later pass.             |
+| `not-applicable`       | Concept/category does not apply to this artifact/section in its current form.                                                             | Non-applicable.                                           | Yes — omission is structurally correct. |
+| `future-slot-reserved` | Section/slot intentionally reserved for structural continuity and provenance; content is expected later when triggering conditions exist. | Intentional structural reservation for future activation. | Yes — placeholder is deliberate.        |
 
 ### 7.1 User-Facing Outputs
+
 - Absence State: `absent-by-design`.
 - Build surface currently focuses on structure and interaction rather than user-facing result outputs.
 
 ### 7.2 Dev / Debug Outputs
+
 - Absence State: `deferred-planned`.
 - Optional debug panel for anchor inspection is planned for a future iteration.
 
 ### 7.3 Accessibility Outputs
+
 - Absence State: `future-slot-reserved`.
 - Live-region hooks will surface here when the builder emits status messages that require announcements.
 
 ## 8. ResultsStyle Concern (Output Styling)
+
 ### 8.1 Results Layout Styles
+
 - Absence State: `future-slot-reserved`.
 - Results layout styles are intentionally reserved and will be added when Results outputs exist.
 
 ### 8.2 Debug Display Styles
+
 - Absence State: `deferred-planned`.
 - Debug display styles are planned for the same future iteration as Results debug outputs.
 
 ## 9. Assembly Pattern
+
 ### 9.1 File Structure
+
 - src/tabs/build/BuildSurface.build.tsx
 - src/tabs/build/BuildSurface.build.module.css
 - src/tabs/build/BuildSurface.logic.ts
@@ -316,13 +359,17 @@ Absence-state labels distinguish intentional omission from planned future additi
 - src/tabs/build/index.ts
 
 ### 9.2 Assembly Logic
+
 - `src/tabs/build/index.tsx` composes Build with Logic bindings, imports BuildStyle CSS modules for side effects, and re-exports the assembled component.
 
 ### 9.3 Integration
+
 - Imported by cfg-appFrame via its `[3.3.2]` Build Tab Mount primitive and swapped by shell-globalHeader navigation.
 
 ## 10. Implementation Passes
+
 ### 10.1 Pass Mapping
+
 - Pass 0: Author NL skeleton and establish anchor registry in Knowledge.
 - Pass 1: Implement Build containers and primitives.
 - Pass 2: Implement BuildStyle styling groups.
@@ -331,6 +378,7 @@ Absence-state labels distinguish intentional omission from planned future additi
 - Pass 5+: Add Results/ResultsStyle (`deferred-planned`) when builder emits analytics or summaries.
 
 ### 10.2 Export Checklist
+
 - All Build anchors match Knowledge registry.
 - BuildStyle selectors reference anchors without introducing structure.
 - Logic handlers clean up pointer listeners and persist state safely.

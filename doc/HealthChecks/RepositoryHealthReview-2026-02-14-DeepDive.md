@@ -1,6 +1,7 @@
 # Repository Health Review — 2026-02-14 (Deep Dive)
 
 ## Scope and method
+
 - Reviewed repository-level setup and conventions: `README.md`, `doc/README.md`, `package.json`, and convention routine docs under `doc/ConventionRoutines/`.
 - Sampled representative runtime modules across shell composition, header shell, build surface, content drawer state/rendering, and doc-engine resolver/provider layers.
 - Reviewed current tests in `test/` and validated runtime health with `npm test`, `npm run lint`, and `npm run build`.
@@ -10,6 +11,7 @@
 ## 1) Architecture map
 
 ### Major subsystems and responsibilities
+
 1. **SPA host + app frame composition**
    - Files: `src/main.tsx`, `src/App.tsx`, `src/App.logic.ts`
    - Responsibilities: root mount, app-level composition, dark mode preference state.
@@ -27,9 +29,11 @@
    - Responsibilities: namespace parsing, provider resolution, docs catalog lookup, and UI-facing adapter narrowing.
 
 ### Data/control flow
+
 `src/main.tsx` mounts `<App />` → `src/App.tsx` provides `ContentProvider` + shell components → header shell logic opens/closes drawer via context API → content drawer requests payload through `resolveDrawerContent` → adapter delegates to singleton provider registry backed by docs provider/catalog.
 
 ### Key architecture observations (9)
+
 1. Concern layering is explicit and generally consistent (Build/Logic/Knowledge/Results files are clearly separated by naming and comments).
 2. Dependency direction is mostly healthy: UI components consume logic hooks and knowledge catalogs; resolver logic stays behind adapters.
 3. `BuildSurface.logic.ts` is currently the largest concentration of mutable UI mechanics (section resize + side panel resize + persistence), creating a practical “god module” risk.
@@ -45,6 +49,7 @@
 ## 2) Code health assessment
 
 ### Naming, cohesion, coupling, layering
+
 - **Naming quality:** generally good and domain-aligned (`useGlobalHeaderShellLogic`, `ContentProviderRegistry`, `resolveDrawerContent`, `toAnchorId`).
 - **Cohesion issues:**
   - `useBuildSurfaceLogic` concern file aggregates several independent responsibilities and would benefit from extraction into per-domain hooks.
@@ -55,6 +60,7 @@
 - **Layering quality:** conventions are followed, but long concern files blur boundaries and make the layering harder to reason about during edits.
 
 ### Code smell findings
+
 1. Large hook file with repeated patterns (`BuildSurface.logic.ts`) rather than composable hook units.
 2. Repeated listener registration/removal blocks with cast-heavy event typing (`as unknown as EventListener`).
 3. Repeated localStorage parse/validate/fallback snippets across section and panel states.
@@ -67,6 +73,7 @@
 ## 3) Stability & correctness risk scan
 
 ### Highest-risk hotspots
+
 1. **Global event listener lifecycle fragility (High)**
    - Where: `useSectionLogic`, `useLeftPanelLogic`, `useRightPanelLogic` in `src/tabs/build/BuildSurface.logic.ts`.
    - Risk: subtle leaks or stuck dragging states if future edits miss one remove path.
@@ -78,14 +85,17 @@
    - Risk: regression-prone when extending new content namespaces/types.
 
 ### Boundary handling notes
+
 - Positive: storage reads validate numeric/boolean fields before accepting persisted data.
 - Positive: `splitNamespace` enforces namespaced IDs and returns deterministic not_found results when invalid.
 - Gap: a few internals depend on window/document assumptions and are only partially guarded (breakpoint logic is SSR-aware; build surface interactions are browser-only but not explicitly isolated).
 
 ### Silent failure patterns
+
 - Local storage errors are routed through reporter hooks, which is better than catch-and-ignore, but there is no user-facing degradation strategy beyond fallback values.
 
 ### TODO/FIXME scan
+
 - No active `TODO`/`FIXME` hotspots were found in sampled runtime files; debt is structural rather than explicitly tracked.
 
 ---
@@ -93,6 +103,7 @@
 ## 4) Test strategy and coverage gaps
 
 ### Current test footprint
+
 - Existing unit tests cover:
   - `clamp` and storage helper reporting (`test/build-surface-utils.test.mjs`)
   - namespace parsing and provider registry behavior (`test/content-provider-registry.test.mjs`)
@@ -103,6 +114,7 @@
   - Drag lifecycle cleanup behavior and keyboard resize semantics.
 
 ### Prioritized test backlog (12 items)
+
 1. **P0 unit:** `resolveDrawerContent` returns `null` for unsupported namespace and preserves discriminants for docs.
 2. **P0 integration (component):** `ContentDrawer` renders “not found” path for missing docs IDs.
 3. **P0 integration (component):** `ContentDrawer` renders sections/workflows/links for valid docs payload.
@@ -121,11 +133,13 @@
 ## 5) Documentation & developer experience
 
 ### What works
+
 - Top-level `README.md` contains clear setup/scripts and architectural intent.
 - `package.json` scripts are straightforward and healthy (dev/build/lint/test).
 - Convention routine docs are present and explicit.
 
 ### Gaps and friction
+
 1. `doc/README.md` links multiple doc-engine directories without declaring canonical ownership.
 2. No single testing strategy doc maps high-risk modules to expected test types.
 3. No ADR index capturing architecture decisions already encoded in comments/conventions.
@@ -136,6 +150,7 @@
 ## 6) Refactoring opportunities (incremental, low-churn)
 
 ### Refactor A — Extract build-surface drag mechanics into reusable helper hooks
+
 - **Impact:** reduces duplication and listener lifecycle risk.
 - **Risk:** Medium.
 - **Effort:** 1–2 days.
@@ -145,6 +160,7 @@
   3. Migrate section/right panel hooks after tests pass.
 
 ### Refactor B — Normalize drawer view model at adapter boundary
+
 - **Impact:** decouples `ContentDrawer.tsx` from provider internals and simplifies rendering branches.
 - **Risk:** Low/Medium.
 - **Effort:** 1 day.
@@ -154,21 +170,27 @@
   3. Update `ContentDrawer.tsx` to render against VM only.
 
 #### Before API sketch
+
 ```ts
-export function resolveDrawerContent(contentId: string, anchorId?: string): DrawerContentResolution | null
+export function resolveDrawerContent(
+  contentId: string,
+  anchorId?: string,
+): DrawerContentResolution | null;
 ```
 
 #### After API sketch
+
 ```ts
 type DrawerViewModel =
   | { kind: 'hidden' }
   | { kind: 'not_found'; label: string; reason: string }
   | { kind: 'doc'; doc: HeaderDocDefinition; anchorId?: string };
 
-export function resolveDrawerViewModel(contentId: string, anchorId?: string): DrawerViewModel
+export function resolveDrawerViewModel(contentId: string, anchorId?: string): DrawerViewModel;
 ```
 
 ### Refactor C — Split header logic selectors from mutation handlers
+
 - **Impact:** makes `GlobalHeaderShell.logic.ts` easier to evolve/test.
 - **Risk:** Low.
 - **Effort:** 1–2 days.
@@ -178,6 +200,7 @@ export function resolveDrawerViewModel(contentId: string, anchorId?: string): Dr
   3. Add focused tests for extracted pure selectors first.
 
 ### Refactor D — Consolidate docs ownership
+
 - **Impact:** improves onboarding and reduces stale-doc drift.
 - **Risk:** Low.
 - **Effort:** 0.5–1 day.
@@ -218,26 +241,30 @@ export function resolveDrawerViewModel(contentId: string, anchorId?: string): Dr
    - Where: `src/main.tsx` (`createRoot(document.getElementById('root')!)`).
    - Rationale: brittle under alternate test/host contexts.
 10. **Low — Component barrel exports can trigger fast-refresh caution patterns**
-   - Where: `src/components/ContentDrawer/index.tsx`, `src/content/index.ts`.
-   - Rationale: minor DX warning potential when mixing component and non-component exports.
+
+- Where: `src/components/ContentDrawer/index.tsx`, `src/content/index.ts`.
+- Rationale: minor DX warning potential when mixing component and non-component exports.
 
 ---
 
 ## 8) Next steps roadmap
 
 ### Immediate (1–2 days)
+
 1. Add P0 tests for content drawer rendering and adapter contracts.
 2. Extract one shared drag/listener helper and migrate a single panel hook as proof point.
 3. Document canonical docs ownership in `doc/README.md`.
 4. Add a root-anchor guard utility in `src/main.tsx` (small defensive hardening).
 
 ### Near-term (1–2 weeks)
+
 1. Split `BuildSurface.logic.ts` into concern-specific hooks while preserving public API.
 2. Introduce drawer view model adapter to reduce UI coupling.
 3. Add header logic state-transition unit tests.
 4. Add integration tests for drag cleanup and keyboard resizing.
 
 ### Longer-term
+
 1. Add CI gate that enforces lint/build/test per PR.
 2. Decide fate of `calculogic-doc-engine/src/content-node.types.ts` (adopt or remove).
 3. Add ADR index for resolver contracts, docs ownership, and interaction model decisions.
@@ -245,6 +272,7 @@ export function resolveDrawerViewModel(contentId: string, anchorId?: string): Dr
 ---
 
 ## 9) Quick wins (8)
+
 1. Add a one-line canonical docs declaration in `doc/README.md`.
 2. Add `resolveDrawerContent` unit tests for unsupported namespaces and anchor passthrough.
 3. Pull repeated min/max numbers in `BuildSurface.logic.ts` into named constants.
@@ -257,6 +285,7 @@ export function resolveDrawerViewModel(contentId: string, anchorId?: string): Dr
 ---
 
 ## 10) Open questions (short)
+
 1. Should `calculogic-doc-engine/src/content-node.types.ts` become the canonical drawer payload contract, or should it be removed?
 2. Which doc-engine directory is canonical for active engineering work: `doc/DocEngine` or `doc/doc-engine`?
 3. Are header mode-menu behaviors expected to be keyboard-navigable beyond current click/hover semantics?

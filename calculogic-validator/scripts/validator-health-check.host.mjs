@@ -17,7 +17,7 @@ const assert = (condition, message) => {
   }
 };
 
-const runScopeSummary = scope => {
+const runScopeSummary = (scope) => {
   const { findings, totalFilesScanned } = runNamingValidator(repositoryRoot, { scope });
   const summary = summarizeFindings(findings);
 
@@ -31,7 +31,7 @@ const runScopeSummary = scope => {
   };
 };
 
-const assertDeterministicScope = scope => {
+const assertDeterministicScope = (scope) => {
   const profile = getScopeProfile(scope);
   assert(profile, `Missing naming validator scope profile: ${scope}`);
 
@@ -63,7 +63,10 @@ const assertDeterministicScope = scope => {
 
 const assertAppScopeDocs = () => {
   const docsToValidate = [
-    path.resolve(repositoryRoot, 'calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md'),
+    path.resolve(
+      repositoryRoot,
+      'calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md',
+    ),
     path.resolve(repositoryRoot, 'doc/nl-config/cfg-namingValidator.md'),
   ];
 

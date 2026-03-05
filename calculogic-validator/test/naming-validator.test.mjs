@@ -120,18 +120,33 @@ test('repo scope includes docs + src + root config examples', () => {
 
 test('app scope includes only src/test and excludes docs, validator, and system root files', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'app' });
-  assert.ok(paths.some(p => p.startsWith('src/')));
-  assert.ok(paths.some(p => p.startsWith('test/')));
-  assert.equal(paths.some(p => p.startsWith('doc/')), false);
-  assert.equal(paths.some(p => p.startsWith('docs/')), false);
-  assert.equal(paths.some(p => p.startsWith('calculogic-validator/')), false);
+  assert.ok(paths.some((p) => p.startsWith('src/')));
+  assert.ok(paths.some((p) => p.startsWith('test/')));
+  assert.equal(
+    paths.some((p) => p.startsWith('doc/')),
+    false,
+  );
+  assert.equal(
+    paths.some((p) => p.startsWith('docs/')),
+    false,
+  );
+  assert.equal(
+    paths.some((p) => p.startsWith('calculogic-validator/')),
+    false,
+  );
   assert.equal(paths.includes('package.json'), false);
 });
 
 test('docs scope includes doc/docs and excludes src', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'docs' });
-  assert.equal(paths.some(p => p.startsWith('src/')), false);
-  assert.equal(paths.some(p => p.startsWith('calculogic-validator/')), false);
+  assert.equal(
+    paths.some((p) => p.startsWith('src/')),
+    false,
+  );
+  assert.equal(
+    paths.some((p) => p.startsWith('calculogic-validator/')),
+    false,
+  );
 });
 
 test('scope filtering output order is deterministic', () => {
@@ -151,7 +166,10 @@ test('scope filtering output order is deterministic', () => {
     const second = collectRepositoryPaths(tempRoot, { scope: 'app' });
 
     assert.deepEqual(first, second);
-    assert.deepEqual(first, [...first].sort((a, b) => a.localeCompare(b)));
+    assert.deepEqual(
+      first,
+      [...first].sort((a, b) => a.localeCompare(b)),
+    );
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
@@ -160,7 +178,11 @@ test('scope filtering output order is deterministic', () => {
 test('invalid CLI scope returns deterministic usage error and non-zero exit', () => {
   const result = spawnSync(
     process.execPath,
-    ['--experimental-strip-types', 'calculogic-validator/scripts/validate-naming.mjs', '--scope=invalid-scope'],
+    [
+      '--experimental-strip-types',
+      'calculogic-validator/scripts/validate-naming.mjs',
+      '--scope=invalid-scope',
+    ],
     { cwd: process.cwd(), encoding: 'utf8' },
   );
 

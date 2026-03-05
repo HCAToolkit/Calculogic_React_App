@@ -1,6 +1,7 @@
 # Alignment Audit – 2026-02-21
 
 ## Scope and method
+
 - Binding routines reviewed first: `calculogic-validator/doc/ConventionRoutines/CCPP.md`, `calculogic-validator/doc/ConventionRoutines/CCS.md`, `doc/ConventionRoutines/General-NL-Skeletons.md`, and `doc/ConventionRoutines/NL-First-Workflow.md`.
 - Recently changed configuration/shell surfaces were identified from git history focused on active config/shell paths.
 - Audited targets:
@@ -10,6 +11,7 @@
 ## 1) cfg-buildSurface
 
 ### Violations found
+
 1. **Build concern numbering drift in comments**
    - Concern files: `src/tabs/BuildTab.tsx`, `src/tabs/build/BuildSurface.build.tsx`
    - Sections involved: Build `§3.1.x`, `§3.2.x`, `§3.3.x`
@@ -29,11 +31,13 @@
    - Minimal fix: Renumber to `[6.1.1]` and `[6.2.1]`.
 
 ### Status
+
 - Fixed in this alignment change set.
 
 ## 2) shell-globalHeader
 
 ### Violations found
+
 1. **NL → Code + Code → NL mismatch for mode menu atoms**
    - Concern files: `doc/nl-shell/shell-globalHeader.md`, `src/components/GlobalHeaderShell/GlobalHeaderShell.build.tsx`
    - Sections involved: Build `§3.2.x`, `§3.3.x`
@@ -53,9 +57,10 @@
    - Minimal fix: Add `[8.2.1] Live Region Anchor` to NL and align CSS comment to `[8.2.1]`.
 
 ### Status
+
 - Fixed in this alignment change set.
 
 ## Purity and dependency direction
+
 - No new cross-concern imports were introduced during alignment.
 - Changes are comment/metadata/NL alignment only and preserve existing concern boundaries.
-

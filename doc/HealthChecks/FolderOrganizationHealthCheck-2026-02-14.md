@@ -1,7 +1,9 @@
 # Folder Organization Health Check (Doc-Engine Extraction Prep)
 
 ## Scope
+
 ## Status (2026-02-16 update)
+
 - ✅ Change 1 completed (catalog moved to `src/content/packs/header-docs/header-docs.catalog.ts`).
 - ✅ Change 2 completed (provider moved to `src/content/providers/docs.provider.ts`).
 - ✅ Change 3 completed (engine barrel narrowed to core contracts/orchestrator).
@@ -14,6 +16,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 ## A) Current structure map (short)
 
 ### `src/` major folders
+
 - `src/doc-engine/` — staged doc-engine runtime boundary (types, registry, package-style exports).
 - `src/content/` — app composition + adapter layer (packs, provider wiring, drawer-specific resolver adapter, context provider/barrel).
 - `src/components/GlobalHeaderShell/` — app shell UI and shell knowledge/logic/results composition.
@@ -23,6 +26,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 - `src/assets/` — static assets.
 
 ### `doc/` major folders
+
 - `doc/ConventionRoutines/` — binding conventions (CCPP/CCS/NL-first templates/workflow).
 - `doc/doc-engine/` — canonical architecture/contracts/MVP docs for doc-engine.
 - `doc/nl-doc-engine/` — NL skeletons for doc-engine configs.
@@ -32,41 +36,42 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 
 ## B) Extraction grouping recommendation
 
-| Path | Category | Notes |
-|---|---|---|
-| `src/doc-engine/types.ts` | Engine Core | Canonical content contracts should be package-owned. |
-| `src/doc-engine/registry.ts` | Engine Core | Namespace parsing + provider registry orchestration are reusable core runtime primitives. |
-| `src/doc-engine/index.ts` | Engine Core (boundary candidate) | Public API surface for future package extraction. |
-| `src/content/providers/docs.provider.ts` | Provider (app-specific) | Docs namespace adapter is app-owned and intentionally outside engine core for extraction readiness. |
-| `src/content/packs/header-docs/header-docs.catalog.ts` | Content Pack (app-owned) | Header docs payload source of truth, owned by app content layer. |
-| `src/content/contentEngine.ts` | App Composition | Correct host-owned provider registration singleton location. |
-| `src/content/contentResolutionAdapter.ts` | UI Adapter (app layer) | Drawer-specific narrowing and mapping to docs payload should remain app-side. |
-| `src/content/ContentContext.tsx` | App Composition | UI state orchestration for drawer open/close belongs to app shell. |
-| `src/components/ContentDrawer/*` | UI Adapter | Rendering/styling and anchor behavior are app/UI concerns. |
-| `src/components/GlobalHeaderShell/*` | UI Adapter + App Feature | Header UI and shell knowledge remain app feature scope. |
-| `doc/doc-engine/*`, `doc/nl-doc-engine/*`, `doc/Architecture/DocEngineExtractionPlan.md` | Docs | Design/contract docs; keep synchronized but not in runtime package unless copied for package docs. |
+| Path                                                                                     | Category                         | Notes                                                                                               |
+| ---------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `src/doc-engine/types.ts`                                                                | Engine Core                      | Canonical content contracts should be package-owned.                                                |
+| `src/doc-engine/registry.ts`                                                             | Engine Core                      | Namespace parsing + provider registry orchestration are reusable core runtime primitives.           |
+| `src/doc-engine/index.ts`                                                                | Engine Core (boundary candidate) | Public API surface for future package extraction.                                                   |
+| `src/content/providers/docs.provider.ts`                                                 | Provider (app-specific)          | Docs namespace adapter is app-owned and intentionally outside engine core for extraction readiness. |
+| `src/content/packs/header-docs/header-docs.catalog.ts`                                   | Content Pack (app-owned)         | Header docs payload source of truth, owned by app content layer.                                    |
+| `src/content/contentEngine.ts`                                                           | App Composition                  | Correct host-owned provider registration singleton location.                                        |
+| `src/content/contentResolutionAdapter.ts`                                                | UI Adapter (app layer)           | Drawer-specific narrowing and mapping to docs payload should remain app-side.                       |
+| `src/content/ContentContext.tsx`                                                         | App Composition                  | UI state orchestration for drawer open/close belongs to app shell.                                  |
+| `src/components/ContentDrawer/*`                                                         | UI Adapter                       | Rendering/styling and anchor behavior are app/UI concerns.                                          |
+| `src/components/GlobalHeaderShell/*`                                                     | UI Adapter + App Feature         | Header UI and shell knowledge remain app feature scope.                                             |
+| `doc/doc-engine/*`, `doc/nl-doc-engine/*`, `doc/Architecture/DocEngineExtractionPlan.md` | Docs                             | Design/contract docs; keep synchronized but not in runtime package unless copied for package docs.  |
 
 ## C) Top folder-organization issues (ranked)
 
-1. **Resolved — content pack/provider moved out of `src/doc-engine/`**  
-   - Paths: `src/content/packs/header-docs/header-docs.catalog.ts`, `src/content/providers/docs.provider.ts`  
+1. **Resolved — content pack/provider moved out of `src/doc-engine/`**
+   - Paths: `src/content/packs/header-docs/header-docs.catalog.ts`, `src/content/providers/docs.provider.ts`
    - Outcome: app/header-specific docs payload and provider now live in app content layer, keeping core extractable.
 
-2. **Resolved — app barrel no longer re-exports engine internals**  
-   - Path: `src/content/index.ts`  
+2. **Resolved — app barrel no longer re-exports engine internals**
+   - Path: `src/content/index.ts`
    - Outcome: entrypoint ownership is explicit (`src/doc-engine` for engine runtime, `src/content` for app content).
 
-3. **Resolved — shell knowledge now consumes canonical header-doc IDs from content pack module**  
-   - Paths: `src/content/packs/header-docs/header-doc.ids.ts`, `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`  
+3. **Resolved — shell knowledge now consumes canonical header-doc IDs from content pack module**
+   - Paths: `src/content/packs/header-docs/header-doc.ids.ts`, `src/components/GlobalHeaderShell/GlobalHeaderShell.knowledge.ts`
    - Outcome: `src/content/packs/header-docs/header-doc.ids.ts` is now the canonical ID source, and `GlobalHeaderShell.knowledge.ts` consumes pack-provided IDs instead of hardcoding values.
 
-4. **Resolved — doc-engine documentation roots consolidated**  
-   - Path: `doc/doc-engine/` (canonical)  
+4. **Resolved — doc-engine documentation roots consolidated**
+   - Path: `doc/doc-engine/` (canonical)
    - Outcome: duplicate root removed to reduce convention drift during extraction handoff.
 
 ## D) Minimal incremental re-org plan
 
 ### Change 1 — carve out a content-pack staging folder inside app layer
+
 - **Before → After**
   - `src/doc-engine/catalogs/header-docs.catalog.ts`
   - → `src/content/packs/header-docs/header-docs.catalog.ts`
@@ -85,6 +90,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
   - Avoid where possible (and keep extremely short-lived if used): `src/doc-engine/**` importing `src/content/**`.
 
 ### Change 2 — relocate only app-specific providers out of core boundary
+
 - **Before → After**
   - `src/doc-engine/providers/docs.provider.ts`
   - → `src/content/providers/docs.provider.ts`
@@ -98,6 +104,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 > Clarification: this move applies to **this specific provider** because it is coupled to app-owned header docs content. Long-term platform direction can still include reusable providers in separate provider packages (or in a doc-engine-adjacent layer) while keeping core extractable as contracts + registry + helpers.
 
 ### Change 3 — narrow engine public surface to contracts/orchestrator only
+
 - **Before → After**
   - `src/doc-engine/index.ts` (mixed exports)
   - → `src/doc-engine/index.ts` (only `types.ts`, `registry.ts`, helper exports)
@@ -108,6 +115,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
   - Mitigation: add explicit app entrypoints under `src/content/` and codemod imports in one commit.
 
 ### Change 4 — docs consolidation (completed)
+
 - **Before → After**
   - `doc/DocEngine/*` + `doc/doc-engine/*`
   - → canonical single directory `doc/doc-engine/`
@@ -143,6 +151,7 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
    - Verify app still composes providers externally.
 
 ## Verification checks captured in this audit
+
 - `rg "src/doc-engine.*src/components" src` → 0 matches.
 - `rg "GlobalHeaderShell\.knowledge" src/content src/doc-engine calculogic-doc-engine/src test` → 0 matches (resolver plumbing scope).
 - `rg "GlobalHeaderShell\.knowledge" src/components/GlobalHeaderShell` → allowed local shell usage (2 matches in shell files).
@@ -150,5 +159,6 @@ Goal: assess folder boundaries for future doc-engine split with minimal churn.
 - `npm run build` → pass.
 
 ## Notes
+
 - This health check intentionally avoids implementing folder moves.
 - Plan favors boundary hardening and extraction readiness with minimal rename churn.

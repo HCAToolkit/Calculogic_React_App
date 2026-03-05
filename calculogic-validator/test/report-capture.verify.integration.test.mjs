@@ -7,33 +7,31 @@ import { spawn } from 'node:child_process';
 
 const verifierScriptPath = path.resolve('calculogic-validator/scripts/report-capture-verify.mjs');
 
-const runVerifier = ({ reportsDir, scopes }) => new Promise((resolve, reject) => {
-  const child = spawn(process.execPath, [
-    verifierScriptPath,
-    `--scopes=${scopes.join(',')}`,
-  ], {
-    env: {
-      ...process.env,
-      REPORTS_DIR: reportsDir,
-    },
-  });
+const runVerifier = ({ reportsDir, scopes }) =>
+  new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [verifierScriptPath, `--scopes=${scopes.join(',')}`], {
+      env: {
+        ...process.env,
+        REPORTS_DIR: reportsDir,
+      },
+    });
 
-  let stdout = '';
-  let stderr = '';
+    let stdout = '';
+    let stderr = '';
 
-  child.stdout.on('data', chunk => {
-    stdout += chunk.toString();
-  });
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
 
-  child.stderr.on('data', chunk => {
-    stderr += chunk.toString();
-  });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
 
-  child.on('error', reject);
-  child.on('close', code => {
-    resolve({ exitCode: code ?? 1, stdout, stderr });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      resolve({ exitCode: code ?? 1, stdout, stderr });
+    });
   });
-});
 
 test('report-capture verifier emits and validates docs scope report in custom reports dir', async () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'report-capture-verify-'));
@@ -46,7 +44,7 @@ test('report-capture verifier emits and validates docs scope report in custom re
 
     assert.equal(result.exitCode, 0, result.stderr || result.stdout);
 
-    const files = fs.readdirSync(tempDir).filter(name => /^naming-docs-.*\.txt$/u.test(name));
+    const files = fs.readdirSync(tempDir).filter((name) => /^naming-docs-.*\.txt$/u.test(name));
     assert.equal(files.length, 1, `expected one report file, got ${files.join(',')}`);
 
     const reportPath = path.join(tempDir, files[0]);

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 
-const runBin = args =>
+const runBin = (args) =>
   spawnSync(process.execPath, args, {
     cwd: process.cwd(),
     encoding: 'utf8',
@@ -28,17 +28,13 @@ test('calculogic-validate bin runs naming validator and returns JSON', () => {
 });
 
 test('calculogic-validate-naming bin returns naming report JSON', () => {
-  const result = runBin([
-    'calculogic-validator/bin/calculogic-validate-naming.mjs',
-    '--scope=app',
-  ]);
+  const result = runBin(['calculogic-validator/bin/calculogic-validate-naming.mjs', '--scope=app']);
 
   assert.ok([0, 1, 2].includes(result.status), result.stderr);
   const report = JSON.parse(result.stdout);
   assert.equal(report.scope, 'app');
   assert.equal(typeof report.totalFilesScanned, 'number');
 });
-
 
 test('calculogic-validate-naming bin prints usage on runtime target resolution errors', () => {
   const result = runBin([
@@ -52,7 +48,6 @@ test('calculogic-validate-naming bin prints usage on runtime target resolution e
   assert.match(result.stderr, /Target path does not exist: does-not-exist/u);
   assert.match(result.stderr, /Usage: calculogic-validate-naming/u);
 });
-
 
 test('calculogic-validate bin accepts --config path', () => {
   const result = runBin([

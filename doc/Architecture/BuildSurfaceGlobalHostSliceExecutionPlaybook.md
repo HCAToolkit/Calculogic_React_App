@@ -1,8 +1,8 @@
 # Build Surface Global Host Slice Execution Playbook
 
 ## Document Status
-> Terminology note: in this architecture/playbook context, `host` refers to the `ui_host_surface` concept (UI composition shell) and `host_owner` boundary assignments where stated, not the `address_host` namespace token semantics used by structural addressing grammar. See `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`.
 
+> Terminology note: in this architecture/playbook context, `host` refers to the `ui_host_surface` concept (UI composition shell) and `host_owner` boundary assignments where stated, not the `address_host` namespace token semantics used by structural addressing grammar. See `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`.
 
 - **Document Type:** Architecture Execution Playbook
 - **Status:** Draft (Docs-First Refactor Execution Guidance)
@@ -175,32 +175,40 @@ It is not intended to be strict compliance criteria and may be adjusted based on
 
 ```md
 ### Slice Name
+
 - <short descriptive name>
 
 ### Boundary Being Migrated
+
 - <host shell / persistence / wiring / contracts / repoint seam>
 
 ### Inventory Row(s) / Target File(s)
+
 - Inventory rows: <list>
 - Target files: <list>
 
 ### Legacy Source(s) Being Drained
+
 - <legacy files/paths and responsibility being drained>
 
 ### Slice Type
+
 - <host | logic | wiring | contracts | persistence | repoint>
 
 ### Preconditions
+
 - [ ] Related inventory rows identified
 - [ ] Dependencies from prior slices met
 - [ ] NL/CCPP touch impact identified (if concern ownership moves)
 - [ ] Legacy NL source section(s) in `doc/nl-config/cfg-buildSurface.md` identified for this slice
 
 ### Extract Steps
+
 1. <bounded extraction step>
 2. <bounded extraction step>
 
 ### NL Co-Migration Steps
+
 1. <identify matching legacy NL section(s) in `cfg-buildSurface.md`>
 2. <create/update canonical split NL target file(s) for this semantic slice>
 3. <repoint or annotate legacy monolith NL references to reflect forwarded/partial/retained status>
@@ -208,19 +216,23 @@ It is not intended to be strict compliance criteria and may be adjusted based on
 5. <verify numbering/provenance consistency for touched atoms/sections>
 
 ### Repoint Steps
+
 1. <import/call-site repoint step>
 2. <integration seam repoint step>
 
 ### Cleanup / Normalize Steps
+
 1. <dead code cleanup>
 2. <local naming/comment/NL normalization>
 
 ### Wrapper/Forwarder Use
+
 - Allowed: <yes/no>
 - Why needed: <short rationale>
 - Retirement trigger for this wrapper/forwarder: <explicit condition>
 
 ### Verification Checks
+
 - [ ] Import/module safety checklist run (applicable items)
 - [ ] Behavior parity checklist run (applicable items)
 - [ ] Persistence safety checklist run (if touched)
@@ -229,6 +241,7 @@ It is not intended to be strict compliance criteria and may be adjusted based on
 - [ ] NL co-migration checklist run for touched semantic slice
 
 ### Done Criteria
+
 - [ ] Bounded responsibility moved
 - [ ] Required call sites repointed
 - [ ] Code behavior unchanged for the slice unless an explicit planned behavior adjustment was declared
@@ -241,6 +254,7 @@ It is not intended to be strict compliance criteria and may be adjusted based on
 - [ ] Inventory reconciliation update recorded when material
 
 ### Deferred Follow-Ups (Explicit)
+
 - <item intentionally not completed in this slice>
 ```
 
@@ -393,6 +407,7 @@ Do not mass-edit inventory rows for docs-only wording polish unrelated to landed
 These starter examples follow current draft inventory/repo-reality naming and are illustrative execution aids for slicing; they are not a naming-policy or role-registry expansion by this playbook.
 
 ### 1) Persistence Canonicalization + Repoint Prep
+
 - **Objective:** align persistence contracts/logic to canonical targets and prep clean repoint seam.
 - **Likely target file(s):** `src/tabs/build/buildsurface-persistence.logic.ts`, `src/tabs/build/buildsurface-persistence.contracts.ts`
 - **Likely legacy source(s):** `src/tabs/build/buildSurfacePersistence.ts`, `src/tabs/build/buildSurfacePersistence.contracts.ts`
@@ -400,6 +415,7 @@ These starter examples follow current draft inventory/repo-reality naming and ar
 - **Notes:** keep behavior identical; no shell extraction mixed in.
 
 ### 2) Host Root Shell Extraction Scaffold
+
 - **Objective:** establish global host root composition target.
 - **Likely target file(s):** `src/tabs/build/buildsurface.host.tsx`
 - **Likely legacy source(s):** `src/tabs/build/BuildSurface.build.tsx`
@@ -407,6 +423,7 @@ These starter examples follow current draft inventory/repo-reality naming and ar
 - **Notes:** extraction scaffold only; avoid tab-provider redesign in same slice.
 
 ### 3) Left Panel Host Extraction (Shell-Only)
+
 - **Objective:** isolate left panel shell frame from mixed BuildSurface composition.
 - **Likely target file(s):** `src/tabs/build/leftpanel.host.tsx`
 - **Likely legacy source(s):** `src/tabs/build/BuildSurface.build.tsx`, `src/tabs/build/BuildSurface.logic.ts`
@@ -414,6 +431,7 @@ These starter examples follow current draft inventory/repo-reality naming and ar
 - **Notes:** keep section population semantics unchanged.
 
 ### 4) Shared Host Wiring Seam Introduction
+
 - **Objective:** introduce host-level wiring seam for cross-zone orchestration.
 - **Likely target file(s):** `src/tabs/build/buildsurface-host.wiring.ts`
 - **Likely legacy source(s):** `src/tabs/build/BuildSurface.logic.ts`, `src/tabs/build/index.tsx`
@@ -421,6 +439,7 @@ These starter examples follow current draft inventory/repo-reality naming and ar
 - **Notes:** do not repoint app mount path until seam is stable.
 
 ### 5) Build-Tab Provider Wiring Extraction
+
 - **Objective:** isolate Build-tab-specific source feed seam.
 - **Likely target file(s):** `src/tabs/build/leftpanel-build-sources.wiring.ts`, `src/tabs/build/leftpanel-tab-provider.contracts.ts`
 - **Likely legacy source(s):** `src/tabs/build/BuildSurface.logic.ts`
@@ -428,6 +447,7 @@ These starter examples follow current draft inventory/repo-reality naming and ar
 - **Notes:** keep provider contracts thin and host-facing.
 
 ### 6) Build Entry Repoint Slice (Forwarder-Aware)
+
 - **Objective:** repoint Build entry/mount path toward new host wiring seam.
 - **Likely target file(s):** `src/tabs/build/index.tsx`, `src/tabs/BuildTab.tsx`, `src/App.tsx`
 - **Likely legacy source(s):** forwarding paths currently anchored on BuildSurface legacy entry.

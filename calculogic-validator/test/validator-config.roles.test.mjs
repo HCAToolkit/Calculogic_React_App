@@ -33,7 +33,12 @@ test('normalizes naming.roles.add by trimming and deduplicating first role entry
       roles: {
         add: [
           { role: ' provider ', category: 'architecture-support', status: 'active' },
-          { role: 'provider', category: 'deprecated', status: 'deprecated', notes: 'ignored duplicate' },
+          {
+            role: 'provider',
+            category: 'deprecated',
+            status: 'deprecated',
+            notes: 'ignored duplicate',
+          },
         ],
       },
     },

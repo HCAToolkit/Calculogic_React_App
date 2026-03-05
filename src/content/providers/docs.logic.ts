@@ -6,7 +6,10 @@
  * Invariants: Missing docs return deterministic missing_content payloads matching existing runtime behavior.
  */
 
-import { HEADER_DOC_DEFINITIONS, type HeaderDocDefinition } from '../packs/header-docs/header-docs.knowledge.ts';
+import {
+  HEADER_DOC_DEFINITIONS,
+  type HeaderDocDefinition,
+} from '../packs/header-docs/header-docs.knowledge.ts';
 import { isHeaderDocId } from '../packs/header-docs/header-doc.knowledge.ts';
 import type { ContentProvider } from '@calculogic/doc-engine';
 

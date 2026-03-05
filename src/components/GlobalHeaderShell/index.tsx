@@ -7,7 +7,10 @@
  */
 import { GlobalHeaderShell } from './global-header-shell.build';
 import './global-header-shell.build.css';
-import { useGlobalHeaderShellLogic, type GlobalHeaderShellProps } from './global-header-shell.logic';
+import {
+  useGlobalHeaderShellLogic,
+  type GlobalHeaderShellProps,
+} from './global-header-shell.logic';
 import { GlobalHeaderShellResults } from './global-header-shell.results';
 import './global-header-shell.results.css';
 

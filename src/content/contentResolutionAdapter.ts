@@ -30,7 +30,10 @@ export type DrawerContentResolution =
 // [5.2] cfg-contentDrawer · Primitive · "Registry Resolution Adapter"
 // Concern: Logic · Parent: "Resolver Pipeline" · Catalog: resolver.adapter
 // Notes: Returns canonical doc-engine union for docs and explicit unsupported_namespace for non-doc namespaces.
-export function resolveDrawerContent(contentId: string, anchorId?: string): DrawerContentResolution {
+export function resolveDrawerContent(
+  contentId: string,
+  anchorId?: string,
+): DrawerContentResolution {
   const resolution = contentProviderRegistry.resolveContent({
     contentId,
     anchorId,

@@ -10,7 +10,7 @@
  * Concern: BuildStyle · Parent: "—" · Catalog: surface.container
  * Notes: Fills the viewport and applies default surface/foreground tokens for the frame shell.
  */
-[data-anchor="app-frame"] {
+[data-anchor='app-frame'] {
   height: 100vh;
   font-family: sans-serif;
   background: var(--app-surface, #f8f9fc);
@@ -22,7 +22,7 @@
  * Concern: BuildStyle · Parent: "Frame Surface Styling" · Catalog: control.skin
  * Notes: Positions the toggle and establishes baseline affordance styling within the frame.
  */
-[data-anchor="theme-toggle"] {
+[data-anchor='theme-toggle'] {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
@@ -39,7 +39,7 @@
  * Concern: BuildStyle · Parent: "Theme Toggle Styling" · Catalog: control.focus
  * Notes: Guarantees accessible focus outline for keyboard users.
  */
-[data-anchor="theme-toggle"]:focus-visible {
+[data-anchor='theme-toggle']:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }

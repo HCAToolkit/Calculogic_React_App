@@ -29,6 +29,7 @@ A modular React + TypeScript builder shell for composing configuration-driven wo
 ## Current Tech Stack (Implemented)
 
 ### Runtime
+
 - React 19
 - React DOM 19
 - React Router DOM 7
@@ -38,6 +39,7 @@ A modular React + TypeScript builder shell for composing configuration-driven wo
 - mustache
 
 ### Tooling
+
 - TypeScript 5
 - Vite 6
 - ESLint 9 + typescript-eslint
@@ -55,6 +57,7 @@ These are intentionally planned but not yet baseline in this repository:
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 22+
 - npm
 

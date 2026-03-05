@@ -16,7 +16,7 @@ const ALLOWED_ROLE_CATEGORIES = new Set([
   'deprecated',
 ]);
 
-const canonicalizeRole = roleEntry => {
+const canonicalizeRole = (roleEntry) => {
   if (!roleEntry || typeof roleEntry !== 'object' || Array.isArray(roleEntry)) {
     throw new Error('Invalid custom roles registry: each entry must be an object.');
   }
@@ -26,7 +26,9 @@ const canonicalizeRole = roleEntry => {
   const status = typeof roleEntry.status === 'string' ? roleEntry.status.trim() : '';
 
   if (!role || !category || !status) {
-    throw new Error('Invalid custom roles registry: role, category, and status must be non-empty strings.');
+    throw new Error(
+      'Invalid custom roles registry: role, category, and status must be non-empty strings.',
+    );
   }
 
   if (!ALLOWED_ROLE_CATEGORIES.has(category)) {
@@ -55,7 +57,7 @@ const canonicalizeRole = roleEntry => {
   return canonicalRole;
 };
 
-const canonicalizeRoles = roles => {
+const canonicalizeRoles = (roles) => {
   const dedupedByRole = new Map();
 
   for (const roleEntry of roles) {
@@ -68,7 +70,7 @@ const canonicalizeRoles = roles => {
   return [...dedupedByRole.values()].sort((a, b) => a.role.localeCompare(b.role));
 };
 
-const canonicalizeExtensions = extensions => {
+const canonicalizeExtensions = (extensions) => {
   if (!Array.isArray(extensions)) {
     throw new Error('Invalid custom reportable extensions registry: expected an array of strings.');
   }
@@ -77,16 +79,22 @@ const canonicalizeExtensions = extensions => {
 
   for (const extensionValue of extensions) {
     if (typeof extensionValue !== 'string') {
-      throw new Error('Invalid custom reportable extensions registry: each extension must be a non-empty string.');
+      throw new Error(
+        'Invalid custom reportable extensions registry: each extension must be a non-empty string.',
+      );
     }
 
     const extension = extensionValue.trim();
     if (!extension) {
-      throw new Error('Invalid custom reportable extensions registry: each extension must be a non-empty string.');
+      throw new Error(
+        'Invalid custom reportable extensions registry: each extension must be a non-empty string.',
+      );
     }
 
     if (!extension.startsWith('.')) {
-      throw new Error('Invalid custom reportable extensions registry: each extension must start with ".".');
+      throw new Error(
+        'Invalid custom reportable extensions registry: each extension must start with ".".',
+      );
     }
 
     deduped.add(extension);
@@ -95,11 +103,11 @@ const canonicalizeExtensions = extensions => {
   return [...deduped].sort((a, b) => a.localeCompare(b));
 };
 
-const digestPayload = payload => sha256Hex(stableStringify(payload));
+const digestPayload = (payload) => sha256Hex(stableStringify(payload));
 
-const loadJsonFile = filePath => JSON.parse(fs.readFileSync(filePath, 'utf8'));
+const loadJsonFile = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
-const loadRegistryState = registryRootDir => {
+const loadRegistryState = (registryRootDir) => {
   const statePath = path.join(registryRootDir, 'registry-state.json');
   if (!fs.existsSync(statePath)) {
     return DEFAULT_REGISTRY_STATE;
@@ -109,13 +117,15 @@ const loadRegistryState = registryRootDir => {
   const activeRegistry = parsed?.activeRegistry;
 
   if (activeRegistry !== 'builtin' && activeRegistry !== 'custom') {
-    throw new Error('Invalid activeRegistry in registry-state.json: expected "builtin" or "custom".');
+    throw new Error(
+      'Invalid activeRegistry in registry-state.json: expected "builtin" or "custom".',
+    );
   }
 
   return activeRegistry;
 };
 
-const loadCustomPayload = registryRootDir => {
+const loadCustomPayload = (registryRootDir) => {
   const customRolesPath = path.join(registryRootDir, '_custom', 'roles.registry.custom.json');
   const customExtensionsPath = path.join(
     registryRootDir,
@@ -128,7 +138,9 @@ const loadCustomPayload = registryRootDir => {
   }
 
   if (!fs.existsSync(customExtensionsPath)) {
-    throw new Error('Custom registry file missing: _custom/reportable-extensions.registry.custom.json.');
+    throw new Error(
+      'Custom registry file missing: _custom/reportable-extensions.registry.custom.json.',
+    );
   }
 
   const rolesRaw = loadJsonFile(customRolesPath);
@@ -158,7 +170,7 @@ const applyConfigOverlay = (builtinPayload, config) => {
     ...extensionAdds,
   ]);
 
-  const existingRoles = new Set(builtinPayload.roles.map(entry => entry.role));
+  const existingRoles = new Set(builtinPayload.roles.map((entry) => entry.role));
   const rolesToAppend = [];
 
   for (const roleEntry of roleAdds) {
@@ -182,7 +194,11 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
   const builtinPayload = buildBuiltinPayload();
   const builtinDigest = digestPayload(builtinPayload);
 
-  const customRolesPath = path.join(resolvedRegistryRootDir, '_custom', 'roles.registry.custom.json');
+  const customRolesPath = path.join(
+    resolvedRegistryRootDir,
+    '_custom',
+    'roles.registry.custom.json',
+  );
   const customExtensionsPath = path.join(
     resolvedRegistryRootDir,
     '_custom',
@@ -191,7 +207,9 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
 
   const hasCustomFiles = fs.existsSync(customRolesPath) && fs.existsSync(customExtensionsPath);
 
-  const customPayload = hasCustomFiles ? loadCustomPayload(resolvedRegistryRootDir) : builtinPayload;
+  const customPayload = hasCustomFiles
+    ? loadCustomPayload(resolvedRegistryRootDir)
+    : builtinPayload;
   const customDigest = digestPayload(customPayload);
 
   if (registryState === 'custom' && !hasCustomFiles) {
@@ -199,7 +217,9 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
       throw new Error('Custom registry file missing: _custom/roles.registry.custom.json.');
     }
 
-    throw new Error('Custom registry file missing: _custom/reportable-extensions.registry.custom.json.');
+    throw new Error(
+      'Custom registry file missing: _custom/reportable-extensions.registry.custom.json.',
+    );
   }
 
   const hasConfigOverlay = config !== undefined;

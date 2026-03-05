@@ -120,11 +120,7 @@ export interface BuildSurfaceBindings {
   };
 }
 
-const SECTION_ORDER: SectionId[] = [
-  'configurations',
-  'atomic-components',
-  'search-configurations',
-];
+const SECTION_ORDER: SectionId[] = ['configurations', 'atomic-components', 'search-configurations'];
 
 const PREVIEW_BREAKPOINT_OPTIONS: PreviewBreakpointOption[] = [
   { id: 'mobile', label: 'Mobile', width: '390px' },
@@ -154,7 +150,7 @@ export function sectionTitle(id: SectionId) {
 // Notes: Persists section height/collapse state and emits ARIA-aware bindings.
 function useSectionLogic(
   id: SectionId,
-  { initialHeight, storageKey, gripVisible = true }: SectionLogicOptions
+  { initialHeight, storageKey, gripVisible = true }: SectionLogicOptions,
 ): SectionLogicBinding {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const previousHeight = useRef<number | null>(null);
@@ -174,8 +170,8 @@ function useSectionLogic(
         }
         return parsed.state;
       },
-      serializeSectionStatePayload({ height: initialHeight, collapsed: false })
-    )
+      serializeSectionStatePayload({ height: initialHeight, collapsed: false }),
+    ),
   );
 
   useEffect(() => {
@@ -187,12 +183,10 @@ function useSectionLogic(
   const sectionPointerDrag = usePointerDrag({
     axis: 'y',
     onMove: ({ dy }) => {
-      setState(previous => {
+      setState((previous) => {
         const min = 32;
         const parent = containerRef.current?.parentElement;
-        const parentHeight = parent
-          ? parent.getBoundingClientRect().height
-          : window.innerHeight;
+        const parentHeight = parent ? parent.getBoundingClientRect().height : window.innerHeight;
         const max = Math.max(min, parentHeight - 2 * min);
         const height = clamp(Math.round(previous.height + dy), min, max);
         return { ...previous, height, collapsed: height <= min };
@@ -204,12 +198,10 @@ function useSectionLogic(
     const step = event.shiftKey ? 24 : 8;
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       event.preventDefault();
-      setState(previous => {
+      setState((previous) => {
         const min = 32;
         const parent = containerRef.current?.parentElement;
-        const parentHeight = parent
-          ? parent.getBoundingClientRect().height
-          : window.innerHeight;
+        const parentHeight = parent ? parent.getBoundingClientRect().height : window.innerHeight;
         const max = Math.max(min, parentHeight - 2 * min);
         const delta = event.key === 'ArrowUp' ? -step : step;
         const height = clamp(previous.height + delta, min, max);
@@ -219,7 +211,7 @@ function useSectionLogic(
   }, []);
 
   const toggle = useCallback(() => {
-    setState(previous => {
+    setState((previous) => {
       if (!previous.collapsed) {
         previousHeight.current = previous.height;
         return { ...previous, collapsed: true, height: 32 };
@@ -240,9 +232,7 @@ function useSectionLogic(
       onClick: toggle,
       'aria-controls': BUILD_ANCHORS.sectionContent(id),
       'aria-expanded': !state.collapsed,
-      title: state.collapsed
-        ? `Expand ${sectionTitle(id)}`
-        : `Collapse ${sectionTitle(id)}`,
+      title: state.collapsed ? `Expand ${sectionTitle(id)}` : `Collapse ${sectionTitle(id)}`,
     },
     contentAnchor: BUILD_ANCHORS.sectionContent(id),
     gripProps: {
@@ -280,8 +270,8 @@ function useLeftPanelLogic(): LeftPanelLogic {
 
         return 320;
       },
-      320
-    )
+      320,
+    ),
   );
   useEffect(() => {
     writeBuildSurfaceStorage(STORAGE_KEY, () => {
@@ -292,7 +282,7 @@ function useLeftPanelLogic(): LeftPanelLogic {
   const leftPointerDrag = usePointerDrag({
     axis: 'x',
     onMove: ({ dx }) => {
-      setWidth(previousWidth => {
+      setWidth((previousWidth) => {
         const min = 160;
         const max = Math.max(min, window.innerWidth - 320);
         return clamp(Math.round(previousWidth + dx), min, max);
@@ -304,7 +294,7 @@ function useLeftPanelLogic(): LeftPanelLogic {
     const step = event.shiftKey ? 32 : 8;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      setWidth(previous => {
+      setWidth((previous) => {
         const min = 160;
         const max = Math.max(min, window.innerWidth - 320);
         const delta = event.key === 'ArrowLeft' ? -step : step;
@@ -350,8 +340,8 @@ function useRightPanelLogic(): RightPanelLogic {
         }
         return parsed.state;
       },
-      serializeRightPanelStatePayload({ width: 320, collapsed: false })
-    )
+      serializeRightPanelStatePayload({ width: 320, collapsed: false }),
+    ),
   );
   const previousWidth = useRef<number | null>(null);
 
@@ -364,7 +354,7 @@ function useRightPanelLogic(): RightPanelLogic {
   const rightPointerDrag = usePointerDrag({
     axis: 'x',
     onMove: ({ dx }) => {
-      setState(previousState => {
+      setState((previousState) => {
         const min = 40;
         const max = Math.max(160, window.innerWidth - 320);
         const width = clamp(Math.round(previousState.width - dx), min, max);
@@ -377,7 +367,7 @@ function useRightPanelLogic(): RightPanelLogic {
     const step = event.shiftKey ? 32 : 8;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      setState(previous => {
+      setState((previous) => {
         const min = 40;
         const max = Math.max(160, window.innerWidth - 320);
         const delta = event.key === 'ArrowLeft' ? step : -step;
@@ -388,7 +378,7 @@ function useRightPanelLogic(): RightPanelLogic {
   }, []);
 
   const toggle = useCallback(() => {
-    setState(previous => {
+    setState((previous) => {
       if (!previous.collapsed) {
         previousWidth.current = previous.width;
         return { ...previous, collapsed: true, width: 40 };
@@ -438,7 +428,7 @@ export function useBuildSurfaceLogic(): BuildSurfaceBindings {
       'atomic-components': atomicComponents,
       'search-configurations': searchConfigurations,
     }),
-    [configurations, atomicComponents, searchConfigurations]
+    [configurations, atomicComponents, searchConfigurations],
   ) as Record<SectionId, SectionLogicBinding>;
 
   const leftPanel = useLeftPanelLogic();
@@ -452,7 +442,7 @@ export function useBuildSurfaceLogic(): BuildSurfaceBindings {
       options: PREVIEW_BREAKPOINT_OPTIONS,
       select: setActivePreviewBreakpoint,
     }),
-    [activePreviewBreakpoint]
+    [activePreviewBreakpoint],
   );
 
   return {

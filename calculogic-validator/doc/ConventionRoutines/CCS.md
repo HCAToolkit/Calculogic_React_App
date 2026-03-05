@@ -1,6 +1,5 @@
 # Calculogic Concern System (CCS, NL-Aligned, Codebase-Level)
 
-
 ## 1. First Principles
 
 ### Configuration is semantic, not a file

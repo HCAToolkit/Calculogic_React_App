@@ -5,7 +5,7 @@ import fs from 'node:fs';
 const validateAllScriptPath = 'calculogic-validator/scripts/validate-all.mjs';
 const calculateValidateBinPath = 'calculogic-validator/bin/calculogic-validate.mjs';
 
-const assertDecoupledFromNamingScopeHelpers = filePath => {
+const assertDecoupledFromNamingScopeHelpers = (filePath) => {
   const fileContents = fs.readFileSync(filePath, 'utf8');
 
   assert.equal(fileContents.includes('listNamingValidatorScopes'), false);

@@ -7,7 +7,10 @@ import {
 } from './registries/naming-roles.knowledge.mjs';
 import { REPORTABLE_EXTENSIONS } from './registries/naming-extensions.knowledge.mjs';
 import { EXCLUDED_DIRECTORIES } from './registries/naming-special-cases.knowledge.mjs';
-import { SCOPE_PROFILES, cloneScopeProfile } from './registries/naming-scope-profiles.knowledge.mjs';
+import {
+  SCOPE_PROFILES,
+  cloneScopeProfile,
+} from './registries/naming-scope-profiles.knowledge.mjs';
 import { parseCanonicalName } from './rules/naming-rule-parse-canonical.logic.mjs';
 import {
   getSpecialCaseType,
@@ -21,7 +24,7 @@ import {
   isUnknownOrInactiveRole,
 } from './rules/naming-rule-check-role.logic.mjs';
 
-export const normalizePath = relativePath => relativePath.split(path.sep).join('/');
+export const normalizePath = (relativePath) => relativePath.split(path.sep).join('/');
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
 
@@ -31,7 +34,8 @@ const buildDefaultNamingRolesRuntime = () => ({
   roleSuffixes: ROLE_SUFFIXES,
 });
 
-const resolveNamingRolesRuntime = namingRolesRuntime => namingRolesRuntime ?? buildDefaultNamingRolesRuntime();
+const resolveNamingRolesRuntime = (namingRolesRuntime) =>
+  namingRolesRuntime ?? buildDefaultNamingRolesRuntime();
 
 const isReportableFile = (relativePath, reportableExtensions = REPORTABLE_EXTENSIONS) => {
   const extension = path.extname(relativePath);
@@ -39,12 +43,15 @@ const isReportableFile = (relativePath, reportableExtensions = REPORTABLE_EXTENS
     return true;
   }
 
-  return path.basename(relativePath) === 'package-lock.json' || path.basename(relativePath) === 'package.json';
+  return (
+    path.basename(relativePath) === 'package-lock.json' ||
+    path.basename(relativePath) === 'package.json'
+  );
 };
 
-const sortPaths = paths => Array.from(paths).sort((left, right) => left.localeCompare(right));
+const sortPaths = (paths) => Array.from(paths).sort((left, right) => left.localeCompare(right));
 
-const isPathOutsideRoot = relativePath =>
+const isPathOutsideRoot = (relativePath) =>
   relativePath.startsWith('..') || path.isAbsolute(relativePath);
 
 const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {}) => {
@@ -62,7 +69,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
   const reportableExtensions = options.reportableExtensions ?? REPORTABLE_EXTENSIONS;
   const collected = [];
 
-  const walk = absoluteDirectoryPath => {
+  const walk = (absoluteDirectoryPath) => {
     const entries = fs.readdirSync(absoluteDirectoryPath, { withFileTypes: true });
 
     for (const entry of entries) {
@@ -94,11 +101,11 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
   return collected;
 };
 
-const buildScopePathPredicate = profile => {
+const buildScopePathPredicate = (profile) => {
   const includeRootSet = new Set(profile.includeRoots.map(normalizePath));
   const includeRootFileSet = new Set(profile.includeRootFiles.map(normalizePath));
 
-  return relativePath => {
+  return (relativePath) => {
     const normalizedPath = normalizePath(relativePath);
     if (normalizedPath.includes('/')) {
       const firstSegment = normalizedPath.split('/')[0];
@@ -111,13 +118,13 @@ const buildScopePathPredicate = profile => {
 
 export const listNamingValidatorScopes = () => sortPaths(new Set(Object.keys(SCOPE_PROFILES)));
 
-export const getScopeProfile = scope => {
+export const getScopeProfile = (scope) => {
   const normalizedScope = scope ?? 'repo';
   const profile = SCOPE_PROFILES[normalizedScope];
   return profile ? cloneScopeProfile(profile) : null;
 };
 
-const detectMissingRoleCandidate = basename => {
+const detectMissingRoleCandidate = (basename) => {
   const segments = basename.split('.');
 
   if (segments.length === 2) {
@@ -209,20 +216,26 @@ export const resolveNamingValidatorTargets = (rootDirectory, targets = []) => {
   return resolvedTargets.sort((left, right) => left.relPath.localeCompare(right.relPath));
 };
 
-export const filterRepositoryPathsByTargets = (rootDirectory, relativePaths, resolvedTargets = []) => {
+export const filterRepositoryPathsByTargets = (
+  rootDirectory,
+  relativePaths,
+  resolvedTargets = [],
+) => {
   if (!resolvedTargets.length) {
     return sortPaths(new Set(relativePaths));
   }
 
-  const selectedPaths = relativePaths.filter(relativePath => {
+  const selectedPaths = relativePaths.filter((relativePath) => {
     const absolutePath = path.resolve(rootDirectory, relativePath);
 
-    return resolvedTargets.some(target => {
+    return resolvedTargets.some((target) => {
       if (target.kind === 'file') {
         return absolutePath === target.absPath;
       }
 
-      return absolutePath === target.absPath || absolutePath.startsWith(`${target.absPath}${path.sep}`);
+      return (
+        absolutePath === target.absPath || absolutePath.startsWith(`${target.absPath}${path.sep}`)
+      );
     });
   });
 
@@ -242,7 +255,8 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       path: normalizedPath,
       classification: 'allowed-special-case',
       message: 'Filename matches an allowed reserved/special-case pattern.',
-      ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12',
+      ruleRef:
+        'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12',
       details: { specialCaseType },
     };
   }
@@ -256,8 +270,10 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
         severity: 'info',
         path: normalizedPath,
         classification: 'legacy-exception',
-        message: 'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
-        ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
+        message:
+          'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
+        ruleRef:
+          'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
         suggestedFix: 'Rename to <semantic-name>.<role>.<ext> using an active role.',
         details: missingRoleCandidate,
       };
@@ -273,7 +289,8 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
           path: normalizedPath,
           classification: 'invalid-ambiguous',
           message: `Role segment "${parsed.role}" is deprecated and requires manual migration planning.`,
-          ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
+          ruleRef:
+            'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
           suggestedFix: 'Replace deprecated roles manually using current active role taxonomy.',
           details: {
             ...parsed,
@@ -290,7 +307,8 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
         path: normalizedPath,
         classification: 'invalid-ambiguous',
         message: `Unknown role segment "${parsed.role}" in canonical position.`,
-        ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
+        ruleRef:
+          'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
         suggestedFix: 'Use a role from the active role registry.',
         details: parsed,
       };
@@ -303,7 +321,8 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
         path: normalizedPath,
         classification: 'invalid-ambiguous',
         message: 'Semantic name must use kebab-case for canonical filenames.',
-        ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#semantic-name',
+        ruleRef:
+          'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#semantic-name',
         suggestedFix: `Rename semantic name "${parsed.semanticName}" to kebab-case.`,
         details: {
           ...parsed,
@@ -319,7 +338,8 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       path: normalizedPath,
       classification: 'canonical',
       message: 'Filename is canonical.',
-      ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#core-filename-grammar',
+      ruleRef:
+        'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#core-filename-grammar',
       details: {
         ...parsed,
         roleStatus: roleMetadata.status,
@@ -336,7 +356,8 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       path: normalizedPath,
       classification: 'invalid-ambiguous',
       message: `Role "${ambiguity.role}" appears hyphen-appended instead of dot-separated.`,
-      ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-suffix-separation-rule-important',
+      ruleRef:
+        'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-suffix-separation-rule-important',
       suggestedFix: 'Rename using <semantic-name>.<role>.<ext>.',
     };
   }
@@ -348,8 +369,10 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
       severity: 'info',
       path: normalizedPath,
       classification: 'legacy-exception',
-      message: 'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
-      ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
+      message:
+        'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
+      ruleRef:
+        'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
       suggestedFix: 'Rename to <semantic-name>.<role>.<ext> using an active role.',
       details: missingRoleCandidate,
     };
@@ -360,8 +383,10 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
     severity: 'info',
     path: normalizedPath,
     classification: 'legacy-exception',
-    message: 'Filename does not match canonical format and is treated as incremental legacy exception in report mode.',
-    ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#legacy-file-reality-important',
+    message:
+      'Filename does not match canonical format and is treated as incremental legacy exception in report mode.',
+    ruleRef:
+      'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#legacy-file-reality-important',
   };
 };
 
@@ -373,7 +398,7 @@ export const runNamingValidator = (rootDirectory, options = {}) => {
   });
   const resolvedTargets = resolveNamingValidatorTargets(rootDirectory, options.targets ?? []);
   const paths = filterRepositoryPathsByTargets(rootDirectory, inScopePaths, resolvedTargets);
-  const findings = paths.map(pathname => classifyPath(pathname, options.namingRolesRuntime));
+  const findings = paths.map((pathname) => classifyPath(pathname, options.namingRolesRuntime));
 
   return {
     findings,
@@ -383,7 +408,7 @@ export const runNamingValidator = (rootDirectory, options = {}) => {
       isFiltered: resolvedTargets.length > 0,
       ...(resolvedTargets.length > 0
         ? {
-            targets: resolvedTargets.map(target => target.relPath),
+            targets: resolvedTargets.map((target) => target.relPath),
           }
         : {}),
     },
@@ -394,12 +419,10 @@ const incrementCounter = (counts, key) => {
   counts[key] = (counts[key] ?? 0) + 1;
 };
 
-const sortCountObject = counts =>
-  Object.fromEntries(
-    Object.entries(counts).sort(([left], [right]) => left.localeCompare(right)),
-  );
+const sortCountObject = (counts) =>
+  Object.fromEntries(Object.entries(counts).sort(([left], [right]) => left.localeCompare(right)));
 
-export const summarizeFindings = findings => {
+export const summarizeFindings = (findings) => {
   const counts = {
     canonical: 0,
     'allowed-special-case': 0,

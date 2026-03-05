@@ -35,7 +35,7 @@ function useBodyClass(dark: boolean) {
 // Notes: Provides a stable callback that flips the dark-mode boolean.
 function useDarkToggle(setDark: Dispatch<SetStateAction<boolean>>) {
   return useCallback(() => {
-    setDark(previous => !previous);
+    setDark((previous) => !previous);
   }, [setDark]);
 }
 

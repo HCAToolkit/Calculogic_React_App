@@ -1,7 +1,11 @@
 import os from 'node:os';
 import path from 'node:path';
 
-export const getDefaultCacheBaseDir = (platform = process.platform, env = process.env, homeDir = os.homedir()) => {
+export const getDefaultCacheBaseDir = (
+  platform = process.platform,
+  env = process.env,
+  homeDir = os.homedir(),
+) => {
   if (platform === 'win32') {
     return env.LOCALAPPDATA && env.LOCALAPPDATA.trim()
       ? env.LOCALAPPDATA
@@ -19,5 +23,9 @@ export const getDefaultCacheBaseDir = (platform = process.platform, env = proces
   return path.join(homeDir, '.cache');
 };
 
-export const getDefaultReportsDir = (platform = process.platform, env = process.env, homeDir = os.homedir()) =>
+export const getDefaultReportsDir = (
+  platform = process.platform,
+  env = process.env,
+  homeDir = os.homedir(),
+) =>
   path.join(getDefaultCacheBaseDir(platform, env, homeDir), 'calculogic-report-capture', 'reports');

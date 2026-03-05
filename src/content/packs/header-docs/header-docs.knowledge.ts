@@ -66,7 +66,9 @@ const DEFAULT_CONTENT_META: ContentMeta = {
   tags: [],
 };
 
-function withDefaultContentMeta(definition: Omit<HeaderDocDefinition, 'contentMeta'>): HeaderDocDefinition {
+function withDefaultContentMeta(
+  definition: Omit<HeaderDocDefinition, 'contentMeta'>,
+): HeaderDocDefinition {
   return {
     ...definition,
     contentMeta: {
@@ -130,7 +132,8 @@ export const HEADER_DOC_DEFINITIONS: Record<HeaderDocId, HeaderDocDefinition> = 
     id: HEADER_DOC_IDS.logic,
     concern: 'Logic',
     title: 'Logic Concern Overview',
-    summary: 'Add calculations, conditions, and interaction rules. Keep heavy math in helpers and orchestrate workflows here.',
+    summary:
+      'Add calculations, conditions, and interaction rules. Keep heavy math in helpers and orchestrate workflows here.',
     recommendedWorkflows: [
       'Use Logic/ to react to user input, validate data, and orchestrate cross-configuration communication.',
       'Pair Logic rules with Knowledge traits to stay consistent across similar builds.',
@@ -207,7 +210,8 @@ export const HEADER_DOC_DEFINITIONS: Record<HeaderDocId, HeaderDocDefinition> = 
     id: HEADER_DOC_IDS.results,
     concern: 'Results',
     title: 'Results Concern Overview',
-    summary: 'Design and inspect derived outputs, scores, and summaries. Results/Style/ fine-tunes their presentation.',
+    summary:
+      'Design and inspect derived outputs, scores, and summaries. Results/Style/ fine-tunes their presentation.',
     recommendedWorkflows: [
       'Define scoring formulas and narrative summaries in Results/.',
       'Switch to Results/Style/ to control layout, chart framing, and typography for the same payload.',

@@ -54,10 +54,12 @@ test('parseContentRef treats additional colon segments as part of resolved paylo
   });
 });
 
-
 test('contentProviderRegistry resolves docs:doc-build to found payload', () => {
   const contentProviderRegistry = createRegistry();
-  const found = contentProviderRegistry.resolveContent({ contentId: 'docs:doc-build', anchorId: 'intro' });
+  const found = contentProviderRegistry.resolveContent({
+    contentId: 'docs:doc-build',
+    anchorId: 'intro',
+  });
   assert.deepEqual(found, {
     type: 'found',
     namespace: 'docs',
@@ -94,7 +96,7 @@ test('contentProviderRegistry forwards anchor and context to provider with names
   const contentProviderRegistry = new ContentProviderRegistry();
 
   contentProviderRegistry.registerProvider('docs', {
-    resolveContent: request => {
+    resolveContent: (request) => {
       capturedRequests.push(request);
       return {
         type: 'found',
@@ -112,11 +114,13 @@ test('contentProviderRegistry forwards anchor and context to provider with names
     context: { locale: 'en-US' },
   });
 
-  assert.deepEqual(capturedRequests, [{
-    contentId: 'build:intro',
-    anchorId: 'overview',
-    context: { locale: 'en-US' },
-  }]);
+  assert.deepEqual(capturedRequests, [
+    {
+      contentId: 'build:intro',
+      anchorId: 'overview',
+      context: { locale: 'en-US' },
+    },
+  ]);
 
   assert.deepEqual(resolved, {
     type: 'found',

@@ -12,7 +12,7 @@ const writeJson = (filePath, value) => {
   fs.writeFileSync(filePath, JSON.stringify(value, null, 2));
 };
 
-const assertDigestShape = digest => {
+const assertDigestShape = (digest) => {
   assert.equal(typeof digest, 'string');
   assert.equal(digest.length, 64);
   assert.match(digest, /^[a-f0-9]{64}$/u);
@@ -70,7 +70,10 @@ test('custom state selects custom and digests diverge from builtin when payload 
       { role: 'custom-role', category: 'architecture-support', status: 'active' },
     ]);
 
-    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.ts', '.abc']);
+    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), [
+      '.ts',
+      '.abc',
+    ]);
 
     const result = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
 
@@ -78,7 +81,7 @@ test('custom state selects custom and digests diverge from builtin when payload 
     assert.equal(result.registrySource, 'custom');
     assert.notEqual(result.registryDigests.custom, result.registryDigests.builtin);
     assert.equal(result.registryDigests.resolved, result.registryDigests.custom);
-    assert.ok(result.roles.some(entry => entry.role === 'custom-role'));
+    assert.ok(result.roles.some((entry) => entry.role === 'custom-role'));
     assert.ok(result.reportableExtensions.includes('.abc'));
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
@@ -125,7 +128,6 @@ test('throws when custom is active and custom files are missing', () => {
   }
 });
 
-
 test('throws when custom roles include invalid category', () => {
   const tempRoot = makeTempRegistryRoot();
 
@@ -139,7 +141,9 @@ test('throws when custom roles include invalid category', () => {
       { role: 'x', category: 'nope', status: 'active' },
     ]);
 
-    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.ts']);
+    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), [
+      '.ts',
+    ]);
 
     assert.throws(
       () => resolveNamingRegistryInputs({ registryRootDir: tempRoot }),
@@ -163,7 +167,9 @@ test('throws when custom roles include invalid status', () => {
       { role: 'x', category: 'architecture-support', status: 'provisional' },
     ]);
 
-    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.ts']);
+    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), [
+      '.ts',
+    ]);
 
     assert.throws(
       () => resolveNamingRegistryInputs({ registryRootDir: tempRoot }),

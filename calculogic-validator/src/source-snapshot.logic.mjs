@@ -8,13 +8,13 @@ const runGit = (cwd, args) =>
     stdio: ['ignore', 'pipe', 'pipe'],
   });
 
-const parseStatusDiagnostics = statusOutput => {
+const parseStatusDiagnostics = (statusOutput) => {
   const lines = statusOutput
     .split('\n')
-    .map(line => line.trimEnd())
+    .map((line) => line.trimEnd())
     .filter(Boolean);
 
-  const untrackedCount = lines.filter(line => line.startsWith('??')).length;
+  const untrackedCount = lines.filter((line) => line.startsWith('??')).length;
   const changedCount = lines.length - untrackedCount;
 
   return {

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runNamingValidator } from '../src/naming/naming-validator.host.mjs';
 
-const assertDigestShape = digest => {
+const assertDigestShape = (digest) => {
   assert.equal(typeof digest, 'string');
   assert.match(digest, /^[a-f0-9]{64}$/u);
 };

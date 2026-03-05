@@ -4,12 +4,12 @@ This note defines how **doc-engine modules** map to CCS concerns so file naming 
 
 ## 1) Mapping Table
 
-| CCS Concern | Doc-engine modules | Scope |
-| --- | --- | --- |
-| **Build** | `drawer`, `renderer` | UI composition, anchors, visible structure only. |
-| **Logic** | `resolver`, `providerRegistry`, `useOrchestration*` hooks | Dependency resolution, provider lookup, orchestration flow/state. |
-| **Knowledge** | `contentCatalog*`, `contentSchema*`, `*Definition*` | Static catalogs, schema contracts, declarative definitions. |
-| **Results** | `diagnostics*`, `telemetry*` surfaces | Read-only debug/readout output (if present). |
+| CCS Concern   | Doc-engine modules                                        | Scope                                                             |
+| ------------- | --------------------------------------------------------- | ----------------------------------------------------------------- |
+| **Build**     | `drawer`, `renderer`                                      | UI composition, anchors, visible structure only.                  |
+| **Logic**     | `resolver`, `providerRegistry`, `useOrchestration*` hooks | Dependency resolution, provider lookup, orchestration flow/state. |
+| **Knowledge** | `contentCatalog*`, `contentSchema*`, `*Definition*`       | Static catalogs, schema contracts, declarative definitions.       |
+| **Results**   | `diagnostics*`, `telemetry*` surfaces                     | Read-only debug/readout output (if present).                      |
 
 ## 2) File Naming Rules
 

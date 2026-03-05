@@ -121,7 +121,9 @@ function determineBreakpoint(width: number): 'desktop' | 'tablet' | 'mobile' {
 // [5.2] shell-globalHeader · Container · "Global Header Logic Hook"
 // Concern: Logic · Catalog: logic.hook
 // Notes: Central orchestrator bundling build/results bindings from React state.
-export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps = {}): GlobalHeaderShellBindings {
+export function useGlobalHeaderShellLogic({
+  onPublish,
+}: GlobalHeaderShellProps = {}): GlobalHeaderShellBindings {
   // [5.2.1] shell-globalHeader · Primitive · "State Initialization & Bootstrapping"
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: state.initialize
   // Notes: Hydrates initial state and adapts to SSR absence of window.
@@ -144,7 +146,7 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
       return undefined;
     }
     const handleResize = () => {
-      setState(prev => {
+      setState((prev) => {
         const nextBreakpoint = determineBreakpoint(window.innerWidth);
         if (prev.viewportBreakpoint === nextBreakpoint) {
           return prev;
@@ -165,10 +167,9 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: interaction.handler
   // Notes: Resets hovered state and mode defaults when switching concerns.
   const selectTab = useCallback((tab: HeaderTabId) => {
-    setState(prev => {
+    setState((prev) => {
       const nextModeMenuVisibleForTab = isModeMenuTab(tab) ? tab : null;
-      const shouldResetMode =
-        isModeMenuTab(tab) && prev.activeModeByTab[tab] !== 'default';
+      const shouldResetMode = isModeMenuTab(tab) && prev.activeModeByTab[tab] !== 'default';
 
       if (
         prev.activeTab === tab &&
@@ -200,7 +201,7 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: interaction.handler
   // Notes: Stores hovered tab id while skipping no-op updates.
   const hoverTab = useCallback((tab: HeaderTabId | null) => {
-    setState(prev => {
+    setState((prev) => {
       let nextModeMenuVisibleForTab = prev.modeMenuVisibleForTab;
 
       if (isModeMenuTab(tab)) {
@@ -228,7 +229,7 @@ export function useGlobalHeaderShellLogic({ onPublish }: GlobalHeaderShellProps 
   // Concern: Logic · Parent: "Global Header Logic Hook" · Catalog: interaction.handler
   // Notes: Pins requested tab and updates mode selection while clearing hover state.
   const selectTabMode = useCallback((tab: 'build' | 'results', mode: HeaderModeId) => {
-    setState(prev => {
+    setState((prev) => {
       const currentMode = prev.activeModeByTab[tab];
       const shouldUpdateMode = currentMode !== mode;
       const shouldUpdateTab = prev.activeTab !== tab;
