@@ -23,7 +23,10 @@
     "report:all:validator": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-validator -- node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs --scope=validator",
     "report:all:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-system -- node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs --scope=system",
     "report:verify": "node calculogic-validator/scripts/report-capture-verify.mjs",
-    "report:summarize": "node calculogic-validator/scripts/report-capture-summarize.mjs"
+    "report:summarize": "node calculogic-validator/scripts/report-capture-summarize.mjs",
+    "lint:fix": "eslint . --fix",
+    "format:check": "prettier . --check",
+    "format:write": "prettier . --write"
   },
   "dependencies": {
     "json-logic-js": "^2.0.5",
@@ -51,7 +54,13 @@
     "vite": "^6.3.1",
     "@calculogic/report-capture": "file:calculogic-validator/tools/report-capture",
     "@calculogic/validator": "file:calculogic-validator",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "prettier": "^3.6.2",
+    "eslint-config-prettier": "^10.1.8"
   },
   "engines": {
     "node": ">=22"
