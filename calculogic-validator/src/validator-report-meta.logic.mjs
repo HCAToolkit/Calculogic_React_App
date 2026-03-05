@@ -15,7 +15,7 @@ export const getValidatorToolVersion = () => {
   return packageJson.version;
 };
 
-const normalizeForStableStringify = value => {
+const normalizeForStableStringify = (value) => {
   if (Array.isArray(value)) {
     return value.map(normalizeForStableStringify);
   }
@@ -24,16 +24,15 @@ const normalizeForStableStringify = value => {
     return Object.fromEntries(
       Object.keys(value)
         .sort()
-        .map(key => [key, normalizeForStableStringify(value[key])]),
+        .map((key) => [key, normalizeForStableStringify(value[key])]),
     );
   }
 
   return value;
 };
 
-export const stableStringify = value => JSON.stringify(normalizeForStableStringify(value));
+export const stableStringify = (value) => JSON.stringify(normalizeForStableStringify(value));
 
-export const sha256Hex = text => crypto.createHash('sha256').update(text, 'utf8').digest('hex');
+export const sha256Hex = (text) => crypto.createHash('sha256').update(text, 'utf8').digest('hex');
 
-export const computeConfigDigest = config => sha256Hex(stableStringify(config));
-
+export const computeConfigDigest = (config) => sha256Hex(stableStringify(config));

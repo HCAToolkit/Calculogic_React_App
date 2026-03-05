@@ -14,7 +14,9 @@ test('config naming.roles.add recognizes added role and changes classification d
     fs.writeFileSync(path.join(tempRoot, 'src', 'demo.provider.ts'), 'export const demo = 1;\n');
 
     const withoutConfig = runNamingValidator(tempRoot, { scope: 'repo' });
-    const noConfigFinding = withoutConfig.findings.find(finding => finding.path === 'src/demo.provider.ts');
+    const noConfigFinding = withoutConfig.findings.find(
+      (finding) => finding.path === 'src/demo.provider.ts',
+    );
 
     assert.ok(noConfigFinding);
     assert.equal(noConfigFinding.code, 'NAMING_UNKNOWN_ROLE');
@@ -24,7 +26,9 @@ test('config naming.roles.add recognizes added role and changes classification d
       { cwd: process.cwd() },
     );
     const withConfig = runNamingValidator(tempRoot, { scope: 'repo', config });
-    const withConfigFinding = withConfig.findings.find(finding => finding.path === 'src/demo.provider.ts');
+    const withConfigFinding = withConfig.findings.find(
+      (finding) => finding.path === 'src/demo.provider.ts',
+    );
 
     assert.ok(withConfigFinding);
     assert.notEqual(withConfigFinding.code, 'NAMING_UNKNOWN_ROLE');

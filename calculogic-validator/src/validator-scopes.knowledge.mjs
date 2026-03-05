@@ -28,15 +28,16 @@ export const SCOPE_PROFILES = {
   },
 };
 
-export const cloneScopeProfile = profile => ({
+export const cloneScopeProfile = (profile) => ({
   description: profile.description,
   includeRoots: [...profile.includeRoots],
   includeRootFiles: [...profile.includeRootFiles],
 });
 
-export const listValidatorScopes = () => Array.from(new Set(Object.keys(SCOPE_PROFILES))).sort((a, b) => a.localeCompare(b));
+export const listValidatorScopes = () =>
+  Array.from(new Set(Object.keys(SCOPE_PROFILES))).sort((a, b) => a.localeCompare(b));
 
-export const getValidatorScopeProfile = scope => {
+export const getValidatorScopeProfile = (scope) => {
   const normalizedScope = scope ?? 'repo';
   const profile = SCOPE_PROFILES[normalizedScope];
   return profile ? cloneScopeProfile(profile) : null;

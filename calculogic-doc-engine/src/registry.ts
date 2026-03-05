@@ -69,7 +69,10 @@ export function parseContentRef(contentId: string): ParsedContentRef {
   };
 }
 
-export function splitNamespace(contentId: string): { namespace: string | null; resolvedId: string | null } {
+export function splitNamespace(contentId: string): {
+  namespace: string | null;
+  resolvedId: string | null;
+} {
   const parsedRef = parseContentRef(contentId);
 
   if (parsedRef.type === 'invalid_ref') {

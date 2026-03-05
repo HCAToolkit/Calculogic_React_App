@@ -17,7 +17,7 @@ const parsePositiveInt = (value, fallback) => {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 };
 
-const parseArgs = argv => {
+const parseArgs = (argv) => {
   const separatorIndex = argv.indexOf('--');
   if (separatorIndex === -1) {
     throw new Error('Missing command separator "--" and wrapped command.');
@@ -98,7 +98,7 @@ const parseArgs = argv => {
   };
 };
 
-const resolveWindowsCommand = command => {
+const resolveWindowsCommand = (command) => {
   if (process.platform !== 'win32') {
     return command;
   }
@@ -135,11 +135,16 @@ const run = async () => {
   if (shouldPrune({ noPrune: options.noPrune }) && options.warnOnPrune) {
     const existing = await listMatchingReports(reportDir, { prefix: options.prefix });
     if (existing.length >= options.keep) {
-      process.stderr.write(`WARNING: This run will prune reports beyond the newest ${options.keep}. Save anything you want to keep before continuing.\n`);
+      process.stderr.write(
+        `WARNING: This run will prune reports beyond the newest ${options.keep}. Save anything you want to keep before continuing.\n`,
+      );
     }
   }
 
-  const reportPath = path.join(reportDir, buildReportFilename({ prefix: options.prefix, date: startedAt }));
+  const reportPath = path.join(
+    reportDir,
+    buildReportFilename({ prefix: options.prefix, date: startedAt }),
+  );
   const reportStream = fs.createWriteStream(reportPath, { flags: 'a' });
 
   const resolvedCommand = resolveWindowsCommand(command);
@@ -148,13 +153,13 @@ const run = async () => {
   });
 
   let bytes = 0;
-  child.stdout.on('data', chunk => {
+  child.stdout.on('data', (chunk) => {
     bytes += chunk.length;
     process.stdout.write(chunk);
     reportStream.write(chunk);
   });
 
-  child.stderr.on('data', chunk => {
+  child.stderr.on('data', (chunk) => {
     bytes += chunk.length;
     process.stderr.write(chunk);
     reportStream.write(chunk);
@@ -162,11 +167,11 @@ const run = async () => {
 
   const exitCode = await new Promise((resolve, reject) => {
     child.on('error', reject);
-    child.on('close', code => resolve(code ?? 1));
+    child.on('close', (code) => resolve(code ?? 1));
   });
 
   await new Promise((resolve, reject) => {
-    reportStream.end(error => (error ? reject(error) : resolve()));
+    reportStream.end((error) => (error ? reject(error) : resolve()));
   });
 
   if (shouldPrune({ noPrune: options.noPrune })) {
@@ -191,7 +196,7 @@ const run = async () => {
   process.exit(exitCode);
 };
 
-run().catch(error => {
+run().catch((error) => {
   process.stderr.write(`${error.message}\n`);
   process.exit(1);
 });

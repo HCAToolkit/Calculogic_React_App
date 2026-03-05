@@ -5,27 +5,30 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
-const summarizerScriptPath = path.resolve('calculogic-validator/scripts/report-capture-summarize.mjs');
+const summarizerScriptPath = path.resolve(
+  'calculogic-validator/scripts/report-capture-summarize.mjs',
+);
 
-const runSummarizer = args => new Promise((resolve, reject) => {
-  const child = spawn(process.execPath, [summarizerScriptPath, ...args]);
+const runSummarizer = (args) =>
+  new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [summarizerScriptPath, ...args]);
 
-  let stdout = '';
-  let stderr = '';
+    let stdout = '';
+    let stderr = '';
 
-  child.stdout.on('data', chunk => {
-    stdout += chunk.toString();
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+
+    child.on('error', reject);
+    child.on('close', (code) => {
+      resolve({ exitCode: code ?? 1, stdout, stderr });
+    });
   });
-
-  child.stderr.on('data', chunk => {
-    stderr += chunk.toString();
-  });
-
-  child.on('error', reject);
-  child.on('close', code => {
-    resolve({ exitCode: code ?? 1, stdout, stderr });
-  });
-});
 
 const writeReport = ({ dir, filename, report, mtime }) => {
   const reportPath = path.join(dir, filename);

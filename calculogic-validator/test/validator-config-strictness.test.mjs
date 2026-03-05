@@ -28,8 +28,6 @@ test('fails when config root contains unknown key', () => {
   }
 });
 
-
-
 test('allows optional root $schema editor hint key and normalizes deterministically', () => {
   const tempPath = writeTempConfig('tmp-config-with-root-schema-key.json', {
     $schema: './calculogic-validator/src/validator-config.schema.json',

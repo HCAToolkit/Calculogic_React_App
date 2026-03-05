@@ -161,7 +161,7 @@ function BuildModeMenu({
       role="group"
       aria-label="Build tab modes"
     >
-      {modes.map(mode => (
+      {modes.map((mode) => (
         <ModeMenuItem
           key={mode.id}
           mode={mode}
@@ -196,7 +196,7 @@ function ResultsModeMenu({
       role="group"
       aria-label="Results tab modes"
     >
-      {modes.map(mode => (
+      {modes.map((mode) => (
         <ModeMenuItem
           key={mode.id}
           mode={mode}
@@ -233,10 +233,8 @@ export function GlobalHeaderShell({
   // Concern: Build · Parent: "Brand Identity Zone" · Catalog: content.copy
   // Notes: Controlled here to suppress tagline on mobile breakpoints.
   const showTagline = !isMobile;
-  const buildModeItems = modeSequence.build.map(modeId => modeMetadata.build[modeId]);
-  const resultsModeItems = modeSequence.results.map(
-    modeId => modeMetadata.results[modeId],
-  );
+  const buildModeItems = modeSequence.build.map((modeId) => modeMetadata.build[modeId]);
+  const resultsModeItems = modeSequence.results.map((modeId) => modeMetadata.results[modeId]);
 
   return (
     // [3.1.1] shell-globalHeader · Container · "Global Header Shell Frame"
@@ -246,7 +244,10 @@ export function GlobalHeaderShell({
       {/* [3.2] shell-globalHeader · Subcontainer · "Brand Identity Zone"
           Concern: Build · Parent: "Global Header Shell Frame" · Catalog: layout.group
           Notes: Houses brand anchor, glyph, wordmark, and optional tagline. */}
-      <div className="global-header-shell__zone global-header-shell__zone--brand" data-anchor="global-header.brand">
+      <div
+        className="global-header-shell__zone global-header-shell__zone--brand"
+        data-anchor="global-header.brand"
+      >
         {/* [3.3] shell-globalHeader · Primitive · "Brand Home Link"
             Concern: Build · Parent: "Brand Identity Zone" · Catalog: navigation.link
             Notes: Wraps brand visuals and routes to home with tooltip copy. */}
@@ -283,12 +284,15 @@ export function GlobalHeaderShell({
       {/* [3.7] shell-globalHeader · Subcontainer · "Tab Navigation Zone"
           Concern: Build · Parent: "Global Header Shell Frame" · Catalog: layout.group
           Notes: Flexes to occupy middle column and center align tab list. */}
-      <div className="global-header-shell__zone global-header-shell__zone--tabs" data-anchor="global-header.tabs">
+      <div
+        className="global-header-shell__zone global-header-shell__zone--tabs"
+        data-anchor="global-header.tabs"
+      >
         {/* [3.8] shell-globalHeader · Subcontainer · "Tab List Track"
             Concern: Build · Parent: "Tab Navigation Zone" · Catalog: navigation.list
             Notes: Tablist semantic wrapper providing scrollable rail. */}
         <div className="tab-list" role="tablist" aria-label="Primary builder concerns">
-          {tabs.map(tab => {
+          {tabs.map((tab) => {
             const isActive = tab.id === activeTab;
             const isHovered = hoveredTab === tab.id;
             const infoLabelId = `global-header-tab-${tab.id}-summary`;
@@ -299,13 +303,13 @@ export function GlobalHeaderShell({
             const activeModeId = isBuildTab
               ? activeModeByTab.build
               : isResultsTab
-              ? activeModeByTab.results
-              : null;
+                ? activeModeByTab.results
+                : null;
             const activeModeDefinition = isBuildTab
               ? modeMetadata.build[activeModeId ?? 'default']
               : isResultsTab
-              ? modeMetadata.results[activeModeId ?? 'default']
-              : null;
+                ? modeMetadata.results[activeModeId ?? 'default']
+                : null;
             return (
               // [3.2.4] shell-globalHeader · Subcontainer · "Tab Item Row"
               // Concern: Build · Parent: "Tab List Track" · Catalog: layout.row
@@ -322,7 +326,7 @@ export function GlobalHeaderShell({
                 onMouseEnter={() => hoverTab(tab.id)}
                 onMouseLeave={() => hoverTab(null)}
                 onFocus={() => hoverTab(tab.id)}
-                onBlur={event => {
+                onBlur={(event) => {
                   if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
                     hoverTab(null);
                   }
@@ -354,7 +358,7 @@ export function GlobalHeaderShell({
                   <BuildModeMenu
                     activeMode={activeModeByTab.build}
                     isPinned={isActive}
-                    selectMode={mode => selectTabMode('build', mode)}
+                    selectMode={(mode) => selectTabMode('build', mode)}
                     modes={buildModeItems}
                   />
                 )}
@@ -362,7 +366,7 @@ export function GlobalHeaderShell({
                   <ResultsModeMenu
                     activeMode={activeModeByTab.results}
                     isPinned={isActive}
-                    selectMode={mode => selectTabMode('results', mode)}
+                    selectMode={(mode) => selectTabMode('results', mode)}
                     modes={resultsModeItems}
                   />
                 )}
@@ -374,7 +378,10 @@ export function GlobalHeaderShell({
       {/* [3.12] shell-globalHeader · Subcontainer · "Publish Action Zone"
           Concern: Build · Parent: "Global Header Shell Frame" · Catalog: layout.group
           Notes: Right-aligned zone hosting publish CTA. */}
-      <div className="global-header-shell__zone global-header-shell__zone--publish" data-anchor="global-header.publish">
+      <div
+        className="global-header-shell__zone global-header-shell__zone--publish"
+        data-anchor="global-header.publish"
+      >
         {/* [3.13] shell-globalHeader · Primitive · "Publish Button"
             Concern: Build · Parent: "Publish Action Zone" · Catalog: action.button
             Notes: High-signal CTA dispatching publish handler. */}

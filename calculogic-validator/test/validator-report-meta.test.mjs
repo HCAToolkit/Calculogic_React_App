@@ -5,7 +5,10 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
-import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
+import {
+  computeConfigDigest,
+  getValidatorToolVersion,
+} from '../src/validator-report-meta.logic.mjs';
 
 test('getValidatorToolVersion matches calculogic-validator/package.json version', () => {
   const packageJsonPath = path.resolve(

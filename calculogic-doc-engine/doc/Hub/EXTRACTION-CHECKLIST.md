@@ -45,6 +45,7 @@ These are host-app responsibilities that consume doc-engine contracts.
 ## 5) Runtime/service note (separate phase)
 
 Runtime/service extraction is a separate phase decision:
+
 - It may become a standalone doc-engine runtime service, or
 - It may be merged into the headless runtime engine.
 

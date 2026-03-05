@@ -22,6 +22,10 @@ export const ROLE_REGISTRY = [
   },
 ];
 
-export const ROLE_METADATA = new Map(ROLE_REGISTRY.map(entry => [entry.role, entry]));
-export const ACTIVE_ROLES = new Set(ROLE_REGISTRY.filter(entry => entry.status === 'active').map(entry => entry.role));
-export const ROLE_SUFFIXES = ROLE_REGISTRY.map(entry => entry.role).sort((a, b) => b.length - a.length);
+export const ROLE_METADATA = new Map(ROLE_REGISTRY.map((entry) => [entry.role, entry]));
+export const ACTIVE_ROLES = new Set(
+  ROLE_REGISTRY.filter((entry) => entry.status === 'active').map((entry) => entry.role),
+);
+export const ROLE_SUFFIXES = ROLE_REGISTRY.map((entry) => entry.role).sort(
+  (a, b) => b.length - a.length,
+);

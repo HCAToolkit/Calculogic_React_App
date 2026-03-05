@@ -3,22 +3,29 @@
 This document is a configuration-level NL skeleton for the planned Doc Engine Content Resolver.
 
 ## 1. Purpose and Scope
+
 ### 1.1 Purpose
+
 Define how raw provider payloads are resolved into normalized `ContentNode` objects for downstream UI and workflow concerns.
 
 ### 1.2 Context
+
 Runs as a core domain service behind authoring and navigation components.
 
 ### 1.3 Interactions
+
 Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conforming to `cfg-contentNodeSchema`, and serves filtered results to `cfg-contentDrawer`.
 
 ### 1.4 In-Repo Staging Boundary
+
 - Core package runtime implementation lives under `calculogic-doc-engine/src/*`.
 - Host shims live under `src/doc-engine/*` as thin re-exports during staged migration.
 - Resolver runtime modules must not import from UI feature directories (`src/components/*`, `src/tabs/*`).
 
 ## 2. Configuration Contracts
+
 ### 2.1 TypeScript Interfaces
+
 - `ContentResolutionRequest` – namespaced content reference (`namespace:id`), optional anchor, optional context.
 - `ContentResolutionResult` – discriminated union with exactly two top-level branches:
   - `found`
@@ -26,23 +33,29 @@ Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conf
 - `ParsedContentRef` – namespace parser result (`valid` vs `invalid_ref`) used by resolver guards and contract tests.
 
 ### 2.2 Data & State Requirements
+
 - Local state: per-request lifecycle state and cache index.
 - Global context: runtime environment flags (preview/live), tenant/workspace ID.
 - External data sources: provider adapter fetch methods and optional remote API endpoints.
 
 ### 2.3 Dependencies
+
 - Shared utilities: adapter execution helper, validation library, cache utility.
 - Async primitives: abort signals and concurrency gate.
 
 ## 3. Build Concern (Structure)
+
 ### 3.0 Dependencies & Hierarchy Notes
+
 - Primary structure is service-oriented with container-level orchestration and nested subcontainers for stages.
 
 ### 3.1 Atomic Components — Containers (Build)
+
 - **[3.1.1] Container – "Resolver Pipeline"**
   - Children: `[3.2.1] Request Intake`, `[3.2.2] Adapter Dispatch`, `[3.2.3] Normalization Stage`, `[3.2.4] Cache Stage`, `[3.2.5] Output Stage`.
 
 ### 3.2 Atomic Components — Subcontainers (Build)
+
 - **[3.2.1] Subcontainer – "Request Intake"**
   - Children: `[3.3.1] Request Guard`, `[3.3.2] Scope Parser`.
 - **[3.2.2] Subcontainer – "Adapter Dispatch"**
@@ -55,6 +68,7 @@ Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conf
   - Children: `[3.3.9] Response Composer`.
 
 ### 3.3 Atomic Components — Primitives (Build)
+
 - **[3.3.1] Primitive – "Request Guard"**
 - **[3.3.2] Primitive – "Scope Parser"**
   - Split namespace parser is exported for contract tests covering valid/invalid `contentId` formats.
@@ -67,34 +81,45 @@ Accepts provider adapters registered by `cfg-providerRegistry`, emits nodes conf
 - **[3.3.9] Primitive – "Response Composer"**
 
 ## 4. BuildStyle Concern (Visual Styling of Structure)
+
 ### 4.0 Dependencies
+
 Not UI-focused; style concern applies only to optional diagnostics visualization.
 
 ### 4.1 Atomic Components — Containers / Groups (BuildStyle)
+
 - **[4.1.1] Container – "Resolver Diagnostic Layout"**
 
 ### 4.2 Atomic Components — Primitives (BuildStyle)
+
 - **[4.2.1] Primitive – "Stage Badge Styling"**
 - **[4.2.2] Primitive – "Latency Meter Styling"**
 
 ### 4.3 Responsive Rules
+
 - N/A for non-visual runtime path.
 
 ### 4.4 Interaction Styles
+
 - N/A except debug panel interactions if rendered.
 
 ## 5. Logic Concern (Workflow)
+
 ### 5.0 Dependencies
+
 Promises, abortable operations, schema validation hooks.
 
 ### 5.1 Atomic Components — Containers (Logic)
+
 - **[5.1.1] Container – "ContentResolverLogic"** handles full resolve lifecycle.
 
 ### 5.2 Atomic Components — Subcontainers (Logic)
+
 - **[5.2.1] Subcontainer – "Resolve Lifecycle"**
 - **[5.2.2] Subcontainer – "Error Recovery"**
 
 ### 5.3 Atomic Components — Primitives (Logic)
+
 - **[5.3.1] Primitive – "Cache Hit Decision"**
 - **[5.3.2] Primitive – "Adapter Invocation"**
 - **[5.3.3] Primitive – "Normalization Execution"**
@@ -104,37 +129,50 @@ Promises, abortable operations, schema validation hooks.
 - **[5.3.6] Primitive – "Response Emit"**
 
 ## 6. Knowledge Concern (Reference Data)
+
 ### 6.1 Maps / Dictionaries
+
 - Provider-to-adapter map and node-type normalization map.
 - Header docs catalog keyed by pack-owned `HeaderDocId` constants from `header-doc.ids.ts`.
 
 ### 6.2 Constants
+
 - Cache TTL defaults, retry limits, resolver error codes.
 - Canonical header doc identifiers (`doc-build`, `doc-logic`, `doc-knowledge`, `doc-results`) exported from pack-owned ids module.
 
 ### 6.3 Shared / Global Reference
+
 - Shares schema version and provider capability constants with sibling configs.
 - Exposes docs namespace formatting helper (`toDocsContentId`) at the pack/provider boundary so shell components avoid inline id encoding details.
 
 ## 7. Results Concern (Outputs)
+
 ### 7.1 User-Facing Outputs
+
 - Normalized node lists and query cursors.
 
 ### 7.2 Dev / Debug Outputs
+
 - Stage timings, adapter warnings, validation error summaries.
 
 ### 7.3 Accessibility Outputs
+
 - N/A (service-level concern).
 
 ## 8. ResultsStyle Concern (Output Styling)
+
 ### 8.1 Results Layout Styles
+
 - Debug timeline/list styling when surfaced in tooling.
 
 ### 8.2 Debug Display Styles
+
 - Severity color coding for warnings/errors.
 
 ## 9. Assembly Pattern
+
 ### 9.1 File Structure
+
 - `calculogic-doc-engine/src/types.ts`
 - `calculogic-doc-engine/src/registry.ts`
 - `src/content/providers/docs.provider.ts`
@@ -143,14 +181,18 @@ Promises, abortable operations, schema validation hooks.
 - `calculogic-doc-engine/src/index.ts`
 
 ### 9.2 Assembly Logic
+
 - Expose resolver factory that wires adapter registry, schema validator, and cache provider.
 - App-owned docs catalog and provider are composed from `src/content/*`; doc-engine exports core resolver contracts only.
 
 ### 9.3 Integration
+
 - Consumed by UI configs and backend-facing orchestration points.
 
 ## 10. Implementation Passes
+
 ### 10.1 Pass Mapping
+
 - Pass 0: skeleton + atomic IDs.
 - Pass 1: resolver pipeline scaffolding.
 - Pass 2: adapter dispatch and normalization.
@@ -158,6 +200,7 @@ Promises, abortable operations, schema validation hooks.
 - Pass 4: diagnostics output.
 
 ### 10.2 Export Checklist
+
 - Containers/subcontainers/primitives are explicitly enumerated for CCPP mapping.
 - Resolver exports a single `ContentResolutionResult` union so consumers never branch on `null` for resolution outcomes.
 - `NotFound` remains the failure branch but carries explicit discriminants (`invalid_ref | no_provider | missing_content`) to scale namespace/provider composition without ambiguous reason strings.

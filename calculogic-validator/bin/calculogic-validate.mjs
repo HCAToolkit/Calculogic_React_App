@@ -1,23 +1,31 @@
 #!/usr/bin/env node
 
-import { getValidatorScopeProfile, listValidatorScopes } from '../src/validator-scopes.knowledge.mjs';
+import {
+  getValidatorScopeProfile,
+  listValidatorScopes,
+} from '../src/validator-scopes.knowledge.mjs';
 import { runValidatorRunner } from '../src/validator-runner.logic.mjs';
 import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
-import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
+import {
+  computeConfigDigest,
+  getValidatorToolVersion,
+} from '../src/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromRunnerReport } from '../src/validator-exit-code.logic.mjs';
 
 const supportedScopes = listValidatorScopes();
 const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
-const supportedScopesToken = preferredScopeOrder.filter(scope => supportedScopes.includes(scope)).join('|');
+const supportedScopesToken = preferredScopeOrder
+  .filter((scope) => supportedScopes.includes(scope))
+  .join('|');
 
 const usageLines = [
   `Usage: calculogic-validate [--scope=<${supportedScopesToken}>] [--validators=<id1,id2>] [--config=<path>] [--strict]`,
   'Validators:',
-  ...listRegisteredValidators().map(validatorId => `  - ${validatorId}`),
+  ...listRegisteredValidators().map((validatorId) => `  - ${validatorId}`),
   'Scopes:',
-  ...supportedScopes.map(scope => {
+  ...supportedScopes.map((scope) => {
     const profile = getValidatorScopeProfile(scope);
     return `  - ${scope}: ${profile?.description ?? ''}`;
   }),
@@ -31,7 +39,7 @@ const usageLines = [
   '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=repo --strict',
 ];
 
-const parseCliArgs = argv => {
+const parseCliArgs = (argv) => {
   let selectedScope;
   let validators;
   let configPath;
@@ -56,7 +64,7 @@ const parseCliArgs = argv => {
       const raw = argument.slice('--validators='.length);
       validators = raw
         .split(',')
-        .map(value => value.trim())
+        .map((value) => value.trim())
         .filter(Boolean);
       continue;
     }

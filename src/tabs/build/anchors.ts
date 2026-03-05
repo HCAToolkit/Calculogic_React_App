@@ -40,4 +40,4 @@ export const BUILD_ANCHORS = {
 // [6.2.1] cfg-buildSurface · Primitive · "Anchor Type Alias"
 // Concern: Knowledge · Parent: "Anchor Registry" · Catalog: contract.type
 // Notes: Provides union of anchor identifiers for compile-time validation.
-export type BuildAnchorId = typeof BUILD_ANCHORS[keyof typeof BUILD_ANCHORS];
+export type BuildAnchorId = (typeof BUILD_ANCHORS)[keyof typeof BUILD_ANCHORS];

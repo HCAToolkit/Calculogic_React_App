@@ -1,7 +1,4 @@
-import {
-  runNamingValidator,
-  summarizeFindings,
-} from './naming/naming-validator.host.mjs';
+import { runNamingValidator, summarizeFindings } from './naming/naming-validator.host.mjs';
 
 const runNamingValidatorHook = (repositoryRoot, options = {}) => {
   const scope = options.scope;
@@ -39,6 +36,8 @@ export const VALIDATOR_REGISTRY = [
   },
 ];
 
-export const listRegisteredValidators = () => VALIDATOR_REGISTRY.map(validator => validator.id).sort((a, b) => a.localeCompare(b));
+export const listRegisteredValidators = () =>
+  VALIDATOR_REGISTRY.map((validator) => validator.id).sort((a, b) => a.localeCompare(b));
 
-export const getValidatorById = id => VALIDATOR_REGISTRY.find(validator => validator.id === id) ?? null;
+export const getValidatorById = (id) =>
+  VALIDATOR_REGISTRY.find((validator) => validator.id === id) ?? null;

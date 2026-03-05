@@ -6,7 +6,7 @@
  * Invariants: Persistence failures never throw to UI flow; development logs include operation and storage key.
  */
 
-export type BuildSurfacePersistenceOperation = "read" | "write";
+export type BuildSurfacePersistenceOperation = 'read' | 'write';
 
 export interface BuildSurfacePersistenceFailure {
   operation: BuildSurfacePersistenceOperation;
@@ -14,22 +14,20 @@ export interface BuildSurfacePersistenceFailure {
   error: unknown;
 }
 
-export type BuildSurfacePersistenceReporter = (
-  failure: BuildSurfacePersistenceFailure,
-) => void;
+export type BuildSurfacePersistenceReporter = (failure: BuildSurfacePersistenceFailure) => void;
 
 // [5.2.6] cfg-buildSurface · Primitive · "Persistence Failure Reporter"
 // Concern: Logic · Parent: "Persistence Effect" · Catalog: telemetry.signal
 // Notes: Emits non-fatal diagnostics for persistence errors while preserving silent UX recovery.
-export const defaultBuildSurfacePersistenceReporter: BuildSurfacePersistenceReporter =
-  ({ operation, storageKey, error }) => {
-    if (import.meta.env.DEV) {
-      console.warn(
-        `[build-surface][persistence:${operation}] ${storageKey}`,
-        error,
-      );
-    }
-  };
+export const defaultBuildSurfacePersistenceReporter: BuildSurfacePersistenceReporter = ({
+  operation,
+  storageKey,
+  error,
+}) => {
+  if (import.meta.env.DEV) {
+    console.warn(`[build-surface][persistence:${operation}] ${storageKey}`, error);
+  }
+};
 
 // [5.2.4] cfg-buildSurface · Primitive · "Persistence Effect"
 // Concern: Logic · Parent: "Section Logic Hook" · Catalog: effect.persistence
@@ -43,7 +41,7 @@ export function readBuildSurfaceStorage<T>(
   try {
     return read();
   } catch (error) {
-    reporter({ operation: "read", storageKey, error });
+    reporter({ operation: 'read', storageKey, error });
     return fallback;
   }
 }
@@ -59,6 +57,6 @@ export function writeBuildSurfaceStorage(
   try {
     write();
   } catch (error) {
-    reporter({ operation: "write", storageKey, error });
+    reporter({ operation: 'write', storageKey, error });
   }
 }

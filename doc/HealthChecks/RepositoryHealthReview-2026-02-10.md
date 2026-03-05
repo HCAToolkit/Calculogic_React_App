@@ -1,12 +1,14 @@
 # Repository Health Review — 2026-02-10
 
 ## Scope and method
+
 - Reviewed architecture, representative modules, and runtime/tooling contracts across app shell, build surface, global header, and content drawer subsystems.
 - Executed quality checks via `npm run lint` and `npm run build`.
 
 ## 1) Architecture map
 
 ### Subsystems and responsibilities
+
 1. **Shell / App frame** (`src/main.tsx`, `src/App.tsx`, `src/App.logic.ts`)
    - Mounts React app, provides top-level shell composition, theme state, and context boundaries.
 2. **Global header shell** (`src/components/GlobalHeaderShell/*`)
@@ -23,6 +25,7 @@
    - `ContentProviderRegistry.ts` implements a parallel provider-registry abstraction (currently not used by drawer view).
 
 ### Data/control flow
+
 - `main.tsx` mounts `<App/>`.
 - `App` composes `ContentProvider`, `GlobalHeaderShell`, `BuildTab`, and `ContentDrawer`.
 - `GlobalHeaderShell.logic` calls `openContent/closeContent` from `ContentContext`.
@@ -30,6 +33,7 @@
 - Build surface state is local to hooks in `BuildSurface.logic.ts` and persisted in localStorage.
 
 ### Key architecture observations
+
 1. The codebase follows a clear concern split (Build/Logic/Knowledge/Results) and consistent naming, which improves local discoverability.
 2. **God modules exist** in `BuildSurface.logic.ts` (566 LOC) and `GlobalHeaderShell.knowledge.ts` (420 LOC); each carries multiple reasons to change.
 3. There are **parallel content-resolution paths** (`contentProviders.ts` and `ContentProviderRegistry.ts`) that are intentionally split during extraction; convergence is still needed on one normalized runtime API.
@@ -42,11 +46,13 @@
 ## 2) Code health assessment
 
 ### Strengths
+
 - Strong file-level documentation and explicit invariants in headers.
 - Consistent naming for concern files (`*.build.tsx`, `*.logic.ts`, `*.knowledge.ts`, `*.results.tsx`).
 - Hooks and bindings pattern is generally cohesive and easy to trace.
 
 ### Smells and maintainability issues
+
 - **Overloaded modules**:
   - `BuildSurface.logic.ts` contains section logic + left/right panel logic + persistence + keyboard/drag handlers.
   - `GlobalHeaderShell.knowledge.ts` mixes types, tab metadata, mode metadata, and full documentation corpus.
@@ -62,15 +68,18 @@
 ## 3) Stability & correctness risk scan
 
 ### High-risk findings
+
 1. **Build breakage**: `src/components/ContentDrawer/index.tsx` exports non-existent named exports/types, causing `tsc -b` failure.
 2. **Lint gate breakage**: `BuildSurface.logic.ts` uses `as any` for event listener registration/removal across multiple lines, failing `@typescript-eslint/no-explicit-any`.
 
 ### Medium-risk findings
+
 3. Silent fallbacks in localStorage parsing/writes across panel/section hooks can mask corrupted persisted state.
 4. Registry + adapter split is intentional for MVP iteration, but still creates short-term convergence risk until both paths share one normalized contract.
 5. Large stateful hooks increase regression risk when extending drag/resize behaviors.
 
 ### Boundary handling observations
+
 - Guarding is generally present for absent content (`if (!activeContentId) return null`, missing-provider fallback shell).
 - Anchor scrolling properly checks element existence before scroll.
 - There is minimal contextual error propagation for malformed payloads.
@@ -78,10 +87,12 @@
 ## 4) Test strategy and coverage gaps
 
 ### Current state
+
 - No test files detected (`test/spec` patterns absent).
 - No `test` script in `package.json`.
 
 ### Prioritized test backlog (high to lower priority)
+
 1. **Unit**: `splitNamespace` parser in `ContentProviderRegistry` for valid/invalid ids.
 2. **Unit**: `resolveContent` in `contentProviders.ts` for doc hit/miss/unknown provider.
 3. **Unit**: `toAnchorId` normalization in `ContentDrawer.tsx` with punctuation/whitespace edge cases.
@@ -98,6 +109,7 @@
 ## 5) Documentation & developer experience
 
 ### Findings
+
 - README tech stack is stale (claims React 18 + Jest/RTL/Prettier) vs package dependencies (React 19, no Jest/RTL/Prettier).
 - README project structure references directories (`builder/`, `engine/`) that do not match current `src/` layout.
 - CI/quality expectations are unclear because lint/build currently fail in default state.
@@ -110,29 +122,30 @@
    - Risk: Medium.
    - Effort: 1–2 days.
    - Safe sequence:
-     1) Introduce adapter so `ContentDrawer` calls registry API.
-     2) Port current `docsProvider` behavior into registry provider.
-     3) Deprecate/remove `contentProviders.ts` after behavior parity tests.
+     1. Introduce adapter so `ContentDrawer` calls registry API.
+     2. Port current `docsProvider` behavior into registry provider.
+     3. Deprecate/remove `contentProviders.ts` after behavior parity tests.
 
 2. **Extract reusable drag listener hook**
    - Impact: Reduces repeated logic in section/left/right panel handlers.
    - Risk: Medium.
    - Effort: 1 day.
    - Safe sequence:
-     1) Add tested internal utility hook for pointer/keyboard drag handling.
-     2) Migrate one panel first.
-     3) Migrate remaining panels; compare behavior snapshots.
+     1. Add tested internal utility hook for pointer/keyboard drag handling.
+     2. Migrate one panel first.
+     3. Migrate remaining panels; compare behavior snapshots.
 
 3. **Split GlobalHeader knowledge corpus**
    - Impact: Improves maintainability and reviewability.
    - Risk: Low.
    - Effort: 0.5–1 day.
    - Safe sequence:
-     1) Move docs payload to `GlobalHeaderShell.docs.ts`.
-     2) Keep type exports centralized.
-     3) Update imports with no behavioral change.
+     1. Move docs payload to `GlobalHeaderShell.docs.ts`.
+     2. Keep type exports centralized.
+     3. Update imports with no behavioral change.
 
 ### API sketch (before/after)
+
 - Before:
   - `resolveContent(contentId: string): ContentResolution | null`
   - `contentProviderRegistry.resolveContent({ contentId, anchorId }): ContentNode | NotFound`
@@ -156,23 +169,27 @@
 ## 8) Next-steps roadmap
 
 ### Immediate (1–2 days)
+
 1. Fix `ContentDrawer/index.tsx` export contract so TypeScript build passes.
 2. Remove `any` event casts in resize handlers to make lint pass.
 3. Update README tech stack + project structure to match reality.
 4. Add a baseline test runner (`vitest` or Jest) and `npm test` script.
 
 ### Near-term (1–2 weeks)
+
 1. Add tests for content resolution, breakpoint derivation, and resizing logic.
 2. Converge UI calls onto the canonical provider-registry API; keep adapter delegation only as an explicit transition step.
 3. Split oversized logic modules into focused hooks/helpers.
 4. Add CI checks for lint/build/test on pull requests.
 
 ### Longer-term
+
 1. Introduce typed persistence utility (versioned localStorage payloads + telemetry hooks).
 2. Formalize architecture decision records for resolver design and concern boundaries.
 3. Expand integration coverage for builder workflows and accessibility regressions.
 
 ## 9) Quick wins (small, low-risk)
+
 1. Correct `ContentDrawer` barrel exports.
 2. Replace `as any` listener casts with typed listener helpers.
 3. Add `npm test` script even before broad coverage.
@@ -183,6 +200,7 @@
 8. Document registry-as-canonical plus adapter transition policy in `doc/doc-engine/README.md`.
 
 ## 10) Open questions — clarifications + answers
+
 1. **Is `ContentProviderRegistry` intended to replace `resolveContent` soon, or is it experimental?**  
    **Answer/decision:** `ContentProviderRegistry` is the canonical extraction-ready design for doc-engine content resolution (including plugin/user/official sources). `resolveContent(...)` is a transitional in-repo adapter for UI iteration and should delegate to the registry during convergence, then be removed once the normalized API boundary is fully adopted.
 

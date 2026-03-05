@@ -6,14 +6,17 @@ import {
 } from '../src/naming/naming-validator.host.mjs';
 import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
-import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
+import {
+  computeConfigDigest,
+  getValidatorToolVersion,
+} from '../src/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromFindings } from '../src/validator-exit-code.logic.mjs';
 import { detectNpmArgForwardingFootgun } from '../src/npm-arg-forwarding-guard.logic.mjs';
 import { getSourceSnapshot } from '../src/source-snapshot.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
-const parseScopeFromCli = argv => {
+const parseScopeFromCli = (argv) => {
   let selectedScope = 'repo';
   let configPath;
   let strict = false;
@@ -65,12 +68,14 @@ const parseScopeFromCli = argv => {
 
 const supportedScopes = listNamingValidatorScopes();
 const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
-const supportedScopesToken = preferredScopeOrder.filter(scope => supportedScopes.includes(scope)).join('|');
+const supportedScopesToken = preferredScopeOrder
+  .filter((scope) => supportedScopes.includes(scope))
+  .join('|');
 
 const usageLines = [
   `Usage: npm run validate:naming -- [--scope=<${supportedScopesToken}>] [--target=<path>]... [--config=<path>] [--strict]`,
   'Scopes:',
-  ...supportedScopes.map(scope => {
+  ...supportedScopes.map((scope) => {
     const profile = getScopeProfile(scope);
     return `  - ${scope}: ${profile?.description ?? ''}`;
   }),

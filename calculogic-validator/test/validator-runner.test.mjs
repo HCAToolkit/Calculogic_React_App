@@ -1,12 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import {
-  listRegisteredValidators,
-} from '../src/validator-registry.knowledge.mjs';
-import {
-  runValidatorRunner,
-} from '../src/validator-runner.logic.mjs';
+import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
+import { runValidatorRunner } from '../src/validator-runner.logic.mjs';
 
 test('registry lists validators deterministically', () => {
   assert.deepEqual(listRegisteredValidators(), ['naming']);
@@ -42,7 +38,11 @@ test('validate-all CLI runs and returns naming validator report', () => {
 });
 
 test('runner forwards targets and includes naming filter meta when filtering is active', () => {
-  const report = runValidatorRunner(process.cwd(), { scope: 'app', validators: ['naming'], targets: ['src'] });
+  const report = runValidatorRunner(process.cwd(), {
+    scope: 'app',
+    validators: ['naming'],
+    targets: ['src'],
+  });
 
   assert.equal(report.validators[0].id, 'naming');
   assert.equal(report.validators[0].validatorId, 'naming');

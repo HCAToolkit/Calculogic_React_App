@@ -289,7 +289,7 @@ The file extension / implementation format/language.
 - `ts`
 - `tsx`
 - `css`
-- `module.css` *(CSS Modules format)*
+- `module.css` _(CSS Modules format)_
 
 **Notes:**
 
@@ -341,7 +341,7 @@ Examples:
 - `ts`
 - `tsx`
 - `css`
-- `module.css` *(CSS Modules format)*
+- `module.css` _(CSS Modules format)_
 
 Examples of the split:
 
@@ -352,7 +352,7 @@ Examples of the split:
   - `contracts` = filename role (support role)
   - `ts` = implementation format
 
-  ---
+  ***
 
 ## Delimiter Rules
 
@@ -522,7 +522,6 @@ Each role below has an explicit deterministic definition: meaning, purpose/use-c
 - **Category:** `architecture-support`
 - **Status:** `active`
 
-
 ##### `spec`
 
 - **Meaning:** canonical specification/contract documentation for a defined scope.
@@ -671,7 +670,7 @@ Each role below has an explicit deterministic definition: meaning, purpose/use-c
 - **Non-goals / misuse examples:**
   - not to be used as a generic dependency-injection, data-source, context wrapper, or service label catch-all
   - not to be used for new canonical naming decisions without explicit role-finalization note
-- **Category:** `integration-adapter` *(provisional category assignment pending final meaning lock)*
+- **Category:** `integration-adapter` _(provisional category assignment pending final meaning lock)_
 - **Status:** `provisional`
 - **Finalization plan note:** before activation, this document MUST define a single intended meaning and boundary; if no single meaning converges, remove/rename instead of activating.
 
@@ -894,7 +893,7 @@ Defines contract-level shapes, parsing/validation boundaries, normalization cont
 **Examples:**
 
 - `buildsurface-persistence.contracts.ts`
-- `content-resolution.contracts.ts` 
+- `content-resolution.contracts.ts`
 
 ---
 
@@ -1004,7 +1003,7 @@ Parse as:
 
 - `semantic-name = buildsurface`
 - `role = build-style`
-- `ext/format = module.css` *(CSS Modules format)*
+- `ext/format = module.css` _(CSS Modules format)_
 
 `module` in `module.css` is **not** a filename role and is **not** a Calculogic concern.
 
@@ -1081,8 +1080,8 @@ A validator should be able to enforce:
 3. `role` is in canonical role registry
 4. No banned generic filenames unless explicitly scoped/allowed
 5. Role suffix is dot-separated (not hyphen-appended)
-6. *(Optional)* role-to-extension constraints if you define them later
-7. *(Optional)* filename ↔ provenance token consistency checks
+6. _(Optional)_ role-to-extension constraints if you define them later
+7. _(Optional)_ filename ↔ provenance token consistency checks
 
 ---
 
@@ -1215,7 +1214,6 @@ This section is guidance only (not a hard validation rule unless explicitly prom
   - default style formats for results-layer presentation
   - prefer CSS / CSS Modules unless a documented subsystem pattern requires otherwise
   - `.module.css` indicates CSS Modules format (tooling-scoped CSS), not a Calculogic role
-
 
 ### Notes
 

@@ -19,6 +19,7 @@
   - Architecture + conventions: `doc/Architecture/`, `doc/ConventionRoutines/`, `doc/nl-*`
 
 ### Repo-evolution notes affecting reconciliation
+
 - Several old findings from early baseline reviews were about **in-flight extraction and missing quality gates**. Current repo now has a `test` script and green build/lint (warnings remain), so some items are now resolved or partially resolved.
 - Folder ownership assumptions changed materially after doc-engine extraction prep (`src/doc-engine` core vs `src/content` app composition), so some early findings are now better classified as **Superseded** rather than strictly open.
 
@@ -39,6 +40,7 @@
 ## 3) Normalized Findings + Reconciliation Status
 
 Legend:
+
 - **Status:** Resolved | Partially Resolved | Still Open | Superseded | Unclear / Needs Fresh Baseline Review
 - **Confidence:** Verified | Inferred | Not Checked
 
@@ -103,50 +105,57 @@ Legend:
    - **Current evidence:** `GlobalHeaderShell.logic.ts` remains a large multi-domain hook module (335 LOC).
 
 10. **GlobalHeader knowledge corpus hotspot**
-   - Source refs: 2026-02-10/11 concern around mixed schema + large corpus.
-   - **Status:** **Partially Resolved**
-   - **Confidence:** **Inferred**
-   - **Current evidence:** file size is now materially smaller (174 LOC), and docs content appears moved into content packs; still requires fresh baseline to confirm all schema/content concerns are fully addressed.
+
+- Source refs: 2026-02-10/11 concern around mixed schema + large corpus.
+- **Status:** **Partially Resolved**
+- **Confidence:** **Inferred**
+- **Current evidence:** file size is now materially smaller (174 LOC), and docs content appears moved into content packs; still requires fresh baseline to confirm all schema/content concerns are fully addressed.
 
 11. **Drawer branch duplication (invalid/missing/unsupported/found shells)**
-   - Source refs: 2026-02-11 and 2026-02-21 refactor recommendations.
-   - **Status:** **Still Open**
-   - **Confidence:** **Verified**
-   - **Current evidence:** `ContentDrawer.tsx` still contains repeated shell/header markup across non-happy-path branches.
+
+- Source refs: 2026-02-11 and 2026-02-21 refactor recommendations.
+- **Status:** **Still Open**
+- **Confidence:** **Verified**
+- **Current evidence:** `ContentDrawer.tsx` still contains repeated shell/header markup across non-happy-path branches.
 
 ### D) Reliability / observability
 
 12. **Recoverable-error observability inconsistency**
-   - Source refs: 2026-02-10/11/21.
-   - **Status:** **Partially Resolved**
-   - **Confidence:** **Verified**
-   - **Current evidence:** persistence wrappers report via reporter callbacks, but interaction utilities still have silent catches with limited diagnostics.
+
+- Source refs: 2026-02-10/11/21.
+- **Status:** **Partially Resolved**
+- **Confidence:** **Verified**
+- **Current evidence:** persistence wrappers report via reporter callbacks, but interaction utilities still have silent catches with limited diagnostics.
 
 13. **SSR/test-environment brittleness (`window.matchMedia`)**
-   - Source refs: 2026-02-11/21.
-   - **Status:** **Still Open**
-   - **Confidence:** **Verified**
-   - **Current evidence:** `useInitialDarkPreference` directly calls `window.matchMedia` without guard.
+
+- Source refs: 2026-02-11/21.
+- **Status:** **Still Open**
+- **Confidence:** **Verified**
+- **Current evidence:** `useInitialDarkPreference` directly calls `window.matchMedia` without guard.
 
 ### E) Docs/DevEx posture
 
 14. **Missing single runtime architecture ownership map**
-   - Source refs: 2026-02-11 and 2026-02-21 docs gaps.
-   - **Status:** **Still Open**
-   - **Confidence:** **Verified**
-   - **Current evidence:** no `doc/Architecture/Runtime-Ownership-Map.md` found.
+
+- Source refs: 2026-02-11 and 2026-02-21 docs gaps.
+- **Status:** **Still Open**
+- **Confidence:** **Verified**
+- **Current evidence:** no `doc/Architecture/Runtime-Ownership-Map.md` found.
 
 15. **Missing local testing-strategy source-of-truth doc**
-   - Source refs: 2026-02-11 and 2026-02-21 docs gaps.
-   - **Status:** **Still Open**
-   - **Confidence:** **Verified**
-   - **Current evidence:** no `doc/Testing/Strategy.md` found.
+
+- Source refs: 2026-02-11 and 2026-02-21 docs gaps.
+- **Status:** **Still Open**
+- **Confidence:** **Verified**
+- **Current evidence:** no `doc/Testing/Strategy.md` found.
 
 16. **Conventions drift severity from earliest baseline reviews**
-   - Source refs: 2026-02-10 conventions drift notes.
-   - **Status:** **Unclear / Needs Fresh Baseline Review**
-   - **Confidence:** **Not Checked**
-   - **Current evidence:** this pass focused on prior specific findings and did not re-run a full CCPP/CCS/NL parity census across all configurations.
+
+- Source refs: 2026-02-10 conventions drift notes.
+- **Status:** **Unclear / Needs Fresh Baseline Review**
+- **Confidence:** **Not Checked**
+- **Current evidence:** this pass focused on prior specific findings and did not re-run a full CCPP/CCS/NL parity census across all configurations.
 
 ---
 
@@ -206,14 +215,17 @@ Legend:
 ## 8) Verification and Execution Log (Required)
 
 ### Checks run
+
 - `npm test` → pass (18 passing tests).
 - `npm run lint` → pass with 2 warnings (`react-refresh/only-export-components`).
 - `npm run build` → pass.
 
 ### Docs reviewed
+
 - All seven source health-check docs listed in Section 2.
 
 ### Files/areas inspected for reconciliation evidence
+
 - `package.json`
 - `src/tabs/build/BuildSurface.logic.ts`
 - `src/components/GlobalHeaderShell/GlobalHeaderShell.logic.ts`
@@ -228,6 +240,7 @@ Legend:
 - `doc/Architecture/` index of current architecture docs
 
 ### Not checked
+
 - Full project-wide CCPP/CCS/NL parity audit for every config/shell.
 - UI-level manual regression pass of all interaction flows.
 

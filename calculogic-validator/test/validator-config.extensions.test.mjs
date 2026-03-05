@@ -14,7 +14,10 @@ test('loads validator config and normalizes reportable extension additions', () 
 });
 
 test('fails when version is not supported', () => {
-  const invalidPath = path.join(process.cwd(), 'calculogic-validator/test/fixtures/tmp-invalid-version.json');
+  const invalidPath = path.join(
+    process.cwd(),
+    'calculogic-validator/test/fixtures/tmp-invalid-version.json',
+  );
   fs.writeFileSync(invalidPath, JSON.stringify({ version: '9.9' }));
 
   try {
@@ -28,7 +31,10 @@ test('fails when version is not supported', () => {
 });
 
 test('fails when extension entries do not start with dot', () => {
-  const invalidPath = path.join(process.cwd(), 'calculogic-validator/test/fixtures/tmp-invalid-extension.json');
+  const invalidPath = path.join(
+    process.cwd(),
+    'calculogic-validator/test/fixtures/tmp-invalid-extension.json',
+  );
   fs.writeFileSync(
     invalidPath,
     JSON.stringify({

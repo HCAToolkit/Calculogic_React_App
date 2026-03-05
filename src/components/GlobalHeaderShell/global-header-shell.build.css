@@ -150,7 +150,10 @@
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease;
 }
 
 /* [4.12] shell-globalHeader · Primitive · "Tab Button Active State"
@@ -180,7 +183,10 @@
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
   white-space: nowrap;
-  transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+  transition:
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
 }
 
 .mode-menu[data-pinned='true'] {
@@ -209,14 +215,18 @@
   white-space: normal;
 
   /* snappier transitions for hover appearance */
-  transition: background 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease, opacity 0.12s ease;
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease,
+    transform 0.12s ease,
+    opacity 0.12s ease;
   will-change: transform, opacity;
   margin-top: -0.15rem; /* tiny overlap */
 }
 
 /* invisible bridge tightened so it doesn't create a large hit area */
 .mode-menu[data-pinned='false']::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 50%;
   top: -0.6rem; /* extend further to keep hover active when moving toward the menu */
@@ -242,7 +252,9 @@
   padding: 0.35rem 0.65rem;
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
   box-sizing: border-box;
   appearance: none;
 }
@@ -268,7 +280,6 @@
   color: #0a0c12;
 }
 
-
 /* [4.14] shell-globalHeader · Primitive · "Info Icon Baseline"
    Concern: BuildStyle · Catalog: action.icon
    Notes: Creates circular hit target and hover transition. */
@@ -285,7 +296,9 @@
   font-size: 0.95rem;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
   appearance: none;
 }
 
@@ -308,7 +321,9 @@
   background: linear-gradient(135deg, #6c5ce7, #00cec9);
   color: #0a0c12;
   cursor: pointer;
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 /* [4.16.a] shell-globalHeader · Utility · "Visually Hidden Text"

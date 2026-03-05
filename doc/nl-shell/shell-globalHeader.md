@@ -3,34 +3,45 @@
 This document is an instance of the ProjectShell-Level NL Skeleton defined in ../ConventionRoutines/General-NL-Skeletons.md.
 
 ## 1. Purpose and Scope
+
 ### 1.1 Purpose
+
 Provide a reusable header shell that anchors Calculogic experiences with brand identity, primary concern navigation, and a publish action surface.
 
 ### 1.2 Context
+
 Wraps the top of the single-page application hosted by shell-spaHost and appears above cfg-appFrame.
 
 ### 1.3 Interactions
+
 Coordinates with cfg-appFrame to mount the active configuration, routes publish actions to downstream handlers, and exposes navigation state to other shells.
 
 ## 2. Configuration Contracts
+
 ### 2.1 TypeScript Interfaces
+
 - `GlobalHeaderProps` – Props for supplying publish callbacks and optional debug toggles.
 - `GlobalHeaderState` – Shape describing active tab, hovered tab, breakpoint flags, and debug state.
 
 ### 2.2 Global State Requirements
+
 - Consumes optional `onPublish` handler provided by parent shell or host.
 - Reads responsive breakpoint information derived from window size (local to this shell).
 
 ### 2.3 Routing & Context
+
 - Relies on shell-spaHost for SPA routing; does not manipulate URLs directly.
 - Exposes selected concern id for cfg-appFrame to mount the matching configuration.
 
 ## 3. Build Concern (Structure)
+
 ### 3.0 Dependencies & Hierarchy Notes
+
 - Mounts within shell-spaHost and sits above cfg-appFrame.
 - Provides anchors `global-header.*` for styling, logic, and Results concerns.
 
 ### 3.1 Atomic Components — Containers (Build)
+
 - **[3.1.1] Container – "Global Header Shell Frame"**
   - Element: `<header>`
   - Anchor: `data-anchor="global-header"`
@@ -41,6 +52,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Children: `[3.2.4] Tab Item Row` instances.
 
 ### 3.2 Atomic Components — Subcontainers (Build)
+
 - **[3.2.1] Subcontainer – "Brand Identity Zone"**
   - Anchor: `data-anchor="global-header.brand"`
   - Children: `[3.3.1] Brand Home Link`, `[3.3.2] Brand Logo Glyph`, `[3.3.3] Brand Wordmark`, `[3.3.4] Brand Tagline`.
@@ -64,6 +76,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Purpose: Inline mode picker rendered adjacent to the Results tab while active/hovered.
 
 ### 3.3 Atomic Components — Primitives (Build)
+
 - **[3.3.1] Primitive – "Brand Home Link"**
   - Element: `<a>`
   - Attributes: `href="/"`, `aria-label` from Knowledge.
@@ -90,11 +103,14 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Purpose: Shared mode-item renderer used by both Build and Results mode menus.
 
 ## 4. BuildStyle Concern (Visual Styling of Structure)
+
 ### 4.0 Dependencies
+
 - Consumes design tokens for spacing, typography, and color from cfg-appFrame knowledge exports.
 - Implemented in CSS or CSS-Module files that target anchors emitted by the Build concern.
 
 ### 4.1 Atomic Components — Containers / Groups (BuildStyle)
+
 - **[4.1.1] Container – "Shell Frame Layout"**
   - Selector: `[data-anchor="global-header"]`
   - Layout: Flex row with baseline border.
@@ -109,6 +125,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Layout: Inline status banner.
 
 ### 4.2 Atomic Components — Primitives (BuildStyle)
+
 - **[4.2.1] Primitive – "Brand Link Styling"**
   - Typography, spacing, and inline alignment for brand anchor.
 - **[4.2.2] Primitive – "Brand Logo Scaling"**
@@ -133,22 +150,28 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Text treatment for debug readouts.
 
 ### 4.3 Responsive Rules
+
 - Tablet breakpoint (≤1023px): Reduce padding, hide tagline, compress tab spacing.
 - Mobile breakpoint (≤767px): Stack zones vertically and convert tab list to horizontal scroll chips.
 
 ### 4.4 Interaction Styles
+
 - Focus outlines use Knowledge-provided tokens; ensure visible contrast.
 - Hover states align with Build-defined anchors only.
 
 ## 5. Logic Concern (Workflow)
+
 ### 5.0 Dependencies
+
 - Uses React hooks for state management and window resize listeners (SSR guarded).
 
 ### 5.1 Atomic Components — Containers (Logic)
+
 - **[5.1.1] Container – "Global Header Logic Hook"**
   - `useGlobalHeader` producing Build and Results bindings.
 
 ### 5.2 Atomic Components — Primitives (Logic)
+
 - **[5.2.1] Primitive – "State Initialization"**
   - Sets default active tab based on Knowledge order.
 - **[5.2.2] Primitive – "Viewport Resize Subscription"**
@@ -171,18 +194,23 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Packages state summary for Results concern.
 
 ### 5.2.3 Derived Values
+
 - Derived booleans for viewport categories and debug enablement.
 
 ### 5.2.4 Side Effects
+
 - Window resize listener attaches/detaches on mount/unmount.
 - Console warning emitted when publish callback is absent.
 
 ### 5.2.5 Workflows
+
 - Tab switch: `[5.2.3]` updates active tab → `[5.2.7]` ensures deterministic ordering → `[5.2.9]` provides Build bindings → Build updates selected state.
 - Publish action: `[5.2.5]` triggers callback → Results snapshot logs latest timestamp when debug enabled.
 
 ## 6. Knowledge Concern (Reference Data)
+
 ### 6.1 Maps / Dictionaries
+
 - **[6.1.1] Primitive – "Header Tab Identifier Types"**
   - Type aliases enumerating valid tab ids (build, logic, knowledge, results, resultsStyle).
 - **[6.1.2] Primitive – "Header Tab Definition Schema"**
@@ -195,6 +223,7 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Interface describing breakpoint metadata for responsive logic.
 
 ### 6.2 Constants
+
 - **[6.2.1] Primitive – "Header Tab Knowledge Base"**
   - Ordered array of concern tab definitions with hover summaries.
   - Tab-to-doc bindings reference pack-owned doc ids (header-doc.ids) instead of inline literals.
@@ -214,35 +243,46 @@ Coordinates with cfg-appFrame to mount the active configuration, routes publish 
   - Array of desktop/tablet/mobile breakpoint definitions.
 
 ### 6.3 Shared / Global Reference
+
 - Exposes tab ordering and copy for cfg-appFrame to reference when rendering nested surfaces.
 - Defers doc-id semantics (identifier constants and optional `docs:` namespacing helper) to the header docs pack/provider boundary.
 
 ## 7. Results Concern (Outputs)
+
 ### 7.1 User-Facing Outputs
+
 - **[7.1.1] Container – "Global Header Debug Panel"**
   - Displays live header state when debug mode enabled.
 
 ### 7.2 Dev / Debug Outputs
+
 - **[7.2.1] Primitive – "Debug Visibility Gate"**
   - Guards render until debug toggle is true.
 - **[7.2.2] Primitive – "Debug State Rows"**
   - Lists active tab, hovered tab, breakpoint flags, and publish readiness.
 
 ### 7.3 Accessibility Outputs
+
 - Provide `aria-live="polite"` announcements when publish action completes (future extension).
 
 ## 8. ResultsStyle Concern (Output Styling)
+
 ResultsStyle styling lives in CSS or CSS-Module files that target the debug/result anchors emitted by the Results concern.
+
 ### 8.1 Results Layout Styles
+
 - **[8.1.1] Primitive – "Debug Panel Styling"**
   - Visual treatment for debug panel: background tint, typography, spacing.
 
 ### 8.2 Debug Display Styles
+
 - **[8.2.1] Primitive – "Live Region Anchor"**
   - Selector targets `data-anchor="global-header.aria-live"` to keep announcements visually hidden.
 
 ## 9. Assembly Pattern
+
 ### 9.1 File Structure
+
 - src/shells/globalHeader/GlobalHeader.build.tsx
 - src/shells/globalHeader/GlobalHeader.build.module.css
 - src/shells/globalHeader/GlobalHeader.logic.ts
@@ -252,13 +292,17 @@ ResultsStyle styling lives in CSS or CSS-Module files that target the debug/resu
 - src/shells/globalHeader/index.ts
 
 ### 9.2 Assembly Logic
+
 - `src/shells/globalHeader/index.ts` composes Build with Logic hook outputs, imports BuildStyle CSS modules for side effects, and exports Results components alongside optional ResultsStyle CSS modules.
 
 ### 9.3 Integration
+
 - Mounted inside shell-spaHost above cfg-appFrame; publishes selected concern id to cfg-appFrame for tab swapping.
 
 ## 10. Implementation Passes
+
 ### 10.1 Pass Mapping
+
 - Pass 0: Author NL skeleton and stub Build anchors.
 - Pass 1: Implement Build containers and primitives.
 - Pass 2: Apply BuildStyle responsive rules.
@@ -267,6 +311,7 @@ ResultsStyle styling lives in CSS or CSS-Module files that target the debug/resu
 - Pass 5+: Extend Knowledge/Results when new tabs or diagnostics emerge.
 
 ### 10.2 Export Checklist
+
 - Build anchors align with Knowledge definitions and BuildStyle selectors.
 - Logic hook guards window access for SSR and cleans up listeners.
 - Results panel renders only when debug is enabled.

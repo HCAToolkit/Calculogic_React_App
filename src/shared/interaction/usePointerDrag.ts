@@ -61,7 +61,7 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
         // WHY: Some browsers can throw if the capture was already lost/released.
       }
     },
-    [setPointerCapture]
+    [setPointerCapture],
   );
 
   const finishDrag = useCallback(
@@ -83,7 +83,7 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
       setIsDragging(false);
       onEnd?.({ pointerId });
     },
-    [onEnd, safeReleasePointerCapture]
+    [onEnd, safeReleasePointerCapture],
   );
 
   useEffect(() => {
@@ -127,7 +127,7 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
         pointerId,
       });
 
-      const moveListener: EventListener = event => {
+      const moveListener: EventListener = (event) => {
         if (!(event instanceof PointerEvent)) return;
 
         const pointerMoveEvent = event;
@@ -152,7 +152,7 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
         });
       };
 
-      const upListener: EventListener = event => {
+      const upListener: EventListener = (event) => {
         if (!(event instanceof PointerEvent)) return;
 
         const pointerUpEvent = event;
@@ -160,7 +160,7 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
         finishDrag(pointerId);
       };
 
-      const cancelListener: EventListener = event => {
+      const cancelListener: EventListener = (event) => {
         if (!(event instanceof PointerEvent)) return;
 
         const pointerCancelEvent = event;
@@ -193,7 +193,7 @@ export function usePointerDrag(opts: UsePointerDragOptions): {
       listenerHost.addEventListener('pointercancel', cancelListener);
       target.addEventListener('lostpointercapture', lostCaptureListener);
     },
-    [axis, disableUserSelectDuringDrag, finishDrag, onMove, onStart, setPointerCapture]
+    [axis, disableUserSelectDuringDrag, finishDrag, onMove, onStart, setPointerCapture],
   );
 
   return { onPointerDown, isDragging };

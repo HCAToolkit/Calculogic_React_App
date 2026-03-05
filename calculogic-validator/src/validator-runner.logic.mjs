@@ -1,8 +1,5 @@
 import { CALCULOGIC_VALIDATOR_REPORT_VERSION } from './validator-report.contracts.mjs';
-import {
-  VALIDATOR_REGISTRY,
-  getValidatorById,
-} from './validator-registry.knowledge.mjs';
+import { VALIDATOR_REGISTRY, getValidatorById } from './validator-registry.knowledge.mjs';
 import { getSourceSnapshot } from './source-snapshot.logic.mjs';
 
 const toValidatorReportEntry = (registryEntry, validatorResult) => {
@@ -25,7 +22,7 @@ const toValidatorReportEntry = (registryEntry, validatorResult) => {
   };
 };
 
-const resolveValidatorsToRun = selectedValidatorIds => {
+const resolveValidatorsToRun = (selectedValidatorIds) => {
   if (!selectedValidatorIds || selectedValidatorIds.length === 0) {
     return VALIDATOR_REGISTRY;
   }
@@ -37,7 +34,7 @@ const resolveValidatorsToRun = selectedValidatorIds => {
     }
   }
 
-  return VALIDATOR_REGISTRY.filter(validator => selectedSet.has(validator.id));
+  return VALIDATOR_REGISTRY.filter((validator) => selectedSet.has(validator.id));
 };
 
 export const runValidatorRunner = (repositoryRoot, options = {}) => {
@@ -47,7 +44,7 @@ export const runValidatorRunner = (repositoryRoot, options = {}) => {
   const config = options.config;
   const targets = options.targets;
 
-  const validators = validatorsToRun.map(registryEntry => {
+  const validators = validatorsToRun.map((registryEntry) => {
     const result = registryEntry.run(repositoryRoot, { scope, config, targets });
     return toValidatorReportEntry(registryEntry, result);
   });

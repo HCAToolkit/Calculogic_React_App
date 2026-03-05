@@ -1,4 +1,4 @@
-const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
 
 export const hasHyphenAppendedRoleAmbiguity = (basename, roleSuffixes) => {
   for (const role of roleSuffixes) {

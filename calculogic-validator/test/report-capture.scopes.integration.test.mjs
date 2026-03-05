@@ -6,39 +6,43 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 
 const scopes = ['repo', 'app', 'docs', 'validator', 'system'];
-const hostPath = path.resolve('calculogic-validator/tools/report-capture/src/report-capture.host.mjs');
+const hostPath = path.resolve(
+  'calculogic-validator/tools/report-capture/src/report-capture.host.mjs',
+);
 
-const runReportCapture = (prefix, scriptPath, scope, outputDir) => new Promise((resolve, reject) => {
-  const child = spawn(process.execPath, [
-    hostPath,
-    '--dir',
-    outputDir,
-    '--keep',
-    '50',
-    '--prefix',
-    prefix,
-    '--',
-    process.execPath,
-    '--experimental-strip-types',
-    scriptPath,
-    `--scope=${scope}`,
-  ]);
+const runReportCapture = (prefix, scriptPath, scope, outputDir) =>
+  new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [
+      hostPath,
+      '--dir',
+      outputDir,
+      '--keep',
+      '50',
+      '--prefix',
+      prefix,
+      '--',
+      process.execPath,
+      '--experimental-strip-types',
+      scriptPath,
+      `--scope=${scope}`,
+    ]);
 
-  child.on('error', reject);
-  child.on('close', code => {
-    if (typeof code !== 'number') {
-      reject(new Error(`report capture returned non-numeric exit code for ${prefix}`));
-      return;
-    }
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (typeof code !== 'number') {
+        reject(new Error(`report capture returned non-numeric exit code for ${prefix}`));
+        return;
+      }
 
-    resolve(code);
+      resolve(code);
+    });
   });
-});
 
-const reportFilesForPrefix = (dirPath, prefix) => fs
-  .readdirSync(dirPath)
-  .filter(name => name.startsWith(`${prefix}-`) && name.endsWith('.txt'))
-  .sort();
+const reportFilesForPrefix = (dirPath, prefix) =>
+  fs
+    .readdirSync(dirPath)
+    .filter((name) => name.startsWith(`${prefix}-`) && name.endsWith('.txt'))
+    .sort();
 
 test('report-capture host emits naming reports for repo/app/docs/validator/system scopes', async () => {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'report-capture-scopes-naming-'));
@@ -48,7 +52,12 @@ test('report-capture host emits naming reports for repo/app/docs/validator/syste
       const prefix = `naming-${scope}`;
       const before = reportFilesForPrefix(tempDir, prefix);
 
-      const exitCode = await runReportCapture(prefix, 'calculogic-validator/scripts/validate-naming.mjs', scope, tempDir);
+      const exitCode = await runReportCapture(
+        prefix,
+        'calculogic-validator/scripts/validate-naming.mjs',
+        scope,
+        tempDir,
+      );
       assert.ok([0, 1, 2].includes(exitCode));
 
       const after = reportFilesForPrefix(tempDir, prefix);
@@ -74,7 +83,12 @@ test('report-capture host emits validate-all reports for repo/app/docs/validator
       const prefix = `validate-all-${scope}`;
       const before = reportFilesForPrefix(tempDir, prefix);
 
-      const exitCode = await runReportCapture(prefix, 'calculogic-validator/scripts/validate-all.mjs', scope, tempDir);
+      const exitCode = await runReportCapture(
+        prefix,
+        'calculogic-validator/scripts/validate-all.mjs',
+        scope,
+        tempDir,
+      );
       assert.ok([0, 1, 2].includes(exitCode));
 
       const after = reportFilesForPrefix(tempDir, prefix);

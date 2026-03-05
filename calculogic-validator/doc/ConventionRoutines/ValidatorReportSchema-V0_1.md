@@ -143,10 +143,7 @@ Transitional note: naming currently emits `code`. Until migration is complete, t
   "totalFilesScanned": 42,
   "filters": {
     "isFiltered": true,
-    "targets": [
-      "src/buildsurface",
-      "src/shared"
-    ]
+    "targets": ["src/buildsurface", "src/shared"]
   },
   "scopeSummary": {
     "scope": "app",
@@ -155,9 +152,7 @@ Transitional note: naming currently emits `code`. Until migration is complete, t
   },
   "scopeContract": {
     "description": "Application source files",
-    "includeRoots": [
-      "src"
-    ],
+    "includeRoots": ["src"],
     "includeRootFiles": []
   },
   "counts": {

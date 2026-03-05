@@ -26,11 +26,7 @@ export default function App() {
   // Concern: Build · Parent: "App Frame Shell" · Catalog: control.toggle
   // Notes: Surface-level button that flips between dark and light modes.
   const themeToggle = (
-    <button
-      data-anchor="theme-toggle"
-      onClick={toggleDark}
-      aria-label="Toggle dark mode"
-    >
+    <button data-anchor="theme-toggle" onClick={toggleDark} aria-label="Toggle dark mode">
       {dark ? '🌙 Dark' : '☀️ Light'}
     </button>
   );

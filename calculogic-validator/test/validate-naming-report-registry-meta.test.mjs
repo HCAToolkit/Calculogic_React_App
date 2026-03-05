@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 
 const digestPattern = /^[a-f0-9]{64}$/u;
 
-const assertRegistryDigestShape = registryDigests => {
+const assertRegistryDigestShape = (registryDigests) => {
   assert.ok(registryDigests);
   assert.match(registryDigests.builtin, digestPattern);
   assert.match(registryDigests.custom, digestPattern);
@@ -14,7 +14,11 @@ const assertRegistryDigestShape = registryDigests => {
 test('validate-naming script report includes registry metadata fields', () => {
   const result = spawnSync(
     process.execPath,
-    ['--experimental-strip-types', 'calculogic-validator/scripts/validate-naming.mjs', '--scope=system'],
+    [
+      '--experimental-strip-types',
+      'calculogic-validator/scripts/validate-naming.mjs',
+      '--scope=system',
+    ],
     { cwd: process.cwd(), encoding: 'utf8' },
   );
 

@@ -24,7 +24,7 @@ const parsePositiveInteger = (value, optionName) => {
   return parsed;
 };
 
-const parseOptions = argv => {
+const parseOptions = (argv) => {
   const options = {
     dir: './.reports',
     prefixes: defaultPrefixes,
@@ -43,7 +43,7 @@ const parseOptions = argv => {
       const parsedPrefixes = argument
         .slice('--prefixes='.length)
         .split(',')
-        .map(prefix => prefix.trim())
+        .map((prefix) => prefix.trim())
         .filter(Boolean);
 
       if (parsedPrefixes.length === 0) {
@@ -60,7 +60,10 @@ const parseOptions = argv => {
     }
 
     if (argument.startsWith('--warn-samples=')) {
-      options.warnSamples = parsePositiveInteger(argument.slice('--warn-samples='.length), '--warn-samples');
+      options.warnSamples = parsePositiveInteger(
+        argument.slice('--warn-samples='.length),
+        '--warn-samples',
+      );
       continue;
     }
 
@@ -78,29 +81,34 @@ const parseOptions = argv => {
 const getLatestReportForPrefix = async ({ dir, prefix }) => {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const matchingFiles = entries
-    .filter(entry => entry.isFile() && entry.name.startsWith(`${prefix}-`) && entry.name.endsWith('.txt'))
-    .map(entry => entry.name);
+    .filter(
+      (entry) =>
+        entry.isFile() && entry.name.startsWith(`${prefix}-`) && entry.name.endsWith('.txt'),
+    )
+    .map((entry) => entry.name);
 
   if (matchingFiles.length === 0) {
     return null;
   }
 
-  const reportsWithStats = await Promise.all(matchingFiles.map(async filename => {
-    const filePath = path.join(dir, filename);
-    const stats = await fs.stat(filePath);
-    return {
-      filename,
-      filePath,
-      mtimeMs: stats.mtimeMs,
-      bytes: stats.size,
-    };
-  }));
+  const reportsWithStats = await Promise.all(
+    matchingFiles.map(async (filename) => {
+      const filePath = path.join(dir, filename);
+      const stats = await fs.stat(filePath);
+      return {
+        filename,
+        filePath,
+        mtimeMs: stats.mtimeMs,
+        bytes: stats.size,
+      };
+    }),
+  );
 
   reportsWithStats.sort((a, b) => b.mtimeMs - a.mtimeMs || b.filename.localeCompare(a.filename));
   return reportsWithStats[0];
 };
 
-const parseReportJson = async report => {
+const parseReportJson = async (report) => {
   const raw = await fs.readFile(report.filePath, 'utf8');
 
   try {
@@ -132,14 +140,16 @@ const printSummary = ({ prefix, report, parsedReport, top, warnSamples }) => {
   }
 
   const findings = Array.isArray(parsedReport.findings) ? parsedReport.findings : [];
-  const warnFindings = findings.filter(finding => finding?.severity === 'warn');
+  const warnFindings = findings.filter((finding) => finding?.severity === 'warn');
   const warnSampleLines = warnFindings
     .slice(0, warnSamples)
-    .map(finding => `${finding.code ?? 'unknown'}: ${finding.path ?? '(no path)'}`);
+    .map((finding) => `${finding.code ?? 'unknown'}: ${finding.path ?? '(no path)'}`);
 
   process.stdout.write(`=== ${prefix} (latest) ===\n`);
   process.stdout.write(`file: ${report.filename} | bytes: ${report.bytes}\n`);
-  process.stdout.write(`scope: ${parsedReport.scope ?? 'unknown'} | totalFilesScanned: ${parsedReport.totalFilesScanned ?? 0} | findingsGenerated: ${parsedReport.scopeSummary?.findingsGenerated ?? parsedReport.findingsGenerated ?? findings.length}\n`);
+  process.stdout.write(
+    `scope: ${parsedReport.scope ?? 'unknown'} | totalFilesScanned: ${parsedReport.totalFilesScanned ?? 0} | findingsGenerated: ${parsedReport.scopeSummary?.findingsGenerated ?? parsedReport.findingsGenerated ?? findings.length}\n`,
+  );
 
   const counts = parsedReport.counts ?? {};
   const hasNamingCountShape = Object.prototype.hasOwnProperty.call(counts, 'allowed-special-case');
@@ -148,7 +158,9 @@ const printSummary = ({ prefix, report, parsedReport, top, warnSamples }) => {
     : `counts: canonical=${counts.canonical ?? 0}, allowed=${counts.allowed ?? 0}, legacy=${counts.legacy ?? 0}, invalid=${counts.invalid ?? 0}`;
 
   process.stdout.write(`${countsLine}\n`);
-  process.stdout.write(`topCodeCounts(${top}): ${formatCodeCounts({ codeCounts: parsedReport.codeCounts, top })}\n`);
+  process.stdout.write(
+    `topCodeCounts(${top}): ${formatCodeCounts({ codeCounts: parsedReport.codeCounts, top })}\n`,
+  );
   process.stdout.write(`warnCount: ${warnFindings.length}\n`);
 
   if (warnSampleLines.length > 0) {
@@ -162,20 +174,27 @@ const printRunnerSummary = ({ prefix, report, parsedReport, top }) => {
   const validators = parsedReport.validators;
   process.stdout.write(`=== ${prefix} (latest) ===\n`);
   process.stdout.write(`file: ${report.filename} | bytes: ${report.bytes}\n`);
-  process.stdout.write(`scope: ${parsedReport.scope ?? '(none)'} | validators: ${validators.length} | durationMs: ${parsedReport.durationMs ?? '(n/a)'}\n`);
+  process.stdout.write(
+    `scope: ${parsedReport.scope ?? '(none)'} | validators: ${validators.length} | durationMs: ${parsedReport.durationMs ?? '(n/a)'}\n`,
+  );
 
   for (const validator of validators) {
     const findings = Array.isArray(validator?.findings) ? validator.findings : [];
-    const warnCount = findings.filter(finding => finding?.severity === 'warn').length;
+    const warnCount = findings.filter((finding) => finding?.severity === 'warn').length;
     const countsEntries = Object.entries(validator?.counts ?? {});
-    const countsLine = countsEntries.length === 0
-      ? 'none'
-      : countsEntries.map(([key, value]) => `${key}=${value}`).join(', ');
+    const countsLine =
+      countsEntries.length === 0
+        ? 'none'
+        : countsEntries.map(([key, value]) => `${key}=${value}`).join(', ');
 
-    process.stdout.write(`validator: ${validator?.id ?? '(unknown)'} | totalFilesScanned: ${validator?.totalFilesScanned ?? 0}\n`);
+    process.stdout.write(
+      `validator: ${validator?.id ?? '(unknown)'} | totalFilesScanned: ${validator?.totalFilesScanned ?? 0}\n`,
+    );
     process.stdout.write(`counts: ${countsLine}\n`);
     process.stdout.write(`warnCount: ${warnCount}\n`);
-    process.stdout.write(`topCodeCounts(${top}): ${formatCodeCounts({ codeCounts: validator?.codeCounts, top })}\n`);
+    process.stdout.write(
+      `topCodeCounts(${top}): ${formatCodeCounts({ codeCounts: validator?.codeCounts, top })}\n`,
+    );
   }
 
   process.stdout.write('\n');
@@ -189,7 +208,9 @@ const run = async () => {
     await fs.stat(reportsDir);
   } catch (error) {
     if (error?.code === 'ENOENT') {
-      process.stderr.write(`No reports directory found at ${reportsDir}. Run a report capture command first (e.g. npm run report:naming:docs).\n`);
+      process.stderr.write(
+        `No reports directory found at ${reportsDir}. Run a report capture command first (e.g. npm run report:naming:docs).\n`,
+      );
       process.exit(options.strict ? 1 : 0);
     }
 
@@ -224,7 +245,7 @@ const run = async () => {
   process.exit(hasFailures ? 1 : 0);
 };
 
-run().catch(error => {
+run().catch((error) => {
   process.stderr.write(`${error.message}\n`);
   process.exit(1);
 });

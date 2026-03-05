@@ -1,6 +1,6 @@
 # Calculogic Concern System (CCS, NL-aligned)
 
-> **Canonical source (validator-owned):** `calculogic-validator/doc/ConventionRoutines/CCS.md`  
+> **Canonical source (validator-owned):** `calculogic-validator/doc/ConventionRoutines/CCS.md`
 
 ## Repo usage
 

@@ -6,7 +6,8 @@
  */
 
 /* [4.1] Document Baseline Reset — Apply zero margins, border-box sizing, and typography defaults to html and body. */
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   box-sizing: border-box;

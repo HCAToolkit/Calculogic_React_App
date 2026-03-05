@@ -2,30 +2,35 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { VALIDATOR_CONFIG_VERSION } from './validator-config.contracts.mjs';
 
-const VALID_ROLE_CATEGORIES = new Set(['concern-core', 'architecture-support', 'documentation', 'deprecated']);
+const VALID_ROLE_CATEGORIES = new Set([
+  'concern-core',
+  'architecture-support',
+  'documentation',
+  'deprecated',
+]);
 const VALID_ROLE_STATUSES = new Set(['active', 'deprecated']);
 
-const fail = message => {
+const fail = (message) => {
   throw new Error(`Invalid validator config: ${message}`);
 };
 
 const assertOnlyKeys = (obj, allowedKeys, pathLabel) => {
   const allowed = new Set(allowedKeys);
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     if (!allowed.has(key)) {
       fail(`${pathLabel} contains unknown key "${key}".`);
     }
   });
 };
 
-const normalizeReportableExtensions = additions =>
-  Array.from(new Set(additions.map(extension => extension.trim())));
+const normalizeReportableExtensions = (additions) =>
+  Array.from(new Set(additions.map((extension) => extension.trim())));
 
-const normalizeRoleAdditions = additions => {
+const normalizeRoleAdditions = (additions) => {
   const uniqueRoles = new Set();
   const normalized = [];
 
-  additions.forEach(entry => {
+  additions.forEach((entry) => {
     const trimmedRole = entry.role.trim();
     if (uniqueRoles.has(trimmedRole)) {
       return;
@@ -43,7 +48,7 @@ const normalizeRoleAdditions = additions => {
   return normalized;
 };
 
-const normalizeConfig = config => {
+const normalizeConfig = (config) => {
   const normalized = {
     version: VALIDATOR_CONFIG_VERSION,
   };
@@ -70,10 +75,14 @@ const normalizeConfig = config => {
   return normalized;
 };
 
-const validateReportableExtensionAdditions = config => {
+const validateReportableExtensionAdditions = (config) => {
   const reportableExtensions = config?.naming?.reportableExtensions;
   if (reportableExtensions !== undefined) {
-    if (!reportableExtensions || typeof reportableExtensions !== 'object' || Array.isArray(reportableExtensions)) {
+    if (
+      !reportableExtensions ||
+      typeof reportableExtensions !== 'object' ||
+      Array.isArray(reportableExtensions)
+    ) {
       fail('naming.reportableExtensions must be an object when provided.');
     }
 
@@ -127,7 +136,7 @@ const validateRoleAdditionEntry = (entry, index) => {
   }
 };
 
-const validateRoleAdditions = config => {
+const validateRoleAdditions = (config) => {
   const roles = config?.naming?.roles;
   if (roles !== undefined) {
     if (!roles || typeof roles !== 'object' || Array.isArray(roles)) {
@@ -149,7 +158,7 @@ const validateRoleAdditions = config => {
   additions.forEach(validateRoleAdditionEntry);
 };
 
-const validateConfig = config => {
+const validateConfig = (config) => {
   if (!config || typeof config !== 'object' || Array.isArray(config)) {
     fail('root must be an object.');
   }

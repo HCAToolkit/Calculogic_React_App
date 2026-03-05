@@ -12,12 +12,12 @@ import {
   summarizeFindings,
 } from './naming-validator.logic.mjs';
 
-const toReportableExtensionsSet = extensionArray => new Set(extensionArray);
+const toReportableExtensionsSet = (extensionArray) => new Set(extensionArray);
 
-const toNamingRolesRuntime = rolesArray => {
+const toNamingRolesRuntime = (rolesArray) => {
   const roleMetadata = new Map();
 
-  rolesArray.forEach(entry => {
+  rolesArray.forEach((entry) => {
     if (!roleMetadata.has(entry.role)) {
       roleMetadata.set(entry.role, entry);
     }
@@ -25,11 +25,13 @@ const toNamingRolesRuntime = rolesArray => {
 
   const activeRoles = new Set(
     Array.from(roleMetadata.values())
-      .filter(entry => entry.status === 'active')
-      .map(entry => entry.role),
+      .filter((entry) => entry.status === 'active')
+      .map((entry) => entry.role),
   );
 
-  const roleSuffixes = Array.from(roleMetadata.keys()).sort((left, right) => right.length - left.length);
+  const roleSuffixes = Array.from(roleMetadata.keys()).sort(
+    (left, right) => right.length - left.length,
+  );
 
   return {
     roleMetadata,

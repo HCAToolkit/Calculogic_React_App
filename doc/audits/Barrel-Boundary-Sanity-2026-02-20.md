@@ -1,6 +1,7 @@
 # Barrel & Boundary Sanity Pass — 2026-02-20
 
 ## Scope
+
 - Repo-wide audit of every `src/**/index.ts` and `src/**/index.tsx` barrel.
 - Minimal code fixes applied only for truthful exports and canonical boundary import usage.
 
@@ -25,12 +26,14 @@
 ## 2) Invalid/stale/misleading exports found
 
 ### Issue A — Missing docs-id exports from content public surface
+
 - Problem: `src/content/index.ts` did not export docs-id helpers/types used by shell consumers.
 - Why boundary-relevant: Consumers used deep imports into `src/content/packs/...` bypassing content boundary surface.
 - Minimal fix:
   - Added `HEADER_DOC_IDS`, `isHeaderDocId`, `toDocsContentId`, and `HeaderDocId` exports to `src/content/index.ts`.
 
 ### Before/after API sketch (content barrel)
+
 - Before:
   - `export { DOCS_PROVIDER, HEADER_DOC_DEFINITIONS, resolveHeaderDoc, ...types }`
 - After:
@@ -47,10 +50,12 @@
 ## 4) Import-direction guardrail audit
 
 ### Required guardrails
+
 - `src/doc-engine/**` importing from `src/content/**`: **none found**.
 - `src/doc-engine/**` importing from `src/components/**`: **none found**.
 
 ### Additional layering observations
+
 - `src/content/**` imports from `src/doc-engine/index.ts` for engine contracts: expected direction.
 - `src/components/**` imports from `src/content` for UI content resolution and docs metadata: expected direction.
 

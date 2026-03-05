@@ -122,13 +122,13 @@ Examples: `1.3`, `3.5.1`, `2.3.1.1.4`
 1. Host letter (namespace root)
 2. Host-local structure index
 3. Concern slot
-4+ Nested node indices
+   4+ Nested node indices
 
 #### No-host
 
 1. Artifact-local root structure index
 2. Concern slot
-3+ Nested node indices
+   3+ Nested node indices
 
 ### 4.4 Required vs Optional Positions
 
@@ -308,14 +308,14 @@ This subsection is the **authoritative source** for `x` placeholder legality in 
 Classification: `Normative` for placeholder-legality rules in this subsection.
 It is a documentation classification rule only; parser/validator/tooling behavior remains deferred as described elsewhere in this draft.
 
-| Context | `x` Allowed? | Classification / Marking Requirement | Notes |
-| --- | --- | --- | --- |
-| Illustrative examples | Yes, conditionally | **MUST** be labeled `Illustrative` or `Placeholder` near the example block/line. | Allowed only to demonstrate structure shape (for example, unresolved depth/index examples). |
-| Template scaffolds | Yes, conditionally | **MUST** be labeled `Illustrative` or `Placeholder`. | Applies to reusable doc templates where concrete canonical addresses are not yet assigned. |
-| Canonical structural addresses | No | Not applicable; canonical values must be fully concrete and numeric per grammar. | `x` is non-canonical and invalid in canonical address values. |
-| Canonical NL docs/config entries (address metadata intended as real/canonical) | No | Not applicable; address metadata must use canonical concrete addresses. | If placeholder text is temporarily shown for drafting, it must be explicitly marked and treated as non-canonical. |
-| CCPP canonical IDs (when referenced from this spec) | No (current React App Scope v1) | Not applicable in canonical IDs. | CCPP atomic IDs remain NL-section authoritative; placeholder `x` is non-canonical unless a future policy explicitly changes this. |
-| Migration planning rows | Yes, conditionally | **MUST** be labeled `Placeholder` or `Illustrative` at row/table scope. | Permitted only for transitional planning artifacts that are explicitly non-canonical. |
+| Context                                                                        | `x` Allowed?                    | Classification / Marking Requirement                                             | Notes                                                                                                                             |
+| ------------------------------------------------------------------------------ | ------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Illustrative examples                                                          | Yes, conditionally              | **MUST** be labeled `Illustrative` or `Placeholder` near the example block/line. | Allowed only to demonstrate structure shape (for example, unresolved depth/index examples).                                       |
+| Template scaffolds                                                             | Yes, conditionally              | **MUST** be labeled `Illustrative` or `Placeholder`.                             | Applies to reusable doc templates where concrete canonical addresses are not yet assigned.                                        |
+| Canonical structural addresses                                                 | No                              | Not applicable; canonical values must be fully concrete and numeric per grammar. | `x` is non-canonical and invalid in canonical address values.                                                                     |
+| Canonical NL docs/config entries (address metadata intended as real/canonical) | No                              | Not applicable; address metadata must use canonical concrete addresses.          | If placeholder text is temporarily shown for drafting, it must be explicitly marked and treated as non-canonical.                 |
+| CCPP canonical IDs (when referenced from this spec)                            | No (current React App Scope v1) | Not applicable in canonical IDs.                                                 | CCPP atomic IDs remain NL-section authoritative; placeholder `x` is non-canonical unless a future policy explicitly changes this. |
+| Migration planning rows                                                        | Yes, conditionally              | **MUST** be labeled `Placeholder` or `Illustrative` at row/table scope.          | Permitted only for transitional planning artifacts that are explicitly non-canonical.                                             |
 
 Marking requirement (normative for docs): examples/templates using placeholder marker `x` **MUST** be explicitly marked `Illustrative` or `Placeholder` to avoid ambiguous interpretation in future scanning/validation workflows.
 

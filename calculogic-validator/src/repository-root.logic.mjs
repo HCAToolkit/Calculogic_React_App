@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 
-export const fileExists = filePath => {
+export const fileExists = (filePath) => {
   try {
     fs.accessSync(filePath, fs.constants.F_OK);
     return true;
@@ -10,7 +10,7 @@ export const fileExists = filePath => {
   }
 };
 
-export const isDirectory = filePath => {
+export const isDirectory = (filePath) => {
   try {
     return fs.statSync(filePath).isDirectory();
   } catch {

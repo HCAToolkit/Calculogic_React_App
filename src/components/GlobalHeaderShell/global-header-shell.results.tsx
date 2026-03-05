@@ -32,13 +32,12 @@ export function GlobalHeaderShellResults({ debugPanel }: GlobalHeaderShellResult
     const updates: string[] = [];
 
     if (previous.currentActiveTab !== current.currentActiveTab) {
-      const tabMessage =
-        {
-          build: 'Switched to Build.',
-          logic: 'Switched to Logic.',
-          knowledge: 'Switched to Knowledge.',
-          results: 'Switched to Results.',
-        }[current.currentActiveTab];
+      const tabMessage = {
+        build: 'Switched to Build.',
+        logic: 'Switched to Logic.',
+        knowledge: 'Switched to Knowledge.',
+        results: 'Switched to Results.',
+      }[current.currentActiveTab];
       updates.push(tabMessage);
     }
 
@@ -59,9 +58,9 @@ export function GlobalHeaderShellResults({ debugPanel }: GlobalHeaderShellResult
     }
 
     if (updates.length > 0) {
-      setAnnouncements(prevAnnouncements => {
+      setAnnouncements((prevAnnouncements) => {
         const nextAnnouncements = [...prevAnnouncements];
-        updates.forEach(message => {
+        updates.forEach((message) => {
           announcementIdRef.current += 1;
           nextAnnouncements.push({ id: announcementIdRef.current, message });
         });
@@ -104,8 +103,13 @@ export function GlobalHeaderShellResults({ debugPanel }: GlobalHeaderShellResult
   const liveRegionContent = useMemo(
     () =>
       announcements.length > 0 ? (
-        <div className="visually-hidden" aria-live="polite" aria-atomic="false" data-anchor="global-header.aria-live">
-          {announcements.map(announcement => (
+        <div
+          className="visually-hidden"
+          aria-live="polite"
+          aria-atomic="false"
+          data-anchor="global-header.aria-live"
+        >
+          {announcements.map((announcement) => (
             <div key={announcement.id}>{announcement.message}</div>
           ))}
         </div>

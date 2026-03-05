@@ -1,6 +1,7 @@
 # Repository Health Review — 2026-02-14
 
 ## Scope and method
+
 - Reviewed architecture/setup docs (`README.md`, `doc/README.md`, `doc/Architecture/ConfigurationArchitectureSummary.md`, `package.json`).
 - Sampled representative runtime modules across app shell, header shell, build surface, content context/resolution, and doc-engine provider layers.
 - Reviewed automated tests in `test/` and executed `npm test`, `npm run lint`, and `npm run build`.
@@ -10,6 +11,7 @@
 ## 1) Architecture map
 
 ### Major subsystems
+
 1. **App shell composition**
    - Files: `src/main.tsx`, `src/App.tsx`, `src/App.logic.ts`.
    - Responsibility: app bootstrapping, top-level providers, theme toggle state.
@@ -27,9 +29,11 @@
    - Responsibility: namespace parsing, provider registration, docs catalog lookup, adapter mapping into drawer shape.
 
 ### Data/control flow (runtime)
+
 `main.tsx` mounts `App` → `App` wraps shell content with `ContentProvider` → `GlobalHeaderShell.logic` emits open/close drawer intents via context → `ContentDrawer` resolves content and renders doc/missing states → build surface hooks independently manage resize/persist behavior.
 
 ### Key architecture observations (9)
+
 1. Concern-based naming and layering are consistently applied across major features (`*.build.tsx`, `*.logic.ts`, `*.knowledge.ts`, `*.results.tsx`).
 2. **Current compile path is broken** due contract mismatch between `resolveDrawerContent` output and `ContentDrawer` assumptions.
 3. `BuildSurface.logic.ts` is a **god module** (~566 LOC) holding three independent interaction domains (sections, left panel, right panel).
@@ -45,6 +49,7 @@
 ## 2) Code health assessment
 
 ### Naming, cohesion, coupling, layering
+
 - **Naming:** Mostly clear and domain-aligned (`useBuildSurfaceLogic`, `ContentProviderRegistry`, `resolveDrawerContent`).
 - **Cohesion concerns:**
   - `useBuildSurfaceLogic` file owns multiple independent responsibilities that could be split with no API change.
@@ -55,6 +60,7 @@
 - **Layering:** CCS-style separation is present, but some files are overgrown enough that boundary clarity is eroding.
 
 ### Code smell highlights
+
 1. **Contract drift:** `resolveDrawerContent` returns `{kind: ...}` while `ContentDrawer` expects `{type: ...}` union.
 2. **Silent failure pattern:** multiple `catch {}` blocks suppress storage failures in panel logic.
 3. **Cast-heavy event listeners:** repeated `as unknown as EventListener` blocks reduce type safety confidence.
@@ -67,6 +73,7 @@
 ## 3) Stability & correctness risk scan
 
 ### High-risk findings
+
 1. **Build is currently failing (High).**
    - Where: `src/components/ContentDrawer/ContentDrawer.tsx`, `src/content/contentResolutionAdapter.ts`.
    - Why: incompatible types/properties (`kind` vs `type`, missing `contentProviderRegistry` export path).
@@ -78,6 +85,7 @@
    - Why: duplicated add/remove logic increases leak/regression risk when editing.
 
 ### Additional risk notes
+
 - **Boundary handling:** parse guards are present for JSON and numeric bounds, which is good baseline safety.
 - **Async/race profile:** most logic is synchronous UI state; primary risk is stale global listeners and mutable refs under drag interactions.
 - **TODO/FIXME hotspots:** no significant TODO clusters found, which reduces hidden known-debt risk.
@@ -87,11 +95,13 @@
 ## 4) Test strategy and coverage gaps
 
 ### Current tested surface
+
 - `clamp` utility boundaries.
 - `toAnchorId` normalization behavior.
 - Namespace parsing and registry provider resolution.
 
 ### Not currently tested (high value gaps)
+
 - Drawer rendering branches (content/missing/null).
 - Drawer anchor scrolling behavior.
 - Build-surface keyboard and pointer resize interactions.
@@ -99,6 +109,7 @@
 - Header state transitions for tab/mode/hover interaction rules.
 
 ### Prioritized test backlog (12)
+
 1. **[P0, unit]** `resolveDrawerContent` contract test: ensures returned discriminant/schema matches drawer consumer.
 2. **[P0, unit]** `ContentDrawer` missing-state render for unresolved content IDs.
 3. **[P0, unit]** `ContentDrawer` docs-state render for valid docs payload (title/sections/links).
@@ -117,10 +128,12 @@
 ## 5) Documentation & developer experience
 
 ### Strengths
+
 - README clearly describes runtime stack and scripts.
 - Convention routines are present and explicit, which helps consistency.
 
 ### Gaps
+
 1. **No single “current architecture source of truth.”** `README.md`, `doc/Architecture/*`, and older health checks can diverge.
 2. **No explicit troubleshooting section** for common failures (e.g., strict TS build break, env assumptions).
 3. **No formal testing strategy doc** that maps test layers to subsystem risk.
@@ -131,6 +144,7 @@
 ## 6) Refactoring opportunities (incremental)
 
 ### A) Unify drawer resolution contract
+
 - **Impact:** restores build stability and removes consumer/adapter drift.
 - **Risk:** Low.
 - **Effort:** 0.5 day.
@@ -143,6 +157,7 @@
   - After: `resolveDrawerContent(request) => {type:'content'|'not_found', ...}` (or invert consumer to `kind`, but one union only).
 
 ### B) Extract persistence helpers from BuildSurface logic
+
 - **Impact:** reduces duplication and clarifies error policy.
 - **Risk:** Low.
 - **Effort:** 1 day.
@@ -152,6 +167,7 @@
   3. Add targeted unit tests for malformed payload and clamp behavior.
 
 ### C) Split `BuildSurface.logic.ts` by concern
+
 - **Impact:** improves readability/testability and lowers regression surface.
 - **Risk:** Medium (wiring errors possible).
 - **Effort:** 1–2 days.
@@ -161,6 +177,7 @@
   3. Move shared constants (`min`, `max`, storage keys) into a small local constants module.
 
 ### D) Clarify docs ownership and archive stale types
+
 - **Impact:** better onboarding and reduced cognitive load.
 - **Risk:** Low.
 - **Effort:** 0.5–1 day.
@@ -209,18 +226,21 @@
 ## 8) Next steps roadmap
 
 ### Immediate (1–2 days)
+
 1. Fix drawer/adapter type and import contract to restore `npm run build` health.
 2. Add P0 tests for drawer resolution + missing/content rendering branches.
 3. Introduce one shared persistence helper and migrate one panel hook as a template.
 4. Record canonical documentation path in `doc/README.md`.
 
 ### Near-term (1–2 weeks)
+
 1. Split `BuildSurface.logic.ts` into concern-focused hooks with unchanged public API.
 2. Add integration tests for drag listener cleanup and keyboard resize behavior.
 3. Add header interaction tests for tab/mode state transitions.
 4. Resolve doc tree duplication strategy (`doc/` vs `docs/`) and archive stale files.
 
 ### Longer-term
+
 1. Add CI quality gate requiring build + lint + tests.
 2. Create a short ADR index for architectural pivots (resolver contracts, docs ownership, panel interaction model).
 3. Expand contract tests for doc-engine providers as additional namespaces are added.
@@ -228,6 +248,7 @@
 ---
 
 ## 9) Quick wins (9)
+
 1. Add `contentProviderRegistry` export from `src/content/index.ts` **or** import directly from `contentEngine.ts` to stop symbol drift.
 2. Align `ContentDrawer` to one discriminated union shape (`kind` or `type`) and remove invalid property reads.
 3. Import and use `HeaderDocDefinition` explicitly in `ContentDrawer.tsx` (or avoid cast by narrowing union).
@@ -241,6 +262,7 @@
 ---
 
 ## 10) Open questions
+
 1. **Answer/decision:** The engine contract is canonical and reusable; UI adapters may wrap it for view-model shaping, but must not introduce a competing discriminant union.
 2. **Answer/decision:** `doc/ConventionRoutines/*` is canonical in this repository; `docs/` is non-canonical and should be treated as legacy/non-authoritative.
 3. **Answer/decision:** Persistence failures are user-silent and system-loud: recover safely for the user while emitting non-fatal diagnostics through a reporting hook.

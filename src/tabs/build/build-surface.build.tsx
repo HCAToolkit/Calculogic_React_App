@@ -67,7 +67,7 @@ const SECTION_CONTENT: SectionContentConfig[] = [
     render: () => (
       <>
         <div data-anchor={BUILD_ANCHORS.buttonGroup('configurations')}>
-          {['All', 'User', 'Public', 'Official', 'Favs'].map(filter => (
+          {['All', 'User', 'Public', 'Official', 'Favs'].map((filter) => (
             <button
               type="button"
               key={filter}
@@ -77,9 +77,7 @@ const SECTION_CONTENT: SectionContentConfig[] = [
             </button>
           ))}
         </div>
-        <div data-anchor={BUILD_ANCHORS.placeholder('configurations')}>
-          [ configurations list ]
-        </div>
+        <div data-anchor={BUILD_ANCHORS.placeholder('configurations')}>[ configurations list ]</div>
       </>
     ),
   },
@@ -100,7 +98,7 @@ const SECTION_CONTENT: SectionContentConfig[] = [
     render: () => (
       <>
         <div data-anchor={BUILD_ANCHORS.buttonGroup('search')}>
-          {['Official', 'Public'].map(filter => (
+          {['Official', 'Public'].map((filter) => (
             <button
               type="button"
               key={filter}
@@ -110,16 +108,14 @@ const SECTION_CONTENT: SectionContentConfig[] = [
             </button>
           ))}
         </div>
-        <div data-anchor={BUILD_ANCHORS.placeholder('search')}>
-          [ search results ]
-        </div>
+        <div data-anchor={BUILD_ANCHORS.placeholder('search')}>[ search results ]</div>
       </>
     ),
   },
 ];
 
 function renderSectionContent(id: SectionId) {
-  const match = SECTION_CONTENT.find(entry => entry.id === id);
+  const match = SECTION_CONTENT.find((entry) => entry.id === id);
   return match ? match.render() : null;
 }
 
@@ -184,7 +180,7 @@ export function BuildSurface({
         transition: leftPanel.isDragging ? 'none' : 'width 160ms ease',
       }}
     >
-      {sectionOrder.map(sectionId => (
+      {sectionOrder.map((sectionId) => (
         <SectionPanel key={sectionId} binding={sections[sectionId]} />
       ))}
     </aside>
@@ -194,11 +190,7 @@ export function BuildSurface({
   // Concern: Build · Parent: "Build Surface Layout" · Catalog: control.grip
   // Notes: Exposes left panel resize separator connected to logic grip props.
   const catalogGrip = (
-    <div
-      data-anchor={anchors.leftGrip}
-      style={{ touchAction: 'none' }}
-      {...leftPanel.gripProps}
-    />
+    <div data-anchor={anchors.leftGrip} style={{ touchAction: 'none' }} {...leftPanel.gripProps} />
   );
 
   // [3.2.4] cfg-buildSurface · Subcontainer · "Preview Stage"
@@ -209,7 +201,10 @@ export function BuildSurface({
       <div
         data-anchor={anchors.centerInner}
         data-preview-breakpoint={previewBreakpoint.active}
-        style={{ width: previewBreakpoint.options.find(option => option.id === previewBreakpoint.active)?.width }}
+        style={{
+          width: previewBreakpoint.options.find((option) => option.id === previewBreakpoint.active)
+            ?.width,
+        }}
       >
         <p>Form preview placeholder</p>
       </div>
@@ -268,7 +263,7 @@ export function BuildSurface({
       <div data-anchor="builder-header">
         <h1>Build Surface</h1>
         <div data-anchor="builder-tabs" role="group" aria-label="Preview breakpoint">
-          {previewBreakpoint.options.map(option => (
+          {previewBreakpoint.options.map((option) => (
             <button
               key={option.id}
               type="button"
