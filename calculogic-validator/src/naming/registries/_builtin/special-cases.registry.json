@@ -1,0 +1,22 @@
+{
+  "version": "1",
+  "specialCases": [
+    { "type": "ambient-declaration", "match": { "suffixEquals": [".d.ts"] } },
+    { "type": "barrel", "match": { "basenameEquals": ["index.ts", "index.tsx"] } },
+    { "type": "conventional-doc", "match": { "basenameEquals": ["README.md"] } },
+    {
+      "type": "ecosystem-required",
+      "match": { "regex": "^tsconfig(\\..+)?\\.json$" }
+    },
+    {
+      "type": "ecosystem-required",
+      "match": {
+        "regex": "^vite\\.config\\.[^.]+$|^eslint\\.config\\.[^.]+$|^prettier\\.config\\.[^.]+$"
+      }
+    },
+    {
+      "type": "test-convention",
+      "match": { "regex": "\\.(?:test|spec)\\.(?:[cm]?[jt]sx?)$" }
+    }
+  ]
+}

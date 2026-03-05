@@ -74,6 +74,10 @@ calculogic-validator/src/
       _builtin/
         roles.registry.json
         categories.registry.json
+        reportable-extensions.registry.json
+        case-rules.registry.json
+        special-cases.registry.json
+        walk-exclusions.registry.json
         ...
       _custom/
         roles.registry.custom.json
@@ -84,6 +88,9 @@ calculogic-validator/src/
         current-registry.ts
         current-roles.ts
         current-categories.ts
+  registries/
+    _builtin/
+      scope-profiles.registry.json
 ```
 
 ### Responsibilities
