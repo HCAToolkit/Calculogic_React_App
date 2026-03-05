@@ -9,23 +9,25 @@ const runNamingValidatorHook = (repositoryRoot, options = {}) => {
   const targets = options.targets;
   const namingResult = runNamingValidator(repositoryRoot, { scope, config, targets });
   const summary = summarizeFindings(namingResult.findings);
-  const hasFilterMetadata = Boolean(namingResult.filters?.isFiltered);
+  const meta = {};
+
+  if (namingResult.filters?.isFiltered) {
+    meta.filters = {
+      isFiltered: true,
+      targets: namingResult.filters.targets,
+    };
+  }
+
+  if (namingResult.registry) {
+    meta.registry = namingResult.registry;
+  }
 
   return {
     scope: namingResult.scope,
     totalFilesScanned: namingResult.totalFilesScanned,
     findings: namingResult.findings,
     summary,
-    ...(hasFilterMetadata
-      ? {
-          meta: {
-            filters: {
-              isFiltered: true,
-              targets: namingResult.filters.targets,
-            },
-          },
-        }
-      : {}),
+    ...(Object.keys(meta).length > 0 ? { meta } : {}),
   };
 };
 

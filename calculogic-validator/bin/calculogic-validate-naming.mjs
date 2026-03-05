@@ -10,6 +10,7 @@ import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
 import { computeConfigDigest, getValidatorToolVersion } from '../src/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromFindings } from '../src/validator-exit-code.logic.mjs';
+import { getSourceSnapshot } from '../src/source-snapshot.logic.mjs';
 
 const parseScopeFromCli = argv => {
   let selectedScope = 'repo';
@@ -129,13 +130,24 @@ try {
   process.exit(1);
 }
 const { findings, totalFilesScanned, scope, filters } = validatorResult;
+const registry = validatorResult.registry;
 const endedAtDate = new Date();
 const summary = summarizeFindings(findings);
 
 const report = {
   mode: 'report',
+  validatorId: 'naming',
   toolVersion,
+  ...(toolVersion ? { validatorVersion: toolVersion } : {}),
   ...(configDigest ? { configDigest } : {}),
+  sourceSnapshot: getSourceSnapshot({ cwd: repositoryRoot }),
+  ...(registry
+    ? {
+        registryState: registry.registryState,
+        registrySource: registry.registrySource,
+        registryDigests: registry.registryDigests,
+      }
+    : {}),
   startedAt: startedAtDate.toISOString(),
   endedAt: endedAtDate.toISOString(),
   durationMs: endedAtDate.getTime() - startedAtDate.getTime(),

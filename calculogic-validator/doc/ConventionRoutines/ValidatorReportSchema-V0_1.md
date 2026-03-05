@@ -50,6 +50,9 @@ The slice report envelope is the canonical shape for single-slice output. Curren
 - `specialCaseTypeCounts` (object; naming-specific summary key)
 - `warningRoleStatusCounts` (object; naming-specific summary key)
 - `warningRoleCategoryCounts` (object; naming-specific summary key)
+- `registryState` (`"builtin" | "custom"`; optional registry-state metadata)
+- `registrySource` (`"builtin" | "custom" | "config"`; optional resolved source metadata)
+- `registryDigests` (object `{ builtin, custom, resolved }`; optional digest transparency metadata)
 
 ## 4) Canonical: Runner Report Envelope
 
@@ -88,6 +91,8 @@ Entry-level optional fields:
 - `totalFilesScanned` (number)
 - `counts` (object)
 - `meta` (object)
+  - `meta.filters` (object; present when runner forwards active target filtering metadata)
+  - `meta.registry` (object; present when slice exposes registry-state metadata, e.g. naming)
 
 Pass-through summary keys are allowed (for example naming summary keys beyond `counts`), but they must be deterministic and documented by the corresponding slice spec.
 

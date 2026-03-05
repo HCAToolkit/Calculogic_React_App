@@ -256,6 +256,7 @@ This draft treats registry-state UX as potentially layered with CLI config overr
 ## 12) Rollout notes (draft planning aid)
 
 - Start with naming registries only.
-- Land read-path + report metadata first (still report-only).
+- **Phase 1 landed:** read-path-only registry resolution, digest computation, and report metadata emission (`registryState`, `registrySource`, `registryDigests`) are in place.
+- Phase 1 remains non-mutating: no customization mutation commands/UX are shipped yet.
 - Add customization commands in incremental phases.
 - Gate future expansion to other validator slices behind explicit follow-up specs.
