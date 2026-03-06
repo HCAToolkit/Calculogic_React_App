@@ -8,32 +8,10 @@ import {
   collectRepositoryPaths,
 } from '../src/validators/naming-validator.logic.mjs';
 import { resolveNamingRegistryInputs } from '../src/naming/registries/registry-state.logic.mjs';
-
-const toNamingRolesRuntime = (rolesArray) => {
-  const roleMetadata = new Map();
-
-  rolesArray.forEach((entry) => {
-    if (!roleMetadata.has(entry.role)) {
-      roleMetadata.set(entry.role, entry);
-    }
-  });
-
-  const activeRoles = new Set(
-    Array.from(roleMetadata.values())
-      .filter((entry) => entry.status === 'active')
-      .map((entry) => entry.role),
-  );
-
-  const roleSuffixes = Array.from(roleMetadata.keys()).sort(
-    (left, right) => right.length - left.length,
-  );
-
-  return {
-    roleMetadata,
-    activeRoles,
-    roleSuffixes,
-  };
-};
+import {
+  toNamingRolesRuntime,
+  toReportableExtensionsSet,
+} from '../src/naming/naming-runtime-converters.logic.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
   const absolutePath = path.join(rootDirectory, relativePath);
@@ -63,7 +41,9 @@ test('default direct collectRepositoryPaths reportable extension behavior aligns
     writeFile(tempRoot, 'src/skip.tmp');
 
     const registryInputs = resolveNamingRegistryInputs({ config: {} });
-    const explicitReportableExtensions = new Set(registryInputs.reportableExtensions);
+    const explicitReportableExtensions = toReportableExtensionsSet(
+      registryInputs.reportableExtensions,
+    );
 
     const collectedDefault = collectRepositoryPaths(tempRoot, { scope: 'repo' });
     const collectedExplicit = collectRepositoryPaths(tempRoot, {
@@ -125,7 +105,9 @@ test('default direct helper behavior matches explicit builtin resolver runtime b
 
     const registryInputs = resolveNamingRegistryInputs({ config: {} });
     const explicitRuntime = toNamingRolesRuntime(registryInputs.roles);
-    const explicitReportableExtensions = new Set(registryInputs.reportableExtensions);
+    const explicitReportableExtensions = toReportableExtensionsSet(
+      registryInputs.reportableExtensions,
+    );
 
     const defaultClassification = classifyPath('src/panel.host.tsx');
     const explicitClassification = classifyPath('src/panel.host.tsx', explicitRuntime);

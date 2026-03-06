@@ -1,6 +1,10 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { resolveNamingRegistryInputs } from './registries/registry-state.logic.mjs';
+import {
+  toNamingRolesRuntime,
+  toReportableExtensionsSet,
+} from './naming-runtime-converters.logic.mjs';
 import { BUILTIN_WALK_EXCLUSIONS } from './registries/naming-special-cases.knowledge.mjs';
 import {
   listValidatorScopes,
@@ -23,34 +27,6 @@ export const normalizePath = (relativePath) => relativePath.split(path.sep).join
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
 
-
-const toReportableExtensionsSet = (extensionArray) => new Set(extensionArray);
-
-const toNamingRolesRuntime = (rolesArray) => {
-  const roleMetadata = new Map();
-
-  rolesArray.forEach((entry) => {
-    if (!roleMetadata.has(entry.role)) {
-      roleMetadata.set(entry.role, entry);
-    }
-  });
-
-  const activeRoles = new Set(
-    Array.from(roleMetadata.values())
-      .filter((entry) => entry.status === 'active')
-      .map((entry) => entry.role),
-  );
-
-  const roleSuffixes = Array.from(roleMetadata.keys()).sort(
-    (left, right) => right.length - left.length,
-  );
-
-  return {
-    roleMetadata,
-    activeRoles,
-    roleSuffixes,
-  };
-};
 
 const BUILTIN_NAMING_REGISTRY_INPUTS = resolveNamingRegistryInputs({ config: {} });
 const DEFAULT_NAMING_ROLES_RUNTIME = toNamingRolesRuntime(BUILTIN_NAMING_REGISTRY_INPUTS.roles);
