@@ -17,7 +17,7 @@ This note is a lightweight map for the later hardening/removal pass.
 ## Registry loader seams
 - `src/naming/registries/naming-special-cases.knowledge.mjs` removed after runtime/test import audit + consumer repointing to dedicated runtime-owner loader modules (`naming-special-case-rules.registry.logic.mjs`, `naming-walk-exclusions.registry.logic.mjs`).
 - `src/naming/registries/naming-case-rules.knowledge.mjs` removed after runtime/test import audit + consumer repointing to `src/naming/rules/naming-rule-check-semantic-case.logic.mjs`.
-- `validator-scopes.knowledge.mjs` retained-path validator-owned registry/runtime seam for builtin scope profiles; primary runtime access is getter-backed (`getBuiltinScopeProfiles`, `listValidatorScopes`, `getValidatorScopeProfile`) and the `.knowledge` filename is intentionally kept to avoid broad import churn.
+- `validator-scopes.knowledge.mjs` is kept as the canonical validator-owned runtime owner for builtin scope profiles; getter-backed runtime APIs (`getBuiltinScopeProfiles`, `listValidatorScopes`, `getValidatorScopeProfile`) are the primary contract. The current `.knowledge` filename/path is retained for stability and explicitly marked as a later churn-managed rename candidate (no behavior change in this slice).
 
 ## Primary runtime paths
 - Getter-backed registry accessors (`getBuiltin*`, `getSemanticNameCaseRule`).
