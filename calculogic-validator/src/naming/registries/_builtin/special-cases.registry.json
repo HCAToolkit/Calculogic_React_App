@@ -1,12 +1,52 @@
 {
   "version": "1",
   "specialCases": [
-    { "type": "ambient-declaration", "match": { "suffixEquals": [".d.ts"] } },
-    { "type": "barrel", "match": { "basenameEquals": ["index.ts", "index.tsx"] } },
-    { "type": "conventional-doc", "match": { "basenameEquals": ["README.md"] } },
+    {
+      "type": "ambient-declaration",
+      "match": {
+        "suffixEquals": [
+          ".d.ts"
+        ]
+      }
+    },
+    {
+      "type": "barrel",
+      "match": {
+        "basenameEquals": [
+          "index.ts",
+          "index.tsx"
+        ]
+      }
+    },
+    {
+      "type": "conventional-doc",
+      "match": {
+        "basenameEquals": [
+          "README.md"
+        ]
+      }
+    },
     {
       "type": "ecosystem-required",
-      "match": { "regex": "^tsconfig(\\..+)?\\.json$" }
+      "match": {
+        "basenameEquals": [
+          "package.json"
+        ]
+      }
+    },
+    {
+      "type": "ecosystem-required",
+      "match": {
+        "basenameEquals": [
+          "package-lock.json"
+        ]
+      }
+    },
+    {
+      "type": "ecosystem-required",
+      "match": {
+        "regex": "^tsconfig(\\..+)?\\.json$"
+      }
     },
     {
       "type": "ecosystem-required",
@@ -16,7 +56,9 @@
     },
     {
       "type": "test-convention",
-      "match": { "regex": "\\.(?:test|spec)\\.(?:[cm]?[jt]sx?)$" }
+      "match": {
+        "regex": "\\.(?:test|spec)\\.(?:[cm]?[jt]sx?)$"
+      }
     }
   ]
 }
