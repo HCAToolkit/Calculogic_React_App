@@ -184,6 +184,8 @@ Classify as canonical when filename parses as `<semantic-name>.<role>.<ext>` (in
 
 Classify as allowed special case for reserved filenames and patterns including barrel files, framework-required names, test files (`*.test.<code-ext>` / `*.spec.<code-ext>`), ambient declaration files, and README convention docs.
 
+Runtime source of truth for builtin special-case classification is `calculogic-validator/src/naming/registries/_builtin/special-cases.registry.json`, evaluated in stable first-match order with currently-supported match forms (`basenameEquals`, `suffixEquals`, `regex`).
+
 Allowed special-case findings include `details.specialCaseType` values:
 
 - `ecosystem-required`
