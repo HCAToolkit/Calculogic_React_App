@@ -17,7 +17,7 @@ This note is a lightweight map for the later hardening/removal pass.
 - `naming-special-cases.knowledge.mjs` loaders for special-cases and walk-exclusions registries.
 - `naming-case-rules.knowledge.mjs` retained-path registry loader seam (assertions + style resolver + `getSemanticNameCaseRule()` getter); filename kept intentionally to avoid broad import churn during seam cleanup pilot.
 - `validator-scopes.knowledge.mjs` builtin scope profile registry loading/normalization.
-- `naming-scope-profiles.knowledge.mjs` re-export seam to validator-scope APIs.
+- `naming-scope-profiles.knowledge.mjs` retained-path naming-owned registry/re-export seam over validator-scopes getter-backed runtime APIs (not a standalone policy source).
 
 ## Primary runtime paths
 - Getter-backed registry accessors (`getBuiltin*`, `getSemanticNameCaseRule`).
