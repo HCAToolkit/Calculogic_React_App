@@ -99,11 +99,6 @@ export const getBuiltinScopeProfiles = () => {
   return cachedBuiltinScopeProfiles;
 };
 
-// Compatibility export: snapshot retained for legacy imports.
-// Runtime access must use getter-backed APIs: getBuiltinScopeProfiles(),
-// listValidatorScopes(), and getValidatorScopeProfile().
-export const SCOPE_PROFILES = getBuiltinScopeProfiles();
-
 // Primary runtime path helper: immutable copy for callers and compatibility shims.
 export const cloneScopeProfile = (profile) => ({
   description: profile.description,

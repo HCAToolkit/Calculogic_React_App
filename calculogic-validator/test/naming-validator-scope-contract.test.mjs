@@ -7,10 +7,7 @@ import {
   getScopeProfile,
   listNamingValidatorScopes,
 } from '../src/validators/naming-validator.logic.mjs';
-import {
-  SCOPE_PROFILES,
-  getBuiltinScopeProfiles,
-} from '../src/validator-scopes.knowledge.mjs';
+import { getBuiltinScopeProfiles } from '../src/validator-scopes.knowledge.mjs';
 
 const runValidatorCli = (args) =>
   spawnSync(
@@ -160,10 +157,6 @@ test('system scope profile keeps legacy explicit root-file behavior when builtin
 });
 
 
-
-test('compatibility scope profiles export stays aligned with getter-backed builtin profiles', () => {
-  assert.deepEqual(SCOPE_PROFILES, getBuiltinScopeProfiles());
-});
 
 test('scope profiles are cloned on lookup (mutations do not leak across reads)', () => {
   const firstRead = getScopeProfile('docs');
