@@ -114,54 +114,31 @@ test('direct reportableExtensions override still wins over default registry-back
   }
 });
 
-test('default direct runtime remains builtin-backed even when registry-state is custom', async () => {
-  const registryDir = path.resolve(
-    process.cwd(),
-    'calculogic-validator/src/naming/registries',
-  );
-  const registryStatePath = path.join(registryDir, 'registry-state.json');
-  const customExtensionsPath = path.join(
-    registryDir,
-    '_custom',
-    'reportable-extensions.registry.custom.json',
-  );
 
-  const originalRegistryState = fs.readFileSync(registryStatePath, 'utf8');
-  const originalCustomExtensions = fs.readFileSync(customExtensionsPath, 'utf8');
-
-  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-default-builtin-pinned-'));
+test('default direct helper behavior matches explicit builtin resolver runtime bundle', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-default-bundle-'));
 
   try {
-    fs.writeFileSync(
-      registryStatePath,
-      JSON.stringify({ schemaVersion: '1', activeRegistry: 'custom' }, null, 2),
-      'utf8',
-    );
-    fs.writeFileSync(
-      customExtensionsPath,
-      JSON.stringify(['.tmp'], null, 2),
-      'utf8',
-    );
+    writeFile(tempRoot, 'src/panel.host.tsx');
+    writeFile(tempRoot, 'src/panel.logic.ts');
+    writeFile(tempRoot, 'src/not-reportable.tmp');
 
-    writeFile(tempRoot, 'src/visible.logic.ts');
-    writeFile(tempRoot, 'src/custom-only.tmp');
+    const registryInputs = resolveNamingRegistryInputs({ config: {} });
+    const explicitRuntime = toNamingRolesRuntime(registryInputs.roles);
+    const explicitReportableExtensions = new Set(registryInputs.reportableExtensions);
 
-    const modulePath = path.resolve(
-      process.cwd(),
-      'calculogic-validator/src/naming/naming-validator.logic.mjs',
-    );
-    const cacheBypassSpecifier = `file://${modulePath}?builtin-default-check=${Date.now()}`;
-    const { collectRepositoryPaths: collectRepositoryPathsDirect } = await import(
-      cacheBypassSpecifier
-    );
+    const defaultClassification = classifyPath('src/panel.host.tsx');
+    const explicitClassification = classifyPath('src/panel.host.tsx', explicitRuntime);
 
-    const collected = collectRepositoryPathsDirect(tempRoot, { scope: 'repo' });
+    const defaultCollected = collectRepositoryPaths(tempRoot, { scope: 'repo' });
+    const explicitCollected = collectRepositoryPaths(tempRoot, {
+      scope: 'repo',
+      reportableExtensions: explicitReportableExtensions,
+    });
 
-    assert.equal(collected.includes('src/visible.logic.ts'), true);
-    assert.equal(collected.includes('src/custom-only.tmp'), false);
+    assert.deepEqual(defaultClassification, explicitClassification);
+    assert.deepEqual(defaultCollected, explicitCollected);
   } finally {
-    fs.writeFileSync(registryStatePath, originalRegistryState, 'utf8');
-    fs.writeFileSync(customExtensionsPath, originalCustomExtensions, 'utf8');
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 });
