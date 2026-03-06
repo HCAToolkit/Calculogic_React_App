@@ -164,6 +164,37 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 });
+
+
+test('registryRootDir falls back to module _builtin when temp _builtin is incomplete', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
+      categories: [{ category: 'from-incomplete-temp-root' }],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+      rolesByCategory: {
+        'from-incomplete-temp-root': [{ role: 'incomplete-temp-role', status: 'active' }],
+      },
+    });
+
+    const moduleBuiltinResult = resolveNamingRegistryInputs();
+    const incompleteBuiltinResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
+
+    assert.deepEqual(incompleteBuiltinResult.roles, moduleBuiltinResult.roles);
+    assert.deepEqual(
+      incompleteBuiltinResult.reportableExtensions,
+      moduleBuiltinResult.reportableExtensions,
+    );
+    assert.ok(
+      !incompleteBuiltinResult.roles.some((entry) => entry.role === 'incomplete-temp-role'),
+    );
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
 test('builtin resolved reportable extensions preserve intended parity, including .jsx and .cjs', () => {
   const result = resolveNamingRegistryInputs();
 
