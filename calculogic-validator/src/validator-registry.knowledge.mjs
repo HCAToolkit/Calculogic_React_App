@@ -1,4 +1,8 @@
 import { runNamingValidator, summarizeFindings } from './naming/naming-validator.host.mjs';
+import {
+  runTreeStructureAdvisor,
+  summarizeFindings as summarizeTreeStructureAdvisorFindings,
+} from './tree-structure-advisor.host.mjs';
 
 const runNamingValidatorHook = (repositoryRoot, options = {}) => {
   const scope = options.scope;
@@ -28,11 +32,35 @@ const runNamingValidatorHook = (repositoryRoot, options = {}) => {
   };
 };
 
+const runTreeStructureAdvisorHook = (repositoryRoot, options = {}) => {
+  const scope = options.scope;
+  const config = options.config;
+  const targets = options.targets;
+  const treeStructureAdvisorResult = runTreeStructureAdvisor(repositoryRoot, {
+    scope,
+    config,
+    targets,
+  });
+  const summary = summarizeTreeStructureAdvisorFindings(treeStructureAdvisorResult.findings);
+
+  return {
+    scope: treeStructureAdvisorResult.scope,
+    totalFilesScanned: treeStructureAdvisorResult.totalFilesScanned,
+    findings: treeStructureAdvisorResult.findings,
+    summary,
+  };
+};
+
 export const VALIDATOR_REGISTRY = [
   {
     id: 'naming',
     description: 'Filename naming validator (report-mode).',
     run: runNamingValidatorHook,
+  },
+  {
+    id: 'tree-structure-advisor',
+    description: 'Repository tree structure advisory validator (report-only).',
+    run: runTreeStructureAdvisorHook,
   },
 ];
 

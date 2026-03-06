@@ -21,9 +21,11 @@ The runner reads validator definitions from a deterministic registry in `calculo
 - `config` (optional loaded validator config object from JSON contract V0.1)
 - `targets` (optional repeatable path filters forwarded to validators that implement target-aware filtering)
 
-### 2.3 Initial validator set
+### 2.3 Validator set
 
-V0.1.0 includes the naming validator only, wrapped through the registry run hook without changing naming-validator internals.
+- V0.1.0 started with naming validator registration only.
+- V0.1.6 adds the second real slice: `tree-structure-advisor` (advisory-only/report-first).
+- Runner continues to preserve deterministic registry declaration ordering when executing multiple slices.
 
 ### 2.4 Metadata injections
 
