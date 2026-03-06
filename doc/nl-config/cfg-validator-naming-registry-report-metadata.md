@@ -3,7 +3,7 @@
 Project: Calculogic Validator (calculogic-validator)
 Type: Configuration
 Scope: validator CLI + runner metadata plumbing
-Passes: 1
+Passes: 2
 
 ## 1. Purpose and Scope
 
@@ -42,10 +42,14 @@ N/A (non-visual).
 
 - Preserve existing exit-code behavior.
 - Add `sourceSnapshot` and `validatorVersion` parity in bin envelope.
+- Keep naming registry resolver behavior deterministic while validating custom role
+  categories from `_builtin/categories.registry.json` during resolver flow (not module init).
 
 ## 6. Knowledge Concern
 
 - Update schema and registry-state docs for optional registry metadata fields and runner placement.
+- Maintain `_builtin/reportable-extensions.registry.json` parity with intended built-in
+  reportable extension coverage.
 
 ## 7. Results Concern
 
@@ -64,3 +68,5 @@ N/A (non-visual).
 1. Update docs and code envelopes/meta plumbing.
 2. Add integration-ish tests.
 3. Run full test suite.
+4. Follow-up nits: restore intended built-in reportable extension parity and thread
+   builtin category allowlist through resolver validation flow.

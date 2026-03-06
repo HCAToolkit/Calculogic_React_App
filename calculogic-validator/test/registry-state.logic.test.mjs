@@ -7,6 +7,18 @@ import { resolveNamingRegistryInputs } from '../src/naming/registries/registry-s
 
 const REGISTRY_MODULE_ROOT = path.resolve('calculogic-validator/src/naming/registries');
 
+const INTENDED_BUILTIN_REPORTABLE_EXTENSIONS = [
+  '.cjs',
+  '.css',
+  '.js',
+  '.json',
+  '.jsx',
+  '.md',
+  '.mjs',
+  '.ts',
+  '.tsx',
+];
+
 const makeTempRegistryRoot = () => fs.mkdtempSync(path.join(os.tmpdir(), 'registry-state-test-'));
 
 const writeJson = (filePath, value) => {
@@ -34,6 +46,23 @@ test('defaults to builtin when registry-state.json is missing', () => {
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
+});
+
+test('resolver contract shape remains stable', () => {
+  const result = resolveNamingRegistryInputs();
+
+  assert.deepEqual(Object.keys(result).sort((a, b) => a.localeCompare(b)), [
+    'registryDigests',
+    'registrySource',
+    'registryState',
+    'reportableExtensions',
+    'roles',
+  ]);
+  assert.deepEqual(Object.keys(result.registryDigests).sort((a, b) => a.localeCompare(b)), [
+    'builtin',
+    'custom',
+    'resolved',
+  ]);
 });
 
 test('builtin state selects builtin and digests stay stable across calls', () => {
@@ -94,6 +123,14 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
 
   assert.deepEqual(result.roles, expectedRoles);
   assert.deepEqual(result.reportableExtensions, expectedExtensions);
+});
+
+test('builtin resolved reportable extensions preserve intended parity, including .jsx and .cjs', () => {
+  const result = resolveNamingRegistryInputs();
+
+  assert.deepEqual(result.reportableExtensions, INTENDED_BUILTIN_REPORTABLE_EXTENSIONS);
+  assert.ok(result.reportableExtensions.includes('.jsx'));
+  assert.ok(result.reportableExtensions.includes('.cjs'));
 });
 
 test('custom state selects custom and digests diverge from builtin when payload differs', () => {

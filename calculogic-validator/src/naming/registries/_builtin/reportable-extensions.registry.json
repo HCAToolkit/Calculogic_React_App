@@ -1,9 +1,11 @@
 {
   "version": "1",
   "reportableExtensions": [
+    ".cjs",
     ".css",
     ".js",
     ".json",
+    ".jsx",
     ".md",
     ".mjs",
     ".ts",
