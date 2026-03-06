@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ROOT_APP_FILES } from '../../validator-root-files.knowledge.mjs';
 
@@ -10,6 +9,8 @@ export { ROOT_APP_FILES };
 const SPECIAL_CASES_REGISTRY_PATH = fileURLToPath(
   new URL('./_builtin/special-cases.registry.json', import.meta.url),
 );
+
+let cachedBuiltinSpecialCaseRules = null;
 
 const loadBuiltinSpecialCases = () => {
   const payload = JSON.parse(fs.readFileSync(SPECIAL_CASES_REGISTRY_PATH, 'utf8'));
@@ -60,6 +61,14 @@ const loadBuiltinSpecialCases = () => {
   });
 };
 
-export const BUILTIN_SPECIAL_CASES_REGISTRY_PATH = path.relative(process.cwd(), SPECIAL_CASES_REGISTRY_PATH);
+export const getBuiltinSpecialCaseRules = () => {
+  if (cachedBuiltinSpecialCaseRules === null) {
+    cachedBuiltinSpecialCaseRules = loadBuiltinSpecialCases();
+  }
 
-export const BUILTIN_SPECIAL_CASE_RULES = loadBuiltinSpecialCases();
+  return cachedBuiltinSpecialCaseRules;
+};
+
+export const BUILTIN_SPECIAL_CASES_REGISTRY_PATH = SPECIAL_CASES_REGISTRY_PATH;
+
+export const BUILTIN_SPECIAL_CASE_RULES = getBuiltinSpecialCaseRules();
