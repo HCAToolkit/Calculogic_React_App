@@ -1,5 +1,9 @@
 import builtinCaseRulesRegistry from './_builtin/case-rules.registry.json' with { type: 'json' };
 
+// Transitional naming note:
+// - The `.knowledge` filename is retained to avoid broad-churn import rewrites.
+// - Runtime ownership lives in builtin registry payloads plus getter-backed access.
+// - This module acts as a registry loader seam (assert + style resolver + getter export).
 const CANONICAL_KEBAB_CASE_SEMANTIC_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 // Registry loader seam: validates builtin case-rules registry payload shape.
