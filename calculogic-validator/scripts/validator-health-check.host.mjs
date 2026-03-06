@@ -5,7 +5,7 @@ import {
   getScopeProfile,
 } from '../src/naming/naming-validator.host.mjs';
 import fs from 'node:fs';
-import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
+import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 

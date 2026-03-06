@@ -8,6 +8,7 @@
 
 This is the intended target structure for the validator suite as refactors continue.
 Some folders and files shown below may not exist yet in the current state.
+Suite-core migration into `src/core/` has started; flat `src/*.mjs` suite-core paths may be temporary compatibility shims during this transition.
 The naming reflects modular suite-core boundaries, slice roots (`naming/` now and `tree/` planned), configurable policy surfaces, and shared tools ownership.
 
 ```text
@@ -41,10 +42,14 @@ calculogic-validator/
 │  │  ├─ validator-registry.knowledge.mjs
 │  │  ├─ validator-scopes.runtime.mjs
 │  │  ├─ validator-root-files.knowledge.mjs
+│  │  ├─ source-snapshot.logic.mjs
 │  │  └─ config/
 │  │     ├─ validator-config.contracts.mjs
 │  │     ├─ validator-config.logic.mjs
 │  │     └─ validator-config.schema.json
+│  ├─ registries/
+│  │  └─ _builtin/
+│  │     └─ scope-profiles.registry.json
 │  └─ compat/                         # SHIMS ONLY (policy-bound)
 │     └─ (temporary files only)        # e.g. old-path re-exports during refactor
 ├─ test/                              # suite-core tests + suite integration tests
@@ -62,6 +67,9 @@ calculogic-validator/
 │  │  ├─ naming-validator.logic.mjs
 │  │  ├─ naming-validator.contracts.mjs
 │  │  ├─ registries/                  # *.knowledge.*
+│  │  │  └─ _builtin/
+│  │  │     ├─ roles.registry.json
+│  │  │     └─ reportable-extensions.registry.json
 │  │  └─ rules/                       # *.logic.*
 │  └─ test/
 │     ├─ naming-validator.test.mjs

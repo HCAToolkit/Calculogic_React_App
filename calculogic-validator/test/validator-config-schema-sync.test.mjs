@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { VALIDATOR_CONFIG_VERSION } from '../src/validator-config.contracts.mjs';
+import { VALIDATOR_CONFIG_VERSION } from '../src/core/config/validator-config.contracts.mjs';
 
 test('validator config schema version const matches runtime contract version', () => {
   const schemaPath = path.join(
