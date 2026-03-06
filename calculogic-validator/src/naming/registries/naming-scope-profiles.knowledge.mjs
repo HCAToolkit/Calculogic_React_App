@@ -1,1 +1,6 @@
-export { SCOPE_PROFILES, cloneScopeProfile } from '../../validator-scopes.knowledge.mjs';
+export {
+  SCOPE_PROFILES,
+  cloneScopeProfile,
+  listValidatorScopes,
+  getValidatorScopeProfile,
+} from '../../validator-scopes.knowledge.mjs';

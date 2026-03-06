@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
 import {
   collectRepositoryPaths,
   getScopeProfile,
@@ -17,8 +18,20 @@ const runValidatorCli = (args) =>
     },
   );
 
+const BUILTIN_SCOPE_PROFILES_REGISTRY_PATH =
+  'calculogic-validator/src/registries/_builtin/scope-profiles.registry.json';
+
 test('scope registry exposes deterministic supported scopes', () => {
   assert.deepEqual(listNamingValidatorScopes(), ['app', 'docs', 'repo', 'system', 'validator']);
+});
+
+test('scope registry is sourced from builtin JSON scope profile keys', () => {
+  const builtinRegistry = JSON.parse(fs.readFileSync(BUILTIN_SCOPE_PROFILES_REGISTRY_PATH, 'utf8'));
+  const expectedScopes = Object.keys(builtinRegistry.profiles).sort((left, right) =>
+    left.localeCompare(right),
+  );
+
+  assert.deepEqual(listNamingValidatorScopes(), expectedScopes);
 });
 
 test('default/no-scope behavior resolves to repo', () => {
@@ -120,6 +133,17 @@ test('--scope=system includes root tooling files only and excludes all folders',
     systemPaths.some((pathname) => pathname.includes('/')),
     false,
   );
+});
+
+test('system scope profile keeps legacy explicit root-file behavior when builtin registry has wildcard patterns', () => {
+  const profile = getScopeProfile('system');
+  assert.ok(profile);
+  assert.equal(profile.includeRootFiles.includes('eslint.config.*'), false);
+  assert.equal(profile.includeRootFiles.includes('tsconfig*.json'), false);
+  assert.equal(profile.includeRootFiles.includes('vite.config.*'), false);
+  assert.ok(profile.includeRootFiles.includes('eslint.config.js'));
+  assert.ok(profile.includeRootFiles.includes('tsconfig.json'));
+  assert.ok(profile.includeRootFiles.includes('vite.config.ts'));
 });
 
 test('docs scope profile explicitly declares root conventional docs inclusion contract', () => {

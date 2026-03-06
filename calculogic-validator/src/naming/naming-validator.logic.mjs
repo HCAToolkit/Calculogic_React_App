@@ -8,8 +8,8 @@ import {
 import { REPORTABLE_EXTENSIONS } from './registries/naming-extensions.knowledge.mjs';
 import { EXCLUDED_DIRECTORIES } from './registries/naming-special-cases.knowledge.mjs';
 import {
-  SCOPE_PROFILES,
-  cloneScopeProfile,
+  listValidatorScopes,
+  getValidatorScopeProfile,
 } from './registries/naming-scope-profiles.knowledge.mjs';
 import { parseCanonicalName } from './rules/naming-rule-parse-canonical.logic.mjs';
 import {
@@ -116,13 +116,9 @@ const buildScopePathPredicate = (profile) => {
   };
 };
 
-export const listNamingValidatorScopes = () => sortPaths(new Set(Object.keys(SCOPE_PROFILES)));
+export const listNamingValidatorScopes = () => listValidatorScopes();
 
-export const getScopeProfile = (scope) => {
-  const normalizedScope = scope ?? 'repo';
-  const profile = SCOPE_PROFILES[normalizedScope];
-  return profile ? cloneScopeProfile(profile) : null;
-};
+export const getScopeProfile = (scope) => getValidatorScopeProfile(scope);
 
 const detectMissingRoleCandidate = (basename) => {
   const segments = basename.split('.');
