@@ -6,12 +6,24 @@ import { stableStringify, sha256Hex } from '../../validator-report-meta.logic.mj
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const BUILTIN_REGISTRY_DIR = path.join(MODULE_DIR, '_builtin');
+const REQUIRED_BUILTIN_REGISTRY_FILES = [
+  'categories.registry.json',
+  'roles.registry.json',
+  'reportable-extensions.registry.json',
+];
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
 
+const hasRequiredBuiltinRegistryFiles = ({ builtinRegistryDir }) =>
+  REQUIRED_BUILTIN_REGISTRY_FILES.every((registryFile) =>
+    fs.existsSync(path.join(builtinRegistryDir, registryFile)),
+  );
+
 const resolveBuiltinRegistryDir = ({ resolvedRegistryRootDir }) => {
   const candidateBuiltinRegistryDir = path.join(resolvedRegistryRootDir, '_builtin');
-  return fs.existsSync(candidateBuiltinRegistryDir) ? candidateBuiltinRegistryDir : BUILTIN_REGISTRY_DIR;
+  return hasRequiredBuiltinRegistryFiles({ builtinRegistryDir: candidateBuiltinRegistryDir })
+    ? candidateBuiltinRegistryDir
+    : BUILTIN_REGISTRY_DIR;
 };
 
 const loadBuiltinCategorySet = ({ builtinRegistryDir }) => {
