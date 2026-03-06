@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {
-  BUILTIN_SPECIAL_CASE_RULES,
   BUILTIN_SPECIAL_CASES_REGISTRY_PATH,
   getBuiltinSpecialCaseRules,
 } from '../src/naming/registries/naming-special-cases.knowledge.mjs';
@@ -53,11 +52,4 @@ test('runtime builtin special-case rules are loaded from builtin registry json',
 
   assert.equal(hasPackageRule, true);
   assert.equal(getSpecialCaseType('package.json'), 'ecosystem-required');
-});
-
-test('builtin special-case rules compatibility export stays aligned with getter', () => {
-  const runtimeRules = getBuiltinSpecialCaseRules();
-
-  assert.equal(BUILTIN_SPECIAL_CASE_RULES, runtimeRules);
-  assert.deepEqual(BUILTIN_SPECIAL_CASE_RULES, runtimeRules);
 });
