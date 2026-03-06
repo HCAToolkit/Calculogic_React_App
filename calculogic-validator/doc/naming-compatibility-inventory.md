@@ -2,6 +2,10 @@
 
 This note is a lightweight map for the later hardening/removal pass.
 
+## Retired legacy modules
+- `src/naming/registries/naming-roles.knowledge.mjs` removed after runtime/test import audit confirmed no internal consumers.
+- `src/naming/registries/naming-extensions.knowledge.mjs` removed after runtime/test import audit confirmed no internal consumers.
+
 ## Compatibility exports retained
 - `SCOPE_PROFILES` (snapshot compatibility export; primary runtime path is `getBuiltinScopeProfiles()`).
 - `BUILTIN_SPECIAL_CASE_RULES` (snapshot compatibility export; primary runtime path is `getBuiltinSpecialCaseRules()`).
@@ -17,4 +21,4 @@ This note is a lightweight map for the later hardening/removal pass.
 
 ## Primary runtime paths
 - Getter-backed registry accessors (`getBuiltin*`, `getSemanticNameCaseRule`).
-- `ROLE_REGISTRY` and `REPORTABLE_EXTENSIONS` as direct runtime policy defaults.
+- Resolver-backed builtin registry payload via `resolveNamingRegistryInputs()` + shared runtime converters (`toNamingRolesRuntime`, `toReportableExtensionsSet`) for defaults.
