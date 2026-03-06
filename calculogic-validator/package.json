@@ -18,7 +18,7 @@
     ".": "./src/index.mjs",
     "./runner": "./src/validator-runner.logic.mjs",
     "./registry": "./src/validator-registry.knowledge.mjs",
-    "./scopes": "./src/validator-scopes.knowledge.mjs",
+    "./scopes": "./src/validator-scopes.runtime.mjs",
     "./naming": "./src/naming/naming-validator.host.mjs"
   },
   "bin": {
