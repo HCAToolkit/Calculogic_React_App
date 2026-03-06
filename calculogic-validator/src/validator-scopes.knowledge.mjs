@@ -3,6 +3,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ROOT_APP_FILES } from './validator-root-files.knowledge.mjs';
 
+// Retained-path seam note:
+// - This module remains at the historical `.knowledge` path to avoid broad-churn import rewrites.
+// - Runtime ownership is validator-owned builtin scope-profile registry loading + getter-backed access.
+// - Policy source-of-truth lives in the builtin registry payload, not in this file as standalone static knowledge.
+
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const BUILTIN_SCOPE_PROFILES_REGISTRY_PATH = path.join(
   MODULE_DIR,
@@ -72,7 +77,8 @@ const canonicalizeScopeProfile = (scope, profile) => {
   };
 };
 
-// Registry loader seam: validates and normalizes builtin scope-profile registry payload.
+// Validator-owned retained-path registry/runtime seam:
+// validates and normalizes builtin scope-profile registry payload at load time.
 const loadBuiltinScopeProfiles = () => {
   const parsedRegistry = loadJsonFile(BUILTIN_SCOPE_PROFILES_REGISTRY_PATH);
 
