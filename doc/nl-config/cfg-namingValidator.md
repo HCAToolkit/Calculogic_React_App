@@ -135,8 +135,10 @@ Normalization and merge semantics for `naming.roles.add` are deterministic and a
 Runtime behavior in this slice resolves naming registries via registry-state logic:
 
 - wiring resolves inputs through `resolveNamingRegistryInputs({ config })`
-- built-in roles are loaded from `calculogic-validator/src/naming/registries/_builtin/roles.registry.json` (`rolesByCategory` flattened into `{ role, category, status, notes? }`)
-- built-in reportable extensions are loaded from `calculogic-validator/src/naming/registries/_builtin/reportable-extensions.registry.json` (`reportableExtensions`)
+- resolver computes one effective built-in registry root per call (defaulting to `calculogic-validator/src/naming/registries/_builtin`)
+- built-in roles are loaded from that effective root `roles.registry.json` (`rolesByCategory` flattened into `{ role, category, status, notes? }`)
+- built-in reportable extensions are loaded from that effective root `reportable-extensions.registry.json` (`reportableExtensions`)
+- built-in allowed categories for role validation are loaded from that same effective root `categories.registry.json`
 - resolver returns normalized arrays for `reportableExtensions` and `roles`
 - wiring converts arrays into runtime structures expected by naming runtime:
   - `reportableExtensions` → `Set`
