@@ -11,11 +11,11 @@ This note is a lightweight map for the later hardening/removal pass.
 - `src/naming/registries/naming-extensions.knowledge.mjs` removed after runtime/test import audit confirmed no internal consumers.
 
 ## Compatibility exports retained
-- `CANONICAL_SEMANTIC_PATTERN` (compatibility export; primary runtime path is `getSemanticNameCaseRule().pattern`).
+- None.
 
 ## Registry loader seams
 - `naming-special-cases.knowledge.mjs` loaders for special-cases and walk-exclusions registries.
-- `naming-case-rules.knowledge.mjs` builtin registry assertions.
+- `naming-case-rules.knowledge.mjs` builtin registry assertions and semantic-name case-rule getter.
 - `validator-scopes.knowledge.mjs` builtin scope profile registry loading/normalization.
 - `naming-scope-profiles.knowledge.mjs` re-export seam to validator-scope APIs.
 
