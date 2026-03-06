@@ -2,6 +2,11 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { ROOT_APP_FILES } from '../../validator-root-files.knowledge.mjs';
 
+// Retained-path registry seam:
+// - Loads builtin naming registry JSON payloads for special-cases + walk-exclusions.
+// - Exposes getter-backed runtime access used by naming logic.
+// - Kept at the legacy `.knowledge` path to avoid broad import churn during seam cleanup.
+// - Not an independently maintained policy source.
 export { ROOT_APP_FILES };
 
 const BUILTIN_REGISTRY_ROOT = new URL('./_builtin/', import.meta.url);
@@ -133,4 +138,5 @@ export const getBuiltinSpecialCaseRules = () => {
   return cachedBuiltinSpecialCaseRules;
 };
 
+// Retained for compatibility/debug surfaces; runtime callers should use getter-backed accessors.
 export const BUILTIN_SPECIAL_CASES_REGISTRY_PATH = SPECIAL_CASES_REGISTRY_PATH;
