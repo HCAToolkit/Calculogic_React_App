@@ -123,9 +123,6 @@ export const getBuiltinWalkExclusions = () => {
 
 export const BUILTIN_WALK_EXCLUSIONS_REGISTRY_PATH = WALK_EXCLUSIONS_REGISTRY_PATH;
 
-// Compatibility export: eager snapshot retained for legacy imports.
-// Primary runtime path is getBuiltinWalkExclusions().
-export const BUILTIN_WALK_EXCLUSIONS = getBuiltinWalkExclusions();
 
 // Primary runtime path: getter-backed access for special-case rule matchers.
 export const getBuiltinSpecialCaseRules = () => {

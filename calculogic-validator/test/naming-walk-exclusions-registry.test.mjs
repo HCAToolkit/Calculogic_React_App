@@ -5,7 +5,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { collectRepositoryPaths } from '../src/validators/naming-validator.logic.mjs';
 import {
-  BUILTIN_WALK_EXCLUSIONS,
   BUILTIN_WALK_EXCLUSIONS_REGISTRY_PATH,
   getBuiltinWalkExclusions,
 } from '../src/naming/registries/naming-special-cases.knowledge.mjs';
@@ -26,7 +25,6 @@ test('runtime walk exclusions are loaded from builtin registry json', () => {
   );
   assert.equal(runtime.skipDotDirectories, registryJson.skipDotDirectories);
   assert.deepEqual(Array.from(runtime.allowDotFiles).sort(), [...registryJson.allowDotFiles].sort());
-  assert.equal(BUILTIN_WALK_EXCLUSIONS, runtime);
 });
 
 test('collectRepositoryPaths preserves excluded-directories and dot-directory behavior while allowing reportable dot-files', () => {
@@ -39,7 +37,7 @@ test('collectRepositoryPaths preserves excluded-directories and dot-directory be
     writeFile(tempRoot, '.config/inside.logic.ts');
     writeFile(tempRoot, '.lintstagedrc.js');
 
-    for (const excludedDirectory of BUILTIN_WALK_EXCLUSIONS.excludedDirectories) {
+    for (const excludedDirectory of getBuiltinWalkExclusions().excludedDirectories) {
       writeFile(tempRoot, `${excludedDirectory}/ignored.logic.ts`);
     }
 
@@ -54,7 +52,7 @@ test('collectRepositoryPaths preserves excluded-directories and dot-directory be
     assert.equal(collected.includes('.lintstagedrc.js'), true);
     assert.equal(collected.includes('.config/inside.logic.ts'), false);
 
-    for (const excludedDirectory of BUILTIN_WALK_EXCLUSIONS.excludedDirectories) {
+    for (const excludedDirectory of getBuiltinWalkExclusions().excludedDirectories) {
       assert.equal(collected.includes(`${excludedDirectory}/ignored.logic.ts`), false);
     }
   } finally {

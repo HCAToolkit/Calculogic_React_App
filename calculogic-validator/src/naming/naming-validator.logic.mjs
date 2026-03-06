@@ -5,7 +5,7 @@ import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
 } from './naming-runtime-converters.logic.mjs';
-import { BUILTIN_WALK_EXCLUSIONS } from './registries/naming-special-cases.knowledge.mjs';
+import { getBuiltinWalkExclusions } from './registries/naming-special-cases.knowledge.mjs';
 import {
   listValidatorScopes,
   getValidatorScopeProfile,
@@ -67,7 +67,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
   }
 
   const reportableExtensions = options.reportableExtensions ?? DEFAULT_REPORTABLE_EXTENSIONS;
-  const walkExclusions = options.walkExclusions ?? BUILTIN_WALK_EXCLUSIONS;
+  const walkExclusions = options.walkExclusions ?? getBuiltinWalkExclusions();
   const collected = [];
 
   const walk = (absoluteDirectoryPath) => {
