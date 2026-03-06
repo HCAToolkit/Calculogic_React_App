@@ -97,6 +97,9 @@ export const getBuiltinScopeProfiles = () => {
   return cachedBuiltinScopeProfiles;
 };
 
+// Compatibility snapshot export for legacy imports.
+// Runtime access must use getter-backed APIs: getBuiltinScopeProfiles(),
+// listValidatorScopes(), and getValidatorScopeProfile().
 export const SCOPE_PROFILES = getBuiltinScopeProfiles();
 
 export const cloneScopeProfile = (profile) => ({
