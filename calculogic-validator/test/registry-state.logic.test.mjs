@@ -125,6 +125,45 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
   assert.deepEqual(result.reportableExtensions, expectedExtensions);
 });
 
+test('registryRootDir drives builtin roles, extensions, and categories from the same _builtin root', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
+      categories: [{ category: 'from-temp-root' }],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+      rolesByCategory: {
+        'from-temp-root': [{ role: 'temp-builtin-role', status: 'active' }],
+      },
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), {
+      reportableExtensions: ['.tmp', '.tmp', '.alt'],
+    });
+
+    const builtinResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
+    assert.deepEqual(builtinResult.roles, [
+      { role: 'temp-builtin-role', category: 'from-temp-root', status: 'active' },
+    ]);
+    assert.deepEqual(builtinResult.reportableExtensions, ['.alt', '.tmp']);
+
+    writeJson(path.join(tempRoot, 'registry-state.json'), {
+      schemaVersion: '1',
+      activeRegistry: 'custom',
+    });
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+      { role: 'temp-custom-role', category: 'from-temp-root', status: 'active' },
+    ]);
+    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.tmp']);
+
+    const customResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
+    assert.ok(customResult.roles.some((entry) => entry.role === 'temp-custom-role'));
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
 test('builtin resolved reportable extensions preserve intended parity, including .jsx and .cjs', () => {
   const result = resolveNamingRegistryInputs();
 

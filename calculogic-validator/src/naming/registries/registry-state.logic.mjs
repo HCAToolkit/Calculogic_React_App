@@ -8,11 +8,14 @@ const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const BUILTIN_REGISTRY_DIR = path.join(MODULE_DIR, '_builtin');
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
-const BUILTIN_CATEGORIES_PATH = path.join(BUILTIN_REGISTRY_DIR, 'categories.registry.json');
 
+const resolveBuiltinRegistryDir = ({ resolvedRegistryRootDir }) => {
+  const candidateBuiltinRegistryDir = path.join(resolvedRegistryRootDir, '_builtin');
+  return fs.existsSync(candidateBuiltinRegistryDir) ? candidateBuiltinRegistryDir : BUILTIN_REGISTRY_DIR;
+};
 
-const loadBuiltinCategorySet = () => {
-  const parsed = loadJsonFile(BUILTIN_CATEGORIES_PATH);
+const loadBuiltinCategorySet = ({ builtinRegistryDir }) => {
+  const parsed = loadJsonFile(path.join(builtinRegistryDir, 'categories.registry.json'));
   const categories = parsed?.categories;
 
   if (!Array.isArray(categories)) {
@@ -136,8 +139,8 @@ function loadJsonFile(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-const loadBuiltinRolesPayload = () => {
-  const parsed = loadJsonFile(path.join(BUILTIN_REGISTRY_DIR, 'roles.registry.json'));
+const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
+  const parsed = loadJsonFile(path.join(builtinRegistryDir, 'roles.registry.json'));
   const rolesByCategory = parsed?.rolesByCategory;
 
   if (!rolesByCategory || typeof rolesByCategory !== 'object' || Array.isArray(rolesByCategory)) {
@@ -158,13 +161,13 @@ const loadBuiltinRolesPayload = () => {
     }
   }
 
-  const allowedCategories = loadBuiltinCategorySet();
+  const allowedCategories = loadBuiltinCategorySet({ builtinRegistryDir });
   return canonicalizeRoles(flattenedRoles, { allowedCategories });
 };
 
-const loadBuiltinReportableExtensions = () => {
+const loadBuiltinReportableExtensions = ({ builtinRegistryDir }) => {
   const parsed = loadJsonFile(
-    path.join(BUILTIN_REGISTRY_DIR, 'reportable-extensions.registry.json'),
+    path.join(builtinRegistryDir, 'reportable-extensions.registry.json'),
   );
 
   if (!Array.isArray(parsed?.reportableExtensions)) {
@@ -194,7 +197,7 @@ const loadRegistryState = (registryRootDir) => {
   return activeRegistry;
 };
 
-const loadCustomPayload = (registryRootDir) => {
+const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
   const customRolesPath = path.join(registryRootDir, '_custom', 'roles.registry.custom.json');
   const customExtensionsPath = path.join(
     registryRootDir,
@@ -220,20 +223,22 @@ const loadCustomPayload = (registryRootDir) => {
   const extensionsRaw = loadJsonFile(customExtensionsPath);
 
   return {
-    roles: canonicalizeRoles(rolesRaw, { allowedCategories: loadBuiltinCategorySet() }),
+    roles: canonicalizeRoles(rolesRaw, {
+      allowedCategories: loadBuiltinCategorySet({ builtinRegistryDir }),
+    }),
     reportableExtensions: canonicalizeExtensions(extensionsRaw),
   };
 };
 
-const buildBuiltinPayload = () => ({
-  roles: loadBuiltinRolesPayload(),
-  reportableExtensions: loadBuiltinReportableExtensions(),
+const buildBuiltinPayload = ({ builtinRegistryDir }) => ({
+  roles: loadBuiltinRolesPayload({ builtinRegistryDir }),
+  reportableExtensions: loadBuiltinReportableExtensions({ builtinRegistryDir }),
 });
 
-const applyConfigOverlay = (builtinPayload, config) => {
+const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
   const extensionAdds = config?.naming?.reportableExtensions?.add ?? [];
   const roleAdds = config?.naming?.roles?.add ?? [];
-  const allowedCategories = loadBuiltinCategorySet();
+  const allowedCategories = loadBuiltinCategorySet({ builtinRegistryDir });
 
   const mergedExtensions = canonicalizeExtensions([
     ...builtinPayload.reportableExtensions,
@@ -261,7 +266,8 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
   const resolvedRegistryRootDir = registryRootDir ?? MODULE_DIR;
   const registryState = loadRegistryState(resolvedRegistryRootDir);
 
-  const builtinPayload = buildBuiltinPayload();
+  const builtinRegistryDir = resolveBuiltinRegistryDir({ resolvedRegistryRootDir });
+  const builtinPayload = buildBuiltinPayload({ builtinRegistryDir });
   const builtinDigest = digestPayload(builtinPayload);
 
   const customRolesPath = path.join(
@@ -278,7 +284,7 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
   const hasCustomFiles = fs.existsSync(customRolesPath) && fs.existsSync(customExtensionsPath);
 
   const customPayload = hasCustomFiles
-    ? loadCustomPayload(resolvedRegistryRootDir)
+    ? loadCustomPayload({ registryRootDir: resolvedRegistryRootDir, builtinRegistryDir })
     : builtinPayload;
   const customDigest = digestPayload(customPayload);
 
@@ -296,7 +302,7 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
   const registrySource = hasConfigOverlay ? 'config' : registryState;
 
   const resolvedPayload = hasConfigOverlay
-    ? applyConfigOverlay(builtinPayload, config)
+    ? applyConfigOverlay({ builtinPayload, config, builtinRegistryDir })
     : registryState === 'custom'
       ? customPayload
       : builtinPayload;
