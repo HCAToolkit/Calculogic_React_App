@@ -3,6 +3,7 @@
 This note is a lightweight map for the later hardening/removal pass.
 
 ## Retired legacy modules
+- `SCOPE_PROFILES` retired after runtime/test import audit confirmed no internal consumers; runtime path remains `getBuiltinScopeProfiles()`.
 - `EXCLUDED_DIRECTORIES` retired after runtime/test import audit confirmed no internal consumers; runtime path remains `getBuiltinWalkExclusions().excludedDirectories`.
 - `BUILTIN_WALK_EXCLUSIONS` retired after runtime/test import audit and consumer repointing to `getBuiltinWalkExclusions()` completed.
 - `BUILTIN_SPECIAL_CASE_RULES` retired after runtime/test import audit confirmed no internal consumers; runtime path remains `getBuiltinSpecialCaseRules()`.
@@ -10,7 +11,6 @@ This note is a lightweight map for the later hardening/removal pass.
 - `src/naming/registries/naming-extensions.knowledge.mjs` removed after runtime/test import audit confirmed no internal consumers.
 
 ## Compatibility exports retained
-- `SCOPE_PROFILES` (snapshot compatibility export; primary runtime path is `getBuiltinScopeProfiles()`).
 - `CANONICAL_SEMANTIC_PATTERN` (compatibility export; primary runtime path is `getSemanticNameCaseRule().pattern`).
 
 ## Registry loader seams
