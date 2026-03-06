@@ -134,7 +134,3 @@ export const getBuiltinSpecialCaseRules = () => {
 };
 
 export const BUILTIN_SPECIAL_CASES_REGISTRY_PATH = SPECIAL_CASES_REGISTRY_PATH;
-
-// Compatibility export: eager snapshot retained for legacy imports.
-// Primary runtime path is getBuiltinSpecialCaseRules().
-export const BUILTIN_SPECIAL_CASE_RULES = getBuiltinSpecialCaseRules();
