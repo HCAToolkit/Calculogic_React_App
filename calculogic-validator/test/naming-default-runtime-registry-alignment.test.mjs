@@ -42,7 +42,7 @@ const writeFile = (rootDirectory, relativePath) => {
 };
 
 test('default direct classifyPath runtime aligns with builtin registry resolver payload', () => {
-  const registryInputs = resolveNamingRegistryInputs();
+  const registryInputs = resolveNamingRegistryInputs({ config: {} });
   const explicitRuntime = toNamingRolesRuntime(registryInputs.roles);
 
   const canonicalDefault = classifyPath('src/rightpanel.results-style.css');
@@ -62,7 +62,7 @@ test('default direct collectRepositoryPaths reportable extension behavior aligns
     writeFile(tempRoot, 'doc/readme.spec.md');
     writeFile(tempRoot, 'src/skip.tmp');
 
-    const registryInputs = resolveNamingRegistryInputs();
+    const registryInputs = resolveNamingRegistryInputs({ config: {} });
     const explicitReportableExtensions = new Set(registryInputs.reportableExtensions);
 
     const collectedDefault = collectRepositoryPaths(tempRoot, { scope: 'repo' });
@@ -109,6 +109,35 @@ test('direct reportableExtensions override still wins over default registry-back
     assert.equal(defaultCollected.includes('src/notes.tmp'), false);
     assert.equal(overrideCollected.includes('src/notes.tmp'), true);
     assert.equal(overrideCollected.includes('src/visible.logic.ts'), false);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+
+test('default direct helper behavior matches explicit builtin resolver runtime bundle', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-default-bundle-'));
+
+  try {
+    writeFile(tempRoot, 'src/panel.host.tsx');
+    writeFile(tempRoot, 'src/panel.logic.ts');
+    writeFile(tempRoot, 'src/not-reportable.tmp');
+
+    const registryInputs = resolveNamingRegistryInputs({ config: {} });
+    const explicitRuntime = toNamingRolesRuntime(registryInputs.roles);
+    const explicitReportableExtensions = new Set(registryInputs.reportableExtensions);
+
+    const defaultClassification = classifyPath('src/panel.host.tsx');
+    const explicitClassification = classifyPath('src/panel.host.tsx', explicitRuntime);
+
+    const defaultCollected = collectRepositoryPaths(tempRoot, { scope: 'repo' });
+    const explicitCollected = collectRepositoryPaths(tempRoot, {
+      scope: 'repo',
+      reportableExtensions: explicitReportableExtensions,
+    });
+
+    assert.deepEqual(defaultClassification, explicitClassification);
+    assert.deepEqual(defaultCollected, explicitCollected);
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
