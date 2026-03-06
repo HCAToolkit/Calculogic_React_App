@@ -39,7 +39,7 @@ calculogic-validator/
 │  │  ├─ validator-report-meta.logic.mjs
 │  │  ├─ validator-runner.logic.mjs
 │  │  ├─ validator-registry.knowledge.mjs
-│  │  ├─ validator-scopes.knowledge.mjs
+│  │  ├─ validator-scopes.runtime.mjs
 │  │  ├─ validator-root-files.knowledge.mjs
 │  │  └─ config/
 │  │     ├─ validator-config.contracts.mjs
