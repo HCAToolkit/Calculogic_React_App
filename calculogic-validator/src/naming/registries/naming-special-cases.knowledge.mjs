@@ -17,6 +17,7 @@ const WALK_EXCLUSIONS_REGISTRY_PATH = fileURLToPath(
 let cachedBuiltinSpecialCaseRules = null;
 let cachedBuiltinWalkExclusions = null;
 
+// Registry loader seam: validates builtin JSON and adapts it into runtime matchers.
 const loadBuiltinSpecialCases = () => {
   const payload = JSON.parse(fs.readFileSync(SPECIAL_CASES_REGISTRY_PATH, 'utf8'));
 
@@ -67,6 +68,7 @@ const loadBuiltinSpecialCases = () => {
 };
 
 
+// Registry loader seam: validates builtin JSON and adapts it into runtime walk exclusions.
 const loadBuiltinWalkExclusions = () => {
   const payload = JSON.parse(fs.readFileSync(WALK_EXCLUSIONS_REGISTRY_PATH, 'utf8'));
 
@@ -110,6 +112,7 @@ const loadBuiltinWalkExclusions = () => {
   };
 };
 
+// Primary runtime path: getter-backed access for naming walk exclusions.
 export const getBuiltinWalkExclusions = () => {
   if (cachedBuiltinWalkExclusions === null) {
     cachedBuiltinWalkExclusions = loadBuiltinWalkExclusions();
@@ -120,10 +123,15 @@ export const getBuiltinWalkExclusions = () => {
 
 export const BUILTIN_WALK_EXCLUSIONS_REGISTRY_PATH = WALK_EXCLUSIONS_REGISTRY_PATH;
 
+// Compatibility export: eager snapshot retained for legacy imports.
+// Primary runtime path is getBuiltinWalkExclusions().
 export const BUILTIN_WALK_EXCLUSIONS = getBuiltinWalkExclusions();
 
+// Legacy data export retained temporarily for compatibility.
+// Primary runtime path is getBuiltinWalkExclusions().excludedDirectories.
 export const EXCLUDED_DIRECTORIES = BUILTIN_WALK_EXCLUSIONS.excludedDirectories;
 
+// Primary runtime path: getter-backed access for special-case rule matchers.
 export const getBuiltinSpecialCaseRules = () => {
   if (cachedBuiltinSpecialCaseRules === null) {
     cachedBuiltinSpecialCaseRules = loadBuiltinSpecialCases();
@@ -134,4 +142,6 @@ export const getBuiltinSpecialCaseRules = () => {
 
 export const BUILTIN_SPECIAL_CASES_REGISTRY_PATH = SPECIAL_CASES_REGISTRY_PATH;
 
+// Compatibility export: eager snapshot retained for legacy imports.
+// Primary runtime path is getBuiltinSpecialCaseRules().
 export const BUILTIN_SPECIAL_CASE_RULES = getBuiltinSpecialCaseRules();
