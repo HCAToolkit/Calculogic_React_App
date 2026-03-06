@@ -6,7 +6,7 @@ import {
   ROLE_SUFFIXES,
 } from './registries/naming-roles.knowledge.mjs';
 import { REPORTABLE_EXTENSIONS } from './registries/naming-extensions.knowledge.mjs';
-import { EXCLUDED_DIRECTORIES } from './registries/naming-special-cases.knowledge.mjs';
+import { BUILTIN_WALK_EXCLUSIONS } from './registries/naming-special-cases.knowledge.mjs';
 import {
   listValidatorScopes,
   getValidatorScopeProfile,
@@ -67,24 +67,30 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
   }
 
   const reportableExtensions = options.reportableExtensions ?? REPORTABLE_EXTENSIONS;
+  const walkExclusions = options.walkExclusions ?? BUILTIN_WALK_EXCLUSIONS;
   const collected = [];
 
   const walk = (absoluteDirectoryPath) => {
     const entries = fs.readdirSync(absoluteDirectoryPath, { withFileTypes: true });
 
     for (const entry of entries) {
-      if (entry.name.startsWith('.') && entry.name !== '.eslintrc') {
-        if (entry.isDirectory()) {
-          continue;
-        }
-      }
+      const isDotEntry = entry.name.startsWith('.');
+      const isAllowedDotFile = walkExclusions.allowDotFiles.has(entry.name);
 
       if (entry.isDirectory()) {
-        if (EXCLUDED_DIRECTORIES.has(entry.name)) {
+        if (walkExclusions.excludedDirectories.has(entry.name)) {
+          continue;
+        }
+
+        if (isDotEntry && walkExclusions.skipDotDirectories) {
           continue;
         }
 
         walk(path.join(absoluteDirectoryPath, entry.name));
+        continue;
+      }
+
+      if (isDotEntry && !isAllowedDotFile) {
         continue;
       }
 
