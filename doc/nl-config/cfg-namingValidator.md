@@ -184,9 +184,9 @@ Runtime walk policy fields:
 
 - `excludedDirectories`: directory basenames skipped during recursive walk.
 - `skipDotDirectories`: when `true`, dot-directories are skipped.
-- `allowDotFiles`: explicit dot-file basename allowlist; other dot-files are skipped.
+- `allowDotFiles`: retained registry compatibility field (loaded at runtime) for explicit dot-file entries such as `.eslintrc`; it does **not** act as a deny-by-default switch for all other dot-files.
 
-This slice is behavior-preserving for the default builtin profile (`.git`, `.vite`, `coverage`, `dist`, `node_modules`; skip dot-directories; allow `.eslintrc` exception).
+This slice preserves default builtin walk behavior (`.git`, `.vite`, `coverage`, `dist`, `node_modules`; skip dot-directories) while allowing reportable dot-files to flow through standard reportable-file checks.
 
 ### 2.9 Semantic-name case rules runtime source (V0.1.18)
 
