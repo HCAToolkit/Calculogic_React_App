@@ -1,5 +1,9 @@
 import { resolveNamingRegistryInputs } from './registries/registry-state.logic.mjs';
 import {
+  toNamingRolesRuntime,
+  toReportableExtensionsSet,
+} from './naming-runtime-converters.logic.mjs';
+import {
   parseCanonicalName,
   getSpecialCaseType,
   isAllowedSpecialCase,
@@ -11,34 +15,6 @@ import {
   runNamingValidator as runNamingValidatorRuntime,
   summarizeFindings,
 } from './naming-validator.logic.mjs';
-
-const toReportableExtensionsSet = (extensionArray) => new Set(extensionArray);
-
-const toNamingRolesRuntime = (rolesArray) => {
-  const roleMetadata = new Map();
-
-  rolesArray.forEach((entry) => {
-    if (!roleMetadata.has(entry.role)) {
-      roleMetadata.set(entry.role, entry);
-    }
-  });
-
-  const activeRoles = new Set(
-    Array.from(roleMetadata.values())
-      .filter((entry) => entry.status === 'active')
-      .map((entry) => entry.role),
-  );
-
-  const roleSuffixes = Array.from(roleMetadata.keys()).sort(
-    (left, right) => right.length - left.length,
-  );
-
-  return {
-    roleMetadata,
-    activeRoles,
-    roleSuffixes,
-  };
-};
 
 export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) => {
   const registryInputs = resolveNamingRegistryInputs({ config });
