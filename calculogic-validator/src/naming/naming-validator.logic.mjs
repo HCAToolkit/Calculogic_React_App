@@ -1,11 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import {
-  ROLE_METADATA,
-  ACTIVE_ROLES,
-  ROLE_SUFFIXES,
-} from './registries/naming-roles.knowledge.mjs';
-import { REPORTABLE_EXTENSIONS } from './registries/naming-extensions.knowledge.mjs';
+import { resolveNamingRegistryInputs } from './registries/registry-state.logic.mjs';
 import { BUILTIN_WALK_EXCLUSIONS } from './registries/naming-special-cases.knowledge.mjs';
 import {
   listValidatorScopes,
@@ -28,16 +23,45 @@ export const normalizePath = (relativePath) => relativePath.split(path.sep).join
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
 
-const buildDefaultNamingRolesRuntime = () => ({
-  roleMetadata: ROLE_METADATA,
-  activeRoles: ACTIVE_ROLES,
-  roleSuffixes: ROLE_SUFFIXES,
-});
+
+const toReportableExtensionsSet = (extensionArray) => new Set(extensionArray);
+
+const toNamingRolesRuntime = (rolesArray) => {
+  const roleMetadata = new Map();
+
+  rolesArray.forEach((entry) => {
+    if (!roleMetadata.has(entry.role)) {
+      roleMetadata.set(entry.role, entry);
+    }
+  });
+
+  const activeRoles = new Set(
+    Array.from(roleMetadata.values())
+      .filter((entry) => entry.status === 'active')
+      .map((entry) => entry.role),
+  );
+
+  const roleSuffixes = Array.from(roleMetadata.keys()).sort(
+    (left, right) => right.length - left.length,
+  );
+
+  return {
+    roleMetadata,
+    activeRoles,
+    roleSuffixes,
+  };
+};
+
+const BUILTIN_NAMING_REGISTRY_INPUTS = resolveNamingRegistryInputs();
+const DEFAULT_NAMING_ROLES_RUNTIME = toNamingRolesRuntime(BUILTIN_NAMING_REGISTRY_INPUTS.roles);
+const DEFAULT_REPORTABLE_EXTENSIONS = toReportableExtensionsSet(
+  BUILTIN_NAMING_REGISTRY_INPUTS.reportableExtensions,
+);
 
 const resolveNamingRolesRuntime = (namingRolesRuntime) =>
-  namingRolesRuntime ?? buildDefaultNamingRolesRuntime();
+  namingRolesRuntime ?? DEFAULT_NAMING_ROLES_RUNTIME;
 
-const isReportableFile = (relativePath, reportableExtensions = REPORTABLE_EXTENSIONS) => {
+const isReportableFile = (relativePath, reportableExtensions = DEFAULT_REPORTABLE_EXTENSIONS) => {
   const extension = path.extname(relativePath);
   if (reportableExtensions.has(extension)) {
     return true;
@@ -66,7 +90,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
     return [];
   }
 
-  const reportableExtensions = options.reportableExtensions ?? REPORTABLE_EXTENSIONS;
+  const reportableExtensions = options.reportableExtensions ?? DEFAULT_REPORTABLE_EXTENSIONS;
   const walkExclusions = options.walkExclusions ?? BUILTIN_WALK_EXCLUSIONS;
   const collected = [];
 
