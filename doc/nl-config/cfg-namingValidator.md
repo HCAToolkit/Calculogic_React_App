@@ -174,6 +174,20 @@ Naming report JSON includes deterministic metadata fields for CI/debug sharing w
 
 `stableStringify` sorts object keys recursively and preserves array order to keep digest generation deterministic across runs.
 
+### 2.8 Walk exclusions runtime source (V0.1.17)
+
+Naming path discovery for repository walking is sourced from builtin registry JSON at:
+
+- `calculogic-validator/src/naming/registries/_builtin/walk-exclusions.registry.json`
+
+Runtime walk policy fields:
+
+- `excludedDirectories`: directory basenames skipped during recursive walk.
+- `skipDotDirectories`: when `true`, dot-directories are skipped.
+- `allowDotFiles`: explicit dot-file basename allowlist; other dot-files are skipped.
+
+This slice is behavior-preserving for the default builtin profile (`.git`, `.vite`, `coverage`, `dist`, `node_modules`; skip dot-directories; allow `.eslintrc` exception).
+
 ## 3.0 Classification Contract
 
 ### 3.1 Canonical
