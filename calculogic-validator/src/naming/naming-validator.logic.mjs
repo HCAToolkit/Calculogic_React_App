@@ -52,7 +52,7 @@ const toNamingRolesRuntime = (rolesArray) => {
   };
 };
 
-const BUILTIN_NAMING_REGISTRY_INPUTS = resolveNamingRegistryInputs();
+const BUILTIN_NAMING_REGISTRY_INPUTS = resolveNamingRegistryInputs({ config: {} });
 const DEFAULT_NAMING_ROLES_RUNTIME = toNamingRolesRuntime(BUILTIN_NAMING_REGISTRY_INPUTS.roles);
 const DEFAULT_REPORTABLE_EXTENSIONS = toReportableExtensionsSet(
   BUILTIN_NAMING_REGISTRY_INPUTS.reportableExtensions,

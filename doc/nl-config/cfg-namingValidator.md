@@ -10,7 +10,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.19** (direct naming runtime defaults sourced from registry resolver).
+Current implementation target: **V0.1.20** (direct naming runtime defaults pinned to builtin registry payload).
 
 ## 1.0 Purpose
 
@@ -196,13 +196,13 @@ Semantic-name case validation is sourced from builtin registry JSON at:
 
 Runtime currently supports the builtin `semanticName.style` value `kebab-case` only for this slice. The runtime maps that style to the existing canonical kebab-case semantic-name predicate behavior.
 
-### 2.10 Direct runtime default registry alignment (V0.1.19)
+### 2.10 Direct runtime default registry alignment (V0.1.20)
 
 Direct helper entrypoints in `calculogic-validator/src/naming/naming-validator.logic.mjs` now source default runtime roles/extensions from registry resolver output instead of legacy static knowledge constants.
 
 Default runtime source path:
 
-- `resolveNamingRegistryInputs()` (no explicit overrides)
+- `resolveNamingRegistryInputs({ config: {} })` (builtin payload path)
 - roles payload converted to runtime shape:
   - `roleMetadata: Map`
   - `activeRoles: Set`

@@ -42,7 +42,7 @@ const writeFile = (rootDirectory, relativePath) => {
 };
 
 test('default direct classifyPath runtime aligns with builtin registry resolver payload', () => {
-  const registryInputs = resolveNamingRegistryInputs();
+  const registryInputs = resolveNamingRegistryInputs({ config: {} });
   const explicitRuntime = toNamingRolesRuntime(registryInputs.roles);
 
   const canonicalDefault = classifyPath('src/rightpanel.results-style.css');
@@ -62,7 +62,7 @@ test('default direct collectRepositoryPaths reportable extension behavior aligns
     writeFile(tempRoot, 'doc/readme.spec.md');
     writeFile(tempRoot, 'src/skip.tmp');
 
-    const registryInputs = resolveNamingRegistryInputs();
+    const registryInputs = resolveNamingRegistryInputs({ config: {} });
     const explicitReportableExtensions = new Set(registryInputs.reportableExtensions);
 
     const collectedDefault = collectRepositoryPaths(tempRoot, { scope: 'repo' });
@@ -110,6 +110,58 @@ test('direct reportableExtensions override still wins over default registry-back
     assert.equal(overrideCollected.includes('src/notes.tmp'), true);
     assert.equal(overrideCollected.includes('src/visible.logic.ts'), false);
   } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('default direct runtime remains builtin-backed even when registry-state is custom', async () => {
+  const registryDir = path.resolve(
+    process.cwd(),
+    'calculogic-validator/src/naming/registries',
+  );
+  const registryStatePath = path.join(registryDir, 'registry-state.json');
+  const customExtensionsPath = path.join(
+    registryDir,
+    '_custom',
+    'reportable-extensions.registry.custom.json',
+  );
+
+  const originalRegistryState = fs.readFileSync(registryStatePath, 'utf8');
+  const originalCustomExtensions = fs.readFileSync(customExtensionsPath, 'utf8');
+
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-default-builtin-pinned-'));
+
+  try {
+    fs.writeFileSync(
+      registryStatePath,
+      JSON.stringify({ schemaVersion: '1', activeRegistry: 'custom' }, null, 2),
+      'utf8',
+    );
+    fs.writeFileSync(
+      customExtensionsPath,
+      JSON.stringify(['.tmp'], null, 2),
+      'utf8',
+    );
+
+    writeFile(tempRoot, 'src/visible.logic.ts');
+    writeFile(tempRoot, 'src/custom-only.tmp');
+
+    const modulePath = path.resolve(
+      process.cwd(),
+      'calculogic-validator/src/naming/naming-validator.logic.mjs',
+    );
+    const cacheBypassSpecifier = `file://${modulePath}?builtin-default-check=${Date.now()}`;
+    const { collectRepositoryPaths: collectRepositoryPathsDirect } = await import(
+      cacheBypassSpecifier
+    );
+
+    const collected = collectRepositoryPathsDirect(tempRoot, { scope: 'repo' });
+
+    assert.equal(collected.includes('src/visible.logic.ts'), true);
+    assert.equal(collected.includes('src/custom-only.tmp'), false);
+  } finally {
+    fs.writeFileSync(registryStatePath, originalRegistryState, 'utf8');
+    fs.writeFileSync(customExtensionsPath, originalCustomExtensions, 'utf8');
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 });
