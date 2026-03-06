@@ -9,7 +9,7 @@ import { getBuiltinWalkExclusions } from './registries/naming-special-cases.know
 import {
   listValidatorScopes,
   getValidatorScopeProfile,
-} from './registries/naming-scope-profiles.knowledge.mjs';
+} from '../validator-scopes.knowledge.mjs';
 import { parseCanonicalName } from './rules/naming-rule-parse-canonical.logic.mjs';
 import {
   getSpecialCaseType,
