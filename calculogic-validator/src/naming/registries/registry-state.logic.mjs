@@ -1,20 +1,48 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ROLE_REGISTRY } from './naming-roles.knowledge.mjs';
-import { REPORTABLE_EXTENSIONS } from './naming-extensions.knowledge.mjs';
 import { stableStringify, sha256Hex } from '../../validator-report-meta.logic.mjs';
 
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const BUILTIN_REGISTRY_DIR = path.join(MODULE_DIR, '_builtin');
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
-const ALLOWED_ROLE_CATEGORIES = new Set([
-  'concern-core',
-  'architecture-support',
-  'documentation',
-  'deprecated',
-]);
+const BUILTIN_CATEGORIES_PATH = path.join(BUILTIN_REGISTRY_DIR, 'categories.registry.json');
+
+
+const loadBuiltinCategorySet = () => {
+  const parsed = loadJsonFile(BUILTIN_CATEGORIES_PATH);
+  const categories = parsed?.categories;
+
+  if (!Array.isArray(categories)) {
+    throw new Error('Invalid builtin categories registry: expected a categories array.');
+  }
+
+  const categorySet = new Set();
+
+  for (const categoryEntry of categories) {
+    if (!categoryEntry || typeof categoryEntry !== 'object' || Array.isArray(categoryEntry)) {
+      throw new Error(
+        'Invalid builtin categories registry: each category entry must be an object.',
+      );
+    }
+
+    const category =
+      typeof categoryEntry.category === 'string' ? categoryEntry.category.trim() : '';
+    if (!category) {
+      throw new Error(
+        'Invalid builtin categories registry: each category entry must include a non-empty category string.',
+      );
+    }
+
+    categorySet.add(category);
+  }
+
+  return categorySet;
+};
+
+const ALLOWED_ROLE_CATEGORIES = loadBuiltinCategorySet();
 
 const canonicalizeRole = (roleEntry) => {
   if (!roleEntry || typeof roleEntry !== 'object' || Array.isArray(roleEntry)) {
@@ -32,8 +60,9 @@ const canonicalizeRole = (roleEntry) => {
   }
 
   if (!ALLOWED_ROLE_CATEGORIES.has(category)) {
+    const allowedCategoriesLabel = [...ALLOWED_ROLE_CATEGORIES].sort((a, b) => a.localeCompare(b));
     throw new Error(
-      'Invalid custom roles registry: category must be one of concern-core, architecture-support, documentation, deprecated.',
+      `Invalid custom roles registry: category must be one of ${allowedCategoriesLabel.join(', ')}.`,
     );
   }
 
@@ -105,7 +134,48 @@ const canonicalizeExtensions = (extensions) => {
 
 const digestPayload = (payload) => sha256Hex(stableStringify(payload));
 
-const loadJsonFile = (filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8'));
+function loadJsonFile(filePath) {
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+const loadBuiltinRolesPayload = () => {
+  const parsed = loadJsonFile(path.join(BUILTIN_REGISTRY_DIR, 'roles.registry.json'));
+  const rolesByCategory = parsed?.rolesByCategory;
+
+  if (!rolesByCategory || typeof rolesByCategory !== 'object' || Array.isArray(rolesByCategory)) {
+    throw new Error('Invalid builtin roles registry: expected rolesByCategory object.');
+  }
+
+  const flattenedRoles = [];
+
+  for (const [category, roles] of Object.entries(rolesByCategory)) {
+    if (!Array.isArray(roles)) {
+      throw new Error(
+        `Invalid builtin roles registry: category "${category}" must map to an array.`,
+      );
+    }
+
+    for (const roleEntry of roles) {
+      flattenedRoles.push({ ...roleEntry, category });
+    }
+  }
+
+  return canonicalizeRoles(flattenedRoles);
+};
+
+const loadBuiltinReportableExtensions = () => {
+  const parsed = loadJsonFile(
+    path.join(BUILTIN_REGISTRY_DIR, 'reportable-extensions.registry.json'),
+  );
+
+  if (!Array.isArray(parsed?.reportableExtensions)) {
+    throw new Error(
+      'Invalid builtin reportable extensions registry: expected reportableExtensions array.',
+    );
+  }
+
+  return canonicalizeExtensions(parsed.reportableExtensions);
+};
 
 const loadRegistryState = (registryRootDir) => {
   const statePath = path.join(registryRootDir, 'registry-state.json');
@@ -157,8 +227,8 @@ const loadCustomPayload = (registryRootDir) => {
 };
 
 const buildBuiltinPayload = () => ({
-  roles: canonicalizeRoles(ROLE_REGISTRY),
-  reportableExtensions: canonicalizeExtensions([...REPORTABLE_EXTENSIONS]),
+  roles: loadBuiltinRolesPayload(),
+  reportableExtensions: loadBuiltinReportableExtensions(),
 });
 
 const applyConfigOverlay = (builtinPayload, config) => {

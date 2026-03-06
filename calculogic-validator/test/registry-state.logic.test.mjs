@@ -5,6 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { resolveNamingRegistryInputs } from '../src/naming/registries/registry-state.logic.mjs';
 
+const REGISTRY_MODULE_ROOT = path.resolve('calculogic-validator/src/naming/registries');
+
 const makeTempRegistryRoot = () => fs.mkdtempSync(path.join(os.tmpdir(), 'registry-state-test-'));
 
 const writeJson = (filePath, value) => {
@@ -54,6 +56,44 @@ test('builtin state selects builtin and digests stay stable across calls', () =>
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
+});
+
+test('builtin resolution loads roles and reportable extensions from _builtin JSON registries', () => {
+  const result = resolveNamingRegistryInputs();
+
+  const builtinRolesRegistry = JSON.parse(
+    fs.readFileSync(path.join(REGISTRY_MODULE_ROOT, '_builtin', 'roles.registry.json'), 'utf8'),
+  );
+  const expectedRoles = Object.entries(builtinRolesRegistry.rolesByCategory)
+    .flatMap(([category, entries]) =>
+      entries.map((entry) => {
+        const normalized = {
+          role: entry.role.trim(),
+          category,
+          status: entry.status.trim(),
+        };
+
+        if (typeof entry.notes === 'string' && entry.notes.trim()) {
+          normalized.notes = entry.notes.trim();
+        }
+
+        return normalized;
+      }),
+    )
+    .sort((left, right) => left.role.localeCompare(right.role));
+
+  const builtinExtensionsRegistry = JSON.parse(
+    fs.readFileSync(
+      path.join(REGISTRY_MODULE_ROOT, '_builtin', 'reportable-extensions.registry.json'),
+      'utf8',
+    ),
+  );
+  const expectedExtensions = [...new Set(builtinExtensionsRegistry.reportableExtensions)]
+    .map((value) => value.trim())
+    .sort((left, right) => left.localeCompare(right));
+
+  assert.deepEqual(result.roles, expectedRoles);
+  assert.deepEqual(result.reportableExtensions, expectedExtensions);
 });
 
 test('custom state selects custom and digests diverge from builtin when payload differs', () => {
@@ -123,6 +163,30 @@ test('throws when custom is active and custom files are missing', () => {
       () => resolveNamingRegistryInputs({ registryRootDir: tempRoot }),
       /Custom registry file missing: _custom\/reportable-extensions\.registry\.custom\.json\./u,
     );
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('accepts custom role category values that exist in _builtin/categories.registry.json', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, 'registry-state.json'), {
+      schemaVersion: '1',
+      activeRegistry: 'custom',
+    });
+
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+      { role: 'perf-role', category: 'performance', status: 'active' },
+    ]);
+
+    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), [
+      '.ts',
+    ]);
+
+    const result = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
+    assert.ok(result.roles.some((entry) => entry.role === 'perf-role'));
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
