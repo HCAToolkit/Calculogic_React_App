@@ -42,9 +42,7 @@ const loadBuiltinCategorySet = () => {
   return categorySet;
 };
 
-const ALLOWED_ROLE_CATEGORIES = loadBuiltinCategorySet();
-
-const canonicalizeRole = (roleEntry) => {
+const canonicalizeRole = (roleEntry, { allowedCategories }) => {
   if (!roleEntry || typeof roleEntry !== 'object' || Array.isArray(roleEntry)) {
     throw new Error('Invalid custom roles registry: each entry must be an object.');
   }
@@ -59,8 +57,8 @@ const canonicalizeRole = (roleEntry) => {
     );
   }
 
-  if (!ALLOWED_ROLE_CATEGORIES.has(category)) {
-    const allowedCategoriesLabel = [...ALLOWED_ROLE_CATEGORIES].sort((a, b) => a.localeCompare(b));
+  if (!allowedCategories.has(category)) {
+    const allowedCategoriesLabel = [...allowedCategories].sort((a, b) => a.localeCompare(b));
     throw new Error(
       `Invalid custom roles registry: category must be one of ${allowedCategoriesLabel.join(', ')}.`,
     );
@@ -86,11 +84,11 @@ const canonicalizeRole = (roleEntry) => {
   return canonicalRole;
 };
 
-const canonicalizeRoles = (roles) => {
+const canonicalizeRoles = (roles, { allowedCategories }) => {
   const dedupedByRole = new Map();
 
   for (const roleEntry of roles) {
-    const canonicalRole = canonicalizeRole(roleEntry);
+    const canonicalRole = canonicalizeRole(roleEntry, { allowedCategories });
     if (!dedupedByRole.has(canonicalRole.role)) {
       dedupedByRole.set(canonicalRole.role, canonicalRole);
     }
@@ -160,7 +158,8 @@ const loadBuiltinRolesPayload = () => {
     }
   }
 
-  return canonicalizeRoles(flattenedRoles);
+  const allowedCategories = loadBuiltinCategorySet();
+  return canonicalizeRoles(flattenedRoles, { allowedCategories });
 };
 
 const loadBuiltinReportableExtensions = () => {
@@ -221,7 +220,7 @@ const loadCustomPayload = (registryRootDir) => {
   const extensionsRaw = loadJsonFile(customExtensionsPath);
 
   return {
-    roles: canonicalizeRoles(rolesRaw),
+    roles: canonicalizeRoles(rolesRaw, { allowedCategories: loadBuiltinCategorySet() }),
     reportableExtensions: canonicalizeExtensions(extensionsRaw),
   };
 };
@@ -234,6 +233,7 @@ const buildBuiltinPayload = () => ({
 const applyConfigOverlay = (builtinPayload, config) => {
   const extensionAdds = config?.naming?.reportableExtensions?.add ?? [];
   const roleAdds = config?.naming?.roles?.add ?? [];
+  const allowedCategories = loadBuiltinCategorySet();
 
   const mergedExtensions = canonicalizeExtensions([
     ...builtinPayload.reportableExtensions,
@@ -244,7 +244,7 @@ const applyConfigOverlay = (builtinPayload, config) => {
   const rolesToAppend = [];
 
   for (const roleEntry of roleAdds) {
-    const canonicalRole = canonicalizeRole(roleEntry);
+    const canonicalRole = canonicalizeRole(roleEntry, { allowedCategories });
     if (!existingRoles.has(canonicalRole.role)) {
       existingRoles.add(canonicalRole.role);
       rolesToAppend.push(canonicalRole);
@@ -252,7 +252,7 @@ const applyConfigOverlay = (builtinPayload, config) => {
   }
 
   return {
-    roles: canonicalizeRoles([...builtinPayload.roles, ...rolesToAppend]),
+    roles: canonicalizeRoles([...builtinPayload.roles, ...rolesToAppend], { allowedCategories }),
     reportableExtensions: mergedExtensions,
   };
 };
