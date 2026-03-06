@@ -7,7 +7,6 @@ import {
   getScopeProfile,
   listNamingValidatorScopes,
 } from '../src/validators/naming-validator.logic.mjs';
-import { getBuiltinScopeProfiles } from '../src/validator-scopes.runtime.mjs';
 
 const runValidatorCli = (args) =>
   spawnSync(
