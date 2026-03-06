@@ -127,10 +127,6 @@ export const BUILTIN_WALK_EXCLUSIONS_REGISTRY_PATH = WALK_EXCLUSIONS_REGISTRY_PA
 // Primary runtime path is getBuiltinWalkExclusions().
 export const BUILTIN_WALK_EXCLUSIONS = getBuiltinWalkExclusions();
 
-// Legacy data export retained temporarily for compatibility.
-// Primary runtime path is getBuiltinWalkExclusions().excludedDirectories.
-export const EXCLUDED_DIRECTORIES = BUILTIN_WALK_EXCLUSIONS.excludedDirectories;
-
 // Primary runtime path: getter-backed access for special-case rule matchers.
 export const getBuiltinSpecialCaseRules = () => {
   if (cachedBuiltinSpecialCaseRules === null) {
