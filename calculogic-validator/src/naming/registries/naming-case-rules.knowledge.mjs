@@ -31,10 +31,6 @@ assertBuiltinCaseRulesRegistry(builtinCaseRulesRegistry);
 const semanticNameStyle = builtinCaseRulesRegistry.semanticName.style;
 const canonicalSemanticPattern = resolveSemanticNamePatternByStyle(semanticNameStyle);
 
-// Compatibility export: concrete pattern retained for legacy imports.
-// Primary runtime path is getSemanticNameCaseRule().pattern.
-export const CANONICAL_SEMANTIC_PATTERN = canonicalSemanticPattern;
-
 // Primary runtime path: getter-backed semantic-name case rule for runtime and tests.
 export const getSemanticNameCaseRule = () => ({
   style: semanticNameStyle,

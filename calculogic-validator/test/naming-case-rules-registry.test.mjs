@@ -1,10 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import caseRulesRegistry from '../src/naming/registries/_builtin/case-rules.registry.json' with { type: 'json' };
-import {
-  CANONICAL_SEMANTIC_PATTERN,
-  getSemanticNameCaseRule,
-} from '../src/naming/registries/naming-case-rules.knowledge.mjs';
+import { getSemanticNameCaseRule } from '../src/naming/registries/naming-case-rules.knowledge.mjs';
 import { isCanonicalSemanticName } from '../src/naming/rules/naming-rule-check-semantic-case.logic.mjs';
 
 test('semantic-name case rule runtime is sourced from builtin registry style', () => {
@@ -12,7 +9,8 @@ test('semantic-name case rule runtime is sourced from builtin registry style', (
 
   assert.equal(semanticCaseRule.style, caseRulesRegistry.semanticName.style);
   assert.equal(semanticCaseRule.style, 'kebab-case');
-  assert.equal(semanticCaseRule.pattern, CANONICAL_SEMANTIC_PATTERN);
+  assert.equal(semanticCaseRule.pattern.test('left-panel'), true);
+  assert.equal(semanticCaseRule.pattern.test('leftPanel'), false);
 });
 
 test('kebab-case semantic names are canonical', () => {
