@@ -122,7 +122,7 @@ Naming validator supports optional runtime config input with deterministic JSON 
 - each extension entry must be a string starting with `.`
 - optional `naming.roles.add` array of role metadata objects:
   - required `role` string
-  - required `category` from `concern-core | architecture-support | documentation | deprecated`
+  - required `category` string, validated against `calculogic-validator/src/naming/registries/_builtin/categories.registry.json` `categories[].category`
   - required `status` from `active | deprecated`
   - optional `notes` string
 
@@ -130,11 +130,13 @@ Normalization and merge semantics for `naming.roles.add` are deterministic and a
 
 - role values are trimmed before validation and storage
 - duplicate role entries in config are dropped by first occurrence (input-order stable)
-- entries whose role already exists in default role registry are treated as no-op at runtime
+- entries whose role already exists in built-in role registry are treated as no-op at runtime
 
 Runtime behavior in this slice resolves naming registries via registry-state logic:
 
 - wiring resolves inputs through `resolveNamingRegistryInputs({ config })`
+- built-in roles are loaded from `calculogic-validator/src/naming/registries/_builtin/roles.registry.json` (`rolesByCategory` flattened into `{ role, category, status, notes? }`)
+- built-in reportable extensions are loaded from `calculogic-validator/src/naming/registries/_builtin/reportable-extensions.registry.json` (`reportableExtensions`)
 - resolver returns normalized arrays for `reportableExtensions` and `roles`
 - wiring converts arrays into runtime structures expected by naming runtime:
   - `reportableExtensions` → `Set`
