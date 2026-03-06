@@ -75,7 +75,6 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
 
     for (const entry of entries) {
       const isDotEntry = entry.name.startsWith('.');
-      const isAllowedDotFile = walkExclusions.allowDotFiles.has(entry.name);
 
       if (entry.isDirectory()) {
         if (walkExclusions.excludedDirectories.has(entry.name)) {
@@ -87,10 +86,6 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
         }
 
         walk(path.join(absoluteDirectoryPath, entry.name));
-        continue;
-      }
-
-      if (isDotEntry && !isAllowedDotFile) {
         continue;
       }
 
