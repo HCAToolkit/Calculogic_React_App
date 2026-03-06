@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { getBuiltinSpecialCaseRules } from '../registries/naming-special-cases.knowledge.mjs';
+import { getBuiltinSpecialCaseRules } from '../registries/naming-special-case-rules.registry.logic.mjs';
 
 export const getSpecialCaseType = (normalizedPath) => {
   const basename = path.posix.basename(normalizedPath);

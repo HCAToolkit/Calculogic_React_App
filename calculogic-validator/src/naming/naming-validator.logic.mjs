@@ -5,7 +5,7 @@ import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
 } from './naming-runtime-converters.logic.mjs';
-import { getBuiltinWalkExclusions } from './registries/naming-special-cases.knowledge.mjs';
+import { getBuiltinWalkExclusions } from './registries/naming-walk-exclusions.registry.logic.mjs';
 import {
   listValidatorScopes,
   getValidatorScopeProfile,

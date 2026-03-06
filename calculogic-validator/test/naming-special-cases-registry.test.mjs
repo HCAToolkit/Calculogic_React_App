@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import {
   BUILTIN_SPECIAL_CASES_REGISTRY_PATH,
   getBuiltinSpecialCaseRules,
-} from '../src/naming/registries/naming-special-cases.knowledge.mjs';
+} from '../src/naming/registries/naming-special-case-rules.registry.logic.mjs';
 import {
   getSpecialCaseType,
   isAllowedSpecialCase,
