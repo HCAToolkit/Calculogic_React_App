@@ -19,20 +19,26 @@ const LEGACY_SCOPE_DESCRIPTIONS = {
   system: 'System/tooling files scan (root package/tsconfig/eslint/vite files).',
 };
 
-const ROOT_FILE_PATTERN_RESOLVERS = [
-  {
-    pattern: 'eslint.config.*',
-    resolve: () => [...ROOT_APP_FILES].filter((rootFile) => rootFile.startsWith('eslint.config.')),
-  },
-  {
-    pattern: 'vite.config.*',
-    resolve: () => [...ROOT_APP_FILES].filter((rootFile) => rootFile.startsWith('vite.config.')),
-  },
-  {
-    pattern: 'tsconfig*.json',
-    resolve: () => [...ROOT_APP_FILES].filter((rootFile) => rootFile.startsWith('tsconfig')),
-  },
+const SYSTEM_SCOPE_COMPATIBILITY_PATTERNS = [
+  'eslint.config.*',
+  'vite.config.*',
+  'tsconfig*.json',
 ];
+
+const SYSTEM_SCOPE_COMPATIBILITY_PATTERN_EXPANSIONS = {
+  'eslint.config.*': [...ROOT_APP_FILES]
+    .filter((rootFile) => rootFile.startsWith('eslint.config.'))
+    .sort((left, right) => left.localeCompare(right)),
+  'vite.config.*': [...ROOT_APP_FILES]
+    .filter((rootFile) => rootFile.startsWith('vite.config.'))
+    .sort((left, right) => left.localeCompare(right)),
+  'tsconfig*.json': [...ROOT_APP_FILES]
+    .filter((rootFile) => rootFile.startsWith('tsconfig'))
+    .sort((left, right) => left.localeCompare(right)),
+};
+
+const isKnownSystemScopeCompatibilityPattern = (rootFileToken) =>
+  SYSTEM_SCOPE_COMPATIBILITY_PATTERNS.includes(rootFileToken);
 
 function loadJsonFile(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -42,12 +48,8 @@ const normalizeIncludeRootFiles = (includeRootFiles = []) => {
   const expandedRootFiles = [];
 
   for (const rootFile of includeRootFiles) {
-    const matchingResolver = ROOT_FILE_PATTERN_RESOLVERS.find(
-      (resolver) => resolver.pattern === rootFile,
-    );
-
-    if (matchingResolver) {
-      expandedRootFiles.push(...matchingResolver.resolve());
+    if (isKnownSystemScopeCompatibilityPattern(rootFile)) {
+      expandedRootFiles.push(...SYSTEM_SCOPE_COMPATIBILITY_PATTERN_EXPANSIONS[rootFile]);
       continue;
     }
 
@@ -85,7 +87,17 @@ const loadBuiltinScopeProfiles = () => {
   );
 };
 
-export const SCOPE_PROFILES = loadBuiltinScopeProfiles();
+let cachedBuiltinScopeProfiles = null;
+
+export const getBuiltinScopeProfiles = () => {
+  if (!cachedBuiltinScopeProfiles) {
+    cachedBuiltinScopeProfiles = loadBuiltinScopeProfiles();
+  }
+
+  return cachedBuiltinScopeProfiles;
+};
+
+export const SCOPE_PROFILES = getBuiltinScopeProfiles();
 
 export const cloneScopeProfile = (profile) => ({
   description: profile.description,
@@ -94,10 +106,10 @@ export const cloneScopeProfile = (profile) => ({
 });
 
 export const listValidatorScopes = () =>
-  Array.from(new Set(Object.keys(SCOPE_PROFILES))).sort((a, b) => a.localeCompare(b));
+  Array.from(new Set(Object.keys(getBuiltinScopeProfiles()))).sort((a, b) => a.localeCompare(b));
 
 export const getValidatorScopeProfile = (scope) => {
   const normalizedScope = scope ?? 'repo';
-  const profile = SCOPE_PROFILES[normalizedScope];
+  const profile = getBuiltinScopeProfiles()[normalizedScope];
   return profile ? cloneScopeProfile(profile) : null;
 };

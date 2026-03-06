@@ -141,9 +141,32 @@ test('system scope profile keeps legacy explicit root-file behavior when builtin
   assert.equal(profile.includeRootFiles.includes('eslint.config.*'), false);
   assert.equal(profile.includeRootFiles.includes('tsconfig*.json'), false);
   assert.equal(profile.includeRootFiles.includes('vite.config.*'), false);
-  assert.ok(profile.includeRootFiles.includes('eslint.config.js'));
-  assert.ok(profile.includeRootFiles.includes('tsconfig.json'));
-  assert.ok(profile.includeRootFiles.includes('vite.config.ts'));
+  assert.deepEqual(profile.includeRootFiles, [
+    'eslint.config.js',
+    'eslint.config.mjs',
+    'package-lock.json',
+    'package.json',
+    'tsconfig.app.json',
+    'tsconfig.json',
+    'tsconfig.node.json',
+    'vite.config.js',
+    'vite.config.mjs',
+    'vite.config.ts',
+  ]);
+});
+
+test('scope profiles are cloned on lookup (mutations do not leak across reads)', () => {
+  const firstRead = getScopeProfile('docs');
+  assert.ok(firstRead);
+  firstRead.includeRoots.push('tmp');
+  firstRead.includeRootFiles.push('tmp.md');
+
+  const secondRead = getScopeProfile('docs');
+  assert.deepEqual(secondRead, {
+    description: 'Documentation-focused scan (doc/docs and root conventional docs: README.md).',
+    includeRoots: ['doc', 'docs'],
+    includeRootFiles: ['README.md'],
+  });
 });
 
 test('docs scope profile explicitly declares root conventional docs inclusion contract', () => {
