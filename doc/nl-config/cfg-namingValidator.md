@@ -188,6 +188,14 @@ Runtime walk policy fields:
 
 This slice is behavior-preserving for the default builtin profile (`.git`, `.vite`, `coverage`, `dist`, `node_modules`; skip dot-directories; allow `.eslintrc` exception).
 
+### 2.9 Semantic-name case rules runtime source (V0.1.18)
+
+Semantic-name case validation is sourced from builtin registry JSON at:
+
+- `calculogic-validator/src/naming/registries/_builtin/case-rules.registry.json`
+
+Runtime currently supports the builtin `semanticName.style` value `kebab-case` only for this slice. The runtime maps that style to the existing canonical kebab-case semantic-name predicate behavior.
+
 ## 3.0 Classification Contract
 
 ### 3.1 Canonical
