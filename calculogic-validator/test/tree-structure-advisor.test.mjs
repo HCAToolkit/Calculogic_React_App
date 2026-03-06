@@ -7,7 +7,7 @@ import {
   runTreeStructureAdvisor,
   summarizeFindings,
 } from '../src/tree-structure-advisor.host.mjs';
-import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
+import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 
 const writeJson = async (filePath, value) => {
   await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');

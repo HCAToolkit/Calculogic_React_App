@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getValidatorScopeProfile } from './validator-scopes.runtime.mjs';
+import { getValidatorScopeProfile } from './core/validator-scopes.runtime.mjs';
 
 const KNOWN_TOP_LEVEL_DIRECTORIES = new Set([
   'bin',

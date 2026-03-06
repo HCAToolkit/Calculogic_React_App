@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { detectNpmArgForwardingFootgun } from '../src/npm-arg-forwarding-guard.logic.mjs';
+import { detectNpmArgForwardingFootgun } from '../src/core/npm-arg-forwarding-guard.logic.mjs';
 
 test('returns null when npm_config_argv is missing and fallback has no suspicious env flags', () => {
   const message = detectNpmArgForwardingFootgun({

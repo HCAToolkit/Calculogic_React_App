@@ -1,1 +1,1 @@
-export const VALIDATOR_CONFIG_VERSION = '0.1';
+export * from './core/config/validator-config.contracts.mjs';

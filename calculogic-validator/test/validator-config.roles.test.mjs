@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
+import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
 
 const fixturePath = 'calculogic-validator/test/fixtures/validator-config.roles.contracts.json';
 

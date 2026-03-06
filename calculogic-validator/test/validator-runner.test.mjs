@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
-import { runValidatorRunner } from '../src/validator-runner.logic.mjs';
+import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
+import { runValidatorRunner } from '../src/core/validator-runner.logic.mjs';
 
 test('registry lists validators deterministically', () => {
   assert.deepEqual(listRegisteredValidators(), ['naming', 'tree-structure-advisor']);
