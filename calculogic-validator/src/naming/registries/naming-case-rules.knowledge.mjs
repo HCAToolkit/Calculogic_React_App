@@ -2,6 +2,7 @@ import builtinCaseRulesRegistry from './_builtin/case-rules.registry.json' with 
 
 const CANONICAL_KEBAB_CASE_SEMANTIC_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+// Registry loader seam: validates builtin case-rules registry payload shape.
 const assertBuiltinCaseRulesRegistry = (registry) => {
   if (typeof registry !== 'object' || registry === null) {
     throw new TypeError('Builtin case-rules registry must be an object.');
@@ -16,6 +17,7 @@ const assertBuiltinCaseRulesRegistry = (registry) => {
   }
 };
 
+// Primary runtime path: canonical semantic-name matcher selection by declared builtin style.
 const resolveSemanticNamePatternByStyle = (semanticNameStyle) => {
   if (semanticNameStyle === 'kebab-case') {
     return CANONICAL_KEBAB_CASE_SEMANTIC_PATTERN;
@@ -29,8 +31,11 @@ assertBuiltinCaseRulesRegistry(builtinCaseRulesRegistry);
 const semanticNameStyle = builtinCaseRulesRegistry.semanticName.style;
 const canonicalSemanticPattern = resolveSemanticNamePatternByStyle(semanticNameStyle);
 
+// Compatibility export: concrete pattern retained for legacy imports.
+// Primary runtime path is getSemanticNameCaseRule().pattern.
 export const CANONICAL_SEMANTIC_PATTERN = canonicalSemanticPattern;
 
+// Primary runtime path: getter-backed semantic-name case rule for runtime and tests.
 export const getSemanticNameCaseRule = () => ({
   style: semanticNameStyle,
   pattern: canonicalSemanticPattern,

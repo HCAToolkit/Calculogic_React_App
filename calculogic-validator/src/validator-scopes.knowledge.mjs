@@ -72,6 +72,7 @@ const canonicalizeScopeProfile = (scope, profile) => {
   };
 };
 
+// Registry loader seam: validates and normalizes builtin scope-profile registry payload.
 const loadBuiltinScopeProfiles = () => {
   const parsedRegistry = loadJsonFile(BUILTIN_SCOPE_PROFILES_REGISTRY_PATH);
 
@@ -89,6 +90,7 @@ const loadBuiltinScopeProfiles = () => {
 
 let cachedBuiltinScopeProfiles = null;
 
+// Primary runtime path: getter-backed scope profile access for validator runtime.
 export const getBuiltinScopeProfiles = () => {
   if (!cachedBuiltinScopeProfiles) {
     cachedBuiltinScopeProfiles = loadBuiltinScopeProfiles();
@@ -97,11 +99,12 @@ export const getBuiltinScopeProfiles = () => {
   return cachedBuiltinScopeProfiles;
 };
 
-// Compatibility snapshot export for legacy imports.
+// Compatibility export: snapshot retained for legacy imports.
 // Runtime access must use getter-backed APIs: getBuiltinScopeProfiles(),
 // listValidatorScopes(), and getValidatorScopeProfile().
 export const SCOPE_PROFILES = getBuiltinScopeProfiles();
 
+// Primary runtime path helper: immutable copy for callers and compatibility shims.
 export const cloneScopeProfile = (profile) => ({
   description: profile.description,
   includeRoots: [...profile.includeRoots],

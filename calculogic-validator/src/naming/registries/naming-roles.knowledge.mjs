@@ -1,3 +1,4 @@
+// Primary runtime path: naming role policy source loaded directly by validator runtime.
 export const ROLE_REGISTRY = [
   { role: 'host', category: 'architecture-support', status: 'active' },
   { role: 'wiring', category: 'architecture-support', status: 'active' },
