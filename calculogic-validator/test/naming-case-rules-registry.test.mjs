@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import caseRulesRegistry from '../src/naming/registries/_builtin/case-rules.registry.json' with { type: 'json' };
-import { getSemanticNameCaseRule } from '../src/naming/registries/naming-case-rules.knowledge.mjs';
+import { getSemanticNameCaseRule } from '../src/naming/rules/naming-rule-check-semantic-case.logic.mjs';
 import { isCanonicalSemanticName } from '../src/naming/rules/naming-rule-check-semantic-case.logic.mjs';
 
 test('semantic-name case rule runtime is sourced from builtin registry style', () => {
