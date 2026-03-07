@@ -160,7 +160,7 @@ test('tree-structure-advisor suppresses token-only shim signals on quality surfa
     await writeBaseFixtureRepo(fixtureDir);
     await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'test'), { recursive: true });
     await fs.writeFile(
-      path.join(fixtureDir, 'calculogic-validator', 'test', 'core-compat-shims.test.mjs'),
+      path.join(fixtureDir, 'calculogic-validator', 'test', 'core-entrypoints-contract.test.mjs'),
       'export const testCase = true\n',
       'utf8',
     );
@@ -169,7 +169,7 @@ test('tree-structure-advisor suppresses token-only shim signals on quality surfa
 
     assert.equal(
       result.findings.some(
-        (finding) => finding.path === 'calculogic-validator/test/core-compat-shims.test.mjs',
+        (finding) => finding.path === 'calculogic-validator/test/core-entrypoints-contract.test.mjs',
       ),
       false,
     );
