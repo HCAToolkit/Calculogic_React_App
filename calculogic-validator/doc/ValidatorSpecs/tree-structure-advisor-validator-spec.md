@@ -286,9 +286,15 @@ Example:
 
 Shim/compat detection is a tree-health diagnostic layer in report-first mode:
 
-- detect shim-like files via folder signals (`compat/`, `shims/`, `adapters/`) and/or naming needles (`shim`, `compat`, `adapter`, `bridge`, `migration`)
-- detect scatter when shim-like entries appear across many unrelated folders
+- detect shim-like files via folder signals (`compat/`, `shims/`, `adapters/`, `bridges/`) and/or naming needles (`shim`, `compat`, `adapter`, `bridge`, `migration`)
+- treat thin flat re-export files (`export * from ...` / `export { ... } from ...` only) as a strong shim-like signal
 - recommend a discoverable surface (for example `src/compat/` or `src/compat/shims/`) only when shim-like files already exist
+
+V0.0.1 implemented subset:
+
+- `TREE_SHIM_SURFACE_PRESENT` (`info`): emitted for deterministic shim-like paths with signal details
+- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`): emitted when shim-like paths are not under a discoverable compat/shims surface
+- `TREE_SHIM_SCATTERED`: reserved for a later deterministic slice
 
 Constraints:
 
@@ -361,9 +367,9 @@ Suggested codes (V0.0.1):
 - `TREE_MISSING_NAMESPACE_ROOT`
 - `TREE_SUBSYSTEM_SCAFFOLD_ASYMMETRY`
 - `TREE_TOOL_SURFACE_MIX`
-- `TREE_SHIM_SURFACE_PRESENT` (`info`)
-- `TREE_SHIM_SCATTERED` (`warn`/`info`)
-- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`/`info`)
+- `TREE_SHIM_SURFACE_PRESENT` (`info`) — implemented
+- `TREE_SHIM_SCATTERED` (`warn`/`info`) — planned
+- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`) — implemented
 - `TREE_SHARED_LANE_FIRST_PARTITION_PRESENT` (`info`)
 - `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (`warn`/`info`)
 - `TREE_SHARED_SEMANTIC_ROOT_RECOMMENDED` (`warn`/`info`)

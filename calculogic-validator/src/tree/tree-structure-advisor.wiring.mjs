@@ -97,12 +97,19 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
   const inScopePaths = sortPaths(new Set(scopedPaths));
   const resolvedTargets = resolveScopedTargets(repositoryRoot, targets ?? []);
   const selectedPaths = filterScopedPathsByTargets(repositoryRoot, inScopePaths, resolvedTargets);
+  const fileContentsByPath = Object.fromEntries(
+    selectedPaths.map((relativePath) => [
+      relativePath,
+      fs.readFileSync(path.resolve(repositoryRoot, relativePath), 'utf8'),
+    ]),
+  );
 
   return {
     scope: selectedScope,
     selectedPaths,
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: resolvedTargets.map((target) => target.relPath),
+    fileContentsByPath,
   };
 };
 
