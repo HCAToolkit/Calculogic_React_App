@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runNamingValidator } from '../src/naming/naming-validator.host.mjs';
-import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
+import { runNamingValidator } from '../src/naming-validator.host.mjs';
+import { loadValidatorConfigFromFile } from '../../src/core/config/validator-config.logic.mjs';
 
 test('config reportableExtensions.add includes .py files in scan set', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'validator-config-ext-'));

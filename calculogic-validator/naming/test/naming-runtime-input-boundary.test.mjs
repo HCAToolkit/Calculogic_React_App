@@ -7,13 +7,13 @@ import {
   classifyPath,
   collectRepositoryPaths,
   runNamingValidator,
-} from '../src/naming/naming-validator.logic.mjs';
-import { resolveNamingRegistryInputs } from '../src/naming/registries/registry-state.logic.mjs';
+} from '../src/naming-validator.logic.mjs';
+import { resolveNamingRegistryInputs } from '../src/registries/registry-state.logic.mjs';
 import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
-} from '../src/naming/naming-runtime-converters.logic.mjs';
-import { getBuiltinWalkExclusions } from '../src/naming/registries/naming-walk-exclusions.registry.logic.mjs';
+} from '../src/naming-runtime-converters.logic.mjs';
+import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
   const absolutePath = path.join(rootDirectory, relativePath);

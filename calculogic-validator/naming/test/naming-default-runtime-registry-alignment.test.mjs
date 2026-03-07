@@ -6,14 +6,14 @@ import path from 'node:path';
 import {
   classifyPath as classifyPathRuntime,
   collectRepositoryPaths as collectRepositoryPathsRuntime,
-} from '../src/naming/naming-validator.logic.mjs';
+} from '../src/naming-validator.logic.mjs';
 import {
   classifyPath,
   collectRepositoryPaths,
   prepareNamingValidatorInputs,
   prepareNamingRuntimeInputs,
-} from '../src/naming/naming-validator.host.mjs';
-import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming/naming-validator.logic.mjs';
+} from '../src/naming-validator.host.mjs';
+import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming-validator.logic.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
   const absolutePath = path.join(rootDirectory, relativePath);

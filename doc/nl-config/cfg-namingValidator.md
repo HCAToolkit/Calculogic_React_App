@@ -89,8 +89,8 @@ Deprecated historical roles:
 
 Validator implementation assets live under top-level `calculogic-validator/`:
 
-- canonical module layout: `calculogic-validator/src/naming/{naming-validator.host.mjs,naming-validator.wiring.mjs,naming-validator.logic.mjs,naming-validator.contracts.mjs}`
-- extension-point folders: `calculogic-validator/src/naming/registries/` and `calculogic-validator/src/naming/rules/`
+- canonical module layout: `calculogic-validator/naming/src/{naming-validator.host.mjs,naming-validator.wiring.mjs,naming-validator.logic.mjs,naming-validator.contracts.mjs}`
+- extension-point folders: `calculogic-validator/naming/src/registries/` and `calculogic-validator/naming/src/rules/`
 - package export barrel: `calculogic-validator/src/index.mjs`
 - stable repository-root resolver shared by CLIs: `calculogic-validator/src/core/repository-root.logic.mjs`
 - repo-local script entrypoints remain supported: `calculogic-validator/scripts/{validate-naming.mjs,validate-tree.mjs,validate-all.mjs,validator-health-check.host.mjs}`
@@ -121,7 +121,7 @@ Naming validator supports optional runtime config input with deterministic JSON 
 - each extension entry must be a string starting with `.`
 - optional `naming.roles.add` array of role metadata objects:
   - required `role` string
-  - required `category` string, validated against `calculogic-validator/src/naming/registries/_builtin/categories.registry.json` `categories[].category`
+  - required `category` string, validated against `calculogic-validator/naming/src/registries/_builtin/categories.registry.json` `categories[].category`
   - required `status` from `active | deprecated`
   - optional `notes` string
 
@@ -134,7 +134,7 @@ Normalization and merge semantics for `naming.roles.add` are deterministic and a
 Runtime behavior in this slice resolves naming registries via registry-state logic:
 
 - wiring resolves inputs through `resolveNamingRegistryInputs({ config })`
-- resolver computes one effective built-in registry root per call (defaulting to `calculogic-validator/src/naming/registries/_builtin`)
+- resolver computes one effective built-in registry root per call (defaulting to `calculogic-validator/naming/src/registries/_builtin`)
 - built-in roles are loaded from that effective root `roles.registry.json` (`rolesByCategory` flattened into `{ role, category, status, notes? }`)
 - built-in reportable extensions are loaded from that effective root `reportable-extensions.registry.json` (`reportableExtensions`)
 - built-in allowed categories for role validation are loaded from that same effective root `categories.registry.json`
@@ -177,7 +177,7 @@ Naming report JSON includes deterministic metadata fields for CI/debug sharing w
 
 Naming path discovery for repository walking is sourced from builtin registry JSON at:
 
-- `calculogic-validator/src/naming/registries/_builtin/walk-exclusions.registry.json`
+- `calculogic-validator/naming/src/registries/_builtin/walk-exclusions.registry.json`
 
 Runtime walk policy fields:
 
@@ -191,7 +191,7 @@ This slice preserves default builtin walk behavior (`.git`, `.vite`, `coverage`,
 
 Semantic-name case validation is sourced from builtin registry JSON at:
 
-- `calculogic-validator/src/naming/registries/_builtin/case-rules.registry.json`
+- `calculogic-validator/naming/src/registries/_builtin/case-rules.registry.json`
 
 Runtime currently supports the builtin `semanticName.style` value `kebab-case` only for this slice. The runtime maps that style to the existing canonical kebab-case semantic-name predicate behavior.
 
@@ -201,10 +201,10 @@ Wiring owns registry/default/config composition and prepares runtime-ready depen
 
 Prepared runtime dependency source path:
 
-- registry resolver: `calculogic-validator/src/naming/registries/registry-state.logic.mjs`
-- converter module: `calculogic-validator/src/naming/naming-runtime-converters.logic.mjs`
-- wiring composition entrypoint: `calculogic-validator/src/naming/naming-validator.wiring.mjs`
-- runtime consumer: `calculogic-validator/src/naming/naming-validator.logic.mjs`
+- registry resolver: `calculogic-validator/naming/src/registries/registry-state.logic.mjs`
+- converter module: `calculogic-validator/naming/src/naming-runtime-converters.logic.mjs`
+- wiring composition entrypoint: `calculogic-validator/naming/src/naming-validator.wiring.mjs`
+- runtime consumer: `calculogic-validator/naming/src/naming-validator.logic.mjs`
 
 Prepared runtime dependency contract:
 
@@ -236,7 +236,7 @@ Classify as canonical when filename parses as `<semantic-name>.<role>.<ext>` (in
 
 Classify as allowed special case for reserved filenames and patterns including barrel files, framework-required names, test files (`*.test.<code-ext>` / `*.spec.<code-ext>`), ambient declaration files, and README convention docs.
 
-Runtime source of truth for builtin special-case classification is `calculogic-validator/src/naming/registries/_builtin/special-cases.registry.json`, evaluated in stable first-match order with currently-supported match forms (`basenameEquals`, `suffixEquals`, `regex`).
+Runtime source of truth for builtin special-case classification is `calculogic-validator/naming/src/registries/_builtin/special-cases.registry.json`, evaluated in stable first-match order with currently-supported match forms (`basenameEquals`, `suffixEquals`, `regex`).
 
 Allowed special-case findings include `details.specialCaseType` values:
 

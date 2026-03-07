@@ -269,13 +269,13 @@ test('tree-structure-advisor does not treat public index entrypoint barrel as sh
       path.join(fixtureDir, 'calculogic-validator', 'src', 'index.mjs'),
       [
         "export * from './core/validator-runner.logic.mjs';",
-        "export * as naming from './naming/naming-validator.host.mjs';",
+        "export * as naming from '../naming/src/naming-validator.host.mjs';",
         "export * as treeStructureAdvisor from '../tree/src/tree-structure-advisor.host.mjs';",
       ].join('\n'),
       'utf8',
     );
     await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'core'), { recursive: true });
-    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'naming'), { recursive: true });
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'naming', 'src'), { recursive: true });
     await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'tree', 'src'), { recursive: true });
     await fs.writeFile(
       path.join(fixtureDir, 'calculogic-validator', 'src', 'core', 'validator-runner.logic.mjs'),
@@ -283,7 +283,7 @@ test('tree-structure-advisor does not treat public index entrypoint barrel as sh
       'utf8',
     );
     await fs.writeFile(
-      path.join(fixtureDir, 'calculogic-validator', 'src', 'naming', 'naming-validator.host.mjs'),
+      path.join(fixtureDir, 'calculogic-validator', 'naming', 'src', 'naming-validator.host.mjs'),
       'export const namingHost = true\n',
       'utf8',
     );

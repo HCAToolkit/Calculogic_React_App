@@ -9,6 +9,7 @@
   },
   "files": [
     "src/**",
+    "naming/**",
     "tree/**",
     "bin/**",
     "scripts/**",
@@ -20,7 +21,7 @@
     "./runner": "./src/validator-runner.logic.mjs",
     "./registry": "./src/validator-registry.knowledge.mjs",
     "./scopes": "./src/validator-scopes.runtime.mjs",
-    "./naming": "./src/naming/naming-validator.host.mjs",
+    "./naming": "./naming/src/naming-validator.host.mjs",
     "./tree": "./tree/src/tree-structure-advisor.host.mjs"
   },
   "bin": {

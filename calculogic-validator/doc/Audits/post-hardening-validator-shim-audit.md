@@ -60,7 +60,7 @@ These are intentionally thin pass-through boundaries and should not be treated a
 | Path | Classification | Why shim-like | Thin target(s) | Intentional role |
 |---|---|---|---|---|
 | `calculogic-validator/src/index.mjs` | Intentional public barrel entrypoint | Export-only public package boundary that forwards canonical module surfaces | `./core/validator-runner.logic.mjs`, `./core/validator-registry.knowledge.mjs`, `./core/validator-report.contracts.mjs`, `./tree/tree-structure-advisor.host.mjs`, `./naming/naming-validator.host.mjs` | Public entrypoint surface |
-| `calculogic-validator/src/naming/naming-validator.host.mjs` | Intentional canonical host pass-through | Canonical host→wiring boundary inside naming slice | `./naming-validator.wiring.mjs` | Canonical host boundary |
+| `calculogic-validator/naming/src/naming-validator.host.mjs` | Intentional canonical host pass-through | Canonical host→wiring boundary inside naming slice | `./naming-validator.wiring.mjs` | Canonical host boundary |
 | `calculogic-validator/src/tree/tree-structure-advisor.host.mjs` | Intentional canonical host pass-through | Canonical host→wiring boundary inside tree slice | `./tree-structure-advisor.wiring.mjs` | Canonical host boundary |
 
 ## 5. Tree validator comparison
@@ -91,7 +91,7 @@ These are intentionally thin pass-through boundaries and should not be treated a
 The command did **not** report:
 
 - `calculogic-validator/src/index.mjs`
-- `calculogic-validator/src/naming/naming-validator.host.mjs`
+- `calculogic-validator/naming/src/naming-validator.host.mjs`
 - `calculogic-validator/src/tree/tree-structure-advisor.host.mjs`
 
 Manual assessment: these are intentional canonical/public pass-through entrypoints. Their unflagged status aligns with hardened carveouts, not missed shim debt detection.
@@ -111,7 +111,7 @@ Confirmed:
 ### 6.3 Canonical host→wiring carveout
 
 Confirmed:
-- `calculogic-validator/src/naming/naming-validator.host.mjs` is intentionally thin but unflagged.
+- `calculogic-validator/naming/src/naming-validator.host.mjs` is intentionally thin but unflagged.
 - `calculogic-validator/src/tree/tree-structure-advisor.host.mjs` is intentionally thin but unflagged.
 
 This matches expected canonical host-boundary carveout behavior.

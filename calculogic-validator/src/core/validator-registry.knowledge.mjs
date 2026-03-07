@@ -1,4 +1,4 @@
-import { runNamingValidator, summarizeFindings } from '../naming/naming-validator.host.mjs';
+import { runNamingValidator, summarizeFindings } from '../../naming/src/naming-validator.host.mjs';
 import {
   runTreeStructureAdvisor,
   summarizeFindings as summarizeTreeStructureAdvisorFindings,

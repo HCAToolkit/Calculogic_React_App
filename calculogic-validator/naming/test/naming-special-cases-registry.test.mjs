@@ -4,11 +4,11 @@ import fs from 'node:fs';
 import {
   BUILTIN_SPECIAL_CASES_REGISTRY_PATH,
   getBuiltinSpecialCaseRules,
-} from '../src/naming/registries/naming-special-case-rules.registry.logic.mjs';
+} from '../src/registries/naming-special-case-rules.registry.logic.mjs';
 import {
   getSpecialCaseType,
   isAllowedSpecialCase,
-} from '../src/naming/rules/naming-rule-classify-special-case.logic.mjs';
+} from '../src/rules/naming-rule-classify-special-case.logic.mjs';
 
 test('special-case classification stays behavior-preserving with builtin registry rules', () => {
   assert.equal(getSpecialCaseType('README.md'), 'conventional-doc');

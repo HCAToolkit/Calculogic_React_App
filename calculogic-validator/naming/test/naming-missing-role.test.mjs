@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyPath } from '../src/naming/naming-validator.host.mjs';
+import { classifyPath } from '../src/naming-validator.host.mjs';
 
 test('classifies two-segment reportable filename as missing role', () => {
   const finding = classifyPath('src/App.tsx');

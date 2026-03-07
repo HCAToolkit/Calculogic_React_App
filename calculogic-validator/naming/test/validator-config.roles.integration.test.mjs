@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { runNamingValidator } from '../src/naming/naming-validator.host.mjs';
-import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
+import { runNamingValidator } from '../src/naming-validator.host.mjs';
+import { loadValidatorConfigFromFile } from '../../src/core/config/validator-config.logic.mjs';
 
 test('config naming.roles.add recognizes added role and changes classification delta', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'validator-config-roles-'));

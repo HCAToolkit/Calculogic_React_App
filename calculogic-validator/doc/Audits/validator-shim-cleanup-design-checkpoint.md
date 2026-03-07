@@ -177,7 +177,7 @@ Planned pass 3 actions:
 
 4. **Documentation alignment**
    - update cleanup pass 3 audit doc with explicit policy language distinguishing temporary legacy compatibility from canonical ownership
-   - keep public boundary carveouts unchanged (`src/index.mjs`, `src/naming/naming-validator.host.mjs`, `tree/src/tree-structure-advisor.host.mjs`)
+   - keep public boundary carveouts unchanged (`src/index.mjs`, `naming/src/naming-validator.host.mjs`, `tree/src/tree-structure-advisor.host.mjs`)
 
 Net expected result of pass 3 under this recommendation:
 
