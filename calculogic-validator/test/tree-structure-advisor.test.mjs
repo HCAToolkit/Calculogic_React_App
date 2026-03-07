@@ -204,6 +204,32 @@ test('tree-structure-advisor keeps runtime token-only shim path as informational
   }
 });
 
+
+test('tree-structure-advisor suppresses weak token-only shim signal for tree shim detector implementation file', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-detector-impl-suppressed-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'tree'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'tree', 'tree-shim-detection.logic.mjs'),
+      'export const collectShimEvidence = () => null\n',
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+
+    assert.equal(
+      result.findings.some(
+        (finding) => finding.path === 'calculogic-validator/src/tree/tree-shim-detection.logic.mjs',
+      ),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor does not treat canonical host-to-wiring pass-through as shim debt', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-host-wiring-pass-through-'));
 

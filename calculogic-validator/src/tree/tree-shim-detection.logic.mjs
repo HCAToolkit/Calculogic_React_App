@@ -5,6 +5,7 @@ const SHIM_NAME_TOKEN_SIGNALS = new Set(['shim', 'compat', 'adapter', 'bridge', 
 const SHIM_SURFACE_SEGMENT_SIGNALS = new Set(['compat', 'shims']);
 const SHIM_RELEVANT_FILE_EXTENSIONS = new Set(['.mjs', '.js', '.cjs', '.ts', '.tsx', '.jsx']);
 const NON_RUNTIME_SHIM_SUPPRESSED_SURFACES = new Set(['quality', 'docs', 'examples', 'fixtures']);
+const SHIM_DETECTOR_IMPLEMENTATION_TOKENS = new Set(['detection', 'detector']);
 
 const tokenizeBasename = (basename) =>
   basename
@@ -159,8 +160,13 @@ export const collectShimEvidence = (relativePath, rawContent) => {
   const shimSignals = collectPathShimSignals(relativePath);
   const thinReexportSignal = parseThinReexportShim(rawContent);
   const surface = inferArtifactSurface(relativePath);
+  const basenameTokens = tokenizeBasename(path.posix.basename(relativePath));
   const isCanonicalHostPassThrough = detectCanonicalHostPassThrough(relativePath, thinReexportSignal);
   const isPublicEntryPointPassThrough = detectPublicEntrypointPassThrough(relativePath, rawContent);
+  const isShimDetectorImplementationModule =
+    relativePath.startsWith('calculogic-validator/src/tree/') &&
+    basenameTokens.includes('shim') &&
+    basenameTokens.some((token) => SHIM_DETECTOR_IMPLEMENTATION_TOKENS.has(token));
 
   return {
     surface,
@@ -172,6 +178,7 @@ export const collectShimEvidence = (relativePath, rawContent) => {
     reexportTargetCount: thinReexportSignal?.reexportTargetCount ?? 0,
     isCanonicalHostPassThrough,
     isPublicEntryPointPassThrough,
+    isShimDetectorImplementationModule,
   };
 };
 
@@ -201,6 +208,10 @@ export const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
     }
 
     if (hasWeakSignalOnly && NON_RUNTIME_SHIM_SUPPRESSED_SURFACES.has(evidence.surface)) {
+      continue;
+    }
+
+    if (hasWeakSignalOnly && evidence.isShimDetectorImplementationModule) {
       continue;
     }
 
