@@ -18,14 +18,14 @@ Observed run notes:
 
 ## 3. Summary
 
-- Total current shim-like files manually confirmed: **18**
+- Total current shim / shim-like pass-through inventory manually confirmed: **18**
   - Confirmed compatibility shims / expected current debt: **15**
-  - Shim-like but intentional canonical/public pass-through entrypoints (non-debt): **3**
+  - Intentional canonical/public pass-through entrypoints (non-debt): **3**
 - Total files reported by tree validator as shim-like: **16**
 - Confirmed matches with real shim cases: **15**
 - Likely false positives: **1** (`calculogic-validator/test/core-compat-shims.test.mjs`)
 - Ambiguous detections among reported paths: **0**
-- Likely missed detections (shim-like not reported): **3** (all intentional pass-through entrypoints)
+- Unreported intentional shim-like pass-through entrypoints: **3** (likely appropriate to remain unflagged by shim-debt heuristics)
 
 ## 4. Current confirmed shim inventory
 
@@ -84,7 +84,7 @@ These are thin pass-through files but are better treated as canonical/public bou
 | `calculogic-validator/src/validators/naming-validator.logic.mjs` | Confirmed compatibility shim | Yes | Correct but expected debt | Explicitly documented legacy compat shim |
 | `calculogic-validator/test/core-compat-shims.test.mjs` | Test file (not shim) | Yes | Likely false positive | Triggered by name token `compat`, not forwarding behavior |
 
-### 5.2 Missed shim-like paths
+### 5.2 Unreported intentional shim-like pass-through entrypoints
 
 The following shim-like pass-through files were **not** reported by this command run:
 
@@ -92,7 +92,7 @@ The following shim-like pass-through files were **not** reported by this command
 - `calculogic-validator/src/naming/naming-validator.host.mjs`
 - `calculogic-validator/src/tree/tree-structure-advisor.host.mjs`
 
-Manual classification: all three are intentional canonical/public pass-through entrypoints and are likely acceptable to leave unflagged by shim debt heuristics.
+Manual classification: all three are intentional canonical/public pass-through entrypoints and are likely appropriate to leave unflagged by shim-debt heuristics. They should not be interpreted as missed compatibility-shim debt detection.
 
 ## 6. Hardening opportunities
 
