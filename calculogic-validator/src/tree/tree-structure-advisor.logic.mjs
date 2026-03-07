@@ -1,6 +1,4 @@
-import fs from 'node:fs';
 import path from 'node:path';
-import { getValidatorScopeProfile } from '../core/validator-scopes.runtime.mjs';
 
 const KNOWN_TOP_LEVEL_DIRECTORIES = new Set([
   'bin',
@@ -14,18 +12,6 @@ const KNOWN_TOP_LEVEL_DIRECTORIES = new Set([
   'tools',
 ]);
 
-const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
-const WALK_EXCLUDED_DIRECTORIES = new Set([
-  '.git',
-  '.next',
-  '.reports',
-  '.turbo',
-  '.yarn',
-  'coverage',
-  'dist',
-  'node_modules',
-]);
-
 const VALIDATOR_OWNED_BASENAME_PATTERNS = [
   /^naming-validator\.(logic|host|wiring|contracts)\.mjs$/u,
   /^tree-structure-advisor\.(logic|host|wiring|contracts)\.mjs$/u,
@@ -35,8 +21,6 @@ const VALIDATOR_OWNED_BASENAME_PATTERNS = [
   /^validator-.+\.test\.mjs$/u,
   /^naming-.+\.test\.mjs$/u,
 ];
-
-export const normalizePath = (relativePath) => relativePath.split(path.sep).join('/');
 
 const sortByPathThenCode = (left, right) => {
   const byPath = left.path.localeCompare(right.path);
@@ -50,69 +34,12 @@ const sortByPathThenCode = (left, right) => {
 const isValidatorOwnedBasenameSignal = (basename) =>
   VALIDATOR_OWNED_BASENAME_PATTERNS.some((pattern) => pattern.test(basename));
 
-const getScopeRoots = (scope) => {
-  const normalizedScope = scope ?? 'repo';
-  const profile = getValidatorScopeProfile(normalizedScope);
-
-  if (!profile) {
-    throw new Error(`Invalid scope profile: ${normalizedScope}`);
-  }
-
-  if (normalizedScope === 'repo') {
-    return ['.'];
-  }
-
-  return profile.includeRoots;
-};
-
-const collectPathsFromRoot = (repositoryRoot, rootRelativePath) => {
-  const absoluteRoot = path.resolve(repositoryRoot, rootRelativePath);
-  if (!fs.existsSync(absoluteRoot)) {
-    return [];
-  }
-
-  const rootStat = fs.statSync(absoluteRoot);
-  if (!rootStat.isDirectory()) {
-    return [];
-  }
-
-  const collected = [];
-
-  const walk = (absoluteDirectoryPath) => {
-    const entries = fs
-      .readdirSync(absoluteDirectoryPath, { withFileTypes: true })
-      .sort((left, right) => left.name.localeCompare(right.name));
-
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        if (WALK_EXCLUDED_DIRECTORIES.has(entry.name) || entry.name.startsWith('.')) {
-          continue;
-        }
-
-        walk(path.join(absoluteDirectoryPath, entry.name));
-        continue;
-      }
-
-      const relativeFilePath = normalizePath(path.relative(repositoryRoot, path.join(absoluteDirectoryPath, entry.name)));
-      collected.push(relativeFilePath);
-    }
-  };
-
-  walk(absoluteRoot);
-  return collected;
-};
-
-const collectTopLevelUnexpectedFolderFindings = (repositoryRoot, scope) => {
+const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope) => {
   if ((scope ?? 'repo') !== 'repo') {
     return [];
   }
 
-  return fs
-    .readdirSync(repositoryRoot, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .filter((directoryName) => !TOP_LEVEL_SCAN_EXCLUSIONS.has(directoryName))
-    .filter((directoryName) => !directoryName.startsWith('.'))
+  return topLevelDirectoryNames
     .filter((directoryName) => !KNOWN_TOP_LEVEL_DIRECTORIES.has(directoryName))
     .sort((left, right) => left.localeCompare(right))
     .map((directoryName) => ({
@@ -171,19 +98,37 @@ export const summarizeFindings = (findings) => {
   };
 };
 
-export const runTreeStructureAdvisor = (repositoryRoot, options = {}) => {
-  const selectedScope = options.scope ?? 'repo';
-  const scopeRoots = getScopeRoots(selectedScope);
-  const scopedPaths = scopeRoots.flatMap((scopeRoot) => collectPathsFromRoot(repositoryRoot, scopeRoot));
+const assertPreparedTreeInputs = (preparedInputs) => {
+  if (
+    preparedInputs &&
+    Array.isArray(preparedInputs.selectedPaths) &&
+    Array.isArray(preparedInputs.topLevelDirectoryNames)
+  ) {
+    return preparedInputs;
+  }
+
+  throw new Error('Tree runtime requires prepared inputs from wiring/runtime adapter.');
+};
+
+export const runTreeStructureAdvisor = (preparedInputs = {}) => {
+  const prepared = assertPreparedTreeInputs(preparedInputs);
 
   const findings = [
-    ...collectTopLevelUnexpectedFolderFindings(repositoryRoot, selectedScope),
-    ...collectValidatorOwnedOutsideTreeFindings(scopedPaths),
+    ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
+    ...collectValidatorOwnedOutsideTreeFindings(prepared.selectedPaths),
   ].sort(sortByPathThenCode);
 
   return {
     findings,
-    totalFilesScanned: Array.from(new Set(scopedPaths)).length,
-    scope: selectedScope,
+    totalFilesScanned: prepared.selectedPaths.length,
+    scope: prepared.scope ?? 'repo',
+    filters: {
+      isFiltered: prepared.targets.length > 0,
+      ...(prepared.targets.length > 0
+        ? {
+            targets: prepared.targets,
+          }
+        : {}),
+    },
   };
 };

@@ -46,6 +46,7 @@ test('tree-structure-advisor is conservative for normal known repository shape',
     assert.equal(result.scope, 'repo');
     assert.equal(result.findings.length, 0);
     assert.equal(typeof result.totalFilesScanned, 'number');
+    assert.equal(result.filters.isFiltered, false);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
@@ -103,6 +104,115 @@ test('tree-structure-advisor flags validator-owned-looking file outside validato
     assert.equal(advisory.severity, 'info');
     assert.equal(advisory.classification, 'advisory-structure');
     assert.equal(advisory.path, 'src/naming-validator.wiring.mjs');
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor directory target narrows analyzed paths/findings', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-target-dir-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'validator-runner.logic.mjs'),
+      'export const misplaced = true\n',
+      'utf8',
+    );
+
+    const unfiltered = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const filtered = runTreeStructureAdvisor(fixtureDir, {
+      scope: 'repo',
+      targets: ['calculogic-validator'],
+    });
+
+    assert.equal(filtered.filters.isFiltered, true);
+    assert.deepEqual(filtered.filters.targets, ['calculogic-validator']);
+    assert.equal(
+      unfiltered.findings.some((finding) => finding.path === 'src/validator-runner.logic.mjs'),
+      true,
+    );
+    assert.equal(filtered.findings.some((finding) => finding.path === 'src/validator-runner.logic.mjs'), false);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor file target narrows analyzed paths/findings', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-target-file-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'naming-validator.wiring.mjs'),
+      'export const misplaced = true\n',
+      'utf8',
+    );
+
+    const filtered = runTreeStructureAdvisor(fixtureDir, {
+      scope: 'repo',
+      targets: ['src/app-shell.logic.ts'],
+    });
+
+    assert.equal(filtered.filters.isFiltered, true);
+    assert.deepEqual(filtered.filters.targets, ['src/app-shell.logic.ts']);
+    assert.equal(
+      filtered.findings.some((finding) => finding.code === 'TREE_VALIDATOR_OWNED_FILE_OUTSIDE_TREE'),
+      false,
+    );
+    assert.equal(filtered.totalFilesScanned, 1);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor throws for invalid target path', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-target-invalid-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    assert.throws(
+      () => runTreeStructureAdvisor(fixtureDir, { scope: 'repo', targets: ['does-not-exist'] }),
+      /Target path does not exist: does-not-exist/u,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor throws for target path escaping repository root', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-target-escape-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    assert.throws(
+      () => runTreeStructureAdvisor(fixtureDir, { scope: 'repo', targets: ['..'] }),
+      /Target path escapes repository root: ../u,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor no-target behavior remains unchanged for findings', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-target-compat-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'validator-runner.logic.mjs'),
+      'export const misplaced = true\n',
+      'utf8',
+    );
+
+    const withoutTargets = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const explicitEmptyTargets = runTreeStructureAdvisor(fixtureDir, { scope: 'repo', targets: [] });
+
+    assert.deepEqual(withoutTargets.findings, explicitEmptyTargets.findings);
+    assert.equal(withoutTargets.filters.isFiltered, false);
+    assert.equal(explicitEmptyTargets.filters.isFiltered, false);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
