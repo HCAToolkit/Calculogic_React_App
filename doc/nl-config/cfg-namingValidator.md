@@ -220,6 +220,13 @@ Ownership and precedence requirements:
 - runtime behavior remains responsible for scanning, scope filtering, target filtering, classification, and summarization.
 - host/wiring public behavior remains unchanged; config continues to override builtin defaults via resolver + converter flow before runtime execution.
 
+Future alignment note:
+
+- current runtime purity for naming runtime dependencies is complete.
+- `walkExclusions` are currently prepared in wiring from the builtin walk-exclusions loader path.
+- future customization may align `walkExclusions` with the same registry-state/config-driven composition path used for roles and reportable extensions.
+- this is an architecture alignment note only, not a current contract violation.
+
 ## 3.0 Classification Contract
 
 ### 3.1 Canonical
