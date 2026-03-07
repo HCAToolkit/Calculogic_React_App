@@ -259,8 +259,6 @@ const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
         insideCompatSurface: evidence.insideCompatSurface,
         canonicalTargetPath: evidence.canonicalTargetPath,
         reexportTargetCount: evidence.reexportTargetCount,
-        suppressedAsIntentionalPassThrough: false,
-        suppressedBySurfaceContext: false,
       },
     });
 
@@ -282,8 +280,6 @@ const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
         insideCompatSurface: evidence.insideCompatSurface,
         canonicalTargetPath: evidence.canonicalTargetPath,
         reexportTargetCount: evidence.reexportTargetCount,
-        suppressedAsIntentionalPassThrough: false,
-        suppressedBySurfaceContext: false,
       },
     });
   }
