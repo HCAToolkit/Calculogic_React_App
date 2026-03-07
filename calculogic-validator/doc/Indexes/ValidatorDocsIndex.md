@@ -49,4 +49,7 @@ Purpose: quick routing map for validator documentation so readers can distinguis
 ## 8) Audits
 
 - `doc/Audits/current-validator-shim-audit.md`
-  Manual audit comparing current validator shim/shim-like inventory vs `validate:tree -- --scope=validator` findings, including confirmed matches, false positives, and hardening opportunities.
+  Earlier shim audit snapshot (pre/post-hardening transition context).
+
+- `doc/Audits/post-hardening-validator-shim-audit.md`
+  Current post-hardening re-audit comparing manually confirmed shim/shim-like inventory vs `validate:tree -- --scope=validator`, including hardened carveout validation and remaining follow-up opportunities.
