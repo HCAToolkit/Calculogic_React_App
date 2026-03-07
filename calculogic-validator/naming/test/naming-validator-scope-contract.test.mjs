@@ -6,7 +6,7 @@ import {
   collectRepositoryPaths,
   getScopeProfile,
   listNamingValidatorScopes,
-} from '../src/naming/naming-validator.host.mjs';
+} from '../src/naming-validator.host.mjs';
 
 const runValidatorCli = (args) =>
   spawnSync(
@@ -15,6 +15,7 @@ const runValidatorCli = (args) =>
     {
       cwd: process.cwd(),
       encoding: 'utf8',
+      maxBuffer: 10 * 1024 * 1024,
     },
   );
 
@@ -42,7 +43,7 @@ test('default/no-scope behavior resolves to repo', () => {
 
 test('--scope=repo aligns with repo contract roots', () => {
   const repoPaths = collectRepositoryPaths(process.cwd(), { scope: 'repo' });
-  assert.ok(repoPaths.includes('calculogic-validator/src/naming/naming-validator.host.mjs'));
+  assert.ok(repoPaths.includes('calculogic-validator/naming/src/naming-validator.host.mjs'));
   assert.ok(
     repoPaths.includes('calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md'),
   );

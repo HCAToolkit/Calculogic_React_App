@@ -8,7 +8,7 @@ import {
   classifyPath,
   parseCanonicalName,
   collectRepositoryPaths,
-} from '../src/naming/naming-validator.host.mjs';
+} from '../src/naming-validator.host.mjs';
 
 test('parse canonical filename with simple extension', () => {
   assert.deepEqual(parseCanonicalName('leftpanel.host.tsx'), {
@@ -113,7 +113,7 @@ test('classifies missing-role teaching case for non-canonical two-segment names'
 
 test('repo scope includes docs + src + root config examples', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'repo' });
-  assert.ok(paths.includes('calculogic-validator/src/naming/naming-validator.host.mjs'));
+  assert.ok(paths.includes('calculogic-validator/naming/src/naming-validator.host.mjs'));
   assert.ok(paths.includes('calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md'));
   assert.ok(paths.includes('package.json'));
 });

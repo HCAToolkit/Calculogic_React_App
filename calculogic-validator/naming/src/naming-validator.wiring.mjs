@@ -19,7 +19,7 @@ import {
   normalizePath,
   resolveScopedTargets,
   filterScopedPathsByTargets,
-} from '../core/scoped-target-paths.logic.mjs';
+} from '../../src/core/scoped-target-paths.logic.mjs';
 
 export const prepareNamingRuntimeInputs = (config) => {
   const registryInputs = resolveNamingRegistryInputs({ config });

@@ -10,7 +10,7 @@ const assertDecoupledFromNamingScopeHelpers = (filePath) => {
 
   assert.equal(fileContents.includes('listNamingValidatorScopes'), false);
   assert.equal(fileContents.includes('getScopeProfile'), false);
-  assert.equal(fileContents.includes('../src/naming/naming-validator.host.mjs'), false);
+  assert.equal(fileContents.includes('../naming/src/naming-validator.host.mjs'), false);
 };
 
 test('validate-all script does not couple scope usage to naming validator host helpers', () => {

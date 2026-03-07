@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   prepareNamingRuntimeInputs,
   runNamingValidator,
-} from '../src/naming/naming-validator.host.mjs';
+} from '../src/naming-validator.host.mjs';
 
 const assertDigestShape = (digest) => {
   assert.equal(typeof digest, 'string');

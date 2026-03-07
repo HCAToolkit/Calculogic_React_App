@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { stableStringify, sha256Hex } from '../../core/validator-report-meta.logic.mjs';
+import { stableStringify, sha256Hex } from '../../../src/core/validator-report-meta.logic.mjs';
 
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));

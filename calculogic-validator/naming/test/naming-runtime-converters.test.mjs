@@ -3,15 +3,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { resolveNamingRegistryInputs } from '../src/naming/registries/registry-state.logic.mjs';
+import { resolveNamingRegistryInputs } from '../src/registries/registry-state.logic.mjs';
 import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
-} from '../src/naming/naming-runtime-converters.logic.mjs';
-import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming/naming-validator.logic.mjs';
-import { getBuiltinWalkExclusions } from '../src/naming/registries/naming-walk-exclusions.registry.logic.mjs';
-import { runNamingValidator as runNamingValidatorWiring } from '../src/naming/naming-validator.wiring.mjs';
-import { collectRepositoryPaths } from '../src/naming/naming-validator.wiring.mjs';
+} from '../src/naming-runtime-converters.logic.mjs';
+import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming-validator.logic.mjs';
+import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
+import { runNamingValidator as runNamingValidatorWiring } from '../src/naming-validator.wiring.mjs';
+import { collectRepositoryPaths } from '../src/naming-validator.wiring.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
   const absolutePath = path.join(rootDirectory, relativePath);

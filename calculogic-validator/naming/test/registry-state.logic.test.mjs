@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { resolveNamingRegistryInputs } from '../src/naming/registries/registry-state.logic.mjs';
+import { resolveNamingRegistryInputs } from '../src/registries/registry-state.logic.mjs';
 
-const REGISTRY_MODULE_ROOT = path.resolve('calculogic-validator/src/naming/registries');
+const REGISTRY_MODULE_ROOT = path.resolve('calculogic-validator/naming/src/registries');
 
 const INTENDED_BUILTIN_REPORTABLE_EXTENSIONS = [
   '.cjs',

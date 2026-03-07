@@ -3,7 +3,7 @@ import {
   summarizeFindings,
   listNamingValidatorScopes,
   getScopeProfile,
-} from '../src/naming/naming-validator.host.mjs';
+} from '../naming/src/naming-validator.host.mjs';
 import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
 import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
 import {
@@ -191,5 +191,5 @@ const report = {
   findings,
 };
 
-console.log(JSON.stringify(report, null, 2));
-process.exit(deriveExitCodeFromFindings(findings, { strict }));
+process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+process.exitCode = deriveExitCodeFromFindings(findings, { strict });

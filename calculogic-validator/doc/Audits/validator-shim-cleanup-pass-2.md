@@ -42,7 +42,7 @@ No broader refactor or compat-surface redesign was performed.
 ### Intentional non-debt boundaries preserved (unchanged)
 
 1. `calculogic-validator/src/index.mjs`
-2. `calculogic-validator/src/naming/naming-validator.host.mjs`
+2. `calculogic-validator/naming/src/naming-validator.host.mjs`
 3. `calculogic-validator/tree/src/tree-structure-advisor.host.mjs`
 
 ### Still-test-referenced shim-debt files left for later passes (unchanged)

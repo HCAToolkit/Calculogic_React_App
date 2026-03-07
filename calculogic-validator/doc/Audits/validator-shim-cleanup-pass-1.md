@@ -10,7 +10,7 @@ This pass canonicalizes **in-repo** usage of confirmed validator compatibility s
 
 ## What changed
 
-Internal references were rewritten from shim-debt paths to canonical owned modules (`src/core/**`, `src/core/config/**`, `src/naming/**`) across:
+Internal references were rewritten from shim-debt paths to canonical owned modules (`src/core/**`, `src/core/config/**`, `naming/src/**`) across:
 
 - installable bins under `calculogic-validator/bin/`
 - naming-related validator tests under `calculogic-validator/test/`

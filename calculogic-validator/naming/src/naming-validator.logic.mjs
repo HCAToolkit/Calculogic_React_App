@@ -1,10 +1,10 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import { listValidatorScopes, getValidatorScopeProfile } from '../core/validator-scopes.runtime.mjs';
+import { listValidatorScopes, getValidatorScopeProfile } from '../../src/core/validator-scopes.runtime.mjs';
 import {
   normalizePath,
   filterScopedPathsByProfile,
-} from '../core/scoped-target-paths.logic.mjs';
+} from '../../src/core/scoped-target-paths.logic.mjs';
 import { parseCanonicalName } from './rules/naming-rule-parse-canonical.logic.mjs';
 import {
   getSpecialCaseType,

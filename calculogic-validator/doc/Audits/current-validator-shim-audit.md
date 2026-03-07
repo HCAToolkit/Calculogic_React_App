@@ -58,7 +58,7 @@ These are thin pass-through files but are better treated as canonical/public bou
 | Path | Classification | Why shim-like | Thin target | Intentional role |
 |---|---|---|---|---|
 | `calculogic-validator/src/index.mjs` | Intentional public barrel pass-through | Multi-export barrel forwarding to canonical slice modules; not a legacy per-file shim | `./core/validator-runner.logic.mjs`, `./core/validator-registry.knowledge.mjs`, `./core/validator-report.contracts.mjs`, plus namespaced exports | Package/public surface entrypoint |
-| `calculogic-validator/src/naming/naming-validator.host.mjs` | Intentional canonical host pass-through | Thin `host -> wiring` re-export within canonical naming slice | `./naming-validator.wiring.mjs` | Canonical host boundary, not legacy bridge |
+| `calculogic-validator/naming/src/naming-validator.host.mjs` | Intentional canonical host pass-through | Thin `host -> wiring` re-export within canonical naming slice | `./naming-validator.wiring.mjs` | Canonical host boundary, not legacy bridge |
 | `calculogic-validator/src/tree/tree-structure-advisor.host.mjs` | Intentional canonical host pass-through | Thin `host -> wiring` re-export within canonical tree advisor slice | `./tree-structure-advisor.wiring.mjs` | Canonical host boundary, not legacy bridge |
 
 ## 5. Tree validator comparison
@@ -89,7 +89,7 @@ These are thin pass-through files but are better treated as canonical/public bou
 The following shim-like pass-through files were **not** reported by this command run:
 
 - `calculogic-validator/src/index.mjs`
-- `calculogic-validator/src/naming/naming-validator.host.mjs`
+- `calculogic-validator/naming/src/naming-validator.host.mjs`
 - `calculogic-validator/src/tree/tree-structure-advisor.host.mjs`
 
 Manual classification: all three are intentional canonical/public pass-through entrypoints and are likely appropriate to leave unflagged by shim-debt heuristics. They should not be interpreted as missed compatibility-shim debt detection.
