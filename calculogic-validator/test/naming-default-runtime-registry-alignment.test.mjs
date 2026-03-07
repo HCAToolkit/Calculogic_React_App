@@ -12,7 +12,7 @@ import {
   collectRepositoryPaths,
   prepareNamingValidatorInputs,
   prepareNamingRuntimeInputs,
-} from '../src/validators/naming-validator.logic.mjs';
+} from '../src/naming/naming-validator.host.mjs';
 import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming/naming-validator.logic.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {

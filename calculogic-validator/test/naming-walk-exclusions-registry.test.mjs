@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { collectRepositoryPaths } from '../src/validators/naming-validator.logic.mjs';
+import { collectRepositoryPaths } from '../src/naming/naming-validator.host.mjs';
 import {
   BUILTIN_WALK_EXCLUSIONS_REGISTRY_PATH,
   getBuiltinWalkExclusions,

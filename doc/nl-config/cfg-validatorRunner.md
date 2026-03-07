@@ -12,7 +12,7 @@ Provide a deterministic runner that executes one or more registered validators a
 
 ### 2.1 Validator registry
 
-The runner reads validator definitions from a deterministic registry in `calculogic-validator/src/validator-registry.knowledge.mjs`.
+The runner reads validator definitions from a deterministic registry in `calculogic-validator/src/core/validator-registry.knowledge.mjs`.
 
 ### 2.2 Runtime options
 

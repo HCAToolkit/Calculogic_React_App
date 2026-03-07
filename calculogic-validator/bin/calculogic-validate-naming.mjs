@@ -6,14 +6,14 @@ import {
   listNamingValidatorScopes,
   getScopeProfile,
 } from '../src/naming/naming-validator.host.mjs';
-import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
-import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
+import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
+import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
 import {
   computeConfigDigest,
   getValidatorToolVersion,
-} from '../src/validator-report-meta.logic.mjs';
-import { deriveExitCodeFromFindings } from '../src/validator-exit-code.logic.mjs';
-import { getSourceSnapshot } from '../src/source-snapshot.logic.mjs';
+} from '../src/core/validator-report-meta.logic.mjs';
+import { deriveExitCodeFromFindings } from '../src/core/validator-exit-code.logic.mjs';
+import { getSourceSnapshot } from '../src/core/source-snapshot.logic.mjs';
 
 const parseScopeFromCli = (argv) => {
   let selectedScope = 'repo';
