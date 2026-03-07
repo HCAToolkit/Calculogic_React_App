@@ -93,7 +93,6 @@ Validator implementation assets live under top-level `calculogic-validator/`:
 - extension-point folders: `calculogic-validator/src/naming/registries/` and `calculogic-validator/src/naming/rules/`
 - package export barrel: `calculogic-validator/src/index.mjs`
 - stable repository-root resolver shared by CLIs: `calculogic-validator/src/core/repository-root.logic.mjs`
-- temporary compatibility shim (legacy imports): `calculogic-validator/src/validators/naming-validator.logic.mjs`
 - repo-local script entrypoints remain supported: `calculogic-validator/scripts/{validate-naming.mjs,validate-tree.mjs,validate-all.mjs,validator-health-check.host.mjs}`
 - stable installable bin entrypoints: `calculogic-validator/bin/{calculogic-validate.mjs,calculogic-validate-naming.mjs,calculogic-validator-health.mjs}`
 - validator tests: `calculogic-validator/test/*.test.mjs`

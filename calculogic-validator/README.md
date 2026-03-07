@@ -303,6 +303,4 @@ Tiny `sourceSnapshot` example shape:
 
 ## 10) Compatibility note
 
-Legacy imports from `src/validators/naming-validator.logic.mjs` remain supported via a thin re-export shim to the canonical naming validator host entrypoint.
-
 Legacy imports from `src/tree-structure-advisor.host.mjs` and `src/tree-structure-advisor.logic.mjs` remain supported as thin compatibility shims to the canonical `src/tree/` slice boundary.
