@@ -32,7 +32,17 @@ Normative rule:
 
 Report-first means findings are emitted deterministically before enforcement/fixes. It does **not** require a success exit code. Exit behavior may still be policy-driven (for example, to keep CI visibility) without changing detection or report ordering.
 
-## 4) Current exit-code policy (as implemented today)
+## 4) Shared CLI report emission contract (Canonical)
+
+For successful validator report runs across suite CLIs (`validate:naming`, `validate:tree`, `validate:all`):
+
+- Emit structured report JSON to `stdout`.
+- Set report-derived exit status via `process.exitCode` after report emission.
+- Reserve `stderr` for usage and runtime/config errors.
+
+This keeps report capture deterministic while preserving explicit invalid-usage and explicit-failure behavior.
+
+## 5) Current exit-code policy (as implemented today)
 
 Current implementation policy:
 
@@ -43,7 +53,7 @@ Current implementation policy:
 
 This is the current implementation policy and may later be generalized under suite modes (`soft-fail` / `hard-fail` / `correct` / `replace`), while detection remains unchanged.
 
-## 5) Shared scope vocabulary (Canonical)
+## 6) Shared scope vocabulary (Canonical)
 
 Current supported scope names are:
 
@@ -55,7 +65,7 @@ Current supported scope names are:
 
 Slices may implement scope-specific include/exclude details, but the scope vocabulary should remain consistent across suite docs and slice specs.
 
-## 6) Shared Report Envelope (Canonical)
+## 7) Shared Report Envelope (Canonical)
 
 This document defines the suite-level shape contract. For the canonical full schema reference (including slice report vs runner report envelopes, finding baseline shape, and deterministic ordering rules), see [`ValidatorReportSchema-V0_1.md`](./ValidatorReportSchema-V0_1.md).
 
@@ -88,7 +98,7 @@ Canonical envelope is the stable suite contract; some slices currently emit equi
 - `findings[]` → `findings[]`
 - `sourceSnapshot` → `sourceSnapshot`
 
-## 7) Shared Determinism Rules (Canonical)
+## 8) Shared Determinism Rules (Canonical)
 
 All slices should follow these deterministic rules:
 
