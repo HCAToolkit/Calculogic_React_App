@@ -45,3 +45,8 @@ Purpose: quick routing map for validator documentation so readers can distinguis
 
 - `doc/ValidatorSpecs/registry-customization-state-system-draft.md`
   Draft spec for built-in vs custom registry state, customization commands, and digest-based default/custom switching (report-only).
+
+## 8) Audits
+
+- `doc/Audits/current-validator-shim-audit.md`
+  Manual audit comparing current validator shim/shim-like inventory vs `validate:tree -- --scope=validator` findings, including confirmed matches, false positives, and hardening opportunities.
