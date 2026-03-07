@@ -1,4 +1,4 @@
-# Tree Structure Advisor Validator Spec (Draft V0.0.1)
+# Tree Structure Advisor Validator Spec (Report-Only Advisory, V0.1.5)
 
 ## Purpose and Scope
 
@@ -13,9 +13,9 @@ This slice exists to reduce “tree drift” as additional validators beyond nam
 
 ## Suite Contract Alignment
 
-This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md): the validator suite is modular, configurable, policy-driven, and report-first by default. Tree advisor Draft V0.0.1 remains report-only even though additional policy modes exist suite-wide.
+This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md): the validator suite is modular, configurable, policy-driven, and report-first by default. Tree advisor V0.1.5 remains report-only even though additional policy modes exist suite-wide.
 
-### In scope (V0.0.1)
+### In scope (V0.1.5 hardened subset)
 
 - Parse `<semantic-name>.<role>.<ext>` metadata when applicable
 - Use role registry metadata (role category/status) as structured signal
@@ -25,8 +25,9 @@ This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-M
   - consolidation of scattered semantic families
   - separation of mixed lanes where mixing predicts growth pain
   - normalization of repeated validator-subtree scaffolds (for future validators)
+- Shim/compat advisory hardening with bounded evidence precedence and intentional pass-through carveouts, including package/public barrel pass-through (`calculogic-validator/src/index.mjs`) with `export * from`, `export * as <name> from`, and optional `export { ... } from` forms
 
-### Out of scope (V0.0.1)
+### Out of scope (V0.1.5)
 
 - Applying any filesystem changes (no auto-move, no auto-fix)
 - Enforcing a single “correct tree” (recommendations are heuristic + explainable)
