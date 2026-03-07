@@ -2,7 +2,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.4** (shim evidence hardening: bounded artifact surface context + intentional pass-through carveouts while preserving thin re-export shim detection).
+Current implementation target: **V0.1.5** (shim evidence hardening with robust public-entrypoint barrel carveout coverage for `export *`, `export * as <name>`, and optional `export { ... } from` pass-through forms while preserving thin re-export shim detection).
 
 ## 1.0 Purpose
 
@@ -47,7 +47,7 @@ V0.1.x uses deterministic path-based signals only:
 2. **Validator-owned-looking file outside validator tree**
    - Emit info advisory when filename/path signal strongly indicates validator ownership but file is outside `calculogic-validator/**`.
 
-3. **Shim/compat surface advisory (hardened evidence precedence, V0.1.4)**
+3. **Shim/compat surface advisory (hardened evidence precedence, V0.1.5)**
    - Collects deterministic shim evidence per file with bounded fields:
      - `artifactSurface` (`quality|docs|examples|fixtures|runtimeish`)
      - folder token signals, basename token signals
@@ -58,7 +58,7 @@ V0.1.x uses deterministic path-based signals only:
    - Token/path-only shim signals on non-runtime surfaces (`quality/docs/examples/fixtures`) are suppressed from shim-debt findings.
    - Intentional pass-through surfaces are excluded from shim debt:
      - canonical `*.host.* -> sibling *.wiring.*` forwarding inside owned slices
-     - public package entrypoint barrel (`calculogic-validator/src/index.mjs`)
+     - public package entrypoint barrel (`calculogic-validator/src/index.mjs`) including `export * from`, namespace re-export (`export * as <name> from`), and optional `export { ... } from` forms
    - Runtimeish token/path-only matches remain info-level observability (`TREE_SHIM_SURFACE_PRESENT`) and do not emit debt-style `TREE_SHIM_OUTSIDE_COMPAT` unless thin re-export evidence exists.
 
 

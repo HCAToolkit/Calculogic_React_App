@@ -133,6 +133,45 @@ const parseThinReexportShim = (rawContent) => {
   };
 };
 
+const parsePublicEntrypointBarrelPassThrough = (relativePath, rawContent) => {
+  if (relativePath !== 'calculogic-validator/src/index.mjs' || typeof rawContent !== 'string') {
+    return null;
+  }
+
+  const lines = rawContent
+    .split(/\r?\n/u)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith('//'));
+
+  if (lines.length === 0) {
+    return null;
+  }
+
+  const barrelTargets = [];
+  for (const line of lines) {
+    const match = line.match(
+      /^export\s+(?:\*|\*\s+as\s+[A-Za-z_$][\w$]*|\{[^}]+\})\s+from\s+['"]([^'"]+)['"];?$/u,
+    );
+    if (!match) {
+      return null;
+    }
+
+    barrelTargets.push(match[1]);
+  }
+
+  const hasCanonicalTargetOnly = barrelTargets.every((targetPath) =>
+    /^(?:\.\/)?(?:core|naming|tree)\//u.test(targetPath),
+  );
+  if (!hasCanonicalTargetOnly) {
+    return null;
+  }
+
+  return {
+    isPublicEntrypointBarrelPassThrough: true,
+    barrelTargetCount: barrelTargets.length,
+  };
+};
+
 const detectCanonicalHostPassThrough = (relativePath, thinReexportSignal) => {
   if (!thinReexportSignal || thinReexportSignal.reexportTargetCount !== 1) {
     return false;
@@ -147,15 +186,15 @@ const detectCanonicalHostPassThrough = (relativePath, thinReexportSignal) => {
   return thinReexportSignal.canonicalTargetPath === expectedSiblingWiringTarget;
 };
 
-const detectPublicEntrypointPassThrough = (relativePath, thinReexportSignal) =>
-  relativePath === 'calculogic-validator/src/index.mjs' && thinReexportSignal !== null;
+const detectPublicEntrypointPassThrough = (relativePath, rawContent) =>
+  parsePublicEntrypointBarrelPassThrough(relativePath, rawContent) !== null;
 
 const collectShimEvidence = (relativePath, rawContent) => {
   const shimSignals = collectPathShimSignals(relativePath);
   const thinReexportSignal = parseThinReexportShim(rawContent);
   const surface = inferArtifactSurface(relativePath);
   const isCanonicalHostPassThrough = detectCanonicalHostPassThrough(relativePath, thinReexportSignal);
-  const isPublicEntryPointPassThrough = detectPublicEntrypointPassThrough(relativePath, thinReexportSignal);
+  const isPublicEntryPointPassThrough = detectPublicEntrypointPassThrough(relativePath, rawContent);
 
   return {
     surface,
