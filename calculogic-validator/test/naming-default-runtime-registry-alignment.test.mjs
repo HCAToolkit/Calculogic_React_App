@@ -37,7 +37,7 @@ test('wiring-injected classifyPath aligns with runtime when using prepared regis
   assert.deepEqual(wiringDeprecated, runtimeDeprecated);
 });
 
-test('wiring-injected collectRepositoryPaths aligns with runtime when using prepared reportable extensions', () => {
+test('wiring-injected collectRepositoryPaths aligns with runtime when using prepared runtime inputs', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-default-runtime-'));
 
   try {
@@ -51,6 +51,7 @@ test('wiring-injected collectRepositoryPaths aligns with runtime when using prep
     const collectedRuntime = collectRepositoryPathsRuntime(tempRoot, {
       scope: 'repo',
       reportableExtensions: prepared.reportableExtensions,
+      walkExclusions: prepared.walkExclusions,
     });
 
     assert.deepEqual(collectedWiring, collectedRuntime);

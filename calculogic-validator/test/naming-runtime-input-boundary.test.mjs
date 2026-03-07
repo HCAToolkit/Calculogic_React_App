@@ -13,6 +13,7 @@ import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
 } from '../src/naming/naming-runtime-converters.logic.mjs';
+import { getBuiltinWalkExclusions } from '../src/naming/registries/naming-walk-exclusions.registry.logic.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
   const absolutePath = path.join(rootDirectory, relativePath);
@@ -38,6 +39,7 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
       scope: 'repo',
       reportableExtensions,
       namingRolesRuntime,
+      walkExclusions: getBuiltinWalkExclusions(),
     });
 
     assert.equal(result.totalFilesScanned, 1);
@@ -59,5 +61,13 @@ test('runtime enforces prepared dependency injection contract', () => {
   assert.throws(
     () => collectRepositoryPaths(process.cwd(), { scope: 'repo' }),
     /requires prepared reportableExtensions/u,
+  );
+
+  assert.throws(
+    () => collectRepositoryPaths(process.cwd(), {
+      scope: 'repo',
+      reportableExtensions: new Set(['.ts']),
+    }),
+    /requires prepared walkExclusions/u,
   );
 });

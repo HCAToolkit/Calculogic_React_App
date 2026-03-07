@@ -1,4 +1,5 @@
 import { resolveNamingRegistryInputs } from './registries/registry-state.logic.mjs';
+import { getBuiltinWalkExclusions } from './registries/naming-walk-exclusions.registry.logic.mjs';
 import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
@@ -22,6 +23,7 @@ export const prepareNamingRuntimeInputs = (config) => {
   return {
     reportableExtensions: toReportableExtensionsSet(registryInputs.reportableExtensions),
     namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
+    walkExclusions: getBuiltinWalkExclusions(),
     registry: {
       registryState: registryInputs.registryState,
       registrySource: registryInputs.registrySource,
@@ -38,6 +40,7 @@ export const runNamingValidator = (repositoryRoot, { scope, config, targets } = 
     targets,
     reportableExtensions: runtimeInputs.reportableExtensions,
     namingRolesRuntime: runtimeInputs.namingRolesRuntime,
+    walkExclusions: runtimeInputs.walkExclusions,
   });
 
   return {
@@ -52,6 +55,7 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
   return collectRepositoryPathsRuntime(rootDirectory, {
     ...options,
     reportableExtensions: options.reportableExtensions ?? runtimeInputs.reportableExtensions,
+    walkExclusions: options.walkExclusions ?? runtimeInputs.walkExclusions,
   });
 };
 
