@@ -33,7 +33,7 @@ Subsection version tags (for example `(V0.1.2)`) reflect the last material chang
 Primary naming authority:
 
 - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
-- Role categories, role status values, role semantics, and provisional-role policy are authoritative in the `Role Registry Master List V1` section of `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`.
+- Role categories, role status values, role semantics, provisional-role policy, and category↔surface governance policy are authoritative in the `Role Registry Master List V1` section of `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`.
 
 Supporting workflow alignment:
 
@@ -59,8 +59,8 @@ V0.1.2 uses a structured role registry with metadata:
 The role registry source-of-truth is `FileNamingMasterList-V1_1.md`.
 
 - `role`
-- `category` (`concern-core` | `architecture-support` | `documentation` | `deprecated`)
-- `status` (`active` | `deprecated`)
+- `category` (runtime-bounded: `concern-core` | `architecture-support` | `documentation` | `deprecated`)
+- `status` (runtime-bounded: `active` | `deprecated`)
 - `notes` (optional)
 
 Default runtime registry roles in the naming slice:
@@ -87,6 +87,13 @@ Registry vocabulary vs config additions:
 - Config can add roles (add-only).
 - `FileNamingMasterList-V1_1.md` remains the source-of-truth taxonomy, while the naming slice currently uses a bounded category vocabulary for deterministic checks.
 - If runtime-supported category values expand beyond the bounded set listed here, update this section and the master-list compatibility note accordingly.
+
+Governance taxonomy vs runtime subset (explicit boundary):
+
+- The master list includes additional governance categories (for example `concern-style`, `surface-system`, `indexing-registry`, `integration-adapter`, and other planned categories) plus category↔surface allowance policy.
+- V0.1.7 runtime does **not** enforce category↔surface validity yet and does not require/support the full governance category vocabulary in this slice.
+- Governance status vocabulary includes `provisional`; runtime role classification in this slice remains bounded to active/deprecated handling for deterministic report behavior.
+- Runtime currently keeps `build-style` and `results-style` under `concern-core` as an implementation taxonomy constraint for deterministic checks; this is not a governance semantic redefinition.
 
 Deprecated historical roles:
 
@@ -386,3 +393,4 @@ A file is `invalid-ambiguous` instead of `legacy-exception` when it presents can
 - no automatic suppression generation
 - no cross-file semantic validation
 - no role taxonomy expansion for `provider`/`catalog`/`ids`/`anchor` in this slice
+- no surface-aware role validity enforcement yet (category↔surface matrix remains governance-only in this slice)

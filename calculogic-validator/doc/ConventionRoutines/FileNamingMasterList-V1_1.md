@@ -76,9 +76,13 @@ This spec is intentionally explicit and semantic (no guessing/inference required
   - [Use `.` for role suffix separation](#use--for-role-suffix-separation)
 - [Role Registry Master List V1](#role-registry-master-list-v1)
   - [Role Category Registry](#role-category-registry)
+    - [Surface Registry (deterministic set)](#surface-registry-deterministic-set)
     - [Role Categories (deterministic set)](#role-categories-deterministic-set)
+    - [Category ↔ Surface Allowance Matrix (governance)](#category--surface-allowance-matrix-governance)
     - [Role Status Values (deterministic vocabulary)](#role-status-values-deterministic-vocabulary)
     - [Role Change-Control Rules](#role-change-control-rules)
+    - [Validator taxonomy compatibility (naming slice)](#validator-taxonomy-compatibility-naming-slice)
+    - [Governance validity rule (taxonomy)](#governance-validity-rule-taxonomy)
   - [Role Semantics Definitions](#role-semantics-definitions)
     - [Active Roles](#active-roles)
     - [Deprecated Roles](#deprecated-roles)
@@ -384,17 +388,82 @@ This is the canonical role list for filenames.
 
 ### Role Category Registry
 
+### Surface Registry (deterministic set)
+
+Surface is a taxonomy class for how an artifact is consumed. Surface is governance metadata in this master list; it is not yet enforced by the naming validator runtime.
+
+All taxonomy entries that declare surface constraints MUST use one or more values from the bounded list below.
+
+- `runtime`: shipped/executed product code.
+- `tooling`: developer automation (build/lint/codegen/CLIs/migrations).
+- `quality`: tests/fixtures/mocks/benchmarks.
+- `docs`: human-facing documentation artifacts.
+- `data`: structured payload artifacts consumed by runtime/tooling/quality.
+- `config`: configuration artifacts.
+- `ops`: operational/infrastructure artifacts.
+- `generated`: machine-generated outputs.
+- `vendor`: third-party/vendored code/assets.
+- `experimental`: prototypes/spikes with relaxed rules.
+- `examples`: demos/tutorial sample code.
+- `assets`: non-code static assets.
+
+Surface change-control notes:
+
+- Surface additions/removals MUST be documented in this section before use in policy/validator logic.
+- `generated`, `vendor`, `experimental`, and `examples` are governance-important for exception policy but are not role-assignment targets by default.
+- Surface-aware validity remains governance-first until naming runtime adds explicit surface classification inputs.
+
 #### Role Categories (deterministic set)
 
 All role registry entries MUST declare one category from the bounded list below.
 
 - `concern-core`: core Calculogic concern roles that represent primary concern responsibilities.
 - `concern-style`: style-partner concern roles dedicated to visual/layout styling concerns.
+- `surface-system`: runtime system surface composition/entry routing roles.
 - `architecture-support`: architecture support/wiring/composition/contract boundary roles.
+- `data-model`: shape/model boundary roles.
+- `configuration`: configuration/settings/environment roles.
+- `operations-support`: operational/deploy/infra support roles.
+- `observability`: logging/telemetry roles.
+- `security`: auth/crypto/secrets-loader boundary roles.
+- `localization`: i18n/locale roles.
+- `build-system`: build/packaging system roles.
+- `migration`: migration roles.
+- `performance`: performance-focused roles.
+- `concurrency`: worker/concurrency roles.
+- `persistence`: storage/cache roles.
+- `networking`: transport/network boundary roles.
 - `documentation`: documentation-only filename roles (spec/policy/workflow/plan/audit/healthcheck).
 - `indexing-registry`: stable indexing/catalog/inventory/anchor/identifier-style roles.
 - `integration-adapter`: adapter/mapper/resolver boundary translation roles (defined now for deterministic future use).
+- `quality-support`: quality artifact roles (test/fixture/mock/benchmark).
 - `deprecated`: historical role segments retained for detection and migration guidance.
+
+#### Category ↔ Surface Allowance Matrix (governance)
+
+The table below is canonical taxonomy policy for allowed category/surface pairings. Runtime validation of this matrix is deferred.
+
+- `concern-core` → `runtime`
+- `concern-style` → `runtime`
+- `surface-system` → `runtime`
+- `architecture-support` → `runtime`, `tooling`, `quality`
+- `indexing-registry` → `runtime`, `tooling`, `quality`, `data`
+- `integration-adapter` → `runtime`, `tooling`, `quality`
+- `data-model` → `runtime`, `tooling`, `quality`, `data`
+- `configuration` → `runtime`, `tooling`, `config`
+- `operations-support` → `ops`, `tooling`
+- `observability` → `runtime`, `tooling`, `ops`
+- `security` → `runtime`, `tooling`, `ops`
+- `localization` → `runtime`, `data`
+- `build-system` → `tooling`, `ops`, `config`
+- `migration` → `tooling`, `ops`, `quality`
+- `performance` → `runtime`, `tooling`, `quality`
+- `concurrency` → `runtime`, `tooling`
+- `persistence` → `runtime`, `tooling`, `quality`
+- `networking` → `runtime`, `tooling`, `quality`
+- `documentation` → `docs`
+- `quality-support` → `quality`
+- `deprecated` → all surfaces (detection/migration only)
 
 #### Role Status Values (deterministic vocabulary)
 
@@ -413,12 +482,22 @@ All role registry entries MUST declare one status from the bounded list below.
 
 #### Validator taxonomy compatibility (naming slice)
 
-- This master list defines the full intended taxonomy, including richer categories such as `concern-style`, `indexing-registry`, and `integration-adapter`.
+- This master list defines the full intended taxonomy, including richer categories and explicit category↔surface policy.
 - The current naming validator runtime uses a bounded subset of category values for deterministic checks (`concern-core`, `architecture-support`, `documentation`, `deprecated`).
+- Surface-aware validation is not runtime-enforced in the naming slice yet.
 - Adoption path for runtime compatibility:
   - use config to add roles and map them to currently supported runtime categories where needed
-  - treat richer master-list categories as governance/semantic intent until validator category handling expands
+  - treat richer master-list categories and category↔surface rules as governance/semantic intent until runtime handling expands
 - Current slice taxonomy constraint note: runtime currently treats `build-style` and `results-style` as concern-aligned roles under `concern-core` for deterministic naming checks. This is an implementation taxonomy constraint in the naming slice today, not a semantic redefinition of those roles in this master list.
+
+#### Governance validity rule (taxonomy)
+
+A role usage is taxonomy-valid iff:
+
+1. the role exists in this registry with `status: active`; and
+2. the role's category allows the file surface according to the category↔surface matrix above.
+
+Runtime note: V0.1.7 naming validation currently enforces role recognition/status via runtime registry rules and does not yet enforce surface-based validity.
 
 ### Role Semantics Definitions
 
@@ -673,6 +752,29 @@ Each role below has an explicit deterministic definition: meaning, purpose/use-c
 - **Category:** `integration-adapter` _(provisional category assignment pending final meaning lock)_
 - **Status:** `provisional`
 - **Finalization plan note:** before activation, this document MUST define a single intended meaning and boundary; if no single meaning converges, remove/rename instead of activating.
+
+#### Planned role lanes (documented for future expansion, not active)
+
+The roles below are documented as planned taxonomy lanes but are intentionally **not** activated in this version. They remain governance candidates until role semantics, usage evidence, and runtime checks are mature enough for deterministic activation.
+
+- `surface-system`: `entry`, `router`
+- `indexing-registry`: `manifest`, `index`, `tokens`
+- `integration-adapter`: `mapper`, `resolver`, `client`, `gateway`
+- `data-model`: `types`, `schema`, `dto`
+- `configuration`: `config`, `settings`, `env`
+- `operations-support`: `deploy`, `infra`, `monitoring`
+- `observability`: `logging`, `telemetry`
+- `security`: `auth`, `crypto`, `secrets` (loaders/placeholders only; no secret material)
+- `localization`: `i18n`, `locale`
+- `build-system`: `buildsys`, `packaging`
+- `migration`: `migration`
+- `performance`: `perf`
+- `concurrency`: `worker`
+- `persistence`: `storage`, `cache`
+- `networking`: `transport`
+- `quality-support`: `test`, `fixture`, `mock`, `benchmark`
+
+Activation rule for this set: each role must receive a full semantics block (meaning/use-cases/non-goals/category/status), plus validator compatibility updates, before it can move from planned candidate to `active` or `provisional`.
 
 ### Role Decision Rubric
 
