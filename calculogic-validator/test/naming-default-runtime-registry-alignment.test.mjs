@@ -10,8 +10,10 @@ import {
 import {
   classifyPath,
   collectRepositoryPaths,
+  prepareNamingValidatorInputs,
   prepareNamingRuntimeInputs,
 } from '../src/validators/naming-validator.logic.mjs';
+import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming/naming-validator.logic.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
   const absolutePath = path.join(rootDirectory, relativePath);
@@ -55,6 +57,27 @@ test('wiring-injected collectRepositoryPaths aligns with runtime when using prep
     });
 
     assert.deepEqual(collectedWiring, collectedRuntime);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('wiring prepares selected naming paths and runtime consumes prepared inputs unchanged', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-wiring-prepared-inputs-'));
+
+  try {
+    writeFile(tempRoot, 'src/visible.logic.ts');
+    writeFile(tempRoot, 'src/skip.tmp');
+
+    const prepared = prepareNamingValidatorInputs(tempRoot, { scope: 'app', targets: ['src'] });
+    const runtimeResult = runNamingValidatorRuntime(prepared);
+
+    assert.deepEqual(
+      runtimeResult.findings.map((finding) => finding.path),
+      ['src/visible.logic.ts'],
+    );
+    assert.equal(runtimeResult.scope, 'app');
+    assert.deepEqual(runtimeResult.filters, { isFiltered: true, targets: ['src'] });
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }

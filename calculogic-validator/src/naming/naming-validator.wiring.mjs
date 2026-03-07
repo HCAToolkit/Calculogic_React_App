@@ -8,14 +8,18 @@ import {
   parseCanonicalName,
   getSpecialCaseType,
   isAllowedSpecialCase,
-  normalizePath,
-  listNamingValidatorScopes,
-  getScopeProfile,
   collectRepositoryPaths as collectRepositoryPathsRuntime,
   classifyPath as classifyPathRuntime,
   runNamingValidator as runNamingValidatorRuntime,
+  listNamingValidatorScopes,
+  getScopeProfile,
   summarizeFindings,
 } from './naming-validator.logic.mjs';
+import {
+  normalizePath,
+  resolveScopedTargets,
+  filterScopedPathsByTargets,
+} from '../core/scoped-target-paths.logic.mjs';
 
 export const prepareNamingRuntimeInputs = (config) => {
   const registryInputs = resolveNamingRegistryInputs({ config });
@@ -32,20 +36,35 @@ export const prepareNamingRuntimeInputs = (config) => {
   };
 };
 
-export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) => {
+export const prepareNamingValidatorInputs = (
+  repositoryRoot,
+  { scope, config, targets } = {},
+) => {
   const runtimeInputs = prepareNamingRuntimeInputs(config);
-
-  const result = runNamingValidatorRuntime(repositoryRoot, {
-    scope,
-    targets,
+  const selectedScope = scope ?? 'repo';
+  const inScopePaths = collectRepositoryPathsRuntime(repositoryRoot, {
+    scope: selectedScope,
     reportableExtensions: runtimeInputs.reportableExtensions,
-    namingRolesRuntime: runtimeInputs.namingRolesRuntime,
     walkExclusions: runtimeInputs.walkExclusions,
   });
+  const resolvedTargets = resolveScopedTargets(repositoryRoot, targets ?? []);
+
+  return {
+    ...runtimeInputs,
+    scope: selectedScope,
+    selectedPaths: filterScopedPathsByTargets(repositoryRoot, inScopePaths, resolvedTargets),
+    targets: resolvedTargets.map((target) => target.relPath),
+  };
+};
+
+export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) => {
+  const preparedInputs = prepareNamingValidatorInputs(repositoryRoot, { scope, config, targets });
+
+  const result = runNamingValidatorRuntime(preparedInputs);
 
   return {
     ...result,
-    registry: runtimeInputs.registry,
+    registry: preparedInputs.registry,
   };
 };
 
