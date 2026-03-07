@@ -2,7 +2,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.2** (wiring-owned scoped/target input preparation and runtime prepared-input consumption).
+Current implementation target: **V0.1.3** (dedicated `validate:tree` CLI surface with scope/target parity to suite semantics).
 
 ## 1.0 Purpose
 
@@ -16,7 +16,21 @@ V0.1.1 converges this slice to a canonical owned boundary under `calculogic-vali
 
 - Uses validator suite scope resolution (`repo|app|docs|validator|system`).
 - Supports optional runner-forwarded `targets` when selected through `validate-all` with deterministic validation and selection parity to suite target semantics.
+- Supports the same optional repeatable target filtering when selected through dedicated `validate-tree` CLI (`--target <path>` and `--target=<path>`).
 - Default scope remains `repo` via existing runner behavior.
+
+### 2.5 Dedicated CLI surface (`validate-tree`) (V0.1.3)
+
+`validate-tree` is a thin report-mode CLI wrapper over the validator runner with a fixed validator set containing only `tree-structure-advisor`.
+
+Contract:
+
+- accepts `--help`
+- accepts optional `--scope=<repo|app|docs|validator|system>`
+- accepts optional repeatable targets via `--target <path>` and `--target=<path>`
+- preserves npm argument-forwarding guard behavior used by validator script surfaces
+- emits JSON report envelope aligned with runner report conventions
+- remains report-only (no fix/mutate behavior)
 
 ### 2.2 Repository signals
 
@@ -87,6 +101,7 @@ Each finding follows existing report conventions:
 - Registry/index/package exports target the canonical `src/tree/` host boundary.
 - Flat legacy paths under `calculogic-validator/src/tree-structure-advisor.*.mjs` remain compatibility shims only (re-export wrappers) during migration.
 - Default runner execution includes both `naming` and `tree-structure-advisor` in deterministic registry order.
+- Dedicated `validate-tree` execution includes only `tree-structure-advisor` while preserving shared runner scope/target semantics.
 - No fix mode, no move/rename behavior.
 
 ## 5.0 Deferred Behavior

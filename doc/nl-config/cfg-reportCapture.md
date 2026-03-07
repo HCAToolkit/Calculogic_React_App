@@ -2,7 +2,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.0** (capture wrapper plus compact latest-report summarizer).
+Current implementation target: **V0.1.1** (add tree-validator report-capture presets alongside naming and validate-all).
 
 ## 1.0 Purpose
 
@@ -34,7 +34,7 @@ Report filenames are deterministic and filesystem-safe:
 
 ### 2.4 Scope capture presets
 
-Root package scripts provide deterministic capture presets for naming and validate-all across `repo`, `app`, `docs`, `validator`, and `system` scopes, writing files to repo-local `./.reports/` for safe exclusion from validator walking behavior.
+Root package scripts provide deterministic capture presets for naming, validate-all, and validate-tree across `repo`, `app`, `docs`, `validator`, and `system` scopes, writing files to repo-local `./.reports/` for safe exclusion from validator walking behavior.
 
 ### 2.5 Verifier workflow contract
 

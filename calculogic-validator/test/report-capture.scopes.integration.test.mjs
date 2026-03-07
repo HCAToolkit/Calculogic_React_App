@@ -105,3 +105,36 @@ test('report-capture host emits validate-all reports for repo/app/docs/validator
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
 });
+
+
+test('report-capture host emits validate-tree reports for repo/app/docs/validator/system scopes', async () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'report-capture-scopes-tree-'));
+
+  try {
+    for (const scope of scopes) {
+      const prefix = `validate-tree-${scope}`;
+      const before = reportFilesForPrefix(tempDir, prefix);
+
+      const exitCode = await runReportCapture(
+        prefix,
+        'calculogic-validator/scripts/validate-tree.mjs',
+        scope,
+        tempDir,
+      );
+      assert.ok([0, 1, 2].includes(exitCode));
+
+      const after = reportFilesForPrefix(tempDir, prefix);
+      assert.equal(after.length, before.length + 1);
+
+      const newest = after.at(-1);
+      assert.ok(newest, `missing report file for ${prefix}`);
+
+      const reportContent = fs.readFileSync(path.join(tempDir, newest), 'utf8');
+      assert.ok(reportContent.includes(`"scope": "${scope}"`));
+      assert.ok(reportContent.includes('"mode": "report"'));
+      assert.ok(reportContent.includes('"id": "tree-structure-advisor"'));
+    }
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
