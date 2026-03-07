@@ -7,7 +7,7 @@ import {
   summarizeFindings,
   getScopeProfile,
 } from '../src/naming/naming-validator.host.mjs';
-import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
+import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
 
 const SCOPES = ['repo', 'app', 'docs'];
 

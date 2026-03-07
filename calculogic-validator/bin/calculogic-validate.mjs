@@ -3,16 +3,16 @@
 import {
   getValidatorScopeProfile,
   listValidatorScopes,
-} from '../src/validator-scopes.runtime.mjs';
-import { runValidatorRunner } from '../src/validator-runner.logic.mjs';
-import { listRegisteredValidators } from '../src/validator-registry.knowledge.mjs';
-import { resolveRepositoryRoot } from '../src/repository-root.logic.mjs';
-import { loadValidatorConfigFromFile } from '../src/validator-config.logic.mjs';
+} from '../src/core/validator-scopes.runtime.mjs';
+import { runValidatorRunner } from '../src/core/validator-runner.logic.mjs';
+import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
+import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
+import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
 import {
   computeConfigDigest,
   getValidatorToolVersion,
-} from '../src/validator-report-meta.logic.mjs';
-import { deriveExitCodeFromRunnerReport } from '../src/validator-exit-code.logic.mjs';
+} from '../src/core/validator-report-meta.logic.mjs';
+import { deriveExitCodeFromRunnerReport } from '../src/core/validator-exit-code.logic.mjs';
 
 const supportedScopes = listValidatorScopes();
 const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];

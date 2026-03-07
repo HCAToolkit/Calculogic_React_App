@@ -14,7 +14,7 @@ This spec defines the canonical validator config contract for current naming-val
 
 - Required field: `version`
 - Required value: `"0.1"`
-- Contract source: `VALIDATOR_CONFIG_VERSION` in `src/validator-config.contracts.mjs`
+- Contract source: `VALIDATOR_CONFIG_VERSION` in `src/core/config/validator-config.contracts.mjs`
 
 Any other version value is invalid.
 
