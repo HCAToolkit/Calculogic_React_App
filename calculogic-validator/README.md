@@ -121,11 +121,13 @@ Use these from the repository root.
 ```bash
 npm run validate:naming
 npm run validate:all
+npm run validate:tree
 npm run health:validator
 ```
 
 - `npm run validate:naming`: naming-only validation using repo defaults.
 - `npm run validate:all`: full validator pass (all configured validators).
+- `npm run validate:tree`: tree-structure-advisor validation using repo defaults.
 - `npm run health:validator`: validator environment/health diagnostics.
 
 ### Reports by scope and target
@@ -150,6 +152,16 @@ npm run report:all:validator
 npm run report:all:system
 ```
 
+Tree report capture:
+
+```bash
+npm run report:tree:repo
+npm run report:tree:app
+npm run report:tree:docs
+npm run report:tree:validator
+npm run report:tree:system
+```
+
 Report utilities:
 
 ```bash
@@ -159,6 +171,7 @@ npm run report:summarize
 
 - `report:naming:*`: capture naming validator output for a specific scope.
 - `report:all:*`: capture full-suite output for a specific scope.
+- `report:tree:*`: capture tree validator output for a specific scope.
 - `report:verify`: checks report-capture wiring/outputs.
 - `report:summarize`: summarizes captured reports.
 
@@ -170,6 +183,7 @@ These binaries are defined in `calculogic-validator/package.json` and can be exe
 node calculogic-validator/bin/calculogic-validate.mjs
 node calculogic-validator/bin/calculogic-validate-naming.mjs
 node calculogic-validator/bin/calculogic-validator-health.mjs
+node calculogic-validator/scripts/validate-tree.mjs --scope=repo
 ```
 
 What each binary does:
@@ -177,6 +191,7 @@ What each binary does:
 - `calculogic-validate.mjs`: full validator entrypoint.
 - `calculogic-validate-naming.mjs`: naming-only validator entrypoint.
 - `calculogic-validator-health.mjs`: validator health/diagnostic entrypoint.
+- `scripts/validate-tree.mjs`: tree validator script (`--scope`, repeatable `--target`, `--config`, `--help`).
 
 ## 6) Scopes and targets
 
@@ -196,6 +211,9 @@ npm run validate:naming -- --scope=app
 npm run validate:naming -- --scope=docs
 npm run validate:all -- --scope=validator
 npm run validate:all -- --scope=system
+npm run validate:tree -- --scope=repo
+npm run validate:tree -- --scope=validator
+npm run validate:tree -- --scope=repo --target calculogic-validator
 ```
 
 Use scope-specific `report:*` commands when you want one-command capture per target/scope combination.
