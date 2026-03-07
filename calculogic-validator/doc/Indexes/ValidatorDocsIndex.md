@@ -53,3 +53,6 @@ Purpose: quick routing map for validator documentation so readers can distinguis
 
 - `doc/Audits/post-hardening-validator-shim-audit.md`
   Current post-hardening re-audit comparing manually confirmed shim/shim-like inventory vs `validate:tree -- --scope=validator`, including hardened carveout validation and remaining follow-up opportunities.
+
+- `doc/Audits/final-state-validator-shim-verification-audit.md`
+  Final-state verification audit after detector-noise cleanup, confirming self-flag removal, preserved thin re-export debt detection (15), preserved canonical/public carveouts, and no new false positives or missed high-confidence shim debt.
