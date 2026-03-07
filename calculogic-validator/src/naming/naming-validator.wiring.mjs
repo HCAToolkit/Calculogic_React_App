@@ -10,32 +10,54 @@ import {
   normalizePath,
   listNamingValidatorScopes,
   getScopeProfile,
-  collectRepositoryPaths,
-  classifyPath,
+  collectRepositoryPaths as collectRepositoryPathsRuntime,
+  classifyPath as classifyPathRuntime,
   runNamingValidator as runNamingValidatorRuntime,
   summarizeFindings,
 } from './naming-validator.logic.mjs';
 
-export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) => {
+export const prepareNamingRuntimeInputs = (config) => {
   const registryInputs = resolveNamingRegistryInputs({ config });
-  const reportableExtensions = toReportableExtensionsSet(registryInputs.reportableExtensions);
-  const namingRolesRuntime = toNamingRolesRuntime(registryInputs.roles);
-
-  const result = runNamingValidatorRuntime(repositoryRoot, {
-    scope,
-    targets,
-    reportableExtensions,
-    namingRolesRuntime,
-  });
 
   return {
-    ...result,
+    reportableExtensions: toReportableExtensionsSet(registryInputs.reportableExtensions),
+    namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
     registry: {
       registryState: registryInputs.registryState,
       registrySource: registryInputs.registrySource,
       registryDigests: registryInputs.registryDigests,
     },
   };
+};
+
+export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) => {
+  const runtimeInputs = prepareNamingRuntimeInputs(config);
+
+  const result = runNamingValidatorRuntime(repositoryRoot, {
+    scope,
+    targets,
+    reportableExtensions: runtimeInputs.reportableExtensions,
+    namingRolesRuntime: runtimeInputs.namingRolesRuntime,
+  });
+
+  return {
+    ...result,
+    registry: runtimeInputs.registry,
+  };
+};
+
+export const collectRepositoryPaths = (rootDirectory, options = {}) => {
+  const runtimeInputs = prepareNamingRuntimeInputs(options.config);
+
+  return collectRepositoryPathsRuntime(rootDirectory, {
+    ...options,
+    reportableExtensions: options.reportableExtensions ?? runtimeInputs.reportableExtensions,
+  });
+};
+
+export const classifyPath = (relativePath, namingRolesRuntime, options = {}) => {
+  const runtimeInputs = prepareNamingRuntimeInputs(options.config);
+  return classifyPathRuntime(relativePath, namingRolesRuntime ?? runtimeInputs.namingRolesRuntime);
 };
 
 export {
@@ -45,7 +67,5 @@ export {
   normalizePath,
   listNamingValidatorScopes,
   getScopeProfile,
-  collectRepositoryPaths,
-  classifyPath,
   summarizeFindings,
 };
