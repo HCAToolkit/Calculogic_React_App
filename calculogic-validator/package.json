@@ -19,7 +19,8 @@
     "./runner": "./src/validator-runner.logic.mjs",
     "./registry": "./src/validator-registry.knowledge.mjs",
     "./scopes": "./src/validator-scopes.runtime.mjs",
-    "./naming": "./src/naming/naming-validator.host.mjs"
+    "./naming": "./src/naming/naming-validator.host.mjs",
+    "./tree": "./src/tree/tree-structure-advisor.host.mjs"
   },
   "bin": {
     "calculogic-validate": "./bin/calculogic-validate.mjs",

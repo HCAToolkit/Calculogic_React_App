@@ -3,4 +3,4 @@ export * from './core/validator-registry.knowledge.mjs';
 export * from './core/validator-report.contracts.mjs';
 export * as naming from './naming/naming-validator.host.mjs';
 
-export * as treeStructureAdvisor from './tree-structure-advisor.host.mjs';
+export * as treeStructureAdvisor from './tree/tree-structure-advisor.host.mjs';

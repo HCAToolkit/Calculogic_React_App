@@ -2,11 +2,13 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.0** (first real advisory-only validator slice).
+Current implementation target: **V0.1.1** (canonical slice-boundary convergence over existing advisory heuristics).
 
 ## 1.0 Purpose
 
 Add a conservative tree-structure advisor validator slice that proves validator-suite multi-slice execution while remaining report-only and non-destructive.
+
+V0.1.1 converges this slice to a canonical owned boundary under `calculogic-validator/src/tree/` to match naming-slice boundary conventions.
 
 ## 2.0 Inputs and Source of Truth
 
@@ -18,7 +20,7 @@ Add a conservative tree-structure advisor validator slice that proves validator-
 
 ### 2.2 Repository signals
 
-V0.1.0 uses deterministic path-based signals only:
+V0.1.x uses deterministic path-based signals only:
 
 - top-level directory names in repository root
 - repository-relative file paths
@@ -59,9 +61,15 @@ Each finding follows existing report conventions:
 - stable sorting by `path` then `code`
 - deterministic message text and codes
 
-## 4.0 Registration and Execution
+## 4.0 Registration, Boundary, and Execution
 
-- Registered in validator registry alongside naming validator.
+- Canonical tree slice boundary lives at:
+  - `calculogic-validator/src/tree/tree-structure-advisor.host.mjs`
+  - `calculogic-validator/src/tree/tree-structure-advisor.wiring.mjs`
+  - `calculogic-validator/src/tree/tree-structure-advisor.logic.mjs`
+  - optional contracts surface: `calculogic-validator/src/tree/tree-structure-advisor.contracts.mjs`
+- Registry/index/package exports target the canonical `src/tree/` host boundary.
+- Flat legacy paths under `calculogic-validator/src/tree-structure-advisor.*.mjs` remain compatibility shims only (re-export wrappers) during migration.
 - Default runner execution includes both `naming` and `tree-structure-advisor` in deterministic registry order.
 - No fix mode, no move/rename behavior.
 

@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import {
   runTreeStructureAdvisor,
   summarizeFindings,
-} from '../src/tree-structure-advisor.host.mjs';
+} from '../src/tree/tree-structure-advisor.host.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 
 const writeJson = async (filePath, value) => {
