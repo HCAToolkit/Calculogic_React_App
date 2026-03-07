@@ -2,7 +2,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.1** (canonical slice-boundary convergence over existing advisory heuristics).
+Current implementation target: **V0.1.2** (wiring-owned scoped/target input preparation and runtime prepared-input consumption).
 
 ## 1.0 Purpose
 
@@ -15,7 +15,7 @@ V0.1.1 converges this slice to a canonical owned boundary under `calculogic-vali
 ### 2.1 Scope and targets
 
 - Uses validator suite scope resolution (`repo|app|docs|validator|system`).
-- Supports optional runner-forwarded `targets` when selected through `validate-all`.
+- Supports optional runner-forwarded `targets` when selected through `validate-all` with deterministic validation and selection parity to suite target semantics.
 - Default scope remains `repo` via existing runner behavior.
 
 ### 2.2 Repository signals
@@ -32,6 +32,22 @@ V0.1.x uses deterministic path-based signals only:
    - Emit info advisory for clearly unusual non-hidden top-level folders outside known repo shape.
 2. **Validator-owned-looking file outside validator tree**
    - Emit info advisory when filename/path signal strongly indicates validator ownership but file is outside `calculogic-validator/**`.
+
+
+### 2.4 Input ownership split (V0.1.2)
+
+V0.1.2 aligns tree with naming input ownership discipline:
+
+- wiring resolves scope profile and validates target paths
+- wiring prepares scoped path inventory and target-filtered selected paths
+- wiring prepares top-level directory inventory used by repo-scope top-level advisory checks
+- runtime consumes prepared inputs only and emits deterministic findings/summary-compatible output
+
+Target behaviors in V0.1.2:
+
+- no targets: analyze all scoped selected paths
+- file/directory targets: analyze only selected in-scope paths under target union
+- invalid/nonexistent/escaping targets: deterministic failures aligned with suite target contract
 
 ## 3.0 Output Contract
 

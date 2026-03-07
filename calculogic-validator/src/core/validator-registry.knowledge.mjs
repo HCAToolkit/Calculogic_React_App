@@ -42,12 +42,21 @@ const runTreeStructureAdvisorHook = (repositoryRoot, options = {}) => {
     targets,
   });
   const summary = summarizeTreeStructureAdvisorFindings(treeStructureAdvisorResult.findings);
+  const meta = {};
+
+  if (treeStructureAdvisorResult.filters?.isFiltered) {
+    meta.filters = {
+      isFiltered: true,
+      targets: treeStructureAdvisorResult.filters.targets,
+    };
+  }
 
   return {
     scope: treeStructureAdvisorResult.scope,
     totalFilesScanned: treeStructureAdvisorResult.totalFilesScanned,
     findings: treeStructureAdvisorResult.findings,
     summary,
+    ...(Object.keys(meta).length > 0 ? { meta } : {}),
   };
 };
 

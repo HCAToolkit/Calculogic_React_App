@@ -87,3 +87,38 @@ test('validate-all returns deterministic error for nonexistent --target', async 
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
 });
+
+
+test('validate-all forwards target filtering contract to tree-structure-advisor', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validate-all-targets-tree-'));
+
+  try {
+    await writeFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'naming-validator.logic.mjs'),
+      'export const misplaced = true\n',
+      'utf8',
+    );
+
+    const result = runValidateAll(fixtureDir, [
+      '--validators=tree-structure-advisor',
+      '--scope=repo',
+      '--target',
+      'calculogic-validator',
+    ]);
+
+    assert.equal(result.status, 0);
+
+    const report = JSON.parse(result.stdout);
+    assert.equal(report.validators[0].id, 'tree-structure-advisor');
+    assert.equal(report.validators[0].meta.filters.isFiltered, true);
+    assert.deepEqual(report.validators[0].meta.filters.targets, ['calculogic-validator']);
+    assert.equal(
+      report.validators[0].findings.some((finding) => finding.code === 'TREE_VALIDATOR_OWNED_FILE_OUTSIDE_TREE'),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
