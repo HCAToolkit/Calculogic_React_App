@@ -175,9 +175,9 @@ npm run report:summarize
 - `report:verify`: checks report-capture wiring/outputs.
 - `report:summarize`: summarizes captured reports.
 
-## 5) Validator binaries (direct invocation)
+## 5) Validator entrypoints and direct invocation
 
-These binaries are defined in `calculogic-validator/package.json` and can be executed directly from repo root.
+This section includes package-defined validator entrypoints plus direct script invocation where useful, all executable from repo root.
 
 ```bash
 node calculogic-validator/bin/calculogic-validate.mjs
@@ -186,7 +186,7 @@ node calculogic-validator/bin/calculogic-validator-health.mjs
 node calculogic-validator/scripts/validate-tree.mjs --scope=repo
 ```
 
-What each binary does:
+What each entrypoint does:
 
 - `calculogic-validate.mjs`: full validator entrypoint.
 - `calculogic-validate-naming.mjs`: naming-only validator entrypoint.
