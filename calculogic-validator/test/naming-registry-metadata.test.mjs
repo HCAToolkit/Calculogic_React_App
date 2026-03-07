@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runNamingValidator } from '../src/naming/naming-validator.host.mjs';
+import {
+  prepareNamingRuntimeInputs,
+  runNamingValidator,
+} from '../src/naming/naming-validator.host.mjs';
 
 const assertDigestShape = (digest) => {
   assert.equal(typeof digest, 'string');
@@ -16,4 +19,16 @@ test('runNamingValidator returns registry metadata envelope', () => {
   assertDigestShape(result.registry.registryDigests?.builtin);
   assertDigestShape(result.registry.registryDigests?.custom);
   assertDigestShape(result.registry.registryDigests?.resolved);
+});
+
+test('prepareNamingRuntimeInputs exposes prepared dependencies and stable registry metadata', () => {
+  const prepared = prepareNamingRuntimeInputs({});
+  assert.ok(prepared.reportableExtensions instanceof Set);
+  assert.ok(prepared.namingRolesRuntime.roleMetadata instanceof Map);
+  assert.ok(prepared.namingRolesRuntime.activeRoles instanceof Set);
+  assert.ok(Array.isArray(prepared.namingRolesRuntime.roleSuffixes));
+  assert.ok(prepared.registry);
+
+  const result = runNamingValidator(process.cwd(), { scope: 'system', config: {} });
+  assert.deepEqual(result.registry, prepared.registry);
 });

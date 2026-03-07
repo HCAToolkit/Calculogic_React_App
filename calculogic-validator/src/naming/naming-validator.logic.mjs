@@ -1,10 +1,5 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import { resolveNamingRegistryInputs } from './registries/registry-state.logic.mjs';
-import {
-  toNamingRolesRuntime,
-  toReportableExtensionsSet,
-} from './naming-runtime-converters.logic.mjs';
 import { getBuiltinWalkExclusions } from './registries/naming-walk-exclusions.registry.logic.mjs';
 import {
   listValidatorScopes,
@@ -27,17 +22,7 @@ export const normalizePath = (relativePath) => relativePath.split(path.sep).join
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
 
-
-const BUILTIN_NAMING_REGISTRY_INPUTS = resolveNamingRegistryInputs({ config: {} });
-const DEFAULT_NAMING_ROLES_RUNTIME = toNamingRolesRuntime(BUILTIN_NAMING_REGISTRY_INPUTS.roles);
-const DEFAULT_REPORTABLE_EXTENSIONS = toReportableExtensionsSet(
-  BUILTIN_NAMING_REGISTRY_INPUTS.reportableExtensions,
-);
-
-const resolveNamingRolesRuntime = (namingRolesRuntime) =>
-  namingRolesRuntime ?? DEFAULT_NAMING_ROLES_RUNTIME;
-
-const isReportableFile = (relativePath, reportableExtensions = DEFAULT_REPORTABLE_EXTENSIONS) => {
+const isReportableFile = (relativePath, reportableExtensions) => {
   const extension = path.extname(relativePath);
   if (reportableExtensions.has(extension)) {
     return true;
@@ -46,6 +31,31 @@ const isReportableFile = (relativePath, reportableExtensions = DEFAULT_REPORTABL
   return (
     path.basename(relativePath) === 'package-lock.json' ||
     path.basename(relativePath) === 'package.json'
+  );
+};
+
+const assertPreparedReportableExtensions = (reportableExtensions) => {
+  if (reportableExtensions instanceof Set) {
+    return reportableExtensions;
+  }
+
+  throw new Error(
+    'Naming runtime requires prepared reportableExtensions (Set) from wiring/runtime adapter.',
+  );
+};
+
+const assertPreparedNamingRolesRuntime = (namingRolesRuntime) => {
+  if (
+    namingRolesRuntime &&
+    namingRolesRuntime.roleMetadata instanceof Map &&
+    namingRolesRuntime.activeRoles instanceof Set &&
+    Array.isArray(namingRolesRuntime.roleSuffixes)
+  ) {
+    return namingRolesRuntime;
+  }
+
+  throw new Error(
+    'Naming runtime requires prepared namingRolesRuntime from wiring/runtime adapter.',
   );
 };
 
@@ -66,7 +76,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
     return [];
   }
 
-  const reportableExtensions = options.reportableExtensions ?? DEFAULT_REPORTABLE_EXTENSIONS;
+  const reportableExtensions = assertPreparedReportableExtensions(options.reportableExtensions);
   const walkExclusions = options.walkExclusions ?? getBuiltinWalkExclusions();
   const collected = [];
 
@@ -240,7 +250,7 @@ export const filterRepositoryPathsByTargets = (
 };
 
 export const classifyPath = (relativePath, namingRolesRuntime) => {
-  const runtime = resolveNamingRolesRuntime(namingRolesRuntime);
+  const runtime = assertPreparedNamingRolesRuntime(namingRolesRuntime);
   const normalizedPath = normalizePath(relativePath);
   const basename = path.posix.basename(normalizedPath);
 

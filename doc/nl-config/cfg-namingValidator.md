@@ -10,7 +10,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.22** (registry-backed naming payload conversion consolidated through shared runtime converters for direct defaults and wiring).
+Current implementation target: **V0.1.23** (naming runtime dependencies are wiring-provided; runtime no longer composes builtin registry defaults internally).
 
 ## 1.0 Purpose
 
@@ -196,25 +196,27 @@ Semantic-name case validation is sourced from builtin registry JSON at:
 
 Runtime currently supports the builtin `semanticName.style` value `kebab-case` only for this slice. The runtime maps that style to the existing canonical kebab-case semantic-name predicate behavior.
 
-### 2.10 Shared naming runtime converter path (V0.1.22)
+### 2.10 Naming runtime input ownership boundary (V0.1.23)
 
-Direct runtime defaults and wiring now share one helper conversion seam for registry-backed naming payloads.
+Wiring owns registry/default/config composition and prepares runtime-ready dependencies before invoking runtime behavior.
 
-Default runtime source path:
+Prepared runtime dependency source path:
 
-- shared converter module: `calculogic-validator/src/naming/naming-runtime-converters.logic.mjs`
-- `resolveNamingRegistryInputs({ config: {} })` (builtin payload path)
-- roles payload converted via `toNamingRolesRuntime(roles)` to runtime shape:
-  - `roleMetadata: Map`
-  - `activeRoles: Set`
-  - `roleSuffixes: string[]` (length-desc sorting)
-- reportable extensions payload converted via `toReportableExtensionsSet(reportableExtensions)` to runtime `Set`
+- registry resolver: `calculogic-validator/src/naming/registries/registry-state.logic.mjs`
+- converter module: `calculogic-validator/src/naming/naming-runtime-converters.logic.mjs`
+- wiring composition entrypoint: `calculogic-validator/src/naming/naming-validator.wiring.mjs`
+- runtime consumer: `calculogic-validator/src/naming/naming-validator.logic.mjs`
 
-Injection precedence remains unchanged:
+Prepared runtime dependency contract:
 
-- explicit `options.namingRolesRuntime` and `options.reportableExtensions` continue to override defaults.
-- direct runtime defaults (`naming-validator.logic.mjs`) and wiring runtime assembly (`naming-validator.wiring.mjs`) both consume the shared converter helper path.
-- alignment tests for direct runtime defaults must be isolation-safe and must not mutate repo-owned registry state files in-place.
+- `namingRolesRuntime` supplied by wiring (shape: `roleMetadata`, `activeRoles`, `roleSuffixes`)
+- `reportableExtensions` supplied by wiring as runtime `Set`
+
+Ownership and precedence requirements:
+
+- runtime does not resolve registry state and does not build builtin runtime defaults at module scope.
+- runtime behavior remains responsible for scanning, scope filtering, target filtering, classification, and summarization.
+- host/wiring public behavior remains unchanged; config continues to override builtin defaults via resolver + converter flow before runtime execution.
 
 ## 3.0 Classification Contract
 
