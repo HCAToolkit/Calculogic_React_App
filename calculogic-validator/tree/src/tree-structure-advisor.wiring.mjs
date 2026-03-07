@@ -4,12 +4,12 @@ import {
   runTreeStructureAdvisor as runTreeStructureAdvisorRuntime,
   summarizeFindings,
 } from './tree-structure-advisor.logic.mjs';
-import { getValidatorScopeProfile } from '../core/validator-scopes.runtime.mjs';
+import { getValidatorScopeProfile } from '../../src/core/validator-scopes.runtime.mjs';
 import {
   normalizePath,
   resolveScopedTargets,
   filterScopedPathsByTargets,
-} from '../core/scoped-target-paths.logic.mjs';
+} from '../../src/core/scoped-target-paths.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([

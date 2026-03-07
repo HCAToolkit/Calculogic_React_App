@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import {
   runTreeStructureAdvisor,
   summarizeFindings,
-} from '../src/tree/tree-structure-advisor.host.mjs';
+} from '../tree/src/tree-structure-advisor.host.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 
 const writeJson = async (filePath, value) => {
@@ -210,9 +210,9 @@ test('tree-structure-advisor suppresses weak token-only shim signal for tree shi
 
   try {
     await writeBaseFixtureRepo(fixtureDir);
-    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'tree'), { recursive: true });
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'tree', 'src'), { recursive: true });
     await fs.writeFile(
-      path.join(fixtureDir, 'calculogic-validator', 'src', 'tree', 'tree-shim-detection.logic.mjs'),
+      path.join(fixtureDir, 'calculogic-validator', 'tree', 'src', 'tree-shim-detection.logic.mjs'),
       'export const collectShimEvidence = () => null\n',
       'utf8',
     );
@@ -221,7 +221,7 @@ test('tree-structure-advisor suppresses weak token-only shim signal for tree shi
 
     assert.equal(
       result.findings.some(
-        (finding) => finding.path === 'calculogic-validator/src/tree/tree-shim-detection.logic.mjs',
+        (finding) => finding.path === 'calculogic-validator/tree/src/tree-shim-detection.logic.mjs',
       ),
       false,
     );
@@ -235,14 +235,14 @@ test('tree-structure-advisor does not treat canonical host-to-wiring pass-throug
 
   try {
     await writeBaseFixtureRepo(fixtureDir);
-    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'tree'), { recursive: true });
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'tree', 'src'), { recursive: true });
     await fs.writeFile(
-      path.join(fixtureDir, 'calculogic-validator', 'src', 'tree', 'tree-structure-advisor.host.mjs'),
+      path.join(fixtureDir, 'calculogic-validator', 'tree', 'src', 'tree-structure-advisor.host.mjs'),
       "export * from './tree-structure-advisor.wiring.mjs';\n",
       'utf8',
     );
     await fs.writeFile(
-      path.join(fixtureDir, 'calculogic-validator', 'src', 'tree', 'tree-structure-advisor.wiring.mjs'),
+      path.join(fixtureDir, 'calculogic-validator', 'tree', 'src', 'tree-structure-advisor.wiring.mjs'),
       'export const treeAdvisor = true\n',
       'utf8',
     );
@@ -251,7 +251,7 @@ test('tree-structure-advisor does not treat canonical host-to-wiring pass-throug
 
     assert.equal(
       result.findings.some(
-        (finding) => finding.path === 'calculogic-validator/src/tree/tree-structure-advisor.host.mjs',
+        (finding) => finding.path === 'calculogic-validator/tree/src/tree-structure-advisor.host.mjs',
       ),
       false,
     );
@@ -270,13 +270,13 @@ test('tree-structure-advisor does not treat public index entrypoint barrel as sh
       [
         "export * from './core/validator-runner.logic.mjs';",
         "export * as naming from './naming/naming-validator.host.mjs';",
-        "export * as treeStructureAdvisor from './tree/tree-structure-advisor.host.mjs';",
+        "export * as treeStructureAdvisor from '../tree/src/tree-structure-advisor.host.mjs';",
       ].join('\n'),
       'utf8',
     );
     await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'core'), { recursive: true });
     await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'naming'), { recursive: true });
-    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'tree'), { recursive: true });
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'tree', 'src'), { recursive: true });
     await fs.writeFile(
       path.join(fixtureDir, 'calculogic-validator', 'src', 'core', 'validator-runner.logic.mjs'),
       'export const validatorRunner = true\n',
@@ -288,7 +288,7 @@ test('tree-structure-advisor does not treat public index entrypoint barrel as sh
       'utf8',
     );
     await fs.writeFile(
-      path.join(fixtureDir, 'calculogic-validator', 'src', 'tree', 'tree-structure-advisor.host.mjs'),
+      path.join(fixtureDir, 'calculogic-validator', 'tree', 'src', 'tree-structure-advisor.host.mjs'),
       'export const treeHost = true\n',
       'utf8',
     );

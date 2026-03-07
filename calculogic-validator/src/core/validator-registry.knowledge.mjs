@@ -2,7 +2,7 @@ import { runNamingValidator, summarizeFindings } from '../naming/naming-validato
 import {
   runTreeStructureAdvisor,
   summarizeFindings as summarizeTreeStructureAdvisorFindings,
-} from '../tree/tree-structure-advisor.host.mjs';
+} from '../../tree/src/tree-structure-advisor.host.mjs';
 
 const runNamingValidatorHook = (repositoryRoot, options = {}) => {
   const scope = options.scope;

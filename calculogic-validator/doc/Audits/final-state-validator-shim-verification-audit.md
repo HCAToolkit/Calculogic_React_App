@@ -64,7 +64,7 @@ Key final-state conclusion: detector output now aligns cleanly with the manually
 
 1. `calculogic-validator/src/index.mjs` (public barrel entrypoint)
 2. `calculogic-validator/src/naming/naming-validator.host.mjs` (canonical host→wiring boundary)
-3. `calculogic-validator/src/tree/tree-structure-advisor.host.mjs` (canonical host→wiring boundary)
+3. `calculogic-validator/tree/src/tree-structure-advisor.host.mjs` (canonical host→wiring boundary)
 
 ## 5. Current tree validator comparison
 
@@ -78,7 +78,7 @@ Key final-state conclusion: detector output now aligns cleanly with the manually
 
 - `calculogic-validator/src/index.mjs` remains unflagged (public barrel carveout preserved).
 - `calculogic-validator/src/naming/naming-validator.host.mjs` remains unflagged (canonical host boundary carveout preserved).
-- `calculogic-validator/src/tree/tree-structure-advisor.host.mjs` remains unflagged (canonical host boundary carveout preserved).
+- `calculogic-validator/tree/src/tree-structure-advisor.host.mjs` remains unflagged (canonical host boundary carveout preserved).
 
 ### 5.3 False positive / ambiguous / missed classification
 
@@ -90,7 +90,7 @@ Key final-state conclusion: detector output now aligns cleanly with the manually
 
 ### 6.1 Detector self-flag removal verified
 
-Verified: `calculogic-validator/src/tree/tree-shim-detection.logic.mjs` no longer appears in current shim-like findings.
+Verified: `calculogic-validator/tree/src/tree-shim-detection.logic.mjs` no longer appears in current shim-like findings.
 
 ### 6.2 Thin re-export detection preserved
 

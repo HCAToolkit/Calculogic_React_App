@@ -32,7 +32,7 @@ const usageLines = [
   'Examples:',
   '  ✅ npm run validate:tree -- --scope=repo',
   '  ✅ npm run validate:tree -- --scope=app --target src/tree',
-  '  ✅ npm run validate:tree -- --target calculogic-validator/src/tree',
+  '  ✅ npm run validate:tree -- --target calculogic-validator/tree/src',
   '  ✅ npm run validate:all -- --validators=tree-structure-advisor --scope=repo',
 ];
 

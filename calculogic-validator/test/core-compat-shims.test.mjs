@@ -7,9 +7,9 @@ import * as canonicalRegistry from '../src/core/validator-registry.knowledge.mjs
 import * as legacyRegistryShim from '../src/validator-registry.knowledge.mjs';
 import * as canonicalScopes from '../src/core/validator-scopes.runtime.mjs';
 import * as legacyScopesShim from '../src/validator-scopes.runtime.mjs';
-import * as canonicalTreeHost from '../src/tree/tree-structure-advisor.host.mjs';
+import * as canonicalTreeHost from '../tree/src/tree-structure-advisor.host.mjs';
 import * as legacyTreeHostShim from '../src/tree-structure-advisor.host.mjs';
-import * as canonicalTreeLogic from '../src/tree/tree-structure-advisor.logic.mjs';
+import * as canonicalTreeLogic from '../tree/src/tree-structure-advisor.logic.mjs';
 import * as legacyTreeLogicShim from '../src/tree-structure-advisor.logic.mjs';
 
 test('validator runner core module and legacy shim expose the same runtime API', () => {

@@ -8,7 +8,7 @@ Current implementation target: **V0.1.5** (shim evidence hardening with robust p
 
 Add a conservative tree-structure advisor validator slice that proves validator-suite multi-slice execution while remaining report-only and non-destructive.
 
-V0.1.1 converges this slice to a canonical owned boundary under `calculogic-validator/src/tree/` to match naming-slice boundary conventions.
+V0.1.1 converges this slice to a canonical owned boundary under `calculogic-validator/tree/src/` to match naming-slice boundary conventions.
 
 ## 2.0 Inputs and Source of Truth
 
@@ -108,12 +108,12 @@ Each finding follows existing report conventions:
 ## 4.0 Registration, Boundary, and Execution
 
 - Canonical tree slice boundary lives at:
-  - `calculogic-validator/src/tree/tree-structure-advisor.host.mjs`
-  - `calculogic-validator/src/tree/tree-structure-advisor.wiring.mjs`
-  - `calculogic-validator/src/tree/tree-structure-advisor.logic.mjs`
-  - shim evidence/runtime helpers: `calculogic-validator/src/tree/tree-shim-detection.logic.mjs`
-  - optional contracts surface: `calculogic-validator/src/tree/tree-structure-advisor.contracts.mjs`
-- Registry/index/package exports target the canonical `src/tree/` host boundary.
+  - `calculogic-validator/tree/src/tree-structure-advisor.host.mjs`
+  - `calculogic-validator/tree/src/tree-structure-advisor.wiring.mjs`
+  - `calculogic-validator/tree/src/tree-structure-advisor.logic.mjs`
+  - shim evidence/runtime helpers: `calculogic-validator/tree/src/tree-shim-detection.logic.mjs`
+  - optional contracts surface: `calculogic-validator/tree/src/tree-structure-advisor.contracts.mjs`
+- Registry/index/package exports target the canonical `tree/src/` host boundary.
 - Flat legacy paths under `calculogic-validator/src/tree-structure-advisor.*.mjs` remain compatibility shims only (re-export wrappers) during migration.
 - Default runner execution includes both `naming` and `tree-structure-advisor` in deterministic registry order.
 - Dedicated `validate-tree` execution includes only `tree-structure-advisor` while preserving shared runner scope/target semantics.
