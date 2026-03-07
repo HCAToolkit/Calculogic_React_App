@@ -42,6 +42,8 @@ For successful validator report runs across suite CLIs (`validate:naming`, `vali
 
 This keeps report capture deterministic while preserving explicit invalid-usage and explicit-failure behavior.
 
+Implementation note: suite CLI scripts should reuse suite-core helpers in `src/core/validator-cli-output.logic.mjs` for report emission and usage/error output flow, rather than duplicating ad hoc CLI output scaffolding.
+
 ## 5) Current exit-code policy (as implemented today)
 
 Current implementation policy:

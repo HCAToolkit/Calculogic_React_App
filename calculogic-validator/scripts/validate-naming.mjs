@@ -13,6 +13,12 @@ import {
 import { deriveExitCodeFromFindings } from '../src/core/validator-exit-code.logic.mjs';
 import { detectNpmArgForwardingFootgun } from '../src/core/npm-arg-forwarding-guard.logic.mjs';
 import { getSourceSnapshot } from '../src/core/source-snapshot.logic.mjs';
+import {
+  writeValidatorReportToStdout,
+  setValidatorReportExitCode,
+  printValidatorUsageToStdout,
+  printValidatorUsageErrorToStderr,
+} from '../src/core/validator-cli-output.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
@@ -100,29 +106,26 @@ const npmArgForwardingMessage = detectNpmArgForwardingFootgun({
 });
 
 if (npmArgForwardingMessage) {
-  console.error(npmArgForwardingMessage);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(npmArgForwardingMessage, usageLines);
   process.exit(1);
 }
 
 try {
   parsed = parseScopeFromCli(process.argv.slice(2));
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
 
 const { helpRequested, selectedScope, configPath, strict, targets } = parsed;
 
 if (helpRequested) {
-  console.log(usageLines.join('\n'));
+  printValidatorUsageToStdout(usageLines);
   process.exit(0);
 }
 
 if (!getScopeProfile(selectedScope)) {
-  console.error(`Invalid scope: ${selectedScope}`);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(`Invalid scope: ${selectedScope}`, usageLines);
   process.exit(1);
 }
 
@@ -132,8 +135,7 @@ let config;
 try {
   config = configPath ? loadValidatorConfigFromFile(configPath, { cwd: process.cwd() }) : undefined;
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
 
@@ -144,8 +146,7 @@ let validatorResult;
 try {
   validatorResult = runNamingValidator(repositoryRoot, { scope: selectedScope, config, targets });
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
 const { findings, totalFilesScanned, scope, filters } = validatorResult;
@@ -191,5 +192,5 @@ const report = {
   findings,
 };
 
-process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-process.exitCode = deriveExitCodeFromFindings(findings, { strict });
+writeValidatorReportToStdout(report);
+setValidatorReportExitCode(deriveExitCodeFromFindings(findings, { strict }));

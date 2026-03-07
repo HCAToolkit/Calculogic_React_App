@@ -12,6 +12,12 @@ import {
 } from '../src/core/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromRunnerReport } from '../src/core/validator-exit-code.logic.mjs';
 import { detectNpmArgForwardingFootgun } from '../src/core/npm-arg-forwarding-guard.logic.mjs';
+import {
+  writeValidatorReportToStdout,
+  setValidatorReportExitCode,
+  printValidatorUsageToStdout,
+  printValidatorUsageErrorToStderr,
+} from '../src/core/validator-cli-output.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
@@ -113,27 +119,24 @@ const npmArgForwardingMessage = detectNpmArgForwardingFootgun({
 });
 
 if (npmArgForwardingMessage) {
-  console.error(npmArgForwardingMessage);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(npmArgForwardingMessage, usageLines);
   process.exit(1);
 }
 
 try {
   parsed = parseCliArgs(process.argv.slice(2));
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
 
 if (parsed.helpRequested) {
-  console.log(usageLines.join('\n'));
+  printValidatorUsageToStdout(usageLines);
   process.exit(0);
 }
 
 if (parsed.selectedScope && !getValidatorScopeProfile(parsed.selectedScope)) {
-  console.error(`Invalid scope: ${parsed.selectedScope}`);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
   process.exit(1);
 }
 
@@ -153,10 +156,9 @@ try {
     ...(config ? { configDigest: computeConfigDigest(config) } : {}),
   });
 
-  process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-  process.exitCode = deriveExitCodeFromRunnerReport(report, { strict: parsed.strict });
+  writeValidatorReportToStdout(report);
+  setValidatorReportExitCode(deriveExitCodeFromRunnerReport(report, { strict: parsed.strict }));
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
