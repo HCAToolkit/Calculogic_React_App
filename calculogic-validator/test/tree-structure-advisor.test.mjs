@@ -151,6 +151,115 @@ test('tree-structure-advisor detects shim-like path inside compat surface withou
   }
 });
 
+test('tree-structure-advisor suppresses token-only shim signals on quality surfaces', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-quality-suppressed-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'test'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'test', 'core-compat-shims.test.mjs'),
+      'export const testCase = true\n',
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+
+    assert.equal(
+      result.findings.some(
+        (finding) => finding.path === 'calculogic-validator/test/core-compat-shims.test.mjs',
+      ),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor keeps runtime token-only shim path as informational signal only', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-runtime-token-only-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'src', 'bridges'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'bridges', 'legacy-api.logic.mjs'),
+      'export const maybeBridge = true\n',
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const shimFindings = result.findings.filter((finding) => finding.path === 'src/bridges/legacy-api.logic.mjs');
+
+    assert.deepEqual(
+      shimFindings.map((finding) => finding.code),
+      ['TREE_SHIM_SURFACE_PRESENT'],
+    );
+    assert.equal(shimFindings[0].details.artifactSurface, 'runtimeish');
+    assert.equal(shimFindings[0].details.matchedShimSignals.thinReexportShim, false);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor does not treat canonical host-to-wiring pass-through as shim debt', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-host-wiring-pass-through-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'tree'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'tree', 'tree-structure-advisor.host.mjs'),
+      "export * from './tree-structure-advisor.wiring.mjs';\n",
+      'utf8',
+    );
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'tree', 'tree-structure-advisor.wiring.mjs'),
+      'export const treeAdvisor = true\n',
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+
+    assert.equal(
+      result.findings.some(
+        (finding) => finding.path === 'calculogic-validator/src/tree/tree-structure-advisor.host.mjs',
+      ),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor does not treat public index entrypoint barrel as shim debt', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-public-entrypoint-pass-through-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'index.mjs'),
+      "export * from './core/validator-runner.logic.mjs';\n",
+      'utf8',
+    );
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'core'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'core', 'validator-runner.logic.mjs'),
+      'export const validatorRunner = true\n',
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+
+    assert.equal(
+      result.findings.some((finding) => finding.path === 'calculogic-validator/src/index.mjs'),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor does not flag normal non-shim files for shim findings', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-non-shim-'));
 
