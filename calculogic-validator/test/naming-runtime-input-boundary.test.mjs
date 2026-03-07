@@ -35,11 +35,15 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
     writeFile(tempRoot, 'src/panel.logic.ts');
     writeFile(tempRoot, 'src/skip.tmp');
 
-    const result = runNamingValidator(tempRoot, {
+    const result = runNamingValidator({
       scope: 'repo',
-      reportableExtensions,
+      selectedPaths: collectRepositoryPaths(tempRoot, {
+        scope: 'repo',
+        reportableExtensions,
+        walkExclusions: getBuiltinWalkExclusions(),
+      }),
       namingRolesRuntime,
-      walkExclusions: getBuiltinWalkExclusions(),
+      targets: [],
     });
 
     assert.equal(result.totalFilesScanned, 1);
@@ -56,6 +60,15 @@ test('runtime enforces prepared dependency injection contract', () => {
   assert.throws(
     () => classifyPath('src/rightpanel.results-style.css'),
     /requires prepared namingRolesRuntime/u,
+  );
+
+  assert.throws(
+    () => runNamingValidator({
+      scope: 'repo',
+      namingRolesRuntime: toNamingRolesRuntime(resolveNamingRegistryInputs({ config: {} }).roles),
+      targets: [],
+    }),
+    /requires prepared selectedPaths/u,
   );
 
   assert.throws(

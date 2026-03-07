@@ -83,3 +83,24 @@ export const filterScopedPathsByTargets = (
 
   return sortPaths(new Set(selectedPaths));
 };
+
+export const buildScopePathPredicate = (scopeProfile) => {
+  const includeRootSet = new Set((scopeProfile?.includeRoots ?? []).map(normalizePath));
+  const includeRootFileSet = new Set((scopeProfile?.includeRootFiles ?? []).map(normalizePath));
+
+  return (relativePath) => {
+    const normalizedPath = normalizePath(relativePath);
+    if (normalizedPath.includes('/')) {
+      const firstSegment = normalizedPath.split('/')[0];
+      return includeRootSet.has(firstSegment);
+    }
+
+    return includeRootFileSet.has(normalizedPath);
+  };
+};
+
+export const filterScopedPathsByProfile = (relativePaths, scopeProfile) => {
+  const scopePathPredicate = buildScopePathPredicate(scopeProfile);
+  const scopedPaths = relativePaths.filter(scopePathPredicate);
+  return sortPaths(new Set(scopedPaths));
+};

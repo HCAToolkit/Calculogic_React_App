@@ -1,12 +1,9 @@
 import path from 'node:path';
 import fs from 'node:fs';
+import { listValidatorScopes, getValidatorScopeProfile } from '../core/validator-scopes.runtime.mjs';
 import {
-  listValidatorScopes,
-  getValidatorScopeProfile,
-} from '../core/validator-scopes.runtime.mjs';
-import {
-  resolveScopedTargets,
-  filterScopedPathsByTargets,
+  normalizePath,
+  filterScopedPathsByProfile,
 } from '../core/scoped-target-paths.logic.mjs';
 import { parseCanonicalName } from './rules/naming-rule-parse-canonical.logic.mjs';
 import {
@@ -20,8 +17,6 @@ import {
   isDeprecatedRole,
   isUnknownOrInactiveRole,
 } from './rules/naming-rule-check-role.logic.mjs';
-
-export const normalizePath = (relativePath) => relativePath.split(path.sep).join('/');
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
 
@@ -128,21 +123,6 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
   return collected;
 };
 
-const buildScopePathPredicate = (profile) => {
-  const includeRootSet = new Set(profile.includeRoots.map(normalizePath));
-  const includeRootFileSet = new Set(profile.includeRootFiles.map(normalizePath));
-
-  return (relativePath) => {
-    const normalizedPath = normalizePath(relativePath);
-    if (normalizedPath.includes('/')) {
-      const firstSegment = normalizedPath.split('/')[0];
-      return includeRootSet.has(firstSegment);
-    }
-
-    return includeRootFileSet.has(normalizedPath);
-  };
-};
-
 export const listNamingValidatorScopes = () => listValidatorScopes();
 
 export const getScopeProfile = (scope) => getValidatorScopeProfile(scope);
@@ -183,19 +163,8 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
     return sortPaths(new Set(allReportablePaths));
   }
 
-  const scopePathPredicate = buildScopePathPredicate(profile);
-  const scopedPaths = allReportablePaths.filter(scopePathPredicate);
-  return sortPaths(new Set(scopedPaths));
+  return filterScopedPathsByProfile(allReportablePaths, profile);
 };
-
-export const resolveNamingValidatorTargets = (rootDirectory, targets = []) =>
-  resolveScopedTargets(rootDirectory, targets);
-
-export const filterRepositoryPathsByTargets = (
-  rootDirectory,
-  relativePaths,
-  resolvedTargets = [],
-) => filterScopedPathsByTargets(rootDirectory, relativePaths, resolvedTargets);
 
 export const classifyPath = (relativePath, namingRolesRuntime) => {
   const runtime = assertPreparedNamingRolesRuntime(namingRolesRuntime);
@@ -345,30 +314,33 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
   };
 };
 
-export const runNamingValidator = (rootDirectory, options = {}) => {
-  const selectedScope = options.scope ?? 'repo';
-  const inScopePaths = collectRepositoryPaths(rootDirectory, {
-    scope: selectedScope,
-    reportableExtensions: options.reportableExtensions,
-    walkExclusions: options.walkExclusions,
-  });
-  const resolvedTargets = resolveNamingValidatorTargets(rootDirectory, options.targets ?? []);
-  const paths = filterRepositoryPathsByTargets(rootDirectory, inScopePaths, resolvedTargets);
-  const findings = paths.map((pathname) => classifyPath(pathname, options.namingRolesRuntime));
+export const runNamingValidator = (preparedInputs = {}) => {
+  const selectedPaths = assertPreparedSelectedPaths(preparedInputs.selectedPaths);
+  const namingRolesRuntime = assertPreparedNamingRolesRuntime(preparedInputs.namingRolesRuntime);
+  const resolvedTargets = Array.isArray(preparedInputs.targets) ? preparedInputs.targets : [];
+  const findings = selectedPaths.map((pathname) => classifyPath(pathname, namingRolesRuntime));
 
   return {
     findings,
-    totalFilesScanned: paths.length,
-    scope: selectedScope,
+    totalFilesScanned: selectedPaths.length,
+    scope: preparedInputs.scope ?? 'repo',
     filters: {
       isFiltered: resolvedTargets.length > 0,
       ...(resolvedTargets.length > 0
         ? {
-            targets: resolvedTargets.map((target) => target.relPath),
+            targets: resolvedTargets,
           }
         : {}),
     },
   };
+};
+
+const assertPreparedSelectedPaths = (selectedPaths) => {
+  if (Array.isArray(selectedPaths)) {
+    return selectedPaths;
+  }
+
+  throw new Error('Naming runtime requires prepared selectedPaths from wiring/runtime adapter.');
 };
 
 const incrementCounter = (counts, key) => {
