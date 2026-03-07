@@ -27,6 +27,9 @@ test('prepareNamingRuntimeInputs exposes prepared dependencies and stable regist
   assert.ok(prepared.namingRolesRuntime.roleMetadata instanceof Map);
   assert.ok(prepared.namingRolesRuntime.activeRoles instanceof Set);
   assert.ok(Array.isArray(prepared.namingRolesRuntime.roleSuffixes));
+  assert.ok(prepared.walkExclusions.excludedDirectories instanceof Set);
+  assert.equal(typeof prepared.walkExclusions.skipDotDirectories, 'boolean');
+  assert.ok(prepared.walkExclusions.allowDotFiles instanceof Set);
   assert.ok(prepared.registry);
 
   const result = runNamingValidator(process.cwd(), { scope: 'system', config: {} });

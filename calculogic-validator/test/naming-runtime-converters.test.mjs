@@ -9,6 +9,7 @@ import {
   toReportableExtensionsSet,
 } from '../src/naming/naming-runtime-converters.logic.mjs';
 import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming/naming-validator.logic.mjs';
+import { getBuiltinWalkExclusions } from '../src/naming/registries/naming-walk-exclusions.registry.logic.mjs';
 import { runNamingValidator as runNamingValidatorWiring } from '../src/naming/naming-validator.wiring.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
@@ -54,6 +55,7 @@ test('direct runtime and wiring derive equivalent runtime validation output from
       scope: 'repo',
       namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
       reportableExtensions: toReportableExtensionsSet(registryInputs.reportableExtensions),
+      walkExclusions: getBuiltinWalkExclusions(),
     });
 
     const wiringResult = runNamingValidatorWiring(tempRoot, { scope: 'repo', config: {} });

@@ -1,6 +1,5 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import { getBuiltinWalkExclusions } from './registries/naming-walk-exclusions.registry.logic.mjs';
 import {
   listValidatorScopes,
   getValidatorScopeProfile,
@@ -59,6 +58,22 @@ const assertPreparedNamingRolesRuntime = (namingRolesRuntime) => {
   );
 };
 
+
+const assertPreparedWalkExclusions = (walkExclusions) => {
+  if (
+    walkExclusions &&
+    walkExclusions.excludedDirectories instanceof Set &&
+    typeof walkExclusions.skipDotDirectories === 'boolean' &&
+    walkExclusions.allowDotFiles instanceof Set
+  ) {
+    return walkExclusions;
+  }
+
+  throw new Error(
+    'Naming runtime requires prepared walkExclusions from wiring/runtime adapter.',
+  );
+};
+
 const sortPaths = (paths) => Array.from(paths).sort((left, right) => left.localeCompare(right));
 
 const isPathOutsideRoot = (relativePath) =>
@@ -77,7 +92,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
   }
 
   const reportableExtensions = assertPreparedReportableExtensions(options.reportableExtensions);
-  const walkExclusions = options.walkExclusions ?? getBuiltinWalkExclusions();
+  const walkExclusions = assertPreparedWalkExclusions(options.walkExclusions);
   const collected = [];
 
   const walk = (absoluteDirectoryPath) => {
@@ -160,6 +175,7 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
 
   const allReportablePaths = collectPathsFromRoot(rootDirectory, '.', {
     reportableExtensions: options.reportableExtensions,
+    walkExclusions: options.walkExclusions,
   });
 
   if (selectedScope === 'repo') {
@@ -402,6 +418,7 @@ export const runNamingValidator = (rootDirectory, options = {}) => {
   const inScopePaths = collectRepositoryPaths(rootDirectory, {
     scope: selectedScope,
     reportableExtensions: options.reportableExtensions,
+    walkExclusions: options.walkExclusions,
   });
   const resolvedTargets = resolveNamingValidatorTargets(rootDirectory, options.targets ?? []);
   const paths = filterRepositoryPathsByTargets(rootDirectory, inScopePaths, resolvedTargets);

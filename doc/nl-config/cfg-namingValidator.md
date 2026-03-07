@@ -196,7 +196,7 @@ Semantic-name case validation is sourced from builtin registry JSON at:
 
 Runtime currently supports the builtin `semanticName.style` value `kebab-case` only for this slice. The runtime maps that style to the existing canonical kebab-case semantic-name predicate behavior.
 
-### 2.10 Naming runtime input ownership boundary (V0.1.23)
+### 2.10 Naming runtime input ownership boundary (V0.1.24)
 
 Wiring owns registry/default/config composition and prepares runtime-ready dependencies before invoking runtime behavior.
 
@@ -211,10 +211,12 @@ Prepared runtime dependency contract:
 
 - `namingRolesRuntime` supplied by wiring (shape: `roleMetadata`, `activeRoles`, `roleSuffixes`)
 - `reportableExtensions` supplied by wiring as runtime `Set`
+- `walkExclusions` supplied by wiring (shape: `excludedDirectories`, `skipDotDirectories`, `allowDotFiles`)
 
 Ownership and precedence requirements:
 
 - runtime does not resolve registry state and does not build builtin runtime defaults at module scope.
+- runtime does not import builtin walk-exclusions registry loaders and does not own builtin fallback seams.
 - runtime behavior remains responsible for scanning, scope filtering, target filtering, classification, and summarization.
 - host/wiring public behavior remains unchanged; config continues to override builtin defaults via resolver + converter flow before runtime execution.
 
