@@ -111,6 +111,7 @@ Each finding follows existing report conventions:
   - `calculogic-validator/src/tree/tree-structure-advisor.host.mjs`
   - `calculogic-validator/src/tree/tree-structure-advisor.wiring.mjs`
   - `calculogic-validator/src/tree/tree-structure-advisor.logic.mjs`
+  - shim evidence/runtime helpers: `calculogic-validator/src/tree/tree-shim-detection.logic.mjs`
   - optional contracts surface: `calculogic-validator/src/tree/tree-structure-advisor.contracts.mjs`
 - Registry/index/package exports target the canonical `src/tree/` host boundary.
 - Flat legacy paths under `calculogic-validator/src/tree-structure-advisor.*.mjs` remain compatibility shims only (re-export wrappers) during migration.
