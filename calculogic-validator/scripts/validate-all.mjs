@@ -153,8 +153,8 @@ try {
     ...(config ? { configDigest: computeConfigDigest(config) } : {}),
   });
 
-  console.log(JSON.stringify(report, null, 2));
-  process.exit(deriveExitCodeFromRunnerReport(report, { strict: parsed.strict }));
+  process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+  process.exitCode = deriveExitCodeFromRunnerReport(report, { strict: parsed.strict });
 } catch (error) {
   console.error(error.message);
   console.error(usageLines.join('\n'));
