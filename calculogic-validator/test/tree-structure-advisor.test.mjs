@@ -84,6 +84,87 @@ test('tree-structure-advisor findings are deterministic and summary-stable', asy
   }
 });
 
+
+test('tree-structure-advisor detects flat thin re-export shim deterministically', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-reexport-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'validator-runner.logic.mjs'),
+      "export * from '../calculogic-validator/src/core/validator-runner.logic.mjs';\n",
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const findings = result.findings.filter(
+      (finding) => finding.path === 'src/validator-runner.logic.mjs' && finding.code.startsWith('TREE_SHIM_'),
+    );
+
+    assert.deepEqual(
+      findings.map((finding) => finding.code),
+      ['TREE_SHIM_OUTSIDE_COMPAT', 'TREE_SHIM_SURFACE_PRESENT'],
+    );
+    const shimSurface = findings.find((finding) => finding.code === 'TREE_SHIM_SURFACE_PRESENT');
+    assert.ok(shimSurface);
+    assert.equal(shimSurface.details.matchedShimSignals.thinReexportShim, true);
+    assert.equal(
+      shimSurface.details.canonicalTargetPath,
+      '../calculogic-validator/src/core/validator-runner.logic.mjs',
+    );
+    assert.equal(shimSurface.details.insideCompatSurface, false);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor detects shim-like path inside compat surface without outside warning', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-compat-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'src', 'compat'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'compat', 'legacy-api.logic.mjs'),
+      "export * from '../../calculogic-validator/src/core/validator-runner.logic.mjs';\n",
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+
+    assert.equal(
+      result.findings.some(
+        (finding) =>
+          finding.path === 'src/compat/legacy-api.logic.mjs' && finding.code === 'TREE_SHIM_SURFACE_PRESENT',
+      ),
+      true,
+    );
+    assert.equal(
+      result.findings.some(
+        (finding) =>
+          finding.path === 'src/compat/legacy-api.logic.mjs' && finding.code === 'TREE_SHIM_OUTSIDE_COMPAT',
+      ),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor does not flag normal non-shim files for shim findings', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-shim-non-shim-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+
+    assert.equal(result.findings.some((finding) => finding.code.startsWith('TREE_SHIM_')), false);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor flags validator-owned-looking file outside validator tree', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-misplaced-'));
 

@@ -22,6 +22,11 @@ const VALIDATOR_OWNED_BASENAME_PATTERNS = [
   /^naming-.+\.test\.mjs$/u,
 ];
 
+const SHIM_FOLDER_SIGNALS = new Set(['compat', 'shims', 'adapters', 'bridges']);
+const SHIM_NAME_TOKEN_SIGNALS = new Set(['shim', 'compat', 'adapter', 'bridge', 'migration']);
+const SHIM_SURFACE_SEGMENT_SIGNALS = new Set(['compat', 'shims']);
+const SHIM_RELEVANT_FILE_EXTENSIONS = new Set(['.mjs', '.js', '.cjs', '.ts', '.tsx', '.jsx']);
+
 const sortByPathThenCode = (left, right) => {
   const byPath = left.path.localeCompare(right.path);
   if (byPath !== 0) {
@@ -33,6 +38,133 @@ const sortByPathThenCode = (left, right) => {
 
 const isValidatorOwnedBasenameSignal = (basename) =>
   VALIDATOR_OWNED_BASENAME_PATTERNS.some((pattern) => pattern.test(basename));
+
+const tokenizeBasename = (basename) =>
+  basename
+    .toLowerCase()
+    .replace(/\.[^.]+$/u, '')
+    .split(/[^a-z0-9]+/u)
+    .filter(Boolean);
+
+const collectPathShimSignals = (relativePath) => {
+  const segments = relativePath.split('/').filter(Boolean);
+  const directorySegments = segments.slice(0, -1);
+  const basename = segments.at(-1) ?? '';
+  const normalizedDirectories = directorySegments.map((segment) => segment.toLowerCase());
+
+  const folderSignals = normalizedDirectories.filter((segment) => SHIM_FOLDER_SIGNALS.has(segment));
+  const basenameTokens = tokenizeBasename(basename).filter((token) => SHIM_NAME_TOKEN_SIGNALS.has(token));
+
+  return {
+    folderSignals,
+    basenameTokens,
+    insideCompatSurface: normalizedDirectories.some((segment) => SHIM_SURFACE_SEGMENT_SIGNALS.has(segment)),
+  };
+};
+
+const parseThinReexportShim = (rawContent) => {
+  if (typeof rawContent !== 'string') {
+    return null;
+  }
+
+  const lines = rawContent
+    .split(/\r?\n/u)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith('//'));
+
+  if (lines.length === 0) {
+    return null;
+  }
+
+  const reexportTargets = [];
+  for (const line of lines) {
+    const match = line.match(/^export\s+(?:\*|\{[^}]+\})\s+from\s+['"]([^'"]+)['"];?$/u);
+    if (!match) {
+      return null;
+    }
+
+    reexportTargets.push(match[1]);
+  }
+
+  const canonicalTargetPath = reexportTargets[0];
+  const hasCanonicalSegmentSignal = /(?:^|\/)(?:core|tree|naming|validators)\//u.test(canonicalTargetPath);
+  if (!hasCanonicalSegmentSignal) {
+    return null;
+  }
+
+  return {
+    isThinReexportShim: true,
+    canonicalTargetPath,
+    reexportTargetCount: reexportTargets.length,
+  };
+};
+
+const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
+  const findings = [];
+
+  for (const relativePath of paths) {
+    const extension = path.posix.extname(relativePath).toLowerCase();
+    if (!SHIM_RELEVANT_FILE_EXTENSIONS.has(extension)) {
+      continue;
+    }
+
+    const shimSignals = collectPathShimSignals(relativePath);
+    const thinReexportSignal = parseThinReexportShim(fileContentsByPath[relativePath]);
+    const isShimLike =
+      shimSignals.folderSignals.length > 0 ||
+      shimSignals.basenameTokens.length > 0 ||
+      thinReexportSignal !== null;
+
+    if (!isShimLike) {
+      continue;
+    }
+
+    findings.push({
+      code: 'TREE_SHIM_SURFACE_PRESENT',
+      severity: 'info',
+      path: relativePath,
+      classification: 'advisory-structure',
+      message:
+        'Shim/compat signals are present for this path; maintain a discoverable and deterministic compatibility surface while cleanup is pending.',
+      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
+      details: {
+        matchedShimSignals: {
+          folderSignals: shimSignals.folderSignals,
+          nameTokenSignals: shimSignals.basenameTokens,
+          thinReexportShim: thinReexportSignal?.isThinReexportShim ?? false,
+        },
+        canonicalTargetPath: thinReexportSignal?.canonicalTargetPath,
+        reexportTargetCount: thinReexportSignal?.reexportTargetCount,
+        insideCompatSurface: shimSignals.insideCompatSurface,
+      },
+    });
+
+    if (shimSignals.insideCompatSurface) {
+      continue;
+    }
+
+    findings.push({
+      code: 'TREE_SHIM_OUTSIDE_COMPAT',
+      severity: 'warn',
+      path: relativePath,
+      classification: 'advisory-structure',
+      message:
+        'Shim-like path is outside a discoverable compat/shims surface; consider consolidating compat entries to support later cleanup work.',
+      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
+      details: {
+        matchedShimSignals: {
+          folderSignals: shimSignals.folderSignals,
+          nameTokenSignals: shimSignals.basenameTokens,
+          thinReexportShim: thinReexportSignal?.isThinReexportShim ?? false,
+        },
+        canonicalTargetPath: thinReexportSignal?.canonicalTargetPath,
+        insideCompatSurface: shimSignals.insideCompatSurface,
+      },
+    });
+  }
+
+  return findings;
+};
 
 const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope) => {
   if ((scope ?? 'repo') !== 'repo') {
@@ -116,6 +248,7 @@ export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const findings = [
     ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
     ...collectValidatorOwnedOutsideTreeFindings(prepared.selectedPaths),
+    ...collectShimCompatFindings(prepared.selectedPaths, prepared.fileContentsByPath),
   ].sort(sortByPathThenCode);
 
   return {
