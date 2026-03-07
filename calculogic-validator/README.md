@@ -8,7 +8,7 @@
 
 This is the intended target structure for the validator suite as refactors continue.
 Some folders and files shown below may not exist yet in the current state.
-Suite-core migration into `src/core/` has started; flat `src/*.mjs` suite-core paths may be temporary compatibility shims during this transition.
+Suite-core canonical modules are owned under `src/core/`; `src/` is reserved for shared infra boundaries (for example `src/index.mjs`) rather than root-level shim forwarders.
 The naming reflects modular suite-core boundaries, owned validator slice roots (`naming/` and `tree/`), configurable policy surfaces, and shared tools ownership.
 
 ```text
@@ -308,4 +308,4 @@ Tiny `sourceSnapshot` example shape:
 
 ## 10) Compatibility note
 
-Legacy imports from `src/tree-structure-advisor.host.mjs` and `src/tree-structure-advisor.logic.mjs` remain supported as thin compatibility shims to the canonical `tree/src/` slice boundary.
+Legacy root tree shim imports are retired. Use the canonical tree slice entrypoint `tree/src/tree-structure-advisor.host.mjs` (or package subpath `@calculogic/validator/tree`) and canonical logic module `tree/src/tree-structure-advisor.logic.mjs`.

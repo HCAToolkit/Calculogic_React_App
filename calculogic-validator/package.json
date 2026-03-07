@@ -18,9 +18,9 @@
   ],
   "exports": {
     ".": "./src/index.mjs",
-    "./runner": "./src/validator-runner.logic.mjs",
-    "./registry": "./src/validator-registry.knowledge.mjs",
-    "./scopes": "./src/validator-scopes.runtime.mjs",
+    "./runner": "./src/core/validator-runner.logic.mjs",
+    "./registry": "./src/core/validator-registry.knowledge.mjs",
+    "./scopes": "./src/core/validator-scopes.runtime.mjs",
     "./naming": "./naming/src/naming-validator.host.mjs",
     "./tree": "./tree/src/tree-structure-advisor.host.mjs"
   },
