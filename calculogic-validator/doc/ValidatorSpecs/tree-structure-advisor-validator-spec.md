@@ -284,16 +284,34 @@ Example:
 
 ## Compat / Shim Health Signals (Advisory Diagnostics)
 
-Shim/compat detection is a tree-health diagnostic layer in report-first mode:
+Shim/compat detection is a tree-health diagnostic layer in report-first mode.
 
-- detect shim-like files via folder signals (`compat/`, `shims/`, `adapters/`, `bridges/`) and/or naming needles (`shim`, `compat`, `adapter`, `bridge`, `migration`)
-- treat thin flat re-export files (`export * from ...` / `export { ... } from ...` only) as a strong shim-like signal
-- recommend a discoverable surface (for example `src/compat/` or `src/compat/shims/`) only when shim-like files already exist
+V0.1.4 hardened subset:
 
-V0.0.1 implemented subset:
+- infer bounded artifact surface from path/basename only:
+  - `quality`, `docs`, `examples`, `fixtures`, `runtimeish`
+- collect structured evidence fields (do not flatten to `isShimLike` early):
+  - `artifactSurface`
+  - `matchedShimSignals.folderSignals`
+  - `matchedShimSignals.nameTokenSignals`
+  - `matchedShimSignals.thinReexportShim`
+  - `insideCompatSurface`
+  - `canonicalTargetPath`
+  - `reexportTargetCount`
+  - intentional pass-through booleans (canonical host pass-through / public entrypoint pass-through)
+- thin flat re-export files (`export * from ...` / `export { ... } from ...` only) remain the strongest/high-confidence shim signal
+- intentional pass-through entrypoints are excluded from shim debt findings:
+  - canonical `*.host.* -> sibling *.wiring.*` pass-through in owned slices
+  - `calculogic-validator/src/index.mjs` package/public entrypoint barrel
+- weak token/path-only shim signals on non-runtime surfaces (`quality/docs/examples/fixtures`) are suppressed from shim-debt output
+- runtimeish token/path-only shim signals remain info-only observability
 
-- `TREE_SHIM_SURFACE_PRESENT` (`info`): emitted for deterministic shim-like paths with signal details
-- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`): emitted when shim-like paths are not under a discoverable compat/shims surface
+Implemented codes:
+
+- `TREE_SHIM_SURFACE_PRESENT` (`info`):
+  - emitted for thin re-export shim evidence
+  - emitted for runtimeish token/path-only signals as low-confidence observability
+- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`): emitted only when thin re-export shim evidence exists and the path is outside a compat/shims surface
 - `TREE_SHIM_SCATTERED`: reserved for a later deterministic slice
 
 Constraints:
@@ -367,9 +385,9 @@ Suggested codes (V0.0.1):
 - `TREE_MISSING_NAMESPACE_ROOT`
 - `TREE_SUBSYSTEM_SCAFFOLD_ASYMMETRY`
 - `TREE_TOOL_SURFACE_MIX`
-- `TREE_SHIM_SURFACE_PRESENT` (`info`) — implemented
+- `TREE_SHIM_SURFACE_PRESENT` (`info`) — implemented (thin-reexport high-confidence + runtimeish token-only info)
 - `TREE_SHIM_SCATTERED` (`warn`/`info`) — planned
-- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`) — implemented
+- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`) — implemented (thin re-export evidence only)
 - `TREE_SHARED_LANE_FIRST_PARTITION_PRESENT` (`info`)
 - `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (`warn`/`info`)
 - `TREE_SHARED_SEMANTIC_ROOT_RECOMMENDED` (`warn`/`info`)

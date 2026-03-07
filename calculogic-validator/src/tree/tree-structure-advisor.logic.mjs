@@ -26,6 +26,7 @@ const SHIM_FOLDER_SIGNALS = new Set(['compat', 'shims', 'adapters', 'bridges']);
 const SHIM_NAME_TOKEN_SIGNALS = new Set(['shim', 'compat', 'adapter', 'bridge', 'migration']);
 const SHIM_SURFACE_SEGMENT_SIGNALS = new Set(['compat', 'shims']);
 const SHIM_RELEVANT_FILE_EXTENSIONS = new Set(['.mjs', '.js', '.cjs', '.ts', '.tsx', '.jsx']);
+const NON_RUNTIME_SHIM_SUPPRESSED_SURFACES = new Set(['quality', 'docs', 'examples', 'fixtures']);
 
 const sortByPathThenCode = (left, right) => {
   const byPath = left.path.localeCompare(right.path);
@@ -45,6 +46,39 @@ const tokenizeBasename = (basename) =>
     .replace(/\.[^.]+$/u, '')
     .split(/[^a-z0-9]+/u)
     .filter(Boolean);
+
+const inferArtifactSurface = (relativePath) => {
+  const normalizedPath = relativePath.toLowerCase();
+  const segments = normalizedPath.split('/').filter(Boolean);
+  const basename = segments.at(-1) ?? '';
+
+  if (
+    segments.includes('test') ||
+    segments.includes('tests') ||
+    segments.includes('__tests__') ||
+    /\.(?:test|spec)\.[^.]+$/u.test(basename)
+  ) {
+    return 'quality';
+  }
+
+  if (segments.includes('doc') || segments.includes('docs') || basename.endsWith('.md')) {
+    return 'docs';
+  }
+
+  if (segments.includes('examples') || segments.includes('demo')) {
+    return 'examples';
+  }
+
+  if (
+    segments.includes('fixtures') ||
+    segments.includes('mocks') ||
+    segments.includes('benchmarks')
+  ) {
+    return 'fixtures';
+  }
+
+  return 'runtimeish';
+};
 
 const collectPathShimSignals = (relativePath) => {
   const segments = relativePath.split('/').filter(Boolean);
@@ -99,6 +133,43 @@ const parseThinReexportShim = (rawContent) => {
   };
 };
 
+const detectCanonicalHostPassThrough = (relativePath, thinReexportSignal) => {
+  if (!thinReexportSignal || thinReexportSignal.reexportTargetCount !== 1) {
+    return false;
+  }
+
+  const basename = path.posix.basename(relativePath);
+  if (!basename.includes('.host.')) {
+    return false;
+  }
+
+  const expectedSiblingWiringTarget = `./${basename.replace('.host.', '.wiring.')}`;
+  return thinReexportSignal.canonicalTargetPath === expectedSiblingWiringTarget;
+};
+
+const detectPublicEntrypointPassThrough = (relativePath, thinReexportSignal) =>
+  relativePath === 'calculogic-validator/src/index.mjs' && thinReexportSignal !== null;
+
+const collectShimEvidence = (relativePath, rawContent) => {
+  const shimSignals = collectPathShimSignals(relativePath);
+  const thinReexportSignal = parseThinReexportShim(rawContent);
+  const surface = inferArtifactSurface(relativePath);
+  const isCanonicalHostPassThrough = detectCanonicalHostPassThrough(relativePath, thinReexportSignal);
+  const isPublicEntryPointPassThrough = detectPublicEntrypointPassThrough(relativePath, thinReexportSignal);
+
+  return {
+    surface,
+    folderSignals: shimSignals.folderSignals,
+    nameTokenSignals: shimSignals.basenameTokens,
+    insideCompatSurface: shimSignals.insideCompatSurface,
+    thinReexportShim: thinReexportSignal !== null,
+    canonicalTargetPath: thinReexportSignal?.canonicalTargetPath,
+    reexportTargetCount: thinReexportSignal?.reexportTargetCount ?? 0,
+    isCanonicalHostPassThrough,
+    isPublicEntryPointPassThrough,
+  };
+};
+
 const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
   const findings = [];
 
@@ -108,38 +179,53 @@ const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
       continue;
     }
 
-    const shimSignals = collectPathShimSignals(relativePath);
-    const thinReexportSignal = parseThinReexportShim(fileContentsByPath[relativePath]);
-    const isShimLike =
-      shimSignals.folderSignals.length > 0 ||
-      shimSignals.basenameTokens.length > 0 ||
-      thinReexportSignal !== null;
+    const evidence = collectShimEvidence(relativePath, fileContentsByPath[relativePath]);
+    const hasWeakSignalOnly =
+      !evidence.thinReexportShim &&
+      (evidence.folderSignals.length > 0 || evidence.nameTokenSignals.length > 0);
+    const isIntentionalPassThrough =
+      evidence.isCanonicalHostPassThrough || evidence.isPublicEntryPointPassThrough;
+    const isShimLike = evidence.thinReexportShim || hasWeakSignalOnly;
 
     if (!isShimLike) {
       continue;
     }
+
+    if (isIntentionalPassThrough) {
+      continue;
+    }
+
+    if (hasWeakSignalOnly && NON_RUNTIME_SHIM_SUPPRESSED_SURFACES.has(evidence.surface)) {
+      continue;
+    }
+
+    const matchedShimSignals = {
+      folderSignals: evidence.folderSignals,
+      nameTokenSignals: evidence.nameTokenSignals,
+      thinReexportShim: evidence.thinReexportShim,
+    };
 
     findings.push({
       code: 'TREE_SHIM_SURFACE_PRESENT',
       severity: 'info',
       path: relativePath,
       classification: 'advisory-structure',
-      message:
-        'Shim/compat signals are present for this path; maintain a discoverable and deterministic compatibility surface while cleanup is pending.',
+      message: evidence.thinReexportShim
+        ? 'Thin re-export shim signal detected; maintain a discoverable and deterministic compatibility surface while cleanup is pending.'
+        : 'Shim/compat naming/path signals are present with no thin re-export evidence; treat this as low-confidence observability, not immediate shim debt.',
       ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
       details: {
-        matchedShimSignals: {
-          folderSignals: shimSignals.folderSignals,
-          nameTokenSignals: shimSignals.basenameTokens,
-          thinReexportShim: thinReexportSignal?.isThinReexportShim ?? false,
-        },
-        canonicalTargetPath: thinReexportSignal?.canonicalTargetPath,
-        reexportTargetCount: thinReexportSignal?.reexportTargetCount,
-        insideCompatSurface: shimSignals.insideCompatSurface,
+        artifactSurface: evidence.surface,
+        matchedShimSignals,
+        insideCompatSurface: evidence.insideCompatSurface,
+        canonicalTargetPath: evidence.canonicalTargetPath,
+        reexportTargetCount: evidence.reexportTargetCount,
+        suppressedAsIntentionalPassThrough: false,
+        suppressedBySurfaceContext: false,
       },
     });
 
-    if (shimSignals.insideCompatSurface) {
+    if (!evidence.thinReexportShim || evidence.insideCompatSurface) {
       continue;
     }
 
@@ -152,13 +238,13 @@ const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
         'Shim-like path is outside a discoverable compat/shims surface; consider consolidating compat entries to support later cleanup work.',
       ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
       details: {
-        matchedShimSignals: {
-          folderSignals: shimSignals.folderSignals,
-          nameTokenSignals: shimSignals.basenameTokens,
-          thinReexportShim: thinReexportSignal?.isThinReexportShim ?? false,
-        },
-        canonicalTargetPath: thinReexportSignal?.canonicalTargetPath,
-        insideCompatSurface: shimSignals.insideCompatSurface,
+        artifactSurface: evidence.surface,
+        matchedShimSignals,
+        insideCompatSurface: evidence.insideCompatSurface,
+        canonicalTargetPath: evidence.canonicalTargetPath,
+        reexportTargetCount: evidence.reexportTargetCount,
+        suppressedAsIntentionalPassThrough: false,
+        suppressedBySurfaceContext: false,
       },
     });
   }
