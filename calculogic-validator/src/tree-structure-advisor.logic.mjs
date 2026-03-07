@@ -1,1 +1,1 @@
-export * from './tree/tree-structure-advisor.logic.mjs';
+export * from '../tree/src/tree-structure-advisor.logic.mjs';

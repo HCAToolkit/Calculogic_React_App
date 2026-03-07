@@ -26,7 +26,7 @@ This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-M
   - separation of mixed lanes where mixing predicts growth pain
   - normalization of repeated validator-subtree scaffolds (for future validators)
 - Shim/compat advisory hardening with bounded evidence precedence and intentional pass-through carveouts, including package/public barrel pass-through (`calculogic-validator/src/index.mjs`) with `export * from`, `export * as <name> from`, and optional `export { ... } from` forms
-- Weak token/path-only shim observability may suppress detector-implementation modules inside `calculogic-validator/src/tree/` when `shim` appears only as part of the detector semantic name (for example `*shim-detection*`) and no thin re-export evidence exists
+- Weak token/path-only shim observability may suppress detector-implementation modules inside `calculogic-validator/tree/src/` when `shim` appears only as part of the detector semantic name (for example `*shim-detection*`) and no thin re-export evidence exists
 
 ### Out of scope (V0.1.5)
 

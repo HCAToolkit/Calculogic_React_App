@@ -9,6 +9,7 @@
   },
   "files": [
     "src/**",
+    "tree/**",
     "bin/**",
     "scripts/**",
     "README.md",
@@ -20,7 +21,7 @@
     "./registry": "./src/validator-registry.knowledge.mjs",
     "./scopes": "./src/validator-scopes.runtime.mjs",
     "./naming": "./src/naming/naming-validator.host.mjs",
-    "./tree": "./src/tree/tree-structure-advisor.host.mjs"
+    "./tree": "./tree/src/tree-structure-advisor.host.mjs"
   },
   "bin": {
     "calculogic-validate": "./bin/calculogic-validate.mjs",

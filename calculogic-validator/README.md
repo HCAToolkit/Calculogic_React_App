@@ -9,7 +9,7 @@
 This is the intended target structure for the validator suite as refactors continue.
 Some folders and files shown below may not exist yet in the current state.
 Suite-core migration into `src/core/` has started; flat `src/*.mjs` suite-core paths may be temporary compatibility shims during this transition.
-The naming reflects modular suite-core boundaries, slice roots (`naming/` and `tree/` under `src/`), configurable policy surfaces, and shared tools ownership.
+The naming reflects modular suite-core boundaries, owned validator slice roots (`naming/` and `tree/`), configurable policy surfaces, and shared tools ownership.
 
 ```text
 calculogic-validator/
@@ -50,11 +50,6 @@ calculogic-validator/
 │  ├─ registries/
 │  │  └─ _builtin/
 │  │     └─ scope-profiles.registry.json
-│  ├─ tree/
-│  │  ├─ tree-structure-advisor.host.mjs
-│  │  ├─ tree-structure-advisor.wiring.mjs
-│  │  ├─ tree-structure-advisor.logic.mjs
-│  │  └─ tree-structure-advisor.contracts.mjs
 │  └─ compat/                         # SHIMS ONLY (policy-bound)
 │     └─ (temporary files only)        # e.g. old-path re-exports during refactor
 ├─ test/                              # suite-core tests + suite integration tests
@@ -62,6 +57,16 @@ calculogic-validator/
 │  ├─ integration/                    # validate-all.targets.integration, etc.
 │  ├─ fixtures/                       # suite-wide fixtures (only if truly shared)
 │  └─ compat/                         # optional: tests that assert shims are tracked/overdue/etc.
+├─ tree/                              # tree validator scope root (mini-scope)
+│  ├─ README.md                       # optional (what lives here)
+│  ├─ scripts/                        # optional (suite scripts can delegate here)
+│  ├─ src/
+│  │  ├─ tree-structure-advisor.host.mjs
+│  │  ├─ tree-structure-advisor.wiring.mjs
+│  │  ├─ tree-structure-advisor.logic.mjs
+│  │  ├─ tree-structure-advisor.contracts.mjs
+│  │  └─ tree-shim-detection.logic.mjs
+│  └─ test/                           # optional tree-only tests (if split from suite tests)
 ├─ naming/                            # naming validator scope root (mini-scope)
 │  ├─ README.md                       # optional (what lives here)
 │  ├─ scripts/                        # optional (suite scripts can delegate here)
@@ -303,4 +308,4 @@ Tiny `sourceSnapshot` example shape:
 
 ## 10) Compatibility note
 
-Legacy imports from `src/tree-structure-advisor.host.mjs` and `src/tree-structure-advisor.logic.mjs` remain supported as thin compatibility shims to the canonical `src/tree/` slice boundary.
+Legacy imports from `src/tree-structure-advisor.host.mjs` and `src/tree-structure-advisor.logic.mjs` remain supported as thin compatibility shims to the canonical `tree/src/` slice boundary.

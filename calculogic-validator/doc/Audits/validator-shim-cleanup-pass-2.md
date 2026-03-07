@@ -43,7 +43,7 @@ No broader refactor or compat-surface redesign was performed.
 
 1. `calculogic-validator/src/index.mjs`
 2. `calculogic-validator/src/naming/naming-validator.host.mjs`
-3. `calculogic-validator/src/tree/tree-structure-advisor.host.mjs`
+3. `calculogic-validator/tree/src/tree-structure-advisor.host.mjs`
 
 ### Still-test-referenced shim-debt files left for later passes (unchanged)
 

@@ -127,7 +127,7 @@ export const parsePublicEntrypointBarrelPassThrough = (relativePath, rawContent)
   }
 
   const hasCanonicalTargetOnly = barrelTargets.every((targetPath) =>
-    /^(?:\.\/)?(?:core|naming|tree)\//u.test(targetPath),
+    /^(?:\.\/(?:core|naming)\/|\.\.\/tree\/src\/|(?:\.\/)?tree\/)/u.test(targetPath),
   );
   if (!hasCanonicalTargetOnly) {
     return null;
@@ -164,7 +164,7 @@ export const collectShimEvidence = (relativePath, rawContent) => {
   const isCanonicalHostPassThrough = detectCanonicalHostPassThrough(relativePath, thinReexportSignal);
   const isPublicEntryPointPassThrough = detectPublicEntrypointPassThrough(relativePath, rawContent);
   const isShimDetectorImplementationModule =
-    relativePath.startsWith('calculogic-validator/src/tree/') &&
+    relativePath.startsWith('calculogic-validator/tree/src/') &&
     basenameTokens.includes('shim') &&
     basenameTokens.some((token) => SHIM_DETECTOR_IMPLEMENTATION_TOKENS.has(token));
 
