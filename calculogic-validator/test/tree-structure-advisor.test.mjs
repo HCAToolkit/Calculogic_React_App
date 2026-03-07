@@ -113,6 +113,8 @@ test('tree-structure-advisor detects flat thin re-export shim deterministically'
       '../calculogic-validator/src/core/validator-runner.logic.mjs',
     );
     assert.equal(shimSurface.details.insideCompatSurface, false);
+    assert.equal('suppressedAsIntentionalPassThrough' in shimSurface.details, false);
+    assert.equal('suppressedBySurfaceContext' in shimSurface.details, false);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
