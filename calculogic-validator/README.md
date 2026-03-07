@@ -9,7 +9,7 @@
 This is the intended target structure for the validator suite as refactors continue.
 Some folders and files shown below may not exist yet in the current state.
 Suite-core migration into `src/core/` has started; flat `src/*.mjs` suite-core paths may be temporary compatibility shims during this transition.
-The naming reflects modular suite-core boundaries, slice roots (`naming/` now and `tree/` planned), configurable policy surfaces, and shared tools ownership.
+The naming reflects modular suite-core boundaries, slice roots (`naming/` and `tree/` under `src/`), configurable policy surfaces, and shared tools ownership.
 
 ```text
 calculogic-validator/
@@ -50,6 +50,11 @@ calculogic-validator/
 │  ├─ registries/
 │  │  └─ _builtin/
 │  │     └─ scope-profiles.registry.json
+│  ├─ tree/
+│  │  ├─ tree-structure-advisor.host.mjs
+│  │  ├─ tree-structure-advisor.wiring.mjs
+│  │  ├─ tree-structure-advisor.logic.mjs
+│  │  └─ tree-structure-advisor.contracts.mjs
 │  └─ compat/                         # SHIMS ONLY (policy-bound)
 │     └─ (temporary files only)        # e.g. old-path re-exports during refactor
 ├─ test/                              # suite-core tests + suite integration tests
@@ -76,10 +81,6 @@ calculogic-validator/
 │     ├─ naming-validator-scope-contract.test.mjs
 │     ├─ naming-missing-role.test.mjs
 │     └─ fixtures/                    # naming-only fixtures (if any)
-├─ tree/                              # future tree-advisor validator scope root
-│  ├─ scripts/
-│  ├─ src/
-│  └─ test/
 └─ tools/
    └─ report-capture/
       ├─ package.json
@@ -285,3 +286,5 @@ Tiny `sourceSnapshot` example shape:
 ## 10) Compatibility note
 
 Legacy imports from `src/validators/naming-validator.logic.mjs` remain supported via a thin re-export shim to the canonical naming validator host entrypoint.
+
+Legacy imports from `src/tree-structure-advisor.host.mjs` and `src/tree-structure-advisor.logic.mjs` remain supported as thin compatibility shims to the canonical `src/tree/` slice boundary.

@@ -7,6 +7,10 @@ import * as canonicalRegistry from '../src/core/validator-registry.knowledge.mjs
 import * as legacyRegistryShim from '../src/validator-registry.knowledge.mjs';
 import * as canonicalScopes from '../src/core/validator-scopes.runtime.mjs';
 import * as legacyScopesShim from '../src/validator-scopes.runtime.mjs';
+import * as canonicalTreeHost from '../src/tree/tree-structure-advisor.host.mjs';
+import * as legacyTreeHostShim from '../src/tree-structure-advisor.host.mjs';
+import * as canonicalTreeLogic from '../src/tree/tree-structure-advisor.logic.mjs';
+import * as legacyTreeLogicShim from '../src/tree-structure-advisor.logic.mjs';
 
 test('validator runner core module and legacy shim expose the same runtime API', () => {
   assert.equal(typeof canonicalRunner.runValidatorRunner, 'function');
@@ -29,5 +33,23 @@ test('validator scopes core module and legacy shim expose the same runtime API',
   assert.equal(
     legacyScopesShim.getValidatorScopeProfile,
     canonicalScopes.getValidatorScopeProfile,
+  );
+});
+
+test('tree advisor host module and legacy shim expose the same runtime API', () => {
+  assert.equal(typeof canonicalTreeHost.runTreeStructureAdvisor, 'function');
+  assert.equal(typeof legacyTreeHostShim.runTreeStructureAdvisor, 'function');
+  assert.equal(
+    legacyTreeHostShim.runTreeStructureAdvisor,
+    canonicalTreeHost.runTreeStructureAdvisor,
+  );
+});
+
+test('tree advisor logic module and legacy shim expose the same runtime API', () => {
+  assert.equal(typeof canonicalTreeLogic.runTreeStructureAdvisor, 'function');
+  assert.equal(typeof legacyTreeLogicShim.runTreeStructureAdvisor, 'function');
+  assert.equal(
+    legacyTreeLogicShim.runTreeStructureAdvisor,
+    canonicalTreeLogic.runTreeStructureAdvisor,
   );
 });
