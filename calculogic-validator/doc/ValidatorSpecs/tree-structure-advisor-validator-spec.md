@@ -11,6 +11,16 @@ This document defines a **Tree Structure Advisor** validator slice whose output 
 
 This slice exists to reduce “tree drift” as additional validators beyond naming are added.
 
+### Suite-core vs owned-slice boundary principle
+
+Tree advisor structural reasoning also includes an ownership-boundary principle aligned with current repo architecture:
+
+- `calculogic-validator/src/**` is suite-core/shared infrastructure and compat-boundary surface
+- validator-owned slices with their own internal growth path belong in slice roots outside suite-core `src/` (for example `calculogic-validator/naming/src/**`, `calculogic-validator/tree/src/**`)
+- continued owned-slice growth inside suite-core `src/` is structural drift because it predicts avoidable future extraction/shim/refactor debt
+
+This principle is advisory and architecture-oriented; it does not mean one universal folder layout is required for every repo.
+
 ## Suite Contract Alignment
 
 This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md): the validator suite is modular, configurable, policy-driven, and report-first by default. Tree advisor V0.1.5 remains report-only even though additional policy modes exist suite-wide.
@@ -61,6 +71,8 @@ This validator treats **folders as scope roots** (host-like boundaries), and fil
   - derived from `<semantic-name>` grouping (e.g., `validator-config.*`, `naming-rule-*`, `report-capture.*`)
 
 Goal: surface emergent patterns and recommend a structure that makes those patterns obvious.
+
+Boundary note (canonical_target for this slice): tree validator ownership is under `calculogic-validator/tree/src/**`. Legacy flat suite-core paths such as `calculogic-validator/src/tree-structure-advisor.*.mjs` are compatibility wrappers only, not canonical ownership.
 
 ---
 
@@ -206,6 +218,17 @@ Detect when one validator subsystem has a rich internal namespace (`rules/`, `re
 
 Detect when subpackages (e.g., `tools/report-capture`) contain mixed surfaces that should remain isolated from library code.
 
+### 5) Owned-slice boundary drift
+
+Detect when validator-owned subsystem growth is accumulating under suite-core `calculogic-validator/src/**` instead of an owned slice root.
+
+Signals may include subsystem-local host/wiring/logic files, registries, tests, docs, scripts, and scaffolds that indicate package-like internal growth.
+
+Advisory intent:
+
+- prefer earlier extraction to an owned slice root before additional files and shims accumulate
+- preserve suite-core as shared infra/compat boundary rather than long-term home for owned validator internals
+
 All scoring thresholds MUST be explicit constants in code and reported in `details`.
 
 ### Explicit thresholds (V0.0.1 defaults)
@@ -283,6 +306,28 @@ Example:
 - Suggested target:
   - `src/shared/selection/selection.logic.ts`
   - `src/shared/selection/selection.knowledge.ts`
+
+### 4) Owned slice extraction recommendation (advisory-only)
+
+Intent:
+
+- when a validator subsystem is growing like an owned slice inside suite-core `src/**`, recommend extraction to a dedicated slice root
+- keep recommendations report-first and bounded to structural/ownership guidance
+
+Pattern examples (conceptual):
+
+- from: `calculogic-validator/src/<subsystem>/**`
+- to: `calculogic-validator/<subsystem>/src/**`
+
+Current architecture alignment examples:
+
+- canonical naming slice root: `calculogic-validator/naming/src/**`
+- canonical tree slice root: `calculogic-validator/tree/src/**`
+
+Non-claim boundary:
+
+- this spec section defines advisory direction and recommendation shape
+- it does not claim current runtime fully enforces deterministic owned-slice boundary detection yet
 
 ## Compat / Shim Health Signals (Advisory Diagnostics)
 
@@ -393,6 +438,8 @@ Suggested codes (V0.0.1):
 - `TREE_SHARED_LANE_FIRST_PARTITION_PRESENT` (`info`)
 - `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (`warn`/`info`)
 - `TREE_SHARED_SEMANTIC_ROOT_RECOMMENDED` (`warn`/`info`)
+- `TREE_OWNED_SLICE_BOUNDARY_DRIFT` (`warn`/`info`) — future advisory direction
+- `TREE_OWNED_SLICE_EXTRACTION_RECOMMENDED` (`warn`/`info`) — future advisory direction
 
 ---
 
@@ -445,7 +492,7 @@ Suggested entrypoints (aligning to existing patterns):
 - `npm run validate:tree` (defaults to `--scope=repo`)
 - `npm run validate:tree -- --scope=app`
 - `npm run validate:tree -- --scope=validator`
-- `npm run validate:tree -- --scope=app --target calculogic-validator/src`
+- `npm run validate:tree -- --scope=app --target calculogic-validator/tree/src`
 
 Npm forwarding requirement remains: flags must be passed after `--`.
 
