@@ -131,15 +131,15 @@ Classification: Illustrative
 
 ### 9.1 Explicit role slot wins over role-like semantic token
 
-- Filename: `order.role-summary.view.tsx`
-- Interpreted canonical dominant role slot: `.view.tsx`
+- Filename: `order.role-summary.logic.mjs`
+- Interpreted canonical dominant role slot: `.logic.mjs`
 - `role-summary` in semantic name is treated as semantic reference text, not a competing canonical role.
 
 ### 9.2 Role-like folder token treated as contextual
 
-- Path: `components/view/order-details.logic.mjs`
+- Path: `components/host/order-details.logic.mjs`
 - Filename canonical dominant role slot: `.logic.mjs`
-- Folder token `view` is contextual and does not supersede filename role-slot ownership.
+- Folder token `host` is role-like context and does not supersede filename role-slot ownership.
 
 ### 9.3 Semantic name is important but subordinate to explicit canonical role
 

@@ -12,7 +12,7 @@ This spec intentionally formalizes **model rules**, not runtime rewrites. Existi
 
 ## Terminology
 
-- **Canonical entities**: Core nouns that represent canonical_source policy meaning in the model.
+- **Canonical entities**: Core nouns that represent canonical policy meaning in the model.
 - **Perspective/projection registry**: A registry shape that emphasizes one view over shared canonical meaning (for example grouped policy view or allowed-surface view).
 - **Normalization/resolution layer**: Deterministic logic that compiles one or more registry inputs into runtime-ready interpretation.
 - **Slice-local registry surface**: Registry payloads owned by a single validator slice and not yet elevated to suite-shared ownership.
@@ -65,7 +65,7 @@ Contract rules:
 - Not every perspective must exist in code to be part of this model.
 - Perspective registries are contract-valid even when introduced incrementally.
 - Perspective registries must reference canonical meaning through explicit normalization/resolution rules.
-- Perspective registries must not become shadow canonical_source stores through undocumented duplication.
+- Perspective registries must not become shadow canonical stores through undocumented duplication.
 
 ## Normalization/resolution
 
@@ -140,8 +140,8 @@ Expected future interconnection patterns:
 
 Current validator artifacts map into this model as follows:
 
-- **Naming built-in categories registry** (`naming/src/registries/_builtin/categories.registry.json`): canonical entity vocabulary payload (category-focused canonical_source within naming scope).
-- **Naming built-in roles registry** (`naming/src/registries/_builtin/roles.registry.json`): canonical entity payload with role/category assignments and grouped perspectives.
+- **Naming built-in categories registry** (`naming/src/registries/_builtin/categories.registry.json`): canonical entity vocabulary payload (category-focused canonical source within naming scope).
+- **Naming built-in roles registry** (`naming/src/registries/_builtin/roles.registry.json`): grouped storage payload (`rolesByCategory`) for role/category policy entries; runtime normalization resolves this grouped storage shape into canonical flattened role entries for validator interpretation.
 - **Suite scope-profiles registry** (`src/registries/_builtin/scope-profiles.registry.json`): suite-level perspective registry for scope surface targeting used across runner/slice execution contexts.
 - **Naming registry-state normalization logic** (`naming/src/registries/registry-state.logic.mjs`): normalization/resolution contract implementation for active registry-state selection and deterministic digest/state handling.
 - **Suite validator registry composition** (`src/core/validator-registry.knowledge.mjs`): suite-level composition registry for slice runners/entrypoints.
