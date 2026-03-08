@@ -140,12 +140,12 @@ Path example: `validators/host/naming-role-index.logic.mjs`
 
 ### 8.3 Semantic grouping with explicit role slot
 
-Filename example: `role-catalog-family-map.report.mjs`
+Filename example: `role-catalog-family-map.contracts.mjs`
 
-- Canonical role: `report`
+- Canonical role: `contracts`
 - Semantic name: `role-catalog-family-map`
 - Optional semantic-family-style interpretation: `catalog` or `family-map` grouping (optional and policy-dependent)
-- Why role-like tokens are not reclassified: `role` token is semantic reference content; explicit `.report.mjs` slot remains canonical ownership declaration.
+- Why role-like tokens are not reclassified: `role` token is semantic reference content; explicit `.contracts.mjs` slot remains canonical ownership declaration.
 
 ## 9) Ambiguity Handling
 
