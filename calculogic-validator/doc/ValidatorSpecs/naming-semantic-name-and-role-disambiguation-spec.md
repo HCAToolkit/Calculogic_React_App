@@ -130,12 +130,12 @@ Classification: Illustrative
 
 ### 8.2 Role-like folder token with explicit role slot
 
-Path example: `validators/view/naming-role-index.logic.mjs`
+Path example: `validators/host/naming-role-index.logic.mjs`
 
 - Canonical role: `logic` (from explicit `.logic.mjs` slot)
 - Semantic name: `naming-role-index`
 - Optional semantic-family-style interpretation: `naming` family with `role-index` grouping (optional)
-- Folder context: `view` is role-like but contextual in this interpretation lane
+- Folder context: `host` is role-like but contextual in this interpretation lane
 - Why role-like tokens are not reclassified: explicit role slot remains authority; folder token and semantic-name token are contextual/semantic.
 
 ### 8.3 Semantic grouping with explicit role slot
