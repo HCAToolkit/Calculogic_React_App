@@ -86,7 +86,8 @@ calculogic-validator/
 │  │  │  ├─ naming-cli-usage.logic.mjs
 │  │  │  └─ naming-report-builder.logic.mjs
 │  │  ├─ health/
-│  │  │  └─ naming-health-check.logic.mjs
+│  │  │  ├─ naming-health-check.logic.mjs
+│  │  │  └─ naming-health-check.host.mjs
 │  │  ├─ registries/                  # *.knowledge.*
 │  │  │  └─ _builtin/
 │  │  │     ├─ roles.registry.json
