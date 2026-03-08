@@ -52,6 +52,36 @@ test('tree-structure-advisor is conservative for normal known repository shape',
   }
 });
 
+
+test('tree-structure-advisor known roots come from bounded registry policy without behavior drift', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-known-roots-registry-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'experiments'), { recursive: true });
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const advisory = result.findings.find(
+      (finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER' && finding.path === 'experiments',
+    );
+
+    assert.ok(advisory);
+    assert.deepEqual(advisory.details.knownRoots, [
+      'bin',
+      'calculogic-validator',
+      'doc',
+      'docs',
+      'public',
+      'scripts',
+      'src',
+      'test',
+      'tools',
+    ]);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor findings are deterministic and summary-stable', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-deterministic-'));
 
