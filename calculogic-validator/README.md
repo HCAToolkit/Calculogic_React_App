@@ -38,6 +38,7 @@ calculogic-validator/
 │  │  ├─ validator-exit-code.logic.mjs
 │  │  ├─ cli/
 │  │  │  ├─ validator-cli-output.logic.mjs
+│  │  │  ├─ validator-cli-scopes.logic.mjs
 │  │  │  ├─ validator-cli-targets.logic.mjs
 │  │  │  └─ validator-cli-usage.logic.mjs
 │  │  ├─ validator-report.contracts.mjs
