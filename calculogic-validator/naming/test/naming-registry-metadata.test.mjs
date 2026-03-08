@@ -24,6 +24,7 @@ test('runNamingValidator returns registry metadata envelope', () => {
 test('prepareNamingRuntimeInputs exposes prepared dependencies and stable registry metadata', () => {
   const prepared = prepareNamingRuntimeInputs({});
   assert.ok(prepared.reportableExtensions instanceof Set);
+  assert.ok(prepared.reportableRootFiles instanceof Set);
   assert.ok(prepared.namingRolesRuntime.roleMetadata instanceof Map);
   assert.ok(prepared.namingRolesRuntime.activeRoles instanceof Set);
   assert.ok(Array.isArray(prepared.namingRolesRuntime.roleSuffixes));

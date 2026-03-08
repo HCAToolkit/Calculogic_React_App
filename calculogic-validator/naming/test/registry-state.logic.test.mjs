@@ -56,6 +56,7 @@ test('resolver contract shape remains stable', () => {
     'registrySource',
     'registryState',
     'reportableExtensions',
+    'reportableRootFiles',
     'roles',
   ]);
   assert.deepEqual(Object.keys(result.registryDigests).sort((a, b) => a.localeCompare(b)), [
@@ -121,8 +122,19 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
     .map((value) => value.trim())
     .sort((left, right) => left.localeCompare(right));
 
+  const builtinRootFilesRegistry = JSON.parse(
+    fs.readFileSync(
+      path.join(REGISTRY_MODULE_ROOT, '_builtin', 'reportable-root-files.registry.json'),
+      'utf8',
+    ),
+  );
+  const expectedRootFiles = [...new Set(builtinRootFilesRegistry.reportableRootFiles)]
+    .map((value) => value.trim())
+    .sort((left, right) => left.localeCompare(right));
+
   assert.deepEqual(result.roles, expectedRoles);
   assert.deepEqual(result.reportableExtensions, expectedExtensions);
+  assert.deepEqual(result.reportableRootFiles, expectedRootFiles);
 });
 
 test('registryRootDir drives builtin roles, extensions, and categories from the same _builtin root', () => {
@@ -143,11 +155,16 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       reportableExtensions: ['.tmp', '.tmp', '.alt'],
     });
 
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), {
+      reportableRootFiles: ['root-b.json', 'root-a.json', 'root-b.json'],
+    });
+
     const builtinResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
     assert.deepEqual(builtinResult.roles, [
       { role: 'temp-builtin-role', category: 'from-temp-root', status: 'active' },
     ]);
     assert.deepEqual(builtinResult.reportableExtensions, ['.alt', '.tmp']);
+    assert.deepEqual(builtinResult.reportableRootFiles, ['root-a.json', 'root-b.json']);
 
     writeJson(path.join(tempRoot, 'registry-state.json'), {
       schemaVersion: '1',
@@ -187,6 +204,10 @@ test('registryRootDir falls back to module _builtin when temp _builtin is incomp
     assert.deepEqual(
       incompleteBuiltinResult.reportableExtensions,
       moduleBuiltinResult.reportableExtensions,
+    );
+    assert.deepEqual(
+      incompleteBuiltinResult.reportableRootFiles,
+      moduleBuiltinResult.reportableRootFiles,
     );
     assert.ok(
       !incompleteBuiltinResult.roles.some((entry) => entry.role === 'incomplete-temp-role'),

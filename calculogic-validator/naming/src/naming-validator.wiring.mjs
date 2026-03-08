@@ -3,6 +3,7 @@ import { getBuiltinWalkExclusions } from './registries/naming-walk-exclusions.re
 import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
+  toReportableRootFilesSet,
 } from './naming-runtime-converters.logic.mjs';
 import {
   parseCanonicalName,
@@ -27,6 +28,7 @@ export const prepareNamingRuntimeInputs = (config) => {
 
   return {
     reportableExtensions: toReportableExtensionsSet(registryInputs.reportableExtensions),
+    reportableRootFiles: toReportableRootFilesSet(registryInputs.reportableRootFiles),
     namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
     walkExclusions: getBuiltinWalkExclusions(),
     registry: {
@@ -46,6 +48,7 @@ export const prepareNamingValidatorInputs = (
   const inScopePaths = collectRepositoryPathsRuntime(repositoryRoot, {
     scope: selectedScope,
     reportableExtensions: runtimeInputs.reportableExtensions,
+    reportableRootFiles: runtimeInputs.reportableRootFiles,
     walkExclusions: runtimeInputs.walkExclusions,
   });
   const resolvedTargets = resolveScopedTargets(repositoryRoot, targets ?? []);
@@ -75,6 +78,7 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
   return collectRepositoryPathsRuntime(rootDirectory, {
     ...options,
     reportableExtensions: options.reportableExtensions ?? runtimeInputs.reportableExtensions,
+    reportableRootFiles: options.reportableRootFiles ?? runtimeInputs.reportableRootFiles,
     walkExclusions: options.walkExclusions ?? runtimeInputs.walkExclusions,
   });
 };

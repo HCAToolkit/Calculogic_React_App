@@ -25,3 +25,6 @@ export const toNamingRolesRuntime = (rolesArray) => {
     roleSuffixes,
   };
 };
+
+
+export const toReportableRootFilesSet = (rootFilesArray) => new Set(rootFilesArray);

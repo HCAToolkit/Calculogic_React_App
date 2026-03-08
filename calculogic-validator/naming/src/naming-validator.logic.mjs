@@ -24,16 +24,14 @@ import {
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
 
-const isReportableFile = (relativePath, reportableExtensions) => {
+const isReportableFile = (relativePath, reportableExtensions, reportableRootFiles) => {
   const extension = path.extname(relativePath);
   if (reportableExtensions.has(extension)) {
     return true;
   }
 
-  return (
-    path.basename(relativePath) === 'package-lock.json' ||
-    path.basename(relativePath) === 'package.json'
-  );
+  const basename = path.basename(relativePath);
+  return reportableRootFiles.has(basename);
 };
 
 const assertPreparedReportableExtensions = (reportableExtensions) => {
@@ -43,6 +41,16 @@ const assertPreparedReportableExtensions = (reportableExtensions) => {
 
   throw new Error(
     'Naming runtime requires prepared reportableExtensions (Set) from wiring/runtime adapter.',
+  );
+};
+
+const assertPreparedReportableRootFiles = (reportableRootFiles) => {
+  if (reportableRootFiles instanceof Set) {
+    return reportableRootFiles;
+  }
+
+  throw new Error(
+    'Naming runtime requires prepared reportableRootFiles (Set) from wiring/runtime adapter.',
   );
 };
 
@@ -92,6 +100,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
   }
 
   const reportableExtensions = assertPreparedReportableExtensions(options.reportableExtensions);
+  const reportableRootFiles = assertPreparedReportableRootFiles(options.reportableRootFiles);
   const walkExclusions = assertPreparedWalkExclusions(options.walkExclusions);
   const collected = [];
 
@@ -117,7 +126,7 @@ const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {
       const absolutePath = path.join(absoluteDirectoryPath, entry.name);
       const relativePath = path.relative(rootDirectory, absolutePath);
       const normalizedPath = normalizePath(relativePath);
-      if (isReportableFile(normalizedPath, reportableExtensions)) {
+      if (isReportableFile(normalizedPath, reportableExtensions, reportableRootFiles)) {
         collected.push(normalizedPath);
       }
     }
@@ -160,6 +169,7 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
 
   const allReportablePaths = collectPathsFromRoot(rootDirectory, '.', {
     reportableExtensions: options.reportableExtensions,
+    reportableRootFiles: options.reportableRootFiles,
     walkExclusions: options.walkExclusions,
   });
 

@@ -10,6 +10,7 @@ const REQUIRED_BUILTIN_REGISTRY_FILES = [
   'categories.registry.json',
   'roles.registry.json',
   'reportable-extensions.registry.json',
+  'reportable-root-files.registry.json',
 ];
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
@@ -191,6 +192,47 @@ const loadBuiltinReportableExtensions = ({ builtinRegistryDir }) => {
   return canonicalizeExtensions(parsed.reportableExtensions);
 };
 
+const canonicalizeRootFilenames = (rootFilenames) => {
+  if (!Array.isArray(rootFilenames)) {
+    throw new Error('Invalid builtin reportable root files registry: expected an array of strings.');
+  }
+
+  const deduped = new Set();
+
+  for (const rootFilenameValue of rootFilenames) {
+    if (typeof rootFilenameValue !== 'string') {
+      throw new Error(
+        'Invalid builtin reportable root files registry: each root filename must be a non-empty string.',
+      );
+    }
+
+    const rootFilename = rootFilenameValue.trim();
+    if (!rootFilename) {
+      throw new Error(
+        'Invalid builtin reportable root files registry: each root filename must be a non-empty string.',
+      );
+    }
+
+    deduped.add(rootFilename);
+  }
+
+  return [...deduped].sort((a, b) => a.localeCompare(b));
+};
+
+const loadBuiltinReportableRootFiles = ({ builtinRegistryDir }) => {
+  const parsed = loadJsonFile(
+    path.join(builtinRegistryDir, 'reportable-root-files.registry.json'),
+  );
+
+  if (!Array.isArray(parsed?.reportableRootFiles)) {
+    throw new Error(
+      'Invalid builtin reportable root files registry: expected reportableRootFiles array.',
+    );
+  }
+
+  return canonicalizeRootFilenames(parsed.reportableRootFiles);
+};
+
 const loadRegistryState = (registryRootDir) => {
   const statePath = path.join(registryRootDir, 'registry-state.json');
   if (!fs.existsSync(statePath)) {
@@ -239,12 +281,14 @@ const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
       allowedCategories: loadBuiltinCategorySet({ builtinRegistryDir }),
     }),
     reportableExtensions: canonicalizeExtensions(extensionsRaw),
+    reportableRootFiles: loadBuiltinReportableRootFiles({ builtinRegistryDir }),
   };
 };
 
 const buildBuiltinPayload = ({ builtinRegistryDir }) => ({
   roles: loadBuiltinRolesPayload({ builtinRegistryDir }),
   reportableExtensions: loadBuiltinReportableExtensions({ builtinRegistryDir }),
+  reportableRootFiles: loadBuiltinReportableRootFiles({ builtinRegistryDir }),
 });
 
 const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
@@ -271,6 +315,7 @@ const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
   return {
     roles: canonicalizeRoles([...builtinPayload.roles, ...rolesToAppend], { allowedCategories }),
     reportableExtensions: mergedExtensions,
+    reportableRootFiles: builtinPayload.reportableRootFiles,
   };
 };
 
@@ -331,5 +376,6 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
     },
     roles: resolvedPayload.roles,
     reportableExtensions: resolvedPayload.reportableExtensions,
+    reportableRootFiles: resolvedPayload.reportableRootFiles,
   };
 };
