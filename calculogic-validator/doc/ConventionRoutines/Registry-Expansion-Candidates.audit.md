@@ -45,8 +45,6 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 ### registry-ready-now
 
-- Reportability adjunct for root package files.
-- Default scope policy source unification (`repo`).
 - Summary bucket schema extraction.
 - Tree known-root vocabulary (if tree policy churn is expected).
 
@@ -67,19 +65,19 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 Prioritized by structural ROI (clean policy ownership boundaries first):
 
-1. **Reportability adjunct policy**
-   - Move package-file reportability exceptions into deterministic registry payload.
-2. **Missing-role / extension-pattern policy**
-   - Normalize and extract `detectMissingRoleCandidate(...)` patterns.
-3. **Severity/classification defaults**
-   - Introduce stable decision outcomes and externalize finding metadata mapping.
-4. **Report summary bucket policy**
+1. **Report summary bucket policy**
    - Registry-drive summary count buckets and optional facet counters.
-5. **Rule applicability / scope default policy**
-   - Consolidate `repo` default and scope applicability toggles into one policy source.
-6. **Placement / adjacency policy (tree signals)**
-   - Externalize known roots and validator-owned placement signals.
-7. **Deeper semantic relationship metadata**
+2. **Placement / adjacency policy (tree known roots)**
+   - Externalize known top-level root vocabulary where tree advisor policy churn is expected.
+3. **Missing-role / extension-pattern policy**
+   - Normalize and extract `detectMissingRoleCandidate(...)` patterns.
+4. **Severity/classification defaults**
+   - Introduce stable decision outcomes and externalize finding metadata mapping.
+5. **Overlay capability contract expansion**
+   - Add explicit capability declarations for newly extracted registry surfaces.
+6. **Exit policy mapping**
+   - Externalize severity/classification-to-exit predicates after finding outcomes stabilize.
+7. **Deeper semantic relationship metadata (tree signals)**
    - Add bounded registries for shim signal semantics and cross-surface suppression behavior.
 
 ## Keep-hardcoded-for-now
@@ -100,33 +98,32 @@ Retain hardcoded implementation behavior for now where code is primarily **engin
 
 ## Next-step implementation slices
 
-1. **Slice A — Reportability adjunct extraction (no behavior change)**
-   - Add registry for root reportable files.
-   - Keep extension registry unchanged; merge adjunct list deterministically.
-   - Add regression tests for package files.
+1. **Slice A — Summary bucket registry**
+   - Externalize default classification buckets + optional facet families.
+   - Preserve counter sorting and unknown-classification handling behavior.
 
-2. **Slice B — Missing-role pattern registry introduction**
+2. **Slice B — Tree known-root vocabulary extraction**
+   - Extract `KNOWN_TOP_LEVEL_DIRECTORIES` into a bounded registry payload.
+   - Keep advisor decision flow and deterministic ordering behavior unchanged.
+
+3. **Slice C — Missing-role pattern registry introduction**
    - Define normalized pattern schema (`dotSegments`, `compoundExtension`, optional constraints).
    - Replace direct hardcoded branches with runtime-compiled pattern checks.
    - Verify current `module.css` semantics remain exact.
 
-3. **Slice C — Finding policy map**
+4. **Slice D — Finding policy map**
    - Introduce stable internal decision outcome IDs.
    - Move outcome→`{code,severity,classification,message,ruleRef,suggestedFix}` mapping to registry.
    - Keep rule evaluation flow unchanged.
 
-4. **Slice D — Summary bucket registry**
-   - Externalize default classification buckets + optional facet families.
-   - Preserve counter sorting and unknown-classification handling behavior.
-
-5. **Slice E — Scope/default policy unification**
-   - Create single default-scope owner (`repo`) consumed by CLI parser and runtime normalization.
-   - Add drift tests ensuring one-source default behavior.
-
-6. **Slice F — Overlay capability expansion contract**
+5. **Slice E — Overlay capability expansion contract**
    - Add deterministic overlay capability declarations for newly extracted registries.
    - Keep add-only semantics where required and explicit.
 
+6. **Slice F — Exit policy mapping extraction**
+   - Externalize ordered exit predicates after finding policy outcomes are stable.
+   - Preserve strict/legacy exception behavior semantics.
+
 7. **Slice G — Tree signal policy extraction**
    - Extract known roots first (small bounded vocabulary).
-   - Then extract validator-owned basename/shim signals after schema normalization.
+   - Then extract validator-owned basename/shim signals after schema normalization (or skip known-root step if Slice B already landed).
