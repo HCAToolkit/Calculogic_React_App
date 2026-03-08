@@ -13,6 +13,9 @@ Purpose: quick routing map for validator documentation so readers can distinguis
 - `doc/ConventionRoutines/ValidatorRuleIds-Contract.md`
   Canonical rule ID contract for stable finding identifiers and rule-to-document linkage via `ruleRef`.
 
+- `doc/ConventionRoutines/ValidatorHelperAreas-And-Reuse-Conventions.md`
+  Canonical helper-area ownership and reuse guide for current validator helper surfaces (`src/core/cli/`, `naming/src/cli/`, `naming/src/health/`) and anti-generic-folder conventions.
+
 ## 2) Canonical config contract
 
 - `doc/ValidatorSpecs/validator-config-spec.md`
