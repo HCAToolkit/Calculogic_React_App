@@ -91,6 +91,7 @@ Validator implementation assets live under top-level `calculogic-validator/`:
 
 - canonical module layout: `calculogic-validator/naming/src/{naming-validator.host.mjs,naming-validator.wiring.mjs,naming-validator.logic.mjs,naming-validator.contracts.mjs}`
 - extension-point folders: `calculogic-validator/naming/src/registries/` and `calculogic-validator/naming/src/rules/`
+- naming-owned health area: `calculogic-validator/naming/src/health/` (canonical health-check logic + runner)
 - package export barrel: `calculogic-validator/src/index.mjs`
 - stable repository-root resolver shared by CLIs: `calculogic-validator/src/core/repository-root.logic.mjs`
 - repo-local script entrypoints remain supported: `calculogic-validator/scripts/{validate-naming.mjs,validate-tree.mjs,validate-all.mjs,validator-health-check.host.mjs}`
@@ -103,6 +104,7 @@ Root `package.json` scripts remain the canonical invocation interface (`npm run 
 
 Health-check entrypoint lives at `calculogic-validator/scripts/validator-health-check.host.mjs` and is exposed via root script `npm run health:validator`.
 Stable installable health bin entrypoint lives at `calculogic-validator/bin/calculogic-validator-health.mjs`.
+Canonical naming-owned health implementation lives at `calculogic-validator/naming/src/health/naming-health-check.logic.mjs`; both entrypoints are thin wrappers.
 
 The health-check performs deterministic, CI-friendly assertions for scope profiles `repo`, `app`, `docs`, `validator`, and `system`:
 
