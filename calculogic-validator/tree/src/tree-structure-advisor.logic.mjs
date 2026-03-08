@@ -1,17 +1,8 @@
 import path from 'node:path';
 import { collectShimCompatFindings } from './tree-shim-detection.logic.mjs';
+import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots.registry.logic.mjs';
 
-const KNOWN_TOP_LEVEL_DIRECTORIES = new Set([
-  'bin',
-  'calculogic-validator',
-  'doc',
-  'docs',
-  'public',
-  'scripts',
-  'src',
-  'test',
-  'tools',
-]);
+const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
 
 const VALIDATOR_OWNED_BASENAME_PATTERNS = [
   /^naming-validator\.(logic|host|wiring|contracts)\.mjs$/u,
@@ -41,7 +32,7 @@ const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope) 
   }
 
   return topLevelDirectoryNames
-    .filter((directoryName) => !KNOWN_TOP_LEVEL_DIRECTORIES.has(directoryName))
+    .filter((directoryName) => !TREE_KNOWN_ROOTS.knownTopLevelDirectories.has(directoryName))
     .sort((left, right) => left.localeCompare(right))
     .map((directoryName) => ({
       code: 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER',
@@ -52,7 +43,9 @@ const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope) 
         'Top-level folder is outside the known project shape for this repository and may indicate structural drift.',
       ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
       details: {
-        knownRoots: Array.from(KNOWN_TOP_LEVEL_DIRECTORIES).sort((a, b) => a.localeCompare(b)),
+        knownRoots: Array.from(TREE_KNOWN_ROOTS.knownTopLevelDirectories).sort((a, b) =>
+          a.localeCompare(b),
+        ),
       },
     }));
 };
