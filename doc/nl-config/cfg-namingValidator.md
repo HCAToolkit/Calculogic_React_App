@@ -116,7 +116,7 @@ The health-check performs deterministic, CI-friendly assertions for scope profil
 
 - required scope profiles must resolve via host API
 - repeated in-process runs per scope must keep stable summary-level outputs (`totalFilesScanned`, `counts`, `codeCounts`, `specialCaseTypeCounts`, `warningRoleStatusCounts`, `warningRoleCategoryCounts`)
-- docs contract checks ensure scope documentation continues to state app/docs/validator/system split behavior
+- docs contract checks ensure scope documentation continues to state repo/app/docs/validator/system split behavior
 
 Health-check behavior is fail-fast semantics: any contract violation returns non-zero exit status.
 
