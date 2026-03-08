@@ -8,8 +8,8 @@
 
 This is the intended target structure for the validator suite as refactors continue.
 Some folders and files shown below may not exist yet in the current state.
-Suite-core canonical modules are owned under `src/core/`; `src/` is reserved for shared infra boundaries (for example `src/index.mjs`) rather than root-level shim forwarders.
-The naming reflects modular suite-core boundaries, owned validator slice roots (`naming/` and `tree/`), configurable policy surfaces, and shared tools ownership.
+Suite-core canonical modules are owned under `src/core/`; `src/` is reserved for suite-level infrastructure boundaries (for example `src/index.mjs`) rather than root-level shim forwarders.
+The naming reflects modular suite-core boundaries, owned validator slice roots (`naming/` and `tree/`), and configurable policy surfaces.
 
 ```text
 calculogic-validator/
@@ -30,12 +30,16 @@ calculogic-validator/
 │  ├─ validator-health-check.host.mjs
 │  ├─ report-capture-verify.mjs
 │  └─ report-capture-summarize.mjs
-├─ src/                               # suite-core only (shared infra + compat boundary)
+├─ src/                               # suite-core only (suite-level infra + compat boundary)
 │  ├─ index.mjs
 │  ├─ core/
 │  │  ├─ repository-root.logic.mjs
 │  │  ├─ npm-arg-forwarding-guard.logic.mjs
 │  │  ├─ validator-exit-code.logic.mjs
+│  │  ├─ cli/
+│  │  │  ├─ validator-cli-output.logic.mjs
+│  │  │  ├─ validator-cli-targets.logic.mjs
+│  │  │  └─ validator-cli-usage.logic.mjs
 │  │  ├─ validator-report.contracts.mjs
 │  │  ├─ validator-report-meta.logic.mjs
 │  │  ├─ validator-runner.logic.mjs
@@ -76,6 +80,13 @@ calculogic-validator/
 │  │  ├─ naming-validator.wiring.mjs
 │  │  ├─ naming-validator.logic.mjs
 │  │  ├─ naming-validator.contracts.mjs
+│  │  ├─ cli/
+│  │  │  ├─ naming-cli-args.logic.mjs
+│  │  │  ├─ naming-cli-runner.logic.mjs
+│  │  │  ├─ naming-cli-usage.logic.mjs
+│  │  │  └─ naming-report-builder.logic.mjs
+│  │  ├─ health/
+│  │  │  └─ naming-health-check.logic.mjs
 │  │  ├─ registries/                  # *.knowledge.*
 │  │  │  └─ _builtin/
 │  │  │     ├─ roles.registry.json
@@ -95,6 +106,12 @@ calculogic-validator/
          ├─ report-capture.contracts.mjs
          └─ report-capture.knowledge.mjs
 ```
+
+### Ownership boundaries (semantic areas)
+
+- Suite-wide shared concerns belong in semantic suite-core areas under `src/core/<area>/`.
+- Slice-owned shared concerns belong in semantic slice areas under `<slice>/src/<area>/`.
+- Prefer semantic owner areas over generic catch-all `shared/` folders when a clearer owner exists.
 
 ## 3) Quickstart (repo root)
 
