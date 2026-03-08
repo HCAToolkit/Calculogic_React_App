@@ -17,6 +17,8 @@ This spec intentionally formalizes **model rules**, not runtime rewrites. Existi
 - **Normalization/resolution layer**: Deterministic logic that compiles one or more registry inputs into runtime-ready interpretation.
 - **Slice-local registry surface**: Registry payloads owned by a single validator slice and not yet elevated to suite-shared ownership.
 - **Suite-level/shared-contract registry surface**: Registry vocabulary/contracts intended for reuse across slices.
+- **Suite-owned contract surface**: Suite-level shared vocabulary/compatibility contract surface that standardizes meaning across slices.
+- **Suite-owned implementation surface**: Suite-level shared implementation logic/helpers used to support cross-slice reuse while preserving slice-owned concrete behavior.
 
 ## Core model
 
@@ -107,6 +109,12 @@ A registry concept should be elevated when:
 - Do not duplicate canonical entities across slices without explicit derivation contracts.
 - Do not create a mega-registry that collapses unrelated policy domains.
 - Keep policy ownership explicit: slice-local where local, suite-shared where shared.
+- Treat shared contracts and shared implementation differently: contract surfaces may be elevated when shared meaning needs stabilization, while implementation surfaces should be elevated only when real slice-owned consumers/specializers exist.
+- **Normative pairing rule:** any suite-owned implementation surface must have at least one corresponding slice-owned implementation surface that consumes, specializes, or enforces it.
+- Suite-owned implementation is not a standalone destination; it exists to support slice-owned behavior and shared cross-slice contracts.
+- Promotion to suite-owned implementation without a real slice-owned consumer/specializer should generally be treated as a structural smell.
+- Shared contracts may exist before broad reuse, but shared implementation should not be promoted speculatively.
+- Suite-owned implementation should strengthen slice boundaries, not replace slice ownership.
 
 ## Cross-slice interaction
 
@@ -118,6 +126,8 @@ Cross-slice interaction rules:
 2. Slice-internal registry layouts remain slice-owned implementation details unless promoted.
 3. Relationship overlays may connect meanings across slices, but ownership boundaries stay explicit.
 4. Suite-level aggregation/composition may consume multiple slice outputs while preserving per-slice independence.
+5. Shared implementation surfaces should be consumable by slices without collapsing slice-local ownership boundaries.
+6. Slices remain the concrete enforcement/specialization owners even when suite-owned implementation support exists.
 
 Expected future interconnection patterns:
 
@@ -149,6 +159,7 @@ Guidance:
 2. Add perspective registries only when they improve clarity, compatibility governance, or composability.
 3. Define normalization/resolution contract text whenever perspective and canonical shapes differ.
 4. Promote to suite-shared ownership only when cross-slice reuse and drift-risk justify elevation.
+5. Apply the suite-owned implementation pairing rule to future shared helpers/utilities: suite-owned implementation requires at least one real slice-owned implementation consumer/specializer.
 
 Likely future perspective registries include:
 
