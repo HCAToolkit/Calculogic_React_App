@@ -7,6 +7,7 @@ import { resolveNamingRegistryInputs } from '../src/registries/registry-state.lo
 import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
+  toReportableRootFilesSet,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming-validator.logic.mjs';
 import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
@@ -43,6 +44,17 @@ test('shared reportable extension converter returns a Set preserving extension m
   assert.equal(reportableExtensions.size, 2);
 });
 
+
+test('shared reportable root files converter returns a Set preserving filename membership semantics', () => {
+  const reportableRootFiles = toReportableRootFilesSet(['package.json', 'package-lock.json', 'package.json']);
+
+  assert.equal(reportableRootFiles instanceof Set, true);
+  assert.equal(reportableRootFiles.has('package.json'), true);
+  assert.equal(reportableRootFiles.has('package-lock.json'), true);
+  assert.equal(reportableRootFiles.has('README.md'), false);
+  assert.equal(reportableRootFiles.size, 2);
+});
+
 test('direct runtime and wiring derive equivalent runtime validation output from the same resolver payload', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-runtime-converter-parity-'));
 
@@ -57,6 +69,7 @@ test('direct runtime and wiring derive equivalent runtime validation output from
       selectedPaths: collectRepositoryPaths(tempRoot, {
         scope: 'repo',
         reportableExtensions: toReportableExtensionsSet(registryInputs.reportableExtensions),
+        reportableRootFiles: toReportableRootFilesSet(registryInputs.reportableRootFiles),
         walkExclusions: getBuiltinWalkExclusions(),
       }),
       targets: [],

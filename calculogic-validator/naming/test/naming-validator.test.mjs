@@ -118,6 +118,25 @@ test('repo scope includes docs + src + root config examples', () => {
   assert.ok(paths.includes('package.json'));
 });
 
+
+test('repo scope keeps package root-file adjunct reportability for package manifests', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-reportable-root-files-'));
+
+  try {
+    fs.writeFileSync(path.join(tempRoot, 'package.json'), '{}');
+    fs.writeFileSync(path.join(tempRoot, 'package-lock.json'), '{}');
+    fs.writeFileSync(path.join(tempRoot, 'pnpm-lock.yaml'), 'lockfileVersion: 9');
+
+    const paths = collectRepositoryPaths(tempRoot, { scope: 'repo' });
+
+    assert.equal(paths.includes('package.json'), true);
+    assert.equal(paths.includes('package-lock.json'), true);
+    assert.equal(paths.includes('pnpm-lock.yaml'), false);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
 test('app scope includes only src/test and excludes docs, validator, and system root files', () => {
   const paths = collectRepositoryPaths(process.cwd(), { scope: 'app' });
   assert.ok(paths.some((p) => p.startsWith('src/')));

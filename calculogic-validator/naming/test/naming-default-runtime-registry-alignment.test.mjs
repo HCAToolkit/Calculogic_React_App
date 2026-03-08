@@ -53,6 +53,7 @@ test('wiring-injected collectRepositoryPaths aligns with runtime when using prep
     const collectedRuntime = collectRepositoryPathsRuntime(tempRoot, {
       scope: 'repo',
       reportableExtensions: prepared.reportableExtensions,
+      reportableRootFiles: prepared.reportableRootFiles,
       walkExclusions: prepared.walkExclusions,
     });
 
@@ -110,6 +111,7 @@ test('wiring helper reportableExtensions override still wins over prepared defau
     const overrideCollected = collectRepositoryPaths(tempRoot, {
       scope: 'repo',
       reportableExtensions: new Set(['.tmp']),
+      reportableRootFiles: new Set([]),
     });
 
     assert.equal(defaultCollected.includes('src/notes.tmp'), false);

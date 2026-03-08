@@ -12,6 +12,7 @@ import { resolveNamingRegistryInputs } from '../src/registries/registry-state.lo
 import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
+  toReportableRootFilesSet,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
 
@@ -25,6 +26,7 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
   const registryInputs = resolveNamingRegistryInputs({ config: {} });
   const namingRolesRuntime = toNamingRolesRuntime(registryInputs.roles);
   const reportableExtensions = toReportableExtensionsSet(registryInputs.reportableExtensions);
+  const reportableRootFiles = toReportableRootFilesSet(registryInputs.reportableRootFiles);
 
   const canonicalFinding = classifyPath('src/rightpanel.results-style.css', namingRolesRuntime);
   assert.equal(canonicalFinding.code, 'NAMING_CANONICAL');
@@ -40,6 +42,7 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
       selectedPaths: collectRepositoryPaths(tempRoot, {
         scope: 'repo',
         reportableExtensions,
+        reportableRootFiles,
         walkExclusions: getBuiltinWalkExclusions(),
       }),
       namingRolesRuntime,
@@ -80,6 +83,15 @@ test('runtime enforces prepared dependency injection contract', () => {
     () => collectRepositoryPaths(process.cwd(), {
       scope: 'repo',
       reportableExtensions: new Set(['.ts']),
+    }),
+    /requires prepared reportableRootFiles/u,
+  );
+
+  assert.throws(
+    () => collectRepositoryPaths(process.cwd(), {
+      scope: 'repo',
+      reportableExtensions: new Set(['.ts']),
+      reportableRootFiles: new Set(['package.json']),
     }),
     /requires prepared walkExclusions/u,
   );
