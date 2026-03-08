@@ -20,22 +20,20 @@ import {
   printValidatorUsageErrorToStderr,
 } from '../src/core/cli/validator-cli-usage.logic.mjs';
 import { parseRepeatableTargetArgument } from '../src/core/cli/validator-cli-targets.logic.mjs';
+import {
+  buildSupportedScopeToken,
+  buildValidatorScopeUsageLinesFromRuntimeProfiles,
+} from '../src/core/cli/validator-cli-scopes.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
 const supportedScopes = listValidatorScopes();
-const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
-const supportedScopesToken = preferredScopeOrder
-  .filter((scope) => supportedScopes.includes(scope))
-  .join('|');
+const supportedScopesToken = buildSupportedScopeToken(supportedScopes);
 
 const usageLines = [
   `Usage: npm run validate:tree -- [--scope=<${supportedScopesToken}>] [--target=<path>]... [--config=<path>]`,
   'Scopes:',
-  ...supportedScopes.map((scope) => {
-    const profile = getValidatorScopeProfile(scope);
-    return `  - ${scope}: ${profile?.description ?? ''}`;
-  }),
+  ...buildValidatorScopeUsageLinesFromRuntimeProfiles(supportedScopes),
   'Default scope: validator default (repo for tree-structure-advisor)',
   'Validator: tree-structure-advisor',
   'Examples:',
