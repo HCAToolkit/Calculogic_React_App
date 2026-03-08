@@ -1,0 +1,130 @@
+# Registry-Expansion-Candidates.audit
+
+## Purpose
+
+This audit inventories remaining **policy-shaped hardcoding** in the current validator runtime and classifies what should be extracted into deterministic registries next.
+
+This is a planning artifact only: **no runtime behavior changes are proposed in this pass**.
+
+Primary inspection scope:
+
+- `calculogic-validator/naming/src/`
+- `calculogic-validator/tree/src/`
+- `calculogic-validator/src/core/`
+
+## Current registry-backed areas
+
+These areas are already registry-backed and should not be redundantly re-extracted:
+
+- Builtin roles registry (`roles.registry.json`) via `registry-state.logic.mjs`.
+- Reportable extensions registry (`reportable-extensions.registry.json`) via `registry-state.logic.mjs`.
+- Scope profiles registry (`scope-profiles.registry.json`) via `validator-scopes.runtime.mjs`.
+- Special cases registry (`special-cases.registry.json`) via `naming-special-case-rules.registry.logic.mjs`.
+- Walk exclusions registry (`walk-exclusions.registry.json`) via `naming-walk-exclusions.registry.logic.mjs`.
+
+## Hardcoded-policy inventory
+
+| Area | File | Current hardcoded thing | Why it is policy-like | Candidate registry type | Extraction readiness | Recommended action | Notes |
+|---|---|---|---|---|---|---|---|
+| Naming reportability adjunct policy | `naming/src/naming-validator.logic.mjs` | `isReportableFile(...)` always reports `package.json` and `package-lock.json` even when extension set does not imply it. | This is repo policy vocabulary for reportability, not traversal mechanics. | `reportable-root-files.registry.json` (or adjunct list embedded in reportability registry payload). | `registry-ready-now` | Extract as additive overlay on top of extension registry; keep current defaults identical. | Explicit hotspot requested. |
+| Missing-role heuristic | `naming/src/naming-validator.logic.mjs` | `detectMissingRoleCandidate(...)` hardcodes only 2-segment and `module.css` forms. | Heuristic encodes extension-pattern policy and legacy exception semantics. | `missing-role-patterns.registry.json` with deterministic pattern forms. | `registry-ready-after-normalization` | Normalize to explicit pattern descriptors before extraction to avoid regex sprawl. | Explicit hotspot requested, includes module.css branch. |
+| Default scope fallback (runtime) | `naming/src/naming-validator.logic.mjs` and `naming/src/naming-validator.wiring.mjs` | Multiple `scope ?? 'repo'` fallbacks. | Default scope selection is policy; currently duplicated across flow stages. | `runtime-defaults.registry.json` (shared defaults), or scope-profile metadata including `isDefault`. | `registry-ready-now` | Centralize default scope in one policy owner, then read from runtime. | Explicit hotspot requested. |
+| Default scope fallback (CLI) | `naming/src/cli/naming-cli-args.logic.mjs` and `src/core/validator-scopes.runtime.mjs` | CLI parser initializes `selectedScope = 'repo'`; scope runtime also normalizes missing scope to repo. | Duplicate policy leaves drift risk between CLI/runtime layers. | Same default-scope policy registry as above. | `registry-ready-now` | De-duplicate via single canonical default scope source. | Keep parser fallback behavior unchanged in migration slice. |
+| Finding severity/classification/message family mapping | `naming/src/naming-validator.logic.mjs` | `classifyPath(...)` hardcodes `severity`, `classification`, `code`, and message templates per branch. | Branch-to-finding mapping is policy vocabulary and enforcement semantics, not parsing mechanics. | `finding-policy.registry.json` keyed by decision outcome IDs. | `registry-ready-after-normalization` | First normalize decision outcome IDs; then map outcomes → finding metadata via registry. | Explicit hotspot requested. |
+| Summary bucket structure | `naming/src/naming-validator.logic.mjs` | `summarizeFindings(...)` seeds fixed counts for four classifications and fixed secondary bucket families. | Report vocabulary and summary grouping are policy surface decisions. | `summary-buckets.registry.json` (classification buckets + optional facets). | `registry-ready-now` | Extract bucket schema while preserving sort/count behavior. | Explicit hotspot requested. |
+| Config overlay limits | `naming/src/registries/registry-state.logic.mjs` | `applyConfigOverlay(...)` only supports `naming.reportableExtensions.add` and `naming.roles.add`. | Overlay capability is narrow policy contract, currently not extensible to other policy surfaces. | `overlay-capabilities.registry.json` (declared add-only fields and merge mode). | `registry-ready-after-normalization` | Define bounded overlay capability map before adding new policy registries. | Explicit hotspot requested. |
+| Exit behavior mapping | `src/core/validator-exit-code.logic.mjs` | Exit code derivation is hardcoded (`warn => 2`, strict+legacy exception => 1). | Severity/classification → exit code is policy contract. | `exit-policy.registry.json` (ordered predicates). | `registry-ready-after-normalization` | Extract only after naming finding policy is normalized to stable outcome semantics. | Cross-validator relevance; keep deterministic ordering. |
+| Tree top-level shape vocabulary | `tree/src/tree-structure-advisor.logic.mjs` | `KNOWN_TOP_LEVEL_DIRECTORIES` hardcoded set. | Allowed root directories are repository policy, not algorithmic necessity. | `tree-known-roots.registry.json`. | `registry-ready-now` | Extract if tree advisor is expected to evolve per-repo without code edits. | Good ROI if tree advisor is actively used. |
+| Tree validator-owned basename signals | `tree/src/tree-structure-advisor.logic.mjs` | `VALIDATOR_OWNED_BASENAME_PATTERNS` regex list hardcoded. | File ownership signal vocabulary is policy-shaped and expected to drift over time. | `validator-owned-signals.registry.json`. | `registry-ready-after-normalization` | Normalize signal taxonomy (entrypoint/test/module classes) before extraction. | Avoid turning regex into unmanaged catch-all lists. |
+| Shim detection token vocabularies | `tree/src/tree-shim-detection.logic.mjs` | Multiple token/surface sets: folder signals, name tokens, suppressed surfaces, extension allowlist. | These are heuristic policy knobs for advisory behavior. | `shim-detection-signals.registry.json`. | `registry-ready-after-normalization` | Split into bounded vocab sections (signals, suppressions, extensions) before extraction. | Ensure deterministic precedence remains code-owned. |
+| System-scope compatibility expansions | `src/core/validator-scopes.runtime.mjs` | Hardcoded expansion for `eslint.config.*`, `vite.config.*`, `tsconfig*.json`. | Pattern expansion vocabulary is scope policy adjunct. | Scope-profile adjunct registry for compatibility pattern expansions. | `keep-hardcoded-for-now` | Keep local until root-file discovery contracts stabilize. | Tight coupling with `ROOT_APP_FILES` may not justify extraction yet. |
+
+## Candidate classification
+
+### registry-ready-now
+
+- Reportability adjunct for root package files.
+- Default scope policy source unification (`repo`).
+- Summary bucket schema extraction.
+- Tree known-root vocabulary (if tree policy churn is expected).
+
+### registry-ready-after-normalization
+
+- Missing-role and extension-pattern heuristics.
+- Finding outcome-to-metadata mapping (severity/classification/message families).
+- Config overlay capability matrix.
+- Exit policy mapping.
+- Tree basename ownership signal taxonomy.
+- Shim detection signal/suppression vocabulary.
+
+### keep-hardcoded-for-now
+
+- System-scope wildcard expansion plumbing in `validator-scopes.runtime.mjs` while root file compatibility behavior remains coupled to core runtime knowledge.
+
+## Recommended extraction order
+
+Prioritized by structural ROI (clean policy ownership boundaries first):
+
+1. **Reportability adjunct policy**
+   - Move package-file reportability exceptions into deterministic registry payload.
+2. **Missing-role / extension-pattern policy**
+   - Normalize and extract `detectMissingRoleCandidate(...)` patterns.
+3. **Severity/classification defaults**
+   - Introduce stable decision outcomes and externalize finding metadata mapping.
+4. **Report summary bucket policy**
+   - Registry-drive summary count buckets and optional facet counters.
+5. **Rule applicability / scope default policy**
+   - Consolidate `repo` default and scope applicability toggles into one policy source.
+6. **Placement / adjacency policy (tree signals)**
+   - Externalize known roots and validator-owned placement signals.
+7. **Deeper semantic relationship metadata**
+   - Add bounded registries for shim signal semantics and cross-surface suppression behavior.
+
+## Keep-hardcoded-for-now
+
+Retain hardcoded implementation behavior for now where code is primarily **engine mechanics** or where policy is too intertwined with runtime internals to extract safely in a small slice:
+
+- Traversal/sorting mechanics (`sortPaths`, deterministic ordering helpers).
+- Parser mechanics (`parseCanonicalName`, tokenization algorithms).
+- Scope compatibility wildcard expansion internals tied to `ROOT_APP_FILES` until a stable external contract is defined.
+
+## Risks / anti-patterns to avoid
+
+- **Generic “mega config” registry** that mixes unrelated policy concerns.
+- **Regex dump registries** without normalized schema or precedence rules.
+- **Behavior-first refactors** that alter findings while “extracting policy.”
+- **Split ownership** where defaults remain duplicated in CLI + runtime after extraction.
+- **Leaky engine/policy boundary** (algorithm control flow should stay in code; decision vocabularies move to registries).
+
+## Next-step implementation slices
+
+1. **Slice A — Reportability adjunct extraction (no behavior change)**
+   - Add registry for root reportable files.
+   - Keep extension registry unchanged; merge adjunct list deterministically.
+   - Add regression tests for package files.
+
+2. **Slice B — Missing-role pattern registry introduction**
+   - Define normalized pattern schema (`dotSegments`, `compoundExtension`, optional constraints).
+   - Replace direct hardcoded branches with runtime-compiled pattern checks.
+   - Verify current `module.css` semantics remain exact.
+
+3. **Slice C — Finding policy map**
+   - Introduce stable internal decision outcome IDs.
+   - Move outcome→`{code,severity,classification,message,ruleRef,suggestedFix}` mapping to registry.
+   - Keep rule evaluation flow unchanged.
+
+4. **Slice D — Summary bucket registry**
+   - Externalize default classification buckets + optional facet families.
+   - Preserve counter sorting and unknown-classification handling behavior.
+
+5. **Slice E — Scope/default policy unification**
+   - Create single default-scope owner (`repo`) consumed by CLI parser and runtime normalization.
+   - Add drift tests ensuring one-source default behavior.
+
+6. **Slice F — Overlay capability expansion contract**
+   - Add deterministic overlay capability declarations for newly extracted registries.
+   - Keep add-only semantics where required and explicit.
+
+7. **Slice G — Tree signal policy extraction**
+   - Extract known roots first (small bounded vocabulary).
+   - Then extract validator-owned basename/shim signals after schema normalization.
