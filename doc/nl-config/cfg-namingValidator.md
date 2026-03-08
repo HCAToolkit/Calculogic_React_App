@@ -91,7 +91,7 @@ Validator implementation assets live under top-level `calculogic-validator/`:
 
 - canonical module layout: `calculogic-validator/naming/src/{naming-validator.host.mjs,naming-validator.wiring.mjs,naming-validator.logic.mjs,naming-validator.contracts.mjs}`
 - naming-owned CLI semantic area: `calculogic-validator/naming/src/cli/` (`naming-cli-args.logic.mjs`, `naming-cli-usage.logic.mjs`, `naming-report-builder.logic.mjs`, `naming-cli-runner.logic.mjs`)
-- naming-owned health semantic area: `calculogic-validator/naming/src/health/` (`naming-health-check.logic.mjs`)
+- naming-owned health semantic area: `calculogic-validator/naming/src/health/` (`naming-health-check.logic.mjs`, `naming-health-check.host.mjs`)
 - extension-point folders: `calculogic-validator/naming/src/registries/` and `calculogic-validator/naming/src/rules/`
 - suite-core CLI semantic area: `calculogic-validator/src/core/cli/` (`validator-cli-output.logic.mjs`, `validator-cli-usage.logic.mjs`, `validator-cli-targets.logic.mjs`)
 - package export barrel: `calculogic-validator/src/index.mjs`
@@ -110,7 +110,7 @@ Thin-wrapper contract for naming entrypoints: repo-local scripts and installable
 
 Health-check entrypoint lives at `calculogic-validator/scripts/validator-health-check.host.mjs` and is exposed via root script `npm run health:validator`.
 Stable installable health bin entrypoint lives at `calculogic-validator/bin/calculogic-validator-health.mjs`.
-Canonical naming-owned health implementation lives at `calculogic-validator/naming/src/health/naming-health-check.logic.mjs`; both entrypoints are thin wrappers that delegate to naming-owned semantic-area logic.
+Canonical naming-owned health implementation is split by concern: pure assertions live at `calculogic-validator/naming/src/health/naming-health-check.logic.mjs`, while process entrypoint behavior lives at `calculogic-validator/naming/src/health/naming-health-check.host.mjs`; repo-local script/bin entrypoints remain thin wrappers that delegate to the naming-owned host wrapper.
 
 The health-check performs deterministic, CI-friendly assertions for scope profiles `repo`, `app`, `docs`, `validator`, and `system`:
 

@@ -5,7 +5,6 @@ import {
   runNamingValidator,
   summarizeFindings,
 } from '../naming-validator.host.mjs';
-import { resolveRepositoryRoot } from '../../../src/core/repository-root.logic.mjs';
 
 export const NAMING_HEALTH_SCOPES = ['repo', 'app', 'docs', 'validator', 'system'];
 
@@ -89,19 +88,4 @@ export const runNamingHealthCheck = (repositoryRoot) => {
   }
 
   assertNamingHealthDocs(repositoryRoot);
-};
-
-export const runNamingHealthCheckEntrypoint = () => {
-  try {
-    const repositoryRoot = resolveRepositoryRoot();
-    runNamingHealthCheck(repositoryRoot);
-
-    console.log('OK: naming validator deterministic for repo|app|docs|validator|system');
-    console.log('OK: docs match app scope roots');
-    process.exit(0);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(`Validator health check failed: ${message}`);
-    process.exit(1);
-  }
 };
