@@ -20,6 +20,7 @@ import {
   resolveScopedTargets,
   filterScopedPathsByTargets,
 } from '../../src/core/scoped-target-paths.logic.mjs';
+import { DEFAULT_VALIDATOR_SCOPE } from '../../src/core/validator-scopes.runtime.mjs';
 
 export const prepareNamingRuntimeInputs = (config) => {
   const registryInputs = resolveNamingRegistryInputs({ config });
@@ -41,7 +42,7 @@ export const prepareNamingValidatorInputs = (
   { scope, config, targets } = {},
 ) => {
   const runtimeInputs = prepareNamingRuntimeInputs(config);
-  const selectedScope = scope ?? 'repo';
+  const selectedScope = scope ?? DEFAULT_VALIDATOR_SCOPE;
   const inScopePaths = collectRepositoryPathsRuntime(repositoryRoot, {
     scope: selectedScope,
     reportableExtensions: runtimeInputs.reportableExtensions,
