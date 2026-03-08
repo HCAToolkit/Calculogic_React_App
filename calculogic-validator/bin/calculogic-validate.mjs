@@ -13,6 +13,14 @@ import {
   getValidatorToolVersion,
 } from '../src/core/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromRunnerReport } from '../src/core/validator-exit-code.logic.mjs';
+import {
+  writeValidatorReportToStdout,
+  setValidatorReportExitCode,
+} from '../src/core/cli/validator-cli-output.logic.mjs';
+import {
+  printValidatorUsageToStdout,
+  printValidatorUsageErrorToStderr,
+} from '../src/core/cli/validator-cli-usage.logic.mjs';
 
 const supportedScopes = listValidatorScopes();
 const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
@@ -84,19 +92,17 @@ let parsed;
 try {
   parsed = parseCliArgs(process.argv.slice(2));
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
 
 if (parsed.helpRequested) {
-  console.log(usageLines.join('\n'));
+  printValidatorUsageToStdout(usageLines);
   process.exit(0);
 }
 
 if (parsed.selectedScope && !getValidatorScopeProfile(parsed.selectedScope)) {
-  console.error(`Invalid scope: ${parsed.selectedScope}`);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
   process.exit(1);
 }
 
@@ -114,10 +120,9 @@ try {
     ...(config ? { configDigest: computeConfigDigest(config) } : {}),
   });
 
-  console.log(JSON.stringify(report, null, 2));
-  process.exit(deriveExitCodeFromRunnerReport(report, { strict: parsed.strict }));
+  writeValidatorReportToStdout(report);
+  setValidatorReportExitCode(deriveExitCodeFromRunnerReport(report, { strict: parsed.strict }));
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }

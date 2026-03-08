@@ -14,9 +14,12 @@ import { detectNpmArgForwardingFootgun } from '../src/core/npm-arg-forwarding-gu
 import {
   writeValidatorReportToStdout,
   setValidatorReportExitCode,
+} from '../src/core/cli/validator-cli-output.logic.mjs';
+import {
   printValidatorUsageToStdout,
   printValidatorUsageErrorToStderr,
-} from '../src/core/validator-cli-output.logic.mjs';
+} from '../src/core/cli/validator-cli-usage.logic.mjs';
+import { parseRepeatableTargetArgument } from '../src/core/cli/validator-cli-targets.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
@@ -59,19 +62,14 @@ const parseCliArgs = (argv) => {
       continue;
     }
 
-    if (argument === '--target') {
-      const rawTarget = argv[index + 1];
-      if (!rawTarget || rawTarget.startsWith('--')) {
-        throw new Error('Missing required value for --target');
-      }
-
-      targets.push(rawTarget.trim().replaceAll('\\', '/'));
-      index += 1;
-      continue;
-    }
-
-    if (argument.startsWith('--target=')) {
-      targets.push(argument.slice('--target='.length).trim().replaceAll('\\', '/'));
+    const targetArgumentResult = parseRepeatableTargetArgument({
+      argv,
+      index,
+      argument,
+      targets,
+    });
+    if (targetArgumentResult.handled) {
+      index = targetArgumentResult.nextIndex;
       continue;
     }
 
