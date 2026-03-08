@@ -14,6 +14,15 @@ import {
 } from '../src/core/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromFindings } from '../src/core/validator-exit-code.logic.mjs';
 import { getSourceSnapshot } from '../src/core/source-snapshot.logic.mjs';
+import {
+  writeValidatorReportToStdout,
+  setValidatorReportExitCode,
+} from '../src/core/cli/validator-cli-output.logic.mjs';
+import {
+  printValidatorUsageToStdout,
+  printValidatorUsageErrorToStderr,
+} from '../src/core/cli/validator-cli-usage.logic.mjs';
+import { parseRepeatableTargetArgument } from '../src/core/cli/validator-cli-targets.logic.mjs';
 
 const parseScopeFromCli = (argv) => {
   let selectedScope = 'repo';
@@ -29,19 +38,14 @@ const parseScopeFromCli = (argv) => {
       continue;
     }
 
-    if (argument === '--target') {
-      const rawTarget = argv[index + 1];
-      if (!rawTarget || rawTarget.startsWith('--')) {
-        throw new Error('Missing required value for --target');
-      }
-
-      targets.push(rawTarget.trim().replaceAll('\\', '/'));
-      index += 1;
-      continue;
-    }
-
-    if (argument.startsWith('--target=')) {
-      targets.push(argument.slice('--target='.length).trim().replaceAll('\\', '/'));
+    const targetArgumentResult = parseRepeatableTargetArgument({
+      argv,
+      index,
+      argument,
+      targets,
+    });
+    if (targetArgumentResult.handled) {
+      index = targetArgumentResult.nextIndex;
       continue;
     }
 
@@ -93,19 +97,17 @@ let parsed;
 try {
   parsed = parseScopeFromCli(process.argv.slice(2));
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
 
 if (parsed.helpRequested) {
-  console.log(usageLines.join('\n'));
+  printValidatorUsageToStdout(usageLines);
   process.exit(0);
 }
 
 if (!getScopeProfile(parsed.selectedScope)) {
-  console.error(`Invalid scope: ${parsed.selectedScope}`);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
   process.exit(1);
 }
 
@@ -118,8 +120,7 @@ try {
     ? loadValidatorConfigFromFile(parsed.configPath, { cwd: process.cwd() })
     : undefined;
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
 
@@ -134,8 +135,7 @@ try {
     targets: parsed.targets,
   });
 } catch (error) {
-  console.error(error.message);
-  console.error(usageLines.join('\n'));
+  printValidatorUsageErrorToStderr(error.message, usageLines);
   process.exit(1);
 }
 const { findings, totalFilesScanned, scope, filters } = validatorResult;
@@ -181,5 +181,5 @@ const report = {
   findings,
 };
 
-process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
-process.exitCode = deriveExitCodeFromFindings(findings, { strict: parsed.strict });
+writeValidatorReportToStdout(report);
+setValidatorReportExitCode(deriveExitCodeFromFindings(findings, { strict: parsed.strict }));
