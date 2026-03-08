@@ -8,6 +8,7 @@ import {
   classifyPath,
   parseCanonicalName,
   collectRepositoryPaths,
+  summarizeFindings,
 } from '../src/naming-validator.host.mjs';
 
 test('parse canonical filename with simple extension', () => {
@@ -208,4 +209,65 @@ test('invalid CLI scope returns deterministic usage error and non-zero exit', ()
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Invalid scope: invalid-scope/u);
   assert.match(result.stderr, /Usage: npm run validate:naming/u);
+});
+
+
+test('summary keeps default classification buckets and empty secondary families for empty findings', () => {
+  const summary = summarizeFindings([]);
+
+  assert.deepEqual(summary.counts, {
+    canonical: 0,
+    'allowed-special-case': 0,
+    'legacy-exception': 0,
+    'invalid-ambiguous': 0,
+  });
+  assert.deepEqual(summary.codeCounts, {});
+  assert.deepEqual(summary.specialCaseTypeCounts, {});
+  assert.deepEqual(summary.warningRoleStatusCounts, {});
+  assert.deepEqual(summary.warningRoleCategoryCounts, {});
+});
+
+test('summary preserves deterministic ordering and warning facet behavior', () => {
+  const summary = summarizeFindings([
+    {
+      classification: 'invalid-ambiguous',
+      code: 'Z_CODE',
+      severity: 'warn',
+      details: { roleStatus: 'deprecated', roleCategory: 'documentation' },
+    },
+    {
+      classification: 'allowed-special-case',
+      code: 'A_CODE',
+      severity: 'info',
+      details: { specialCaseType: 'ecosystem-required' },
+    },
+    {
+      classification: 'invalid-ambiguous',
+      code: 'A_CODE',
+      severity: 'warn',
+      details: { roleStatus: 'active', roleCategory: 'architecture-support' },
+    },
+  ]);
+
+  assert.deepEqual(summary.counts, {
+    canonical: 0,
+    'allowed-special-case': 1,
+    'legacy-exception': 0,
+    'invalid-ambiguous': 2,
+  });
+  assert.deepEqual(summary.codeCounts, {
+    A_CODE: 2,
+    Z_CODE: 1,
+  });
+  assert.deepEqual(summary.specialCaseTypeCounts, {
+    'ecosystem-required': 1,
+  });
+  assert.deepEqual(summary.warningRoleStatusCounts, {
+    active: 1,
+    deprecated: 1,
+  });
+  assert.deepEqual(summary.warningRoleCategoryCounts, {
+    'architecture-support': 1,
+    documentation: 1,
+  });
 });

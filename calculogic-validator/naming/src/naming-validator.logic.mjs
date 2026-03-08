@@ -70,6 +70,22 @@ const assertPreparedNamingRolesRuntime = (namingRolesRuntime) => {
 };
 
 
+
+
+const assertPreparedSummaryBucketsRuntime = (summaryBucketsRuntime) => {
+  if (
+    summaryBucketsRuntime &&
+    Array.isArray(summaryBucketsRuntime.classificationBuckets) &&
+    Array.isArray(summaryBucketsRuntime.secondaryBucketFamilies)
+  ) {
+    return summaryBucketsRuntime;
+  }
+
+  throw new Error(
+    'Naming summary requires prepared summaryBucketsRuntime from wiring/runtime adapter.',
+  );
+};
+
 const assertPreparedWalkExclusions = (walkExclusions) => {
   if (
     walkExclusions &&
@@ -364,40 +380,46 @@ const incrementCounter = (counts, key) => {
 const sortCountObject = (counts) =>
   Object.fromEntries(Object.entries(counts).sort(([left], [right]) => left.localeCompare(right)));
 
-export const summarizeFindings = (findings) => {
-  const counts = {
-    canonical: 0,
-    'allowed-special-case': 0,
-    'legacy-exception': 0,
-    'invalid-ambiguous': 0,
+export const summarizeFindings = (findings, summaryBucketsRuntime) => {
+  const summaryBuckets = assertPreparedSummaryBucketsRuntime(summaryBucketsRuntime);
+  const counts = Object.fromEntries(
+    summaryBuckets.classificationBuckets.map((classification) => [classification, 0]),
+  );
+
+  const secondaryCountsByFamily = Object.fromEntries(
+    summaryBuckets.secondaryBucketFamilies.map((bucketFamily) => [bucketFamily, {}]),
+  );
+
+  const incrementSecondaryFamilyCounter = (bucketFamily, counterKey) => {
+    if (!secondaryCountsByFamily[bucketFamily]) {
+      return;
+    }
+
+    incrementCounter(secondaryCountsByFamily[bucketFamily], counterKey);
   };
-  const codeCounts = {};
-  const specialCaseTypeCounts = {};
-  const warningRoleStatusCounts = {};
-  const warningRoleCategoryCounts = {};
 
   for (const finding of findings) {
     incrementCounter(counts, finding.classification);
-    incrementCounter(codeCounts, finding.code);
+    incrementSecondaryFamilyCounter('codeCounts', finding.code);
 
     if (finding.details?.specialCaseType) {
-      incrementCounter(specialCaseTypeCounts, finding.details.specialCaseType);
+      incrementSecondaryFamilyCounter('specialCaseTypeCounts', finding.details.specialCaseType);
     }
 
     if (finding.severity === 'warn' && finding.details?.roleStatus) {
-      incrementCounter(warningRoleStatusCounts, finding.details.roleStatus);
+      incrementSecondaryFamilyCounter('warningRoleStatusCounts', finding.details.roleStatus);
     }
 
     if (finding.severity === 'warn' && finding.details?.roleCategory) {
-      incrementCounter(warningRoleCategoryCounts, finding.details.roleCategory);
+      incrementSecondaryFamilyCounter('warningRoleCategoryCounts', finding.details.roleCategory);
     }
   }
 
   return {
     counts,
-    codeCounts: sortCountObject(codeCounts),
-    specialCaseTypeCounts: sortCountObject(specialCaseTypeCounts),
-    warningRoleStatusCounts: sortCountObject(warningRoleStatusCounts),
-    warningRoleCategoryCounts: sortCountObject(warningRoleCategoryCounts),
+    codeCounts: sortCountObject(secondaryCountsByFamily.codeCounts ?? {}),
+    specialCaseTypeCounts: sortCountObject(secondaryCountsByFamily.specialCaseTypeCounts ?? {}),
+    warningRoleStatusCounts: sortCountObject(secondaryCountsByFamily.warningRoleStatusCounts ?? {}),
+    warningRoleCategoryCounts: sortCountObject(secondaryCountsByFamily.warningRoleCategoryCounts ?? {}),
   };
 };

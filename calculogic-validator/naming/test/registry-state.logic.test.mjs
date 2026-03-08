@@ -58,6 +58,7 @@ test('resolver contract shape remains stable', () => {
     'reportableExtensions',
     'reportableRootFiles',
     'roles',
+    'summaryBuckets',
   ]);
   assert.deepEqual(Object.keys(result.registryDigests).sort((a, b) => a.localeCompare(b)), [
     'builtin',
@@ -135,6 +136,18 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
   assert.deepEqual(result.roles, expectedRoles);
   assert.deepEqual(result.reportableExtensions, expectedExtensions);
   assert.deepEqual(result.reportableRootFiles, expectedRootFiles);
+
+  const builtinSummaryBucketsRegistry = JSON.parse(
+    fs.readFileSync(
+      path.join(REGISTRY_MODULE_ROOT, '_builtin', 'summary-buckets.registry.json'),
+      'utf8',
+    ),
+  );
+
+  assert.deepEqual(result.summaryBuckets, {
+    classificationBuckets: builtinSummaryBucketsRegistry.classificationBuckets,
+    secondaryBucketFamilies: builtinSummaryBucketsRegistry.secondaryBucketFamilies,
+  });
 });
 
 test('registryRootDir drives builtin roles, extensions, and categories from the same _builtin root', () => {
@@ -159,12 +172,21 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       reportableRootFiles: ['root-b.json', 'root-a.json', 'root-b.json'],
     });
 
+    writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), {
+      classificationBuckets: ['bucket-a', 'bucket-b'],
+      secondaryBucketFamilies: ['codeCounts'],
+    });
+
     const builtinResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
     assert.deepEqual(builtinResult.roles, [
       { role: 'temp-builtin-role', category: 'from-temp-root', status: 'active' },
     ]);
     assert.deepEqual(builtinResult.reportableExtensions, ['.alt', '.tmp']);
     assert.deepEqual(builtinResult.reportableRootFiles, ['root-a.json', 'root-b.json']);
+    assert.deepEqual(builtinResult.summaryBuckets, {
+      classificationBuckets: ['bucket-a', 'bucket-b'],
+      secondaryBucketFamilies: ['codeCounts'],
+    });
 
     writeJson(path.join(tempRoot, 'registry-state.json'), {
       schemaVersion: '1',

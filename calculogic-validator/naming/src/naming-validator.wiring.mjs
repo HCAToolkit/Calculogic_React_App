@@ -4,6 +4,7 @@ import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
   toReportableRootFilesSet,
+  toSummaryBucketsRuntime,
 } from './naming-runtime-converters.logic.mjs';
 import {
   parseCanonicalName,
@@ -14,7 +15,7 @@ import {
   runNamingValidator as runNamingValidatorRuntime,
   listNamingValidatorScopes,
   getScopeProfile,
-  summarizeFindings,
+  summarizeFindings as summarizeFindingsRuntime,
 } from './naming-validator.logic.mjs';
 import {
   normalizePath,
@@ -31,6 +32,7 @@ export const prepareNamingRuntimeInputs = (config) => {
     reportableRootFiles: toReportableRootFilesSet(registryInputs.reportableRootFiles),
     namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
     walkExclusions: getBuiltinWalkExclusions(),
+    summaryBucketsRuntime: toSummaryBucketsRuntime(registryInputs.summaryBuckets),
     registry: {
       registryState: registryInputs.registryState,
       registrySource: registryInputs.registrySource,
@@ -88,6 +90,12 @@ export const classifyPath = (relativePath, namingRolesRuntime, options = {}) => 
   return classifyPathRuntime(relativePath, namingRolesRuntime ?? runtimeInputs.namingRolesRuntime);
 };
 
+export const summarizeFindings = (findings, options = {}) => {
+  const runtimeInputs = prepareNamingRuntimeInputs(options.config);
+  const summaryBucketsRuntime = options.summaryBucketsRuntime ?? runtimeInputs.summaryBucketsRuntime;
+  return summarizeFindingsRuntime(findings, summaryBucketsRuntime);
+};
+
 export {
   parseCanonicalName,
   getSpecialCaseType,
@@ -95,5 +103,4 @@ export {
   normalizePath,
   listNamingValidatorScopes,
   getScopeProfile,
-  summarizeFindings,
 };

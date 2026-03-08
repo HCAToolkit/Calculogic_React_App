@@ -1,0 +1,14 @@
+{
+  "classificationBuckets": [
+    "canonical",
+    "allowed-special-case",
+    "legacy-exception",
+    "invalid-ambiguous"
+  ],
+  "secondaryBucketFamilies": [
+    "codeCounts",
+    "specialCaseTypeCounts",
+    "warningRoleStatusCounts",
+    "warningRoleCategoryCounts"
+  ]
+}
