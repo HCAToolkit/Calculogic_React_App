@@ -33,7 +33,7 @@ These areas are already registry-backed and should not be redundantly re-extract
 | Default scope fallback (runtime) | `naming/src/naming-validator.logic.mjs` and `naming/src/naming-validator.wiring.mjs` | Fallback now reads suite-owned `DEFAULT_VALIDATOR_SCOPE` (no local `'repo'` hardcoding). | Default scope selection is policy; now centralized to suite runtime owner. | `DEFAULT_VALIDATOR_SCOPE` in suite runtime. | `completed` | Keep centralized owner and guard with drift tests. | Consolidation completed in scope-default unification slice. |
 | Default scope fallback (CLI) | `naming/src/cli/naming-cli-args.logic.mjs` and `src/core/validator-scopes.runtime.mjs` | CLI parser now initializes from suite-owned `DEFAULT_VALIDATOR_SCOPE`; runtime normalizes from same owner. | Canonical owner removes CLI/runtime drift risk. | `DEFAULT_VALIDATOR_SCOPE` in suite runtime. | `completed` | Preserve behavior (`repo`) while keeping one owner. | Parser behavior unchanged; ownership consolidated. |
 | Finding severity/classification/message family mapping | `naming/src/naming-validator.logic.mjs` | `classifyPath(...)` hardcodes `severity`, `classification`, `code`, and message templates per branch. | Branch-to-finding mapping is policy vocabulary and enforcement semantics, not parsing mechanics. | `finding-policy.registry.json` keyed by decision outcome IDs. | `registry-ready-after-normalization` | First normalize decision outcome IDs; then map outcomes → finding metadata via registry. | Explicit hotspot requested. |
-| Summary bucket structure | `naming/src/naming-validator.logic.mjs` | `summarizeFindings(...)` seeds fixed counts for four classifications and fixed secondary bucket families. | Report vocabulary and summary grouping are policy surface decisions. | `summary-buckets.registry.json` (classification buckets + optional facets). | `registry-ready-now` | Extract bucket schema while preserving sort/count behavior. | Explicit hotspot requested. |
+| Summary bucket structure | `naming/src/registries/_builtin/summary-buckets.registry.json` + `naming/src/naming-validator.logic.mjs` | `summarizeFindings(...)` now consumes wiring-prepared summary bucket policy sourced from builtin registry. | Report vocabulary and summary grouping are policy surface decisions and now have a deterministic owner. | `summary-buckets.registry.json` (classification buckets + optional facets). | `completed` | Keep schema bounded and preserve deterministic sort/count behavior. | Extracted in V0.1.24 without output-shape changes. |
 | Config overlay limits | `naming/src/registries/registry-state.logic.mjs` | `applyConfigOverlay(...)` only supports `naming.reportableExtensions.add` and `naming.roles.add`. | Overlay capability is narrow policy contract, currently not extensible to other policy surfaces. | `overlay-capabilities.registry.json` (declared add-only fields and merge mode). | `registry-ready-after-normalization` | Define bounded overlay capability map before adding new policy registries. | Explicit hotspot requested. |
 | Exit behavior mapping | `src/core/validator-exit-code.logic.mjs` | Exit code derivation is hardcoded (`warn => 2`, strict+legacy exception => 1). | Severity/classification → exit code is policy contract. | `exit-policy.registry.json` (ordered predicates). | `registry-ready-after-normalization` | Extract only after naming finding policy is normalized to stable outcome semantics. | Cross-validator relevance; keep deterministic ordering. |
 | Tree top-level shape vocabulary | `tree/src/tree-structure-advisor.logic.mjs` | `KNOWN_TOP_LEVEL_DIRECTORIES` hardcoded set. | Allowed root directories are repository policy, not algorithmic necessity. | `tree-known-roots.registry.json`. | `registry-ready-now` | Extract if tree advisor is expected to evolve per-repo without code edits. | Good ROI if tree advisor is actively used. |
@@ -45,7 +45,6 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 ### registry-ready-now
 
-- Summary bucket schema extraction.
 - Tree known-root vocabulary (if tree policy churn is expected).
 
 ### registry-ready-after-normalization
@@ -65,19 +64,17 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 Prioritized by structural ROI (clean policy ownership boundaries first):
 
-1. **Report summary bucket policy**
-   - Registry-drive summary count buckets and optional facet counters.
-2. **Placement / adjacency policy (tree known roots)**
+1. **Placement / adjacency policy (tree known roots)**
    - Externalize known top-level root vocabulary where tree advisor policy churn is expected.
-3. **Missing-role / extension-pattern policy**
+2. **Missing-role / extension-pattern policy**
    - Normalize and extract `detectMissingRoleCandidate(...)` patterns.
-4. **Severity/classification defaults**
+3. **Severity/classification defaults**
    - Introduce stable decision outcomes and externalize finding metadata mapping.
-5. **Overlay capability contract expansion**
+4. **Overlay capability contract expansion**
    - Add explicit capability declarations for newly extracted registry surfaces.
-6. **Exit policy mapping**
+5. **Exit policy mapping**
    - Externalize severity/classification-to-exit predicates after finding outcomes stabilize.
-7. **Deeper semantic relationship metadata (tree signals)**
+6. **Deeper semantic relationship metadata (tree signals)**
    - Add bounded registries for shim signal semantics and cross-surface suppression behavior.
 
 ## Keep-hardcoded-for-now
@@ -98,32 +95,28 @@ Retain hardcoded implementation behavior for now where code is primarily **engin
 
 ## Next-step implementation slices
 
-1. **Slice A — Summary bucket registry**
-   - Externalize default classification buckets + optional facet families.
-   - Preserve counter sorting and unknown-classification handling behavior.
-
-2. **Slice B — Tree known-root vocabulary extraction**
+1. **Slice A — Tree known-root vocabulary extraction**
    - Extract `KNOWN_TOP_LEVEL_DIRECTORIES` into a bounded registry payload.
    - Keep advisor decision flow and deterministic ordering behavior unchanged.
 
-3. **Slice C — Missing-role pattern registry introduction**
+2. **Slice B — Missing-role pattern registry introduction**
    - Define normalized pattern schema (`dotSegments`, `compoundExtension`, optional constraints).
    - Replace direct hardcoded branches with runtime-compiled pattern checks.
    - Verify current `module.css` semantics remain exact.
 
-4. **Slice D — Finding policy map**
+3. **Slice C — Finding policy map**
    - Introduce stable internal decision outcome IDs.
    - Move outcome→`{code,severity,classification,message,ruleRef,suggestedFix}` mapping to registry.
    - Keep rule evaluation flow unchanged.
 
-5. **Slice E — Overlay capability expansion contract**
+4. **Slice D — Overlay capability expansion contract**
    - Add deterministic overlay capability declarations for newly extracted registries.
    - Keep add-only semantics where required and explicit.
 
-6. **Slice F — Exit policy mapping extraction**
+5. **Slice E — Exit policy mapping extraction**
    - Externalize ordered exit predicates after finding policy outcomes are stable.
    - Preserve strict/legacy exception behavior semantics.
 
-7. **Slice G — Tree signal policy extraction**
+6. **Slice F — Tree signal policy extraction**
    - Extract known roots first (small bounded vocabulary).
    - Then extract validator-owned basename/shim signals after schema normalization (or skip known-root step if Slice B already landed).

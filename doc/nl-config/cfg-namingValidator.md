@@ -10,7 +10,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.23** (naming runtime dependencies are wiring-provided; runtime no longer composes builtin registry defaults internally).
+Current implementation target: **V0.1.24** (summary bucket policy is registry-backed and wiring-provided; runtime no longer hardcodes summary bucket vocabulary).
 
 ## 1.0 Purpose
 
@@ -233,6 +233,24 @@ Future alignment note:
 - `walkExclusions` are currently prepared in wiring from the builtin walk-exclusions loader path.
 - future customization may align `walkExclusions` with the same registry-state/config-driven composition path used for roles and reportable extensions.
 - this is an architecture alignment note only, not a current contract violation.
+
+
+### 2.11 Summary bucket policy runtime source (V0.1.24)
+
+Naming summary bucket vocabulary is sourced from builtin registry JSON at:
+
+- `calculogic-validator/naming/src/registries/_builtin/summary-buckets.registry.json`
+
+Runtime summary policy fields:
+
+- `classificationBuckets`: default classification bucket keys seeded in summary `counts`.
+- `secondaryBucketFamilies`: enabled secondary summary families (`codeCounts`, `specialCaseTypeCounts`, `warningRoleStatusCounts`, `warningRoleCategoryCounts`).
+
+Ownership boundary:
+
+- registry resolver loads summary-bucket policy as part of naming registry inputs.
+- wiring prepares and injects summary-bucket runtime dependencies into summary generation.
+- runtime summary logic consumes prepared summary policy and preserves deterministic ordering/count semantics.
 
 ## 3.0 Classification Contract
 

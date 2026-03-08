@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { stableStringify, sha256Hex } from '../../../src/core/validator-report-meta.logic.mjs';
+import { loadSummaryBucketsFromFile } from './naming-summary-buckets.registry.logic.mjs';
 
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -11,6 +12,7 @@ const REQUIRED_BUILTIN_REGISTRY_FILES = [
   'roles.registry.json',
   'reportable-extensions.registry.json',
   'reportable-root-files.registry.json',
+  'summary-buckets.registry.json',
 ];
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
@@ -233,6 +235,9 @@ const loadBuiltinReportableRootFiles = ({ builtinRegistryDir }) => {
   return canonicalizeRootFilenames(parsed.reportableRootFiles);
 };
 
+const loadBuiltinSummaryBuckets = ({ builtinRegistryDir }) =>
+  loadSummaryBucketsFromFile(path.join(builtinRegistryDir, 'summary-buckets.registry.json'));
+
 const loadRegistryState = (registryRootDir) => {
   const statePath = path.join(registryRootDir, 'registry-state.json');
   if (!fs.existsSync(statePath)) {
@@ -289,6 +294,7 @@ const buildBuiltinPayload = ({ builtinRegistryDir }) => ({
   roles: loadBuiltinRolesPayload({ builtinRegistryDir }),
   reportableExtensions: loadBuiltinReportableExtensions({ builtinRegistryDir }),
   reportableRootFiles: loadBuiltinReportableRootFiles({ builtinRegistryDir }),
+  summaryBuckets: loadBuiltinSummaryBuckets({ builtinRegistryDir }),
 });
 
 const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
@@ -316,6 +322,7 @@ const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
     roles: canonicalizeRoles([...builtinPayload.roles, ...rolesToAppend], { allowedCategories }),
     reportableExtensions: mergedExtensions,
     reportableRootFiles: builtinPayload.reportableRootFiles,
+    summaryBuckets: builtinPayload.summaryBuckets,
   };
 };
 
@@ -377,5 +384,6 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
     roles: resolvedPayload.roles,
     reportableExtensions: resolvedPayload.reportableExtensions,
     reportableRootFiles: resolvedPayload.reportableRootFiles,
+    summaryBuckets: resolvedPayload.summaryBuckets,
   };
 };

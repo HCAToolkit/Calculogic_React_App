@@ -7,6 +7,7 @@ import {
   classifyPath,
   collectRepositoryPaths,
   runNamingValidator,
+  summarizeFindings,
 } from '../src/naming-validator.logic.mjs';
 import { resolveNamingRegistryInputs } from '../src/registries/registry-state.logic.mjs';
 import {
@@ -94,5 +95,11 @@ test('runtime enforces prepared dependency injection contract', () => {
       reportableRootFiles: new Set(['package.json']),
     }),
     /requires prepared walkExclusions/u,
+  );
+
+
+  assert.throws(
+    () => summarizeFindings([]),
+    /requires prepared summaryBucketsRuntime/u,
   );
 });

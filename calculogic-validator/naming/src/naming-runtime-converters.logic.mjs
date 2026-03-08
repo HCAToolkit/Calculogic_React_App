@@ -28,3 +28,9 @@ export const toNamingRolesRuntime = (rolesArray) => {
 
 
 export const toReportableRootFilesSet = (rootFilesArray) => new Set(rootFilesArray);
+
+
+export const toSummaryBucketsRuntime = (summaryBuckets) => ({
+  classificationBuckets: [...summaryBuckets.classificationBuckets],
+  secondaryBucketFamilies: [...summaryBuckets.secondaryBucketFamilies],
+});
