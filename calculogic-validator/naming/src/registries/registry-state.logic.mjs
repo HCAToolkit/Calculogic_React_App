@@ -287,6 +287,7 @@ const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
     }),
     reportableExtensions: canonicalizeExtensions(extensionsRaw),
     reportableRootFiles: loadBuiltinReportableRootFiles({ builtinRegistryDir }),
+    summaryBuckets: loadBuiltinSummaryBuckets({ builtinRegistryDir }),
   };
 };
 

@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { resolveNamingRegistryInputs } from '../src/registries/registry-state.logic.mjs';
+import { toSummaryBucketsRuntime } from '../src/naming-runtime-converters.logic.mjs';
+import { summarizeFindings } from '../src/naming-validator.logic.mjs';
 
 const REGISTRY_MODULE_ROOT = path.resolve('calculogic-validator/naming/src/registries');
 
@@ -199,6 +201,10 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
 
     const customResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
     assert.ok(customResult.roles.some((entry) => entry.role === 'temp-custom-role'));
+    assert.deepEqual(customResult.summaryBuckets, {
+      classificationBuckets: ['bucket-a', 'bucket-b'],
+      secondaryBucketFamilies: ['codeCounts'],
+    });
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
@@ -273,6 +279,39 @@ test('custom state selects custom and digests diverge from builtin when payload 
     assert.equal(result.registryDigests.resolved, result.registryDigests.custom);
     assert.ok(result.roles.some((entry) => entry.role === 'custom-role'));
     assert.ok(result.reportableExtensions.includes('.abc'));
+    assert.ok(Array.isArray(result.summaryBuckets.classificationBuckets));
+    assert.ok(Array.isArray(result.summaryBuckets.secondaryBucketFamilies));
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+
+test('custom state preserves builtin summary buckets for summary runtime preparation', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, 'registry-state.json'), {
+      schemaVersion: '1',
+      activeRegistry: 'custom',
+    });
+
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+      { role: 'host', category: 'architecture-support', status: 'active' },
+      { role: 'custom-role', category: 'architecture-support', status: 'active' },
+    ]);
+
+    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), [
+      '.ts',
+      '.abc',
+    ]);
+
+    const result = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
+    const summaryBucketsRuntime = toSummaryBucketsRuntime(result.summaryBuckets);
+    const summary = summarizeFindings([], summaryBucketsRuntime);
+
+    assert.ok(Object.hasOwn(summary, 'counts'));
+    assert.ok(Object.hasOwn(summary, 'codeCounts'));
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }

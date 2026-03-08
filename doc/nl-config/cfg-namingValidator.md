@@ -145,8 +145,10 @@ Runtime behavior in this slice resolves naming registries via registry-state log
 - resolver computes one effective built-in registry root per call (defaulting to `calculogic-validator/naming/src/registries/_builtin`)
 - built-in roles are loaded from that effective root `roles.registry.json` (`rolesByCategory` flattened into `{ role, category, status, notes? }`)
 - built-in reportable extensions are loaded from that effective root `reportable-extensions.registry.json` (`reportableExtensions`)
+- built-in summary buckets are loaded from that effective root `summary-buckets.registry.json` (`summaryBuckets`)
 - built-in allowed categories for role validation are loaded from that same effective root `categories.registry.json`
-- resolver returns normalized arrays for `reportableExtensions` and `roles`
+- when `activeRegistry` is `custom`, custom payload uses `_custom` roles/extensions plus builtin-backed `reportableRootFiles` and `summaryBuckets`
+- resolver returns normalized arrays for `reportableExtensions` and `roles`, plus `reportableRootFiles` and `summaryBuckets`
 - wiring converts arrays into runtime structures expected by naming runtime:
   - `reportableExtensions` → `Set`
   - `roles` → `{ roleMetadata: Map, activeRoles: Set, roleSuffixes: string[] }` where role suffixes are length-desc sorted
