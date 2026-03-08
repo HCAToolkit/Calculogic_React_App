@@ -10,6 +10,8 @@ import { ROOT_APP_FILES } from './validator-root-files.knowledge.mjs';
 // - Policy source-of-truth remains the builtin registry payload, not ad hoc static data in this module.
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+export const DEFAULT_VALIDATOR_SCOPE = 'repo';
+
 const BUILTIN_SCOPE_PROFILES_REGISTRY_PATH = path.join(
   MODULE_DIR,
   '..',
@@ -118,7 +120,7 @@ export const listValidatorScopes = () =>
   Array.from(new Set(Object.keys(getBuiltinScopeProfiles()))).sort((a, b) => a.localeCompare(b));
 
 export const getValidatorScopeProfile = (scope) => {
-  const normalizedScope = scope ?? 'repo';
+  const normalizedScope = scope ?? DEFAULT_VALIDATOR_SCOPE;
   const profile = getBuiltinScopeProfiles()[normalizedScope];
   return profile ? cloneScopeProfile(profile) : null;
 };

@@ -1,7 +1,8 @@
+import { DEFAULT_VALIDATOR_SCOPE } from '../../../src/core/validator-scopes.runtime.mjs';
 import { parseRepeatableTargetArgument } from '../../../src/core/cli/validator-cli-targets.logic.mjs';
 
 export const parseNamingCliArguments = (argv) => {
-  let selectedScope = 'repo';
+  let selectedScope = DEFAULT_VALIDATOR_SCOPE;
   let configPath;
   let strict = false;
   const targets = [];

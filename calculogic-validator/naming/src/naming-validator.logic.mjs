@@ -1,6 +1,10 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import { listValidatorScopes, getValidatorScopeProfile } from '../../src/core/validator-scopes.runtime.mjs';
+import {
+  DEFAULT_VALIDATOR_SCOPE,
+  listValidatorScopes,
+  getValidatorScopeProfile,
+} from '../../src/core/validator-scopes.runtime.mjs';
 import {
   normalizePath,
   filterScopedPathsByProfile,
@@ -148,7 +152,7 @@ const detectMissingRoleCandidate = (basename) => {
 };
 
 export const collectRepositoryPaths = (rootDirectory, options = {}) => {
-  const selectedScope = options.scope ?? 'repo';
+  const selectedScope = options.scope ?? DEFAULT_VALIDATOR_SCOPE;
   const profile = getScopeProfile(selectedScope);
   if (!profile) {
     throw new Error(`Invalid scope profile: ${selectedScope}`);
@@ -323,7 +327,7 @@ export const runNamingValidator = (preparedInputs = {}) => {
   return {
     findings,
     totalFilesScanned: selectedPaths.length,
-    scope: preparedInputs.scope ?? 'repo',
+    scope: preparedInputs.scope ?? DEFAULT_VALIDATOR_SCOPE,
     filters: {
       isFiltered: resolvedTargets.length > 0,
       ...(resolvedTargets.length > 0
