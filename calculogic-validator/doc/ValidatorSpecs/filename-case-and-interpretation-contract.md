@@ -143,9 +143,9 @@ Classification: Illustrative
 
 ### 9.3 Semantic name is important but subordinate to explicit canonical role
 
-- Filename: `validator-core-normalization.report.mjs`
+- Filename: `validator-core-normalization.logic.mjs`
 - Semantic name lane: `validator-core-normalization` (high importance)
-- Canonical dominant role slot: `.report.mjs` (authoritative ownership lane)
+- Canonical dominant role slot: `.logic.mjs` (authoritative ownership lane)
 
 ### 9.4 Case-policy lanes separated from role ownership
 
