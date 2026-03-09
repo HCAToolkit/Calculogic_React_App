@@ -4,7 +4,7 @@ Status: **Canonical**
 
 ## Report-only note (current behavior)
 
-The naming validator currently operates in **report-only** mode. Supplying validator config changes report inputs and report metadata only (classification registries and optional `configDigest` in report output). It does **not** enable enforcement mode or fix execution.
+The naming validator remains **report-first** for detection and findings emission. Supplying validator config changes report inputs/metadata and may additionally enable strict exit semantics via `strictExit`. It does **not** enable fix execution or broader mode selection.
 
 ## 1) Purpose
 
@@ -37,6 +37,7 @@ Allowed root keys:
 
 - `version` (required, const `"0.1"`)
 - `$schema` (optional string hint)
+- `strictExit` (optional boolean; enables strict exit semantics for naming CLI)
 - `naming` (optional object)
 
 ### 4.2 `naming`
@@ -99,6 +100,7 @@ Special case:
 Runtime loading returns normalized config with deterministic shaping:
 
 - Output always sets `version: "0.1"`.
+- `strictExit` is retained only when provided.
 - `role` strings are trimmed.
 - extension strings are trimmed.
 - extension additions are de-duplicated after trim (`Set` semantics).
@@ -129,6 +131,13 @@ Current failure modes when config is supplied:
 When a valid config is supplied, naming reports may include:
 
 - `configDigest`
+
+Strict-exit resolution for naming CLI uses existing exit-policy semantics:
+
+- CLI `--strict` enables strict exit behavior.
+- Config `strictExit: true` enables strict exit behavior even without CLI `--strict`.
+- CLI precedence is deterministic: `--strict` wins over config when both are present.
+- Report JSON is emitted before exit code is derived/applied.
 
 This behavior applies to:
 
@@ -200,5 +209,14 @@ This behavior applies to:
       ]
     }
   }
+}
+```
+
+### 9.5 Strict exit via config
+
+```json
+{
+  "version": "0.1",
+  "strictExit": true
 }
 ```

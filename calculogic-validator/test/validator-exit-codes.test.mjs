@@ -43,6 +43,7 @@ const parseJsonStdout = (result) => {
 
 test('validate-naming exits 2 by default when warnings are present', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-exit-codes-'));
+  let configDir;
 
   try {
     await writeFixtureRepo(fixtureDir);
@@ -65,6 +66,7 @@ test('validate-naming exits 2 by default when warnings are present', async () =>
 
 test('validate-naming exits 0 by default and 1 in strict mode for legacy-exception-only findings', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-exit-codes-'));
+  let configDir;
 
   try {
     await writeFixtureRepo(fixtureDir);
@@ -91,6 +93,109 @@ test('validate-naming exits 0 by default and 1 in strict mode for legacy-excepti
   }
 });
 
+
+
+test('validate-naming stays default-success for legacy-exception-only findings when config strictExit is absent or false', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-exit-codes-'));
+  let configDir;
+
+  try {
+    await writeFixtureRepo(fixtureDir);
+
+    configDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-config-'));
+    const absentConfigPath = path.join(configDir, 'validator-config.absent-strict.json');
+    await fs.writeFile(
+      absentConfigPath,
+      JSON.stringify({ version: '0.1' }, null, 2),
+      'utf8',
+    );
+
+    const absentStrictResult = runNodeScript(
+      namingScriptPath,
+      [`--config=${absentConfigPath}`],
+      fixtureDir,
+    );
+    assert.equal(absentStrictResult.status, 0);
+
+    const falseConfigPath = path.join(configDir, 'validator-config.strict-false.json');
+    await fs.writeFile(
+      falseConfigPath,
+      JSON.stringify({ version: '0.1', strictExit: false }, null, 2),
+      'utf8',
+    );
+
+    const falseStrictResult = runNodeScript(
+      namingScriptPath,
+      [`--config=${falseConfigPath}`],
+      fixtureDir,
+    );
+    assert.equal(falseStrictResult.status, 0);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+    if (typeof configDir === 'string') {
+      await fs.rm(configDir, { recursive: true, force: true });
+    }
+  }
+});
+
+test('validate-naming exits 1 for legacy-exception-only findings when config strictExit is true', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-exit-codes-'));
+  let configDir;
+
+  try {
+    await writeFixtureRepo(fixtureDir);
+
+    configDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-config-'));
+    const configPath = path.join(configDir, 'validator-config.strict-true.json');
+    await fs.writeFile(
+      configPath,
+      JSON.stringify({ version: '0.1', strictExit: true }, null, 2),
+      'utf8',
+    );
+
+    const result = runNodeScript(namingScriptPath, [`--config=${configPath}`], fixtureDir);
+    assert.equal(result.status, 1);
+
+    const report = parseJsonStdout(result);
+    assert.ok(
+      report.findings.some((finding) => finding?.classification === 'legacy-exception'),
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+    if (typeof configDir === 'string') {
+      await fs.rm(configDir, { recursive: true, force: true });
+    }
+  }
+});
+
+test('validate-naming CLI --strict takes precedence over config strictExit false', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-exit-codes-'));
+  let configDir;
+
+  try {
+    await writeFixtureRepo(fixtureDir);
+
+    configDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-config-'));
+    const configPath = path.join(configDir, 'validator-config.strict-false.json');
+    await fs.writeFile(
+      configPath,
+      JSON.stringify({ version: '0.1', strictExit: false }, null, 2),
+      'utf8',
+    );
+
+    const result = runNodeScript(
+      namingScriptPath,
+      ['--strict', `--config=${configPath}`],
+      fixtureDir,
+    );
+    assert.equal(result.status, 1);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+    if (typeof configDir === 'string') {
+      await fs.rm(configDir, { recursive: true, force: true });
+    }
+  }
+});
 test('validate-all mirrors exit policy from aggregated findings', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-exit-codes-'));
 

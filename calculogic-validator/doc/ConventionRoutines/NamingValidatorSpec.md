@@ -186,7 +186,7 @@ Invalid scope behavior:
 
 Config reference: [`validator-config-spec.md`](../ValidatorSpecs/validator-config-spec.md).
 
-Current naming behavior remains report-only in implementation. Passing `--config=<path>` does **not** enable enforcement or fix execution in the naming slice.
+Current naming behavior remains report-first in implementation. Passing `--config=<path>` does **not** enable fix execution or broader enforcement modes, but config may enable strict-exit semantics via `strictExit`.
 
 When provided, config only affects naming report inputs for:
 
@@ -342,6 +342,7 @@ Naming V0.1.7 currently implements:
   - invalid CLI usage (e.g., unknown `--scope`) exits `1`
 
 `--strict` in this naming slice is an exit-policy modifier, not a separate detection mode. See [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md) for canonical policy framing.
+When both CLI and config are present, CLI `--strict` has precedence for strict-exit resolution.
 
 Suite policy options are shared contracts but deferred for naming implementation:
 
