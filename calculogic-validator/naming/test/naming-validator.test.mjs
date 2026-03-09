@@ -65,6 +65,10 @@ const disambiguationPrecedenceCases = [
         role: 'logic',
         roleCategory: 'concern-core',
         roleStatus: 'active',
+        disambiguation: {
+          roleLikeFolderTokens: ['host'],
+          roleLikeSemanticTokens: [],
+        },
       },
     },
   },
@@ -79,6 +83,10 @@ const disambiguationPrecedenceCases = [
         role: 'logic',
         roleCategory: 'concern-core',
         roleStatus: 'active',
+        disambiguation: {
+          roleLikeFolderTokens: [],
+          roleLikeSemanticTokens: ['host'],
+        },
       },
     },
   },
@@ -93,6 +101,10 @@ const disambiguationPrecedenceCases = [
         role: 'logic',
         roleCategory: 'concern-core',
         roleStatus: 'active',
+        disambiguation: {
+          roleLikeFolderTokens: [],
+          roleLikeSemanticTokens: ['wiring'],
+        },
       },
     },
   },
@@ -120,6 +132,16 @@ disambiguationPrecedenceCases.forEach(({ name, inputPath, expected }) => {
       assert.equal(finding.details?.role, expected.details.role);
       assert.equal(finding.details?.roleCategory, expected.details.roleCategory);
       assert.equal(finding.details?.roleStatus, expected.details.roleStatus);
+      if (expected.details.disambiguation) {
+        assert.deepEqual(
+          finding.details?.disambiguation?.roleLikeFolderTokens,
+          expected.details.disambiguation.roleLikeFolderTokens,
+        );
+        assert.deepEqual(
+          finding.details?.disambiguation?.roleLikeSemanticTokens,
+          expected.details.disambiguation.roleLikeSemanticTokens,
+        );
+      }
     }
 
     if (expected.message) {
