@@ -9,6 +9,25 @@ import { summarizeFindings } from '../src/naming-validator.logic.mjs';
 
 const REGISTRY_MODULE_ROOT = path.resolve('calculogic-validator/naming/src/registries');
 
+const DEFAULT_OVERLAY_CAPABILITIES_REGISTRY = {
+  version: '1',
+  capabilities: [
+    {
+      configPath: 'naming.reportableExtensions',
+      operation: 'add',
+      payloadType: 'string-array',
+      target: 'reportableExtensions',
+    },
+    {
+      configPath: 'naming.roles',
+      operation: 'add',
+      payloadType: 'role-array',
+      target: 'roles',
+    },
+  ],
+};
+
+
 const INTENDED_BUILTIN_REPORTABLE_EXTENSIONS = [
   '.cjs',
   '.css',
@@ -222,6 +241,11 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
         },
       },
     });
+
+    writeJson(
+      path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'),
+      DEFAULT_OVERLAY_CAPABILITIES_REGISTRY,
+    );
 
     const builtinResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
     assert.deepEqual(builtinResult.roles, [
@@ -499,6 +523,116 @@ test('throws when custom reportable extension omits leading dot', () => {
     assert.throws(
       () => resolveNamingRegistryInputs({ registryRootDir: tempRoot }),
       /must start with "\."|must start with "."/u,
+    );
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+
+test('config overlay preserves supported add-only semantics for roles and reportable extensions', () => {
+  const result = resolveNamingRegistryInputs({
+    config: {
+      naming: {
+        reportableExtensions: { add: ['.xyz', '.ts'] },
+        roles: {
+          add: [
+            { role: 'overlay-role', category: 'architecture-support', status: 'active' },
+            { role: 'host', category: 'architecture-support', status: 'active' },
+          ],
+        },
+      },
+    },
+  });
+
+  assert.equal(result.registrySource, 'config');
+  assert.ok(result.reportableExtensions.includes('.xyz'));
+  assert.ok(result.reportableExtensions.includes('.ts'));
+  assert.ok(result.roles.some((entry) => entry.role === 'overlay-role'));
+  assert.equal(result.roles.filter((entry) => entry.role === 'host').length, 1);
+});
+
+test('unsupported config overlay paths remain ignored', () => {
+  const builtin = resolveNamingRegistryInputs();
+  const withUnsupportedOverlay = resolveNamingRegistryInputs({
+    config: {
+      naming: {
+        summaryBuckets: { add: ['not-supported'] },
+      },
+    },
+  });
+
+  assert.equal(withUnsupportedOverlay.registrySource, 'config');
+  assert.deepEqual(withUnsupportedOverlay.roles, builtin.roles);
+  assert.deepEqual(withUnsupportedOverlay.reportableExtensions, builtin.reportableExtensions);
+  assert.deepEqual(withUnsupportedOverlay.summaryBuckets, builtin.summaryBuckets);
+});
+
+test('throws when overlay capabilities registry is malformed', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
+      categories: [{ category: 'architecture-support' }],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+      rolesByCategory: {
+        'architecture-support': [{ role: 'host', status: 'active' }],
+      },
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), {
+      reportableExtensions: ['.ts'],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), {
+      reportableRootFiles: ['package.json'],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), {
+      classificationBuckets: ['canonical'],
+      secondaryBucketFamilies: ['codeCounts'],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), {
+      missingRolePatterns: [
+        {
+          patternId: 'single-extension',
+          dotSegments: 2,
+          semanticSegmentIndex: 0,
+          extensionSegmentIndexes: [1],
+        },
+      ],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), {
+      outcomes: {
+        canonical: {
+          code: 'NAMING_CANONICAL',
+          severity: 'info',
+          classification: 'canonical',
+          message: 'ok',
+          ruleRef: 'naming-spec',
+        },
+      },
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), {
+      version: '1',
+      capabilities: [
+        {
+          configPath: 'naming.roles',
+          operation: 'replace',
+          payloadType: 'role-array',
+          target: 'roles',
+        },
+      ],
+    });
+
+    assert.throws(
+      () => resolveNamingRegistryInputs({ registryRootDir: tempRoot, config: {} }),
+      /overlay-capabilities registry/u,
     );
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });

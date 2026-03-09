@@ -38,7 +38,7 @@ These areas are already registry-backed and should not be redundantly re-extract
 | Default scope fallback (CLI) | `naming/src/cli/naming-cli-args.logic.mjs` and `src/core/validator-scopes.runtime.mjs` | CLI parser now initializes from suite-owned `DEFAULT_VALIDATOR_SCOPE`; runtime normalizes from same owner. | Canonical owner removes CLI/runtime drift risk. | `DEFAULT_VALIDATOR_SCOPE` in suite runtime. | `completed` | Preserve behavior (`repo`) while keeping one owner. | Parser behavior unchanged; ownership consolidated. |
 | Finding severity/classification/message family mapping | `naming/src/naming-validator.logic.mjs` + `naming/src/registries/_builtin/finding-policy.registry.json` | Runtime now resolves finding metadata (`severity`, `classification`, `code`, message templates, rule refs, optional suggested fix) from registry entries keyed by stable outcome IDs. | Branch-to-finding mapping is policy vocabulary and enforcement semantics, with algorithmic decision flow staying code-owned. | `finding-policy.registry.json` keyed by decision outcome IDs. | `completed` | Keep outcome IDs stable and preserve deterministic metadata lookup semantics. | Extraction completed via registry loader/state wiring with runtime lookup ownership in naming validator logic. |
 | Summary bucket structure | `naming/src/registries/_builtin/summary-buckets.registry.json` + `naming/src/naming-validator.logic.mjs` | `summarizeFindings(...)` now consumes wiring-prepared summary bucket policy sourced from builtin registry. | Report vocabulary and summary grouping are policy surface decisions and now have a deterministic owner. | `summary-buckets.registry.json` (classification buckets + optional facets). | `completed` | Keep schema bounded and preserve deterministic sort/count behavior. | Extracted in V0.1.24 without output-shape changes. |
-| Config overlay limits | `naming/src/registries/registry-state.logic.mjs` | `applyConfigOverlay(...)` only supports `naming.reportableExtensions.add` and `naming.roles.add`. | Overlay capability is narrow policy contract, currently not extensible to other policy surfaces. | `overlay-capabilities.registry.json` (declared add-only fields and merge mode). | `registry-ready-after-normalization` | Define bounded overlay capability map before adding new policy registries. | Explicit hotspot requested. |
+| Config overlay limits | `naming/src/registries/registry-state.logic.mjs` + `naming/src/registries/_builtin/overlay-capabilities.registry.json` | Runtime now resolves bounded overlay support from registry-declared capabilities and preserves add-only handling for `naming.reportableExtensions.add` and `naming.roles.add`. | Overlay capability is a policy contract surface; contract declaration is now registry-owned while merge mechanics remain engine-owned. | `overlay-capabilities.registry.json` (declared add-only fields and merge mode). | `completed` | Keep overlay schema bounded to current naming surfaces and preserve unsupported-path behavior. | Extraction completed as bounded contract-first slice without broadening overlay semantics. |
 | Exit behavior mapping | `src/core/validator-exit-code.logic.mjs` | Exit code derivation is hardcoded (`warn => 2`, strict+legacy exception => 1). | Severity/classification → exit code is policy contract. | `exit-policy.registry.json` (ordered predicates). | `registry-ready-after-normalization` | Extract only after naming finding policy is normalized to stable outcome semantics. | Cross-validator relevance; keep deterministic ordering. |
 | Tree top-level shape vocabulary | `tree/src/registries/_builtin/tree-known-roots.registry.json` + `tree/src/tree-structure-advisor.logic.mjs` | Runtime now consumes `knownTopLevelDirectories` from bounded tree registry payload. | Allowed root directories are repository policy, not algorithmic necessity. | `tree-known-roots.registry.json`. | `completed` | Keep payload bounded to current top-level vocabulary and preserve deterministic ordering in findings details. | Extraction completed without decision-flow changes. |
 | Tree validator-owned basename signals | `tree/src/tree-structure-advisor.logic.mjs` | `VALIDATOR_OWNED_BASENAME_PATTERNS` regex list hardcoded. | File ownership signal vocabulary is policy-shaped and expected to drift over time. | `validator-owned-signals.registry.json`. | `registry-ready-after-normalization` | Normalize signal taxonomy (entrypoint/test/module classes) before extraction. | Avoid turning regex into unmanaged catch-all lists. |
@@ -53,7 +53,6 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 ### registry-ready-after-normalization
 
-- Config overlay capability matrix.
 - Exit policy mapping.
 - Tree basename ownership signal taxonomy.
 - Shim detection signal/suppression vocabulary.
@@ -66,11 +65,9 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 Prioritized by structural ROI (clean policy ownership boundaries first):
 
-1. **Overlay capability contract expansion**
-   - Add explicit capability declarations for newly extracted registry surfaces.
-2. **Exit policy mapping**
+1. **Exit policy mapping**
    - Externalize severity/classification-to-exit predicates after finding outcomes stabilize.
-3. **Deeper semantic relationship metadata (tree signals)**
+2. **Deeper semantic relationship metadata (tree signals)**
    - Add bounded registries for shim signal semantics and cross-surface suppression behavior.
 
 ## Keep-hardcoded-for-now
@@ -91,14 +88,10 @@ Retain hardcoded implementation behavior for now where code is primarily **engin
 
 ## Next-step implementation slices
 
-1. **Slice B — Overlay capability expansion contract**
-   - Add deterministic overlay capability declarations for newly extracted registries.
-   - Keep add-only semantics where required and explicit.
-
-2. **Slice C — Exit policy mapping extraction**
+1. **Slice A — Exit policy mapping extraction**
    - Externalize ordered exit predicates after finding policy outcomes are stable.
    - Preserve strict/legacy exception behavior semantics.
 
-3. **Slice D — Tree signal policy extraction**
+2. **Slice B — Tree signal policy extraction**
    - Extract validator-owned basename/shim signals after schema normalization.
    - Keep tree known-roots extraction completed and isolated from broader signal policy work.

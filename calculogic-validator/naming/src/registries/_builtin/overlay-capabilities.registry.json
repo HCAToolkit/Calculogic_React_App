@@ -1,0 +1,17 @@
+{
+  "version": "1",
+  "capabilities": [
+    {
+      "configPath": "naming.reportableExtensions",
+      "operation": "add",
+      "payloadType": "string-array",
+      "target": "reportableExtensions"
+    },
+    {
+      "configPath": "naming.roles",
+      "operation": "add",
+      "payloadType": "role-array",
+      "target": "roles"
+    }
+  ]
+}
