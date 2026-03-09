@@ -102,8 +102,8 @@ Tranche note: this is naming-first hardening, but better deterministic filename 
 - `calculogic-validator/naming/src/naming-runtime-converters.logic.mjs` — converter/runtime preparation layer that compiles registry payload shapes into executable state.
 - `calculogic-validator/naming/src/registries/_builtin/case-rules.registry.json` — current builtin case-policy payload (semantic-name case baseline).
 - `calculogic-validator/naming/src/registries/_builtin/roles.registry.json` — canonical role vocabulary payload consumed by role-slot checks.
-- `calculogic-validator/naming/test/naming-validator.test.mjs` — primary naming behavior coverage location for extending disambiguation matrix scenarios.
-- `calculogic-validator/naming/test/naming-runtime-input-boundary.test.mjs` — runtime input/collection boundary tests where folder-context lane/scope distinctions can be hardened.
+- `calculogic-validator/naming/test/naming-validator.test.mjs` — primary naming behavior coverage location for expanding the disambiguation matrix, including role-like folder tokens remaining contextual vs explicit role-slot authority.
+- `calculogic-validator/naming/test/naming-runtime-input-boundary.test.mjs` — prepared dependency-injection contract and runtime input-boundary enforcement surface (prepared runtimes/sets required, with path selection/walk exclusions as mechanics).
 
 ## 7) Out-of-scope guardrails for this tranche document
 
