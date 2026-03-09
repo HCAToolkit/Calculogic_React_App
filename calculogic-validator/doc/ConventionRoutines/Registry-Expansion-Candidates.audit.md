@@ -22,9 +22,11 @@ These areas are already registry-backed and should not be redundantly re-extract
 - Missing-role patterns registry (`missing-role-patterns.registry.json`) via `registry-state.logic.mjs` + `naming-missing-role-patterns.registry.logic.mjs`.
 - Finding policy registry (`finding-policy.registry.json`) via `registry-state.logic.mjs` + `naming-finding-policy.registry.logic.mjs` + `naming-validator.logic.mjs`.
 - Summary buckets registry (`summary-buckets.registry.json`) via `registry-state.logic.mjs` + `naming-summary-buckets.registry.logic.mjs` + `naming-validator.logic.mjs`.
+- Overlay capabilities registry (`overlay-capabilities.registry.json`) via `registry-state.logic.mjs`.
 - Scope profiles registry (`scope-profiles.registry.json`) via `validator-scopes.runtime.mjs`.
 - Default validator scope policy via `DEFAULT_VALIDATOR_SCOPE` in `validator-scopes.runtime.mjs` (canonical suite-owned default consumed by runtime + naming CLI/wiring).
 - Special cases registry (`special-cases.registry.json`) via `naming-special-case-rules.registry.logic.mjs`.
+- Exit policy registry (`exit-policy.registry.json`) via `validator-exit-policy.registry.runtime.mjs` + `validator-exit-code.logic.mjs`.
 - Tree known-roots registry (`tree-known-roots.registry.json`) via `tree-known-roots.registry.logic.mjs`.
 - Tree validator-owned signal registry (`validator-owned-signals.registry.json`) via `tree-signal-policy.registry.logic.mjs` + `tree-structure-advisor.logic.mjs`.
 - Tree shim detection vocabularies registry (`shim-detection-signals.registry.json`) via `tree-signal-policy.registry.logic.mjs` + `tree-shim-detection.logic.mjs`.
@@ -65,8 +67,7 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 Prioritized by structural ROI (clean policy ownership boundaries first):
 
-1. **Tree signal policy extraction (completed in current-state baseline)**
-   - Bounded registries now own validator-owned basename signals and shim detection vocabularies while evaluation flow remains code-owned.
+- No pending extraction slices remain in this audit scope; current registry-expansion candidates are completed or explicitly `keep-hardcoded-for-now`.
 
 ## Keep-hardcoded-for-now
 
@@ -86,6 +87,4 @@ Retain hardcoded implementation behavior for now where code is primarily **engin
 
 ## Next-step implementation slices
 
-1. **Slice A — Tree signal policy extraction (completed)**
-   - Validator-owned basename and shim-detection vocabularies are now registry-backed with deterministic loader validation.
-   - Keep extraction bounded and avoid broadening into wildcard/system-scope expansion work.
+- No pending implementation slices remain in this audit scope; completed extraction history is captured in the hardcoded-policy inventory.
