@@ -85,6 +85,7 @@ Examples of allowed behavior:
 - Merge built-in + overlay/custom inputs when contract rules define this.
 
 Normalization/resolution owns deterministic runtime interpretation; storage convenience shape does not.
+For canonical loader-converter-runtime ownership boundaries (including mechanics that must remain outside registries), see [`../ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md`](../ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md).
 
 ## Slice-local vs suite-level ownership
 

@@ -6,6 +6,8 @@
 
 Registry expansion roadmap note: see [`doc/ConventionRoutines/Registry-Expansion-Candidates.audit.md`](./doc/ConventionRoutines/Registry-Expansion-Candidates.audit.md) for the current hardcoded-policy audit and prioritized extraction plan.
 
+Canonical ownership boundary note: for loader → converter → runtime ownership and policy-data vs engine-mechanics separation, see [`doc/ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md`](./doc/ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md).
+
 ## 2) Projected package layout (target)
 
 This is the intended target structure for the validator suite as refactors continue.

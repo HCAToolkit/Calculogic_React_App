@@ -45,6 +45,7 @@ This keeps report capture deterministic while preserving explicit invalid-usage 
 Implementation note: suite CLI scripts should reuse suite-core helpers in `calculogic-validator/src/core/cli/` (for example `validator-cli-output.logic.mjs`, `validator-cli-usage.logic.mjs`, `validator-cli-targets.logic.mjs`, and `validator-cli-scopes.logic.mjs`) for report emission, usage/error output flow, and repeatable `--target` parsing rather than duplicating ad hoc CLI scaffolding. This suite-core CLI helper area is intentionally discoverable for current and future validator slices.
 
 For helper-area ownership and reuse routing across suite-core and slice-owned semantic areas, see [`ValidatorHelperAreas-And-Reuse-Conventions.md`](./ValidatorHelperAreas-And-Reuse-Conventions.md).
+For canonical loader → converter → runtime ownership boundaries (including what belongs to policy-data loaders/converters vs engine runtime mechanics), see [`ValidatorLoaderConverterRuntimeOwnership-Contract.md`](./ValidatorLoaderConverterRuntimeOwnership-Contract.md).
 
 ## 5) Current exit-code policy (as implemented today)
 
