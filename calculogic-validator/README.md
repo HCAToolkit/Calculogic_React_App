@@ -119,6 +119,19 @@ calculogic-validator/
 - Slice-owned shared concerns belong in semantic slice areas under `<slice>/src/<area>/`.
 - Prefer semantic owner areas over generic catch-all `shared/` folders when a clearer owner exists.
 
+#### Loader ownership boundary (registry-state vs direct builtin)
+
+- Use a **registry-state owner** when a slice must compose multiple policy payloads (for example builtin + overlay/custom), enforce deterministic precedence/canonicalization, and maintain digest/cache state as a first-class contract.
+- Use a **direct builtin loader** when policy vocabulary is intentionally local, bounded, and consumed by one slice path without needing a generic cross-slice state aggregator.
+- Keep **suite-core surfaces** as local owners when they are composition/runtime mechanics (runner orchestration, scope/runtime contracts, slice registry composition) rather than slice policy payload normalization.
+- Do not force every registry surface through one generic state layer: this creates ownership blur, over-couples independent slices, and encourages catch-all loader sprawl.
+
+Current intentional pattern:
+
+- Naming centralizes major extracted policy surfaces through `naming/src/registries/registry-state.logic.mjs`.
+- Tree signal/core-scope policy uses direct local builtin loaders under tree-owned registry logic modules.
+- Suite-core runtime composition remains locally owned under `src/core/**` instead of acting as a universal registry-state host.
+
 ## 3) Quickstart (repo root)
 
 ```bash

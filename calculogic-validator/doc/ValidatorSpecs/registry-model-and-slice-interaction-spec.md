@@ -87,6 +87,25 @@ Examples of allowed behavior:
 Normalization/resolution owns deterministic runtime interpretation; storage convenience shape does not.
 For canonical loader-converter-runtime ownership boundaries (including mechanics that must remain outside registries), see [`../ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md`](../ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md).
 
+
+## Registry-state vs direct builtin ownership rule
+
+This spec adopts a non-flat ownership model:
+
+- A slice should use a **registry-state owner** when policy assembly requires multi-source state composition, precedence normalization, and explicit state lifecycle contracts.
+- A slice should use **direct builtin loaders** when policy payloads are intentionally local and bounded to that slice, with deterministic local normalization only.
+- **Suite-core** should remain a local owner for suite composition/runtime mechanics and must not become a forced universal state layer for all registries.
+
+Current intentional mapping:
+
+- Naming uses a registry-state owner (`naming/src/registries/registry-state.logic.mjs`) for centralized policy-state composition.
+- Tree keeps local direct builtin loaders (`tree/src/registries/*.registry.logic.mjs`) for bounded tree-owned policy vocabularies.
+- Suite-core keeps composition ownership under `src/core/**` without flattening all registry ownership through one path.
+
+Rationale:
+
+- This preserves clear ownership boundaries and extraction paths, avoids mega-loader coupling, and keeps registry policy ownership aligned to the slice that consumes it.
+
 ## Slice-local vs suite-level ownership
 
 ### Slice-local ownership (default)
