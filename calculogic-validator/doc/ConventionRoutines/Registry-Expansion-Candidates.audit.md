@@ -48,11 +48,10 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 ### registry-ready-now
 
-- None currently.
+- Finding outcome-to-metadata mapping (severity/classification/message families) — **completed** via naming finding-policy registry surface (`naming/src/registries/_builtin/finding-policy.registry.json`) with stable runtime outcome IDs.
 
 ### registry-ready-after-normalization
 
-- Finding outcome-to-metadata mapping (severity/classification/message families).
 - Config overlay capability matrix.
 - Exit policy mapping.
 - Tree basename ownership signal taxonomy.
@@ -93,19 +92,14 @@ Retain hardcoded implementation behavior for now where code is primarily **engin
 
 ## Next-step implementation slices
 
-1. **Slice A — Finding policy map**
-   - Introduce stable internal decision outcome IDs.
-   - Move outcome→`{code,severity,classification,message,ruleRef,suggestedFix}` mapping to registry.
-   - Keep rule evaluation flow unchanged.
-
-2. **Slice B — Overlay capability expansion contract**
+1. **Slice B — Overlay capability expansion contract**
    - Add deterministic overlay capability declarations for newly extracted registries.
    - Keep add-only semantics where required and explicit.
 
-3. **Slice C — Exit policy mapping extraction**
+2. **Slice C — Exit policy mapping extraction**
    - Externalize ordered exit predicates after finding policy outcomes are stable.
    - Preserve strict/legacy exception behavior semantics.
 
-4. **Slice D — Tree signal policy extraction**
+3. **Slice D — Tree signal policy extraction**
    - Extract validator-owned basename/shim signals after schema normalization.
    - Keep tree known-roots extraction completed and isolated from broader signal policy work.

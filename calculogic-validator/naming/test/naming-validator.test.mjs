@@ -49,12 +49,15 @@ test('classifies unknown role as invalid-ambiguous', () => {
   const finding = classifyPath('src/rightpanel.widget.ts');
   assert.equal(finding.classification, 'invalid-ambiguous');
   assert.equal(finding.code, 'NAMING_UNKNOWN_ROLE');
+  assert.equal(finding.message, 'Unknown role segment "widget" in canonical position.');
+  assert.equal(finding.suggestedFix, 'Use a role from the active role registry.');
 });
 
 test('classifies semantic-name casing violation as invalid-ambiguous', () => {
   const finding = classifyPath('src/RightPanel.logic.ts');
   assert.equal(finding.classification, 'invalid-ambiguous');
   assert.equal(finding.code, 'NAMING_BAD_SEMANTIC_CASE');
+  assert.equal(finding.suggestedFix, 'Rename semantic name "RightPanel" to kebab-case.');
 });
 
 test('classifies hyphen-appended role ambiguity as invalid-ambiguous', () => {
@@ -95,6 +98,10 @@ test('classifies deprecated role usage as invalid-ambiguous with metadata', () =
   const finding = classifyPath('src/tabs/build/BuildSurface.view.css');
   assert.equal(finding.classification, 'invalid-ambiguous');
   assert.equal(finding.code, 'NAMING_DEPRECATED_ROLE');
+  assert.equal(
+    finding.message,
+    'Role segment "view" is deprecated and requires manual migration planning.',
+  );
   assert.equal(finding.details?.roleStatus, 'deprecated');
   assert.equal(finding.details?.roleCategory, 'deprecated');
 });

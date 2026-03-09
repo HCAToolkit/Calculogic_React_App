@@ -193,6 +193,7 @@ When provided, config only affects naming report inputs for:
 - reportable extension set (defaults ∪ additions)
 - naming role registry runtime (defaults + add-only role additions)
 - missing-role pattern policy runtime (builtin normalized schema for legacy exception detection)
+- finding-policy runtime (builtin outcome→finding metadata mapping for stable decision outcomes)
 
 In current behavior, these config effects are limited to classification/runtime registries only for report generation.
 
@@ -254,6 +255,12 @@ Stable classifications used by V0.1.2:
 - `invalid-ambiguous`
 
 Classification semantics are unchanged from V0.1.1. Scope profiles only change selected input paths.
+
+Internal decision normalization (runtime implementation boundary):
+
+- code-owned branching resolves stable outcome IDs (for example `canonical`, `unknown-role`, `deprecated-role`, `missing-role`)
+- registry-owned finding policy maps each outcome ID to finding metadata vocabulary (`code`, `severity`, `classification`, `message`, `ruleRef`, optional `suggestedFix`)
+- runtime behavior remains deterministic and output-equivalent while separating branch mechanics from policy metadata defaults
 
 ## Finding Schema
 

@@ -82,6 +82,66 @@ const assertPreparedMissingRolePatternsRuntime = (missingRolePatternsRuntime) =>
   );
 };
 
+const assertPreparedFindingPolicyRuntime = (findingPolicyRuntime) => {
+  if (findingPolicyRuntime instanceof Map) {
+    return findingPolicyRuntime;
+  }
+
+  throw new Error(
+    'Naming runtime requires prepared findingPolicyRuntime (Map) from wiring/runtime adapter.',
+  );
+};
+
+const NAMING_DECISION_OUTCOME_IDS = Object.freeze({
+  ALLOWED_SPECIAL_CASE: 'allowed-special-case',
+  DEPRECATED_ROLE: 'deprecated-role',
+  UNKNOWN_ROLE: 'unknown-role',
+  BAD_SEMANTIC_CASE: 'bad-semantic-case',
+  CANONICAL: 'canonical',
+  ROLE_HYPHEN_AMBIGUITY: 'role-hyphen-ambiguity',
+  MISSING_ROLE: 'missing-role',
+  LEGACY_EXCEPTION: 'legacy-exception',
+});
+
+const interpolateMessageTemplate = (template, values = {}) =>
+  template.replace(/\{([a-zA-Z0-9_]+)\}/gu, (token, key) =>
+    Object.hasOwn(values, key) ? String(values[key]) : token,
+  );
+
+const createFindingFromOutcome = ({
+  outcomeId,
+  path: normalizedPath,
+  findingPolicyRuntime,
+  messageValues,
+  details,
+}) => {
+  const policy = findingPolicyRuntime.get(outcomeId);
+  if (!policy) {
+    throw new Error(
+      `Missing naming finding policy for outcome "${outcomeId}" in prepared findingPolicyRuntime.`,
+    );
+  }
+
+  const finding = {
+    code: policy.code,
+    severity: policy.severity,
+    path: normalizedPath,
+    classification: policy.classification,
+    message: interpolateMessageTemplate(policy.message, messageValues),
+    ruleRef: policy.ruleRef,
+  };
+
+  if (policy.suggestedFix) {
+    finding.suggestedFix = interpolateMessageTemplate(policy.suggestedFix, messageValues);
+  }
+
+  if (details !== undefined) {
+    finding.details = details;
+  }
+
+  return finding;
+};
+
 const assertPreparedSummaryBucketsRuntime = (summaryBucketsRuntime) => {
   if (
     summaryBucketsRuntime &&
@@ -215,153 +275,118 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
   return filterScopedPathsByProfile(allReportablePaths, profile);
 };
 
-export const classifyPath = (relativePath, namingRolesRuntime, missingRolePatternsRuntime) => {
+export const classifyPath = (
+  relativePath,
+  namingRolesRuntime,
+  missingRolePatternsRuntime,
+  findingPolicyRuntime,
+) => {
   const runtime = assertPreparedNamingRolesRuntime(namingRolesRuntime);
   const missingRolePatterns = assertPreparedMissingRolePatternsRuntime(missingRolePatternsRuntime);
+  const findingPolicy = assertPreparedFindingPolicyRuntime(findingPolicyRuntime);
   const normalizedPath = normalizePath(relativePath);
   const basename = path.posix.basename(normalizedPath);
 
   const specialCaseType = getSpecialCaseType(normalizedPath);
   if (specialCaseType) {
-    return {
-      code: 'NAMING_ALLOWED_SPECIAL_CASE',
-      severity: 'info',
+    return createFindingFromOutcome({
+      outcomeId: NAMING_DECISION_OUTCOME_IDS.ALLOWED_SPECIAL_CASE,
       path: normalizedPath,
-      classification: 'allowed-special-case',
-      message: 'Filename matches an allowed reserved/special-case pattern.',
-      ruleRef:
-        'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12',
+      findingPolicyRuntime: findingPolicy,
       details: { specialCaseType },
-    };
+    });
   }
 
   const parsed = parseCanonicalName(basename);
   if (parsed) {
     const missingRoleCandidate = detectMissingRoleCandidate(basename, missingRolePatterns);
     if (missingRoleCandidate && parsed.role === 'module' && parsed.extension === 'css') {
-      return {
-        code: 'NAMING_MISSING_ROLE',
-        severity: 'info',
+      return createFindingFromOutcome({
+        outcomeId: NAMING_DECISION_OUTCOME_IDS.MISSING_ROLE,
         path: normalizedPath,
-        classification: 'legacy-exception',
-        message:
-          'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
-        ruleRef:
-          'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
-        suggestedFix: 'Rename to <semantic-name>.<role>.<ext> using an active role.',
+        findingPolicyRuntime: findingPolicy,
         details: missingRoleCandidate,
-      };
+      });
     }
 
     const roleMetadata = getRoleMetadata(parsed.role, runtime.roleMetadata);
 
     if (isUnknownOrInactiveRole(parsed.role, roleMetadata, runtime.activeRoles)) {
       if (isDeprecatedRole(roleMetadata)) {
-        return {
-          code: 'NAMING_DEPRECATED_ROLE',
-          severity: 'warn',
+        return createFindingFromOutcome({
+          outcomeId: NAMING_DECISION_OUTCOME_IDS.DEPRECATED_ROLE,
           path: normalizedPath,
-          classification: 'invalid-ambiguous',
-          message: `Role segment "${parsed.role}" is deprecated and requires manual migration planning.`,
-          ruleRef:
-            'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
-          suggestedFix: 'Replace deprecated roles manually using current active role taxonomy.',
+          findingPolicyRuntime: findingPolicy,
+          messageValues: { role: parsed.role },
           details: {
             ...parsed,
             roleStatus: roleMetadata.status,
             roleCategory: roleMetadata.category,
             deprecationNote: roleMetadata.notes,
           },
-        };
+        });
       }
 
-      return {
-        code: 'NAMING_UNKNOWN_ROLE',
-        severity: 'warn',
+      return createFindingFromOutcome({
+        outcomeId: NAMING_DECISION_OUTCOME_IDS.UNKNOWN_ROLE,
         path: normalizedPath,
-        classification: 'invalid-ambiguous',
-        message: `Unknown role segment "${parsed.role}" in canonical position.`,
-        ruleRef:
-          'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1',
-        suggestedFix: 'Use a role from the active role registry.',
+        findingPolicyRuntime: findingPolicy,
+        messageValues: { role: parsed.role },
         details: parsed,
-      };
+      });
     }
 
     if (!isCanonicalSemanticName(parsed.semanticName)) {
-      return {
-        code: 'NAMING_BAD_SEMANTIC_CASE',
-        severity: 'warn',
+      return createFindingFromOutcome({
+        outcomeId: NAMING_DECISION_OUTCOME_IDS.BAD_SEMANTIC_CASE,
         path: normalizedPath,
-        classification: 'invalid-ambiguous',
-        message: 'Semantic name must use kebab-case for canonical filenames.',
-        ruleRef:
-          'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#semantic-name',
-        suggestedFix: `Rename semantic name "${parsed.semanticName}" to kebab-case.`,
+        findingPolicyRuntime: findingPolicy,
+        messageValues: { semanticName: parsed.semanticName },
         details: {
           ...parsed,
           roleStatus: roleMetadata.status,
           roleCategory: roleMetadata.category,
         },
-      };
+      });
     }
 
-    return {
-      code: 'NAMING_CANONICAL',
-      severity: 'info',
+    return createFindingFromOutcome({
+      outcomeId: NAMING_DECISION_OUTCOME_IDS.CANONICAL,
       path: normalizedPath,
-      classification: 'canonical',
-      message: 'Filename is canonical.',
-      ruleRef:
-        'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#core-filename-grammar',
+      findingPolicyRuntime: findingPolicy,
       details: {
         ...parsed,
         roleStatus: roleMetadata.status,
         roleCategory: roleMetadata.category,
       },
-    };
+    });
   }
 
   const ambiguity = hasHyphenAppendedRoleAmbiguity(basename, runtime.roleSuffixes);
   if (ambiguity) {
-    return {
-      code: 'NAMING_ROLE_HYPHEN_AMBIGUITY',
-      severity: 'warn',
+    return createFindingFromOutcome({
+      outcomeId: NAMING_DECISION_OUTCOME_IDS.ROLE_HYPHEN_AMBIGUITY,
       path: normalizedPath,
-      classification: 'invalid-ambiguous',
-      message: `Role "${ambiguity.role}" appears hyphen-appended instead of dot-separated.`,
-      ruleRef:
-        'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-suffix-separation-rule-important',
-      suggestedFix: 'Rename using <semantic-name>.<role>.<ext>.',
-    };
+      findingPolicyRuntime: findingPolicy,
+      messageValues: { role: ambiguity.role },
+    });
   }
 
   const missingRoleCandidate = detectMissingRoleCandidate(basename, missingRolePatterns);
   if (missingRoleCandidate) {
-    return {
-      code: 'NAMING_MISSING_ROLE',
-      severity: 'info',
+    return createFindingFromOutcome({
+      outcomeId: NAMING_DECISION_OUTCOME_IDS.MISSING_ROLE,
       path: normalizedPath,
-      classification: 'legacy-exception',
-      message:
-        'Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.',
-      ruleRef:
-        'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern',
-      suggestedFix: 'Rename to <semantic-name>.<role>.<ext> using an active role.',
+      findingPolicyRuntime: findingPolicy,
       details: missingRoleCandidate,
-    };
+    });
   }
 
-  return {
-    code: 'NAMING_LEGACY_EXCEPTION',
-    severity: 'info',
+  return createFindingFromOutcome({
+    outcomeId: NAMING_DECISION_OUTCOME_IDS.LEGACY_EXCEPTION,
     path: normalizedPath,
-    classification: 'legacy-exception',
-    message:
-      'Filename does not match canonical format and is treated as incremental legacy exception in report mode.',
-    ruleRef:
-      'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#legacy-file-reality-important',
-  };
+    findingPolicyRuntime: findingPolicy,
+  });
 };
 
 export const runNamingValidator = (preparedInputs = {}) => {
@@ -371,8 +396,11 @@ export const runNamingValidator = (preparedInputs = {}) => {
   const missingRolePatternsRuntime = assertPreparedMissingRolePatternsRuntime(
     preparedInputs.missingRolePatternsRuntime,
   );
+  const findingPolicyRuntime = assertPreparedFindingPolicyRuntime(
+    preparedInputs.findingPolicyRuntime,
+  );
   const findings = selectedPaths.map((pathname) =>
-    classifyPath(pathname, namingRolesRuntime, missingRolePatternsRuntime),
+    classifyPath(pathname, namingRolesRuntime, missingRolePatternsRuntime, findingPolicyRuntime),
   );
 
   return {

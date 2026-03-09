@@ -54,6 +54,7 @@ test('resolver contract shape remains stable', () => {
   const result = resolveNamingRegistryInputs();
 
   assert.deepEqual(Object.keys(result).sort((a, b) => a.localeCompare(b)), [
+    'findingPolicy',
     'missingRolePatterns',
     'registryDigests',
     'registrySource',
@@ -160,6 +161,16 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
   );
 
   assert.deepEqual(result.missingRolePatterns.length, builtinMissingRolePatternsRegistry.missingRolePatterns.length);
+
+  const builtinFindingPolicyRegistry = JSON.parse(
+    fs.readFileSync(path.join(REGISTRY_MODULE_ROOT, '_builtin', 'finding-policy.registry.json'), 'utf8'),
+  );
+  assert.deepEqual(
+    Object.keys(result.findingPolicy),
+    Object.keys(builtinFindingPolicyRegistry.outcomes).sort((left, right) =>
+      left.localeCompare(right),
+    ),
+  );
 });
 
 test('registryRootDir drives builtin roles, extensions, and categories from the same _builtin root', () => {
@@ -200,6 +211,18 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       ],
     });
 
+    writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), {
+      outcomes: {
+        canonical: {
+          code: 'TEMP_CANONICAL',
+          severity: 'info',
+          classification: 'canonical',
+          message: 'Temporary canonical policy.',
+          ruleRef: 'temp-rule-ref',
+        },
+      },
+    });
+
     const builtinResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
     assert.deepEqual(builtinResult.roles, [
       { role: 'temp-builtin-role', category: 'from-temp-root', status: 'active' },
@@ -211,6 +234,7 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       secondaryBucketFamilies: ['codeCounts'],
     });
     assert.equal(builtinResult.missingRolePatterns.length, 1);
+    assert.equal(builtinResult.findingPolicy.canonical.code, 'TEMP_CANONICAL');
 
     writeJson(path.join(tempRoot, 'registry-state.json'), {
       schemaVersion: '1',
@@ -228,6 +252,7 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       secondaryBucketFamilies: ['codeCounts'],
     });
     assert.equal(customResult.missingRolePatterns.length, 1);
+    assert.equal(customResult.findingPolicy.canonical.code, 'TEMP_CANONICAL');
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }

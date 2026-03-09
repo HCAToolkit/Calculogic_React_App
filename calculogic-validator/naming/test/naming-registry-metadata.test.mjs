@@ -34,6 +34,7 @@ test('prepareNamingRuntimeInputs exposes prepared dependencies and stable regist
   assert.ok(Array.isArray(prepared.summaryBucketsRuntime.classificationBuckets));
   assert.ok(Array.isArray(prepared.summaryBucketsRuntime.secondaryBucketFamilies));
   assert.ok(Array.isArray(prepared.missingRolePatternsRuntime));
+  assert.ok(prepared.findingPolicyRuntime instanceof Map);
   assert.ok(prepared.registry);
 
   const result = runNamingValidator(process.cwd(), { scope: 'system', config: {} });

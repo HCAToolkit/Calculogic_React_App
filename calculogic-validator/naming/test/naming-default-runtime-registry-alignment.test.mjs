@@ -29,6 +29,7 @@ test('wiring-injected classifyPath aligns with runtime when using prepared regis
     'src/rightpanel.results-style.css',
     prepared.namingRolesRuntime,
     prepared.missingRolePatternsRuntime,
+    prepared.findingPolicyRuntime,
   );
   assert.deepEqual(wiringCanonical, runtimeCanonical);
 
@@ -37,6 +38,7 @@ test('wiring-injected classifyPath aligns with runtime when using prepared regis
     'src/tabs/build/BuildSurface.view.css',
     prepared.namingRolesRuntime,
     prepared.missingRolePatternsRuntime,
+    prepared.findingPolicyRuntime,
   );
   assert.deepEqual(wiringDeprecated, runtimeDeprecated);
 });
