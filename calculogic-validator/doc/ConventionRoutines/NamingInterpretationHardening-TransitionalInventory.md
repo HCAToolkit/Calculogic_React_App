@@ -21,7 +21,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Deterministic interpretation precedence (explicit role slot → semantic name → optional family/group → folder context) | **Partially implemented** | Explicit role-slot parsing and role checks exist in naming runtime. Semantic and folder signals are not yet fully represented as a complete interpreted-lane model with explicit runtime diagnostics for every precedence lane. |
 | Explicit role-slot authority over incidental role-like tokens | **Partially implemented** | Canonical parse + role checks exist; role-like semantic/folder override behavior is contract-defined but not yet fully locked as dedicated disambiguation behavior/tests for all edge patterns. |
 | Optional semantic-family / semantic-group interpretation | **Intentionally out of scope for now** | Contract marks this as optional; no mandatory runtime lane required in current tranche. |
-| Folder-token context as contextual (not canonical authority by default) | **Partially implemented** | Folder context is used operationally for scoped walking/reporting; explicit naming-lane disambiguation treatment of role-like folder tokens is not yet hard-locked as a dedicated behavior matrix. |
+| Folder-token context as contextual (not canonical authority by default) | **Partially implemented** | Folder context is used as scope/traversal input for walking/reporting mechanics. Folder-token interpretation remains a separate interpretation lane (contextual by default and non-overriding vs an explicit role slot), and that lane is not yet fully hard-locked as a dedicated behavior matrix. |
 | Lane-aware case policy surface (shared concept) | **Partially implemented** | Semantic-name case policy is registry-backed today; lane-specific policy expansion (for additional interpretation lanes) is not fully represented. |
 | Suite-owned implementation pairing rule (shared impl must have slice consumer) | **Already implemented (architecture guardrail)** | Current naming/runtime boundaries already reflect slice-owned enforcement with suite contracts; no speculative suite-only implementation is required in this tranche. |
 
@@ -33,7 +33,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Semantic name as major lane, non-overriding | **Partially implemented** | Semantic name is parsed and case-checked; explicit “semantic role-like token never overrides valid role slot” needs explicit hardening tests across representative filenames/folders. |
 | Explicit canonical role-slot authority | **Already implemented (core baseline)** | Filename parsing and role-slot role checks establish explicit role handling as the primary runtime lane. |
 | Role-like tokens in semantic name treated as semantic by default when explicit role exists | **Partially implemented** | Contract exists; behavior is covered indirectly by existing parser/role checks, but dedicated disambiguation scenarios remain a hardening target. |
-| Role-like folder tokens remain contextual by default | **Partially implemented** | Contract exists; implementation does not yet present a dedicated folder-role-like disambiguation test matrix as a first-class hardening artifact. |
+| Role-like folder tokens remain contextual by default | **Partially implemented** | Contract exists; folder context is currently used operationally for scoped traversal/reporting, while folder-token meaning as an interpretation lane (contextual and non-overriding vs explicit role slot) is not yet expressed as a dedicated, test-locked disambiguation matrix. |
 | Ambiguity signaling allowed without ownership reassignment | **Already implemented (baseline), hardening recommended** | Ambiguity signaling exists (for example hyphen-appended role ambiguity). Additional disambiguation classes should be broadened before registry expansion. |
 | Naming-case application points beyond current semantic case checks | **Partially implemented** | Current case-rules surface is focused on semantic-name style; lane-aware extensions are a later hardening step. |
 | Optional semantic-family-style interpretation | **Intentionally out of scope for now** | Optional by contract; no mandatory runtime addition needed in this tranche. |
@@ -47,7 +47,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Slice-local vs suite-shared elevation guardrails | **Partially implemented (process maturity)** | Guardrails are specified and mostly followed; this inventory clarifies next tranche boundaries to avoid premature suite-core flattening. |
 | Distinguish shared contract surfaces from shared implementation surfaces | **Partially implemented (process maturity)** | Contract is explicit, but transitional hardening should further prevent speculative promotion without slice consumers. |
 | Do not flatten into mega-registry / avoid shadow canonical stores | **Already implemented (baseline)** | Current structure preserves slice boundaries and avoids universal registry flattening. |
-| Loader/converter/runtime ownership clarity for mechanics | **Already implemented (baseline), keep explicit** | Parser/disambiguation/traversal mechanics are code-owned runtime behavior, not registry payload responsibilities. |
+| Loader/converter/runtime ownership clarity for mechanics | **Already implemented (baseline), keep explicit** | Loader/converter/runtime preparation and parser/disambiguation/traversal mechanics are code-owned behavior, not registry payload responsibilities. |
 
 ## 3) Ownership classification for candidate hardening surfaces
 
@@ -59,7 +59,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Ambiguity findings and naming-slice disambiguation diagnostics | **Naming-slice implementation** |
 | Semantic-name case style policy currently in builtin case-rules payload | **Builtin registry candidate** (already active in bounded form) |
 | Potential lane-aware case-policy expansion metadata (future) | **Builtin registry candidate** (after behavior hardening) |
-| Registry-state selection, normalization, digesting, converter prep | **Code-owned runtime/parser/disambiguation mechanic** |
+| Registry-state selection, normalization, digesting, converter prep | **Code-owned loader/converter mechanism (registry-state + runtime preparation)** |
 | Canonical filename parsing (`<semantic>.<role>.<ext>` and extension handling) | **Code-owned runtime/parser/disambiguation mechanic** |
 | Folder traversal/scoped collection mechanics | **Code-owned runtime/parser/disambiguation mechanic** |
 | Role/category/status canonical vocabulary payloads | **Builtin registry candidate** (already active) |
@@ -94,7 +94,18 @@ Guardrail: do not push parser/disambiguation/traversal engines into registries; 
 
 Tranche note: this is naming-first hardening, but better deterministic filename interpretation should improve downstream tree-validator signal quality indirectly.
 
-## 6) Out-of-scope guardrails for this tranche document
+## 6) Implementation touchpoints (pointer-only)
+
+- `calculogic-validator/naming/src/rules/naming-rule-parse-canonical.logic.mjs` — canonical filename parse entrypoint and lane-adjacent interpretation behavior surface.
+- `calculogic-validator/naming/src/naming-validator.logic.mjs` — naming-slice runtime orchestration where parse/disambiguation outputs are composed into findings.
+- `calculogic-validator/naming/src/registries/registry-state.logic.mjs` — registry-state owner normalization/digesting flow used before runtime execution.
+- `calculogic-validator/naming/src/naming-runtime-converters.logic.mjs` — converter/runtime preparation layer that compiles registry payload shapes into executable state.
+- `calculogic-validator/naming/src/registries/_builtin/case-rules.registry.json` — current builtin case-policy payload (semantic-name case baseline).
+- `calculogic-validator/naming/src/registries/_builtin/roles.registry.json` — canonical role vocabulary payload consumed by role-slot checks.
+- `calculogic-validator/naming/test/naming-validator.test.mjs` — primary naming behavior coverage location for extending disambiguation matrix scenarios.
+- `calculogic-validator/naming/test/naming-runtime-input-boundary.test.mjs` — runtime input/collection boundary tests where folder-context lane/scope distinctions can be hardened.
+
+## 7) Out-of-scope guardrails for this tranche document
 
 - No runtime behavior changes in this task.
 - No registry payload edits in this task.
@@ -102,7 +113,7 @@ Tranche note: this is naming-first hardening, but better deterministic filename 
 - No tree-validator implementation in this task.
 - No speculative suite-core promotion without a real slice-owned consumer.
 
-## 7) Verification checklist for this inventory
+## 8) Verification checklist for this inventory
 
 - Explicitly inventories all three source specs listed in §1.
 - Maintains ownership separation from registry model contract.
