@@ -1,11 +1,7 @@
 import path from 'node:path';
+import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy.registry.logic.mjs';
 
-const SHIM_FOLDER_SIGNALS = new Set(['compat', 'shims', 'adapters', 'bridges']);
-const SHIM_NAME_TOKEN_SIGNALS = new Set(['shim', 'compat', 'adapter', 'bridge', 'migration']);
-const SHIM_SURFACE_SEGMENT_SIGNALS = new Set(['compat', 'shims']);
-const SHIM_RELEVANT_FILE_EXTENSIONS = new Set(['.mjs', '.js', '.cjs', '.ts', '.tsx', '.jsx']);
-const NON_RUNTIME_SHIM_SUPPRESSED_SURFACES = new Set(['quality', 'docs', 'examples', 'fixtures']);
-const SHIM_DETECTOR_IMPLEMENTATION_TOKENS = new Set(['detection', 'detector']);
+const TREE_SIGNAL_POLICY = getBuiltinTreeSignalPolicy();
 
 const tokenizeBasename = (basename) =>
   basename
@@ -53,13 +49,13 @@ export const collectPathShimSignals = (relativePath) => {
   const basename = segments.at(-1) ?? '';
   const normalizedDirectories = directorySegments.map((segment) => segment.toLowerCase());
 
-  const folderSignals = normalizedDirectories.filter((segment) => SHIM_FOLDER_SIGNALS.has(segment));
-  const basenameTokens = tokenizeBasename(basename).filter((token) => SHIM_NAME_TOKEN_SIGNALS.has(token));
+  const folderSignals = normalizedDirectories.filter((segment) => TREE_SIGNAL_POLICY.shimFolderSignals.has(segment));
+  const basenameTokens = tokenizeBasename(basename).filter((token) => TREE_SIGNAL_POLICY.shimNameTokenSignals.has(token));
 
   return {
     folderSignals,
     basenameTokens,
-    insideCompatSurface: normalizedDirectories.some((segment) => SHIM_SURFACE_SEGMENT_SIGNALS.has(segment)),
+    insideCompatSurface: normalizedDirectories.some((segment) => TREE_SIGNAL_POLICY.shimSurfaceSegmentSignals.has(segment)),
   };
 };
 
@@ -166,7 +162,7 @@ export const collectShimEvidence = (relativePath, rawContent) => {
   const isShimDetectorImplementationModule =
     relativePath.startsWith('calculogic-validator/tree/src/') &&
     basenameTokens.includes('shim') &&
-    basenameTokens.some((token) => SHIM_DETECTOR_IMPLEMENTATION_TOKENS.has(token));
+    basenameTokens.some((token) => TREE_SIGNAL_POLICY.shimDetectorImplementationTokens.has(token));
 
   return {
     surface,
@@ -187,7 +183,7 @@ export const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
 
   for (const relativePath of paths) {
     const extension = path.posix.extname(relativePath).toLowerCase();
-    if (!SHIM_RELEVANT_FILE_EXTENSIONS.has(extension)) {
+    if (!TREE_SIGNAL_POLICY.shimRelevantFileExtensions.has(extension)) {
       continue;
     }
 
@@ -207,7 +203,7 @@ export const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
       continue;
     }
 
-    if (hasWeakSignalOnly && NON_RUNTIME_SHIM_SUPPRESSED_SURFACES.has(evidence.surface)) {
+    if (hasWeakSignalOnly && TREE_SIGNAL_POLICY.nonRuntimeWeakSignalSuppressedSurfaces.has(evidence.surface)) {
       continue;
     }
 
