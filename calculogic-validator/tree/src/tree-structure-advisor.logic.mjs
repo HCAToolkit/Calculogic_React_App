@@ -1,18 +1,10 @@
 import path from 'node:path';
 import { collectShimCompatFindings } from './tree-shim-detection.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots.registry.logic.mjs';
+import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy.registry.logic.mjs';
 
 const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
-
-const VALIDATOR_OWNED_BASENAME_PATTERNS = [
-  /^naming-validator\.(logic|host|wiring|contracts)\.mjs$/u,
-  /^tree-structure-advisor\.(logic|host|wiring|contracts)\.mjs$/u,
-  /^validator-(?:runner|registry|config|exit-code|report|scopes|health-check).+\.mjs$/u,
-  /^validate-(?:all|naming)\.mjs$/u,
-  /^calculogic-validate(?:-naming|-validator-health)?\.mjs$/u,
-  /^validator-.+\.test\.mjs$/u,
-  /^naming-.+\.test\.mjs$/u,
-];
+const TREE_SIGNAL_POLICY = getBuiltinTreeSignalPolicy();
 
 const sortByPathThenCode = (left, right) => {
   const byPath = left.path.localeCompare(right.path);
@@ -24,7 +16,7 @@ const sortByPathThenCode = (left, right) => {
 };
 
 const isValidatorOwnedBasenameSignal = (basename) =>
-  VALIDATOR_OWNED_BASENAME_PATTERNS.some((pattern) => pattern.test(basename));
+  TREE_SIGNAL_POLICY.validatorOwnedBasenameSignalMatchers.some(({ matcher }) => matcher.test(basename));
 
 const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope) => {
   if ((scope ?? 'repo') !== 'repo') {

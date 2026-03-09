@@ -1,0 +1,14 @@
+{
+  "shimDetectionSignals": {
+    "folderSignals": ["compat", "shims", "adapters", "bridges"],
+    "nameTokenSignals": ["shim", "compat", "adapter", "bridge", "migration"],
+    "surfaceSegmentSignals": ["compat", "shims"]
+  },
+  "shimSuppressionVocabularies": {
+    "nonRuntimeWeakSignalSurfaces": ["quality", "docs", "examples", "fixtures"],
+    "detectorImplementationTokens": ["detection", "detector"]
+  },
+  "shimExtensionAllowlist": {
+    "relevantFileExtensions": [".mjs", ".js", ".cjs", ".ts", ".tsx", ".jsx"]
+  }
+}

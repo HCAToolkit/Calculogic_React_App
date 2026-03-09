@@ -1,0 +1,39 @@
+{
+  "validatorOwnedBasenameSignals": [
+    {
+      "signalClass": "validator-module-surface",
+      "matchType": "regex",
+      "pattern": "^naming-validator\\.(logic|host|wiring|contracts)\\.mjs$"
+    },
+    {
+      "signalClass": "validator-module-surface",
+      "matchType": "regex",
+      "pattern": "^tree-structure-advisor\\.(logic|host|wiring|contracts)\\.mjs$"
+    },
+    {
+      "signalClass": "validator-module-surface",
+      "matchType": "regex",
+      "pattern": "^validator-(?:runner|registry|config|exit-code|report|scopes|health-check).+\\.mjs$"
+    },
+    {
+      "signalClass": "validator-cli-entrypoint",
+      "matchType": "regex",
+      "pattern": "^validate-(?:all|naming)\\.mjs$"
+    },
+    {
+      "signalClass": "validator-cli-entrypoint",
+      "matchType": "regex",
+      "pattern": "^calculogic-validate(?:-naming|-validator-health)?\\.mjs$"
+    },
+    {
+      "signalClass": "validator-quality-surface",
+      "matchType": "regex",
+      "pattern": "^validator-.+\\.test\\.mjs$"
+    },
+    {
+      "signalClass": "validator-quality-surface",
+      "matchType": "regex",
+      "pattern": "^naming-.+\\.test\\.mjs$"
+    }
+  ]
+}
