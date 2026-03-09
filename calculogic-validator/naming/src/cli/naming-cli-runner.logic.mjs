@@ -77,8 +77,12 @@ export const runNamingCli = ({ argv, usageLines, repositoryRoot, npmArgForwardin
     endedAtDate,
   });
 
+  const effectiveStrictExit = parsed.strict ? true : config?.strictExit === true;
+
   writeValidatorReportToStdout(report);
-  setValidatorReportExitCode(deriveExitCodeFromFindings(validatorResult.findings, { strict: parsed.strict }));
+  setValidatorReportExitCode(
+    deriveExitCodeFromFindings(validatorResult.findings, { strict: effectiveStrictExit }),
+  );
 
   return { shouldExit: false };
 };

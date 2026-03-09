@@ -254,7 +254,7 @@ Validator config schema:
 
 Runtime behavior is strict and rejects unknown keys where the schema disallows them. Root-level `$schema` is allowed as an editor hint.
 
-**Report-only note (current CLI behavior):** Config currently affects report classification/metadata only. Enforcement/fix modes are not implemented in naming CLI behavior yet.
+**Report-first note (current CLI behavior):** Config affects report classification/metadata and can opt into existing strict exit semantics via `strictExit: true`. Detection behavior is unchanged and broader enforcement/fix modes are not implemented yet.
 
 Use `--config=<path>` to pass a config file explicitly:
 

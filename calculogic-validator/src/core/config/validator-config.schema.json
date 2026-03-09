@@ -4,13 +4,18 @@
   "title": "Calculogic Validator Config",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version"],
+  "required": [
+    "version"
+  ],
   "properties": {
     "$schema": {
       "type": "string"
     },
     "version": {
       "const": "0.1"
+    },
+    "strictExit": {
+      "type": "boolean"
     },
     "naming": {
       "type": "object",
@@ -38,17 +43,29 @@
               "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["role", "category", "status"],
+                "required": [
+                  "role",
+                  "category",
+                  "status"
+                ],
                 "properties": {
                   "role": {
                     "type": "string",
                     "minLength": 1
                   },
                   "category": {
-                    "enum": ["concern-core", "architecture-support", "documentation", "deprecated"]
+                    "enum": [
+                      "concern-core",
+                      "architecture-support",
+                      "documentation",
+                      "deprecated"
+                    ]
                   },
                   "status": {
-                    "enum": ["active", "deprecated"]
+                    "enum": [
+                      "active",
+                      "deprecated"
+                    ]
                   },
                   "notes": {
                     "type": "string"

@@ -51,6 +51,7 @@ const normalizeRoleAdditions = (additions) => {
 const normalizeConfig = (config) => {
   const normalized = {
     version: VALIDATOR_CONFIG_VERSION,
+    ...(config?.strictExit === undefined ? {} : { strictExit: config.strictExit }),
   };
 
   const extensionAdditions = config?.naming?.reportableExtensions?.add;
@@ -163,10 +164,14 @@ const validateConfig = (config) => {
     fail('root must be an object.');
   }
 
-  assertOnlyKeys(config, ['version', 'naming', '$schema'], 'root');
+  assertOnlyKeys(config, ['version', 'strictExit', 'naming', '$schema'], 'root');
 
   if (config.version !== VALIDATOR_CONFIG_VERSION) {
     fail(`version must be "${VALIDATOR_CONFIG_VERSION}".`);
+  }
+
+  if (config.strictExit !== undefined && typeof config.strictExit !== 'boolean') {
+    fail('strictExit must be a boolean when provided.');
   }
 
   const naming = config.naming;

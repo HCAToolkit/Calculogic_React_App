@@ -88,3 +88,34 @@ test('still loads existing roles fixture under strict validation', () => {
   assert.equal(config.version, '0.1');
   assert.equal(config.naming?.roles?.add?.[0]?.role, 'provider');
 });
+
+
+test('accepts strictExit at root and preserves normalized value', () => {
+  const tempPath = writeTempConfig('tmp-config-strict-exit-true.json', {
+    version: '0.1',
+    strictExit: true,
+  });
+
+  try {
+    const config = loadValidatorConfigFromFile(tempPath, { cwd: '/' });
+    assert.equal(config.strictExit, true);
+  } finally {
+    fs.rmSync(tempPath, { force: true });
+  }
+});
+
+test('fails when strictExit is not a boolean', () => {
+  const tempPath = writeTempConfig('tmp-config-strict-exit-invalid.json', {
+    version: '0.1',
+    strictExit: 'yes',
+  });
+
+  try {
+    assert.throws(
+      () => loadValidatorConfigFromFile(tempPath, { cwd: '/' }),
+      /Invalid validator config: strictExit must be a boolean when provided\./u,
+    );
+  } finally {
+    fs.rmSync(tempPath, { force: true });
+  }
+});
