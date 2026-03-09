@@ -22,6 +22,7 @@ These areas are already registry-backed and should not be redundantly re-extract
 - Scope profiles registry (`scope-profiles.registry.json`) via `validator-scopes.runtime.mjs`.
 - Default validator scope policy via `DEFAULT_VALIDATOR_SCOPE` in `validator-scopes.runtime.mjs` (canonical suite-owned default consumed by runtime + naming CLI/wiring).
 - Special cases registry (`special-cases.registry.json`) via `naming-special-case-rules.registry.logic.mjs`.
+- Tree known-roots registry (`tree-known-roots.registry.json`) via `tree-known-roots.registry.logic.mjs`.
 - Walk exclusions registry (`walk-exclusions.registry.json`) via `naming-walk-exclusions.registry.logic.mjs`.
 
 ## Hardcoded-policy inventory
@@ -114,4 +115,3 @@ Retain hardcoded implementation behavior for now where code is primarily **engin
 5. **Slice E — Tree signal policy extraction**
    - Extract validator-owned basename/shim signals after schema normalization.
    - Keep tree known-roots extraction completed and isolated from broader signal policy work.
-
