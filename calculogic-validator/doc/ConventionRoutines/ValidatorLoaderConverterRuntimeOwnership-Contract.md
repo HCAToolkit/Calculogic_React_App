@@ -84,6 +84,28 @@ Suite core composes slice runners and shared runtime contracts; it does not repl
   - `tree/src/tree-structure-advisor.wiring.mjs`
   - `tree/src/tree-structure-advisor.logic.mjs`
 
+
+## 6.4 Direct builtin-loader vs registry-state ownership semantics
+
+Use this decision rule to keep ownership deterministic and avoid generic loader sprawl:
+
+1. **Choose a registry-state owner** (for example `naming/src/registries/registry-state.logic.mjs`) when a slice requires:
+   - multi-source policy composition (builtin + custom/overlay),
+   - explicit precedence/merge/canonicalization contracts,
+   - digest/cache/state lifecycle as part of the slice runtime contract.
+2. **Choose a direct builtin loader** (for example tree slice local registry logic) when policy payloads are intentionally slice-local and bounded, and no cross-slice generic state host is required.
+3. **Keep suite-core surfaces locally owned** for composition/runtime mechanics (`src/core/**`) instead of promoting them into a generic registry-state aggregator.
+
+Why this is normative:
+
+- Naming centralization through a registry-state owner is intentional because naming has broader extracted policy surfaces and overlay precedence needs.
+- Tree direct builtin loading is intentional because tree policy vocabularies are bounded and locally consumed.
+- Suite-core local ownership is intentional because runner/registry/scopes modules are composition mechanics, not slice-policy canonicalization hosts.
+
+Anti-pattern to avoid:
+
+- Do **not** flatten every registry surface behind one universal state layer; that pattern obscures ownership, increases coupling, and weakens clear extraction paths.
+
 ## 7. Canonical usage rule
 
 When documenting or implementing validator slices, treat this contract as the canonical ownership reference for loader-converter-runtime boundaries.
