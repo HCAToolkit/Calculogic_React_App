@@ -42,3 +42,13 @@ export const toMissingRolePatternsRuntime = (missingRolePatterns) =>
     extensionSegmentIndexes: [...pattern.extensionSegmentIndexes],
     literalSegmentConstraints: { ...pattern.literalSegmentConstraints },
   }));
+
+export const toFindingPolicyRuntime = (findingPolicy) =>
+  new Map(
+    Object.entries(findingPolicy).map(([outcomeId, entry]) => [
+      outcomeId,
+      {
+        ...entry,
+      },
+    ]),
+  );

@@ -1,0 +1,65 @@
+{
+  "outcomes": {
+    "allowed-special-case": {
+      "code": "NAMING_ALLOWED_SPECIAL_CASE",
+      "severity": "info",
+      "classification": "allowed-special-case",
+      "message": "Filename matches an allowed reserved/special-case pattern.",
+      "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12"
+    },
+    "missing-role": {
+      "code": "NAMING_MISSING_ROLE",
+      "severity": "info",
+      "classification": "legacy-exception",
+      "message": "Filename appears to be missing the role segment; canonical format is <semantic-name>.<role>.<ext>.",
+      "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#canonical-pattern",
+      "suggestedFix": "Rename to <semantic-name>.<role>.<ext> using an active role."
+    },
+    "deprecated-role": {
+      "code": "NAMING_DEPRECATED_ROLE",
+      "severity": "warn",
+      "classification": "invalid-ambiguous",
+      "message": "Role segment \"{role}\" is deprecated and requires manual migration planning.",
+      "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1",
+      "suggestedFix": "Replace deprecated roles manually using current active role taxonomy."
+    },
+    "unknown-role": {
+      "code": "NAMING_UNKNOWN_ROLE",
+      "severity": "warn",
+      "classification": "invalid-ambiguous",
+      "message": "Unknown role segment \"{role}\" in canonical position.",
+      "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-registry-master-list-v1",
+      "suggestedFix": "Use a role from the active role registry."
+    },
+    "bad-semantic-case": {
+      "code": "NAMING_BAD_SEMANTIC_CASE",
+      "severity": "warn",
+      "classification": "invalid-ambiguous",
+      "message": "Semantic name must use kebab-case for canonical filenames.",
+      "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#semantic-name",
+      "suggestedFix": "Rename semantic name \"{semanticName}\" to kebab-case."
+    },
+    "canonical": {
+      "code": "NAMING_CANONICAL",
+      "severity": "info",
+      "classification": "canonical",
+      "message": "Filename is canonical.",
+      "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#core-filename-grammar"
+    },
+    "role-hyphen-ambiguity": {
+      "code": "NAMING_ROLE_HYPHEN_AMBIGUITY",
+      "severity": "warn",
+      "classification": "invalid-ambiguous",
+      "message": "Role \"{role}\" appears hyphen-appended instead of dot-separated.",
+      "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#role-suffix-separation-rule-important",
+      "suggestedFix": "Rename using <semantic-name>.<role>.<ext>."
+    },
+    "legacy-exception": {
+      "code": "NAMING_LEGACY_EXCEPTION",
+      "severity": "info",
+      "classification": "legacy-exception",
+      "message": "Filename does not match canonical format and is treated as incremental legacy exception in report mode.",
+      "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#legacy-file-reality-important"
+    }
+  }
+}

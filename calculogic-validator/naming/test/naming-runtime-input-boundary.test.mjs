@@ -15,6 +15,7 @@ import {
   toReportableExtensionsSet,
   toReportableRootFilesSet,
   toMissingRolePatternsRuntime,
+  toFindingPolicyRuntime,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
 
@@ -34,6 +35,7 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
     'src/rightpanel.results-style.css',
     namingRolesRuntime,
     toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
+    toFindingPolicyRuntime(registryInputs.findingPolicy),
   );
   assert.equal(canonicalFinding.code, 'NAMING_CANONICAL');
 
@@ -53,6 +55,7 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
       }),
       namingRolesRuntime,
       missingRolePatternsRuntime: toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
+      findingPolicyRuntime: toFindingPolicyRuntime(registryInputs.findingPolicy),
       targets: [],
     });
 
@@ -82,12 +85,23 @@ test('runtime enforces prepared dependency injection contract', () => {
   );
 
   assert.throws(
+    () =>
+      classifyPath(
+        'src/rightpanel.results-style.css',
+        toNamingRolesRuntime(resolveNamingRegistryInputs({ config: {} }).roles),
+        toMissingRolePatternsRuntime(resolveNamingRegistryInputs({ config: {} }).missingRolePatterns),
+      ),
+    /requires prepared findingPolicyRuntime/u,
+  );
+
+  assert.throws(
     () => runNamingValidator({
       scope: 'repo',
       namingRolesRuntime: toNamingRolesRuntime(resolveNamingRegistryInputs({ config: {} }).roles),
       missingRolePatternsRuntime: toMissingRolePatternsRuntime(
         resolveNamingRegistryInputs({ config: {} }).missingRolePatterns,
       ),
+      findingPolicyRuntime: toFindingPolicyRuntime(resolveNamingRegistryInputs({ config: {} }).findingPolicy),
       targets: [],
     }),
     /requires prepared selectedPaths/u,

@@ -9,6 +9,7 @@ import {
   toReportableExtensionsSet,
   toReportableRootFilesSet,
   toMissingRolePatternsRuntime,
+  toFindingPolicyRuntime,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming-validator.logic.mjs';
 import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
@@ -75,6 +76,27 @@ test('missing-role pattern runtime converter preserves deterministic pattern ent
   assert.deepEqual(runtimePatterns[0].literalSegmentConstraints, {});
 });
 
+test('finding-policy runtime converter returns outcome-addressable policy map', () => {
+  const runtimePolicy = toFindingPolicyRuntime({
+    canonical: {
+      code: 'NAMING_CANONICAL',
+      severity: 'info',
+      classification: 'canonical',
+      message: 'Filename is canonical.',
+      ruleRef: 'rule-ref',
+    },
+  });
+
+  assert.equal(runtimePolicy instanceof Map, true);
+  assert.deepEqual(runtimePolicy.get('canonical'), {
+    code: 'NAMING_CANONICAL',
+    severity: 'info',
+    classification: 'canonical',
+    message: 'Filename is canonical.',
+    ruleRef: 'rule-ref',
+  });
+});
+
 test('direct runtime and wiring derive equivalent runtime validation output from the same resolver payload', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-runtime-converter-parity-'));
 
@@ -95,6 +117,7 @@ test('direct runtime and wiring derive equivalent runtime validation output from
       targets: [],
       namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
       missingRolePatternsRuntime: toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
+      findingPolicyRuntime: toFindingPolicyRuntime(registryInputs.findingPolicy),
     });
 
     const wiringResult = runNamingValidatorWiring(tempRoot, { scope: 'repo', config: {} });
