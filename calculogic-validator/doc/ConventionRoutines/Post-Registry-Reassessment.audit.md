@@ -42,14 +42,14 @@ The prior audit’s extraction queue is effectively complete for this scope (no 
 
 ### 1) High-ROI next tasks
 
-1. **Add focused “contract-lock” tests for system-scope compatibility expansion boundaries.**
+1. **Add cross-slice invariant tests for deterministic ordering/fallback behavior.**
    - Why ROI is high:
-     - This is the main remaining policy-shaped hardcoded seam.
-     - Drift here can silently change system-scope inclusion.
+     - Determinism is implemented in many local helpers (`localeCompare` sorts, first-match exit policy, canonical key sorts).
+     - Registry operationalization increases need for stable, test-locked ordering contracts.
    - Focus:
-     - ensure wildcard tokens never leak as literals into runtime scope profiles,
-     - ensure expansion remains deterministic and sorted,
-     - ensure expansions only map to allowed root-file universe.
+     - policy first-match semantics (exit policy),
+     - sorted outputs for summary/code buckets and path sets,
+     - stable fallback behavior (`DEFAULT_VALIDATOR_SCOPE`, unknown-scope null handling).
 
 2. **Document explicit ownership contract for “loader vs converter vs runtime” in one validator-facing convention note.**
    - Why ROI is high:
@@ -60,14 +60,11 @@ The prior audit’s extraction queue is effectively complete for this scope (no 
      - formalize where canonicalization/conversion lives,
      - formalize runtime-only invariants (immutable clones, deterministic ordering, fallback semantics).
 
-3. **Add cross-slice invariant tests for deterministic ordering/fallback behavior.**
-   - Why ROI is high:
-     - Determinism is implemented in many local helpers (`localeCompare` sorts, first-match exit policy, canonical key sorts).
-     - Registry operationalization increases need for stable, test-locked ordering contracts.
-   - Focus:
-     - policy first-match semantics (exit policy),
-     - sorted outputs for summary/code buckets and path sets,
-     - stable fallback behavior (`DEFAULT_VALIDATOR_SCOPE`, unknown-scope null handling).
+3. **System-scope compatibility expansion contract-lock tests are complete in practice; preserve as maintained baseline coverage.**
+   - Completion note:
+     - wildcard tokens are contract-locked as non-leaking literals,
+     - expansion remains deterministic/sorted and bounded to root-file compatibility universe,
+     - current test coverage and passing suite already enforce this behavior.
 
 ### 2) Worthwhile but later
 
@@ -120,9 +117,9 @@ Assessment: strong baseline; best next ROI is **cross-slice invariant test reinf
 
 ## high-ROI next task
 
-1. System-scope compatibility expansion contract-lock tests (core + naming scope contract coverage).
-2. Cross-slice deterministic ordering/fallback invariant tests.
-3. Single authoritative doc note for registry ownership layering (loader/converter/runtime logic).
+1. Cross-slice deterministic ordering/fallback invariant tests.
+2. Single authoritative doc note for registry ownership layering (loader/converter/runtime logic).
+3. Maintain completed system-scope compatibility expansion contract-lock coverage as regression baseline.
 
 ## worthwhile but later
 
@@ -140,9 +137,9 @@ Assessment: strong baseline; best next ROI is **cross-slice invariant test reinf
 
 ## Recommended next task order (ranked)
 
-1. **Contract-lock tests for system-scope wildcard expansion behavior** (highest immediate drift-prevention ROI).
-2. **Cross-slice deterministic invariants test pass** (ordering, first-match, fallback semantics).
-3. **Ownership contract note for loader/converter/runtime boundaries** (prevents future coupling regressions).
+1. **Cross-slice deterministic invariants test pass** (ordering, first-match, fallback semantics).
+2. **Ownership contract note for loader/converter/runtime boundaries** (prevents future coupling regressions).
+3. **Maintain system-scope wildcard-expansion contract-lock coverage as completed baseline** (already done in practice; keep green).
 4. **Targeted documentation cleanup for direct-builtin vs registry-state ownership semantics**.
 5. **Optional low-risk utility normalization pass** for duplicated loader helpers (only if still justified after tasks 1–4).
 
