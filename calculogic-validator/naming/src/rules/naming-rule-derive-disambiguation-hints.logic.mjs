@@ -4,7 +4,7 @@ const CONFUSABLE_ROLE_CATEGORIES = new Set(['surface-system', 'architecture-supp
 
 const toSortedUnique = (tokens) => Array.from(new Set(tokens)).sort((left, right) => left.localeCompare(right));
 
-const collectConfusableActiveRoles = (namingRolesRuntime) =>
+export const prepareDisambiguationRoleTokens = (namingRolesRuntime) =>
   Array.from(namingRolesRuntime.roleMetadata.entries()).reduce((roleSet, [role, metadata]) => {
     if (
       metadata?.status === 'active' &&
@@ -18,7 +18,10 @@ const collectConfusableActiveRoles = (namingRolesRuntime) =>
   }, new Set());
 
 export const deriveDisambiguationHints = ({ normalizedPath, parsed, namingRolesRuntime }) => {
-  const confusableRoles = collectConfusableActiveRoles(namingRolesRuntime);
+  const confusableRoles =
+    namingRolesRuntime.disambiguationRoleTokens instanceof Set
+      ? namingRolesRuntime.disambiguationRoleTokens
+      : prepareDisambiguationRoleTokens(namingRolesRuntime);
 
   const dirname = path.posix.dirname(normalizedPath);
   const directorySegments = dirname === '.' ? [] : dirname.split('/').filter(Boolean);

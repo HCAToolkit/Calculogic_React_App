@@ -1,3 +1,5 @@
+import { prepareDisambiguationRoleTokens } from './rules/naming-rule-derive-disambiguation-hints.logic.mjs';
+
 export const toReportableExtensionsSet = (extensionArray) => new Set(extensionArray);
 
 export const toNamingRolesRuntime = (rolesArray) => {
@@ -19,10 +21,17 @@ export const toNamingRolesRuntime = (rolesArray) => {
     (left, right) => right.length - left.length,
   );
 
+  const disambiguationRoleTokens = prepareDisambiguationRoleTokens({
+    roleMetadata,
+    activeRoles,
+    roleSuffixes,
+  });
+
   return {
     roleMetadata,
     activeRoles,
     roleSuffixes,
+    disambiguationRoleTokens,
   };
 };
 
