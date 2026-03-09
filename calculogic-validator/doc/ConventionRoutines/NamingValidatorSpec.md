@@ -192,6 +192,7 @@ When provided, config only affects naming report inputs for:
 
 - reportable extension set (defaults ∪ additions)
 - naming role registry runtime (defaults + add-only role additions)
+- missing-role pattern policy runtime (builtin normalized schema for legacy exception detection)
 
 In current behavior, these config effects are limited to classification/runtime registries only for report generation.
 
@@ -362,6 +363,9 @@ For incremental adoption, V0.1.2 classifies non-canonical in-scope files as `leg
 
 A file is `invalid-ambiguous` instead of `legacy-exception` when it presents canonical intent but violates contract deterministically, including:
 
+- missing-role candidate detection is bounded by normalized registry-backed patterns:
+  - two-dot-segment form: `<semantic>.<ext>`
+  - compound extension form: `<semantic>.module.css` (reported extension remains `module.css`)
 - unknown role segment in canonical position
 - deprecated role segment in canonical position
 - semantic-name casing violation in canonical position

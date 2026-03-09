@@ -34,3 +34,11 @@ export const toSummaryBucketsRuntime = (summaryBuckets) => ({
   classificationBuckets: [...summaryBuckets.classificationBuckets],
   secondaryBucketFamilies: [...summaryBuckets.secondaryBucketFamilies],
 });
+
+
+export const toMissingRolePatternsRuntime = (missingRolePatterns) =>
+  missingRolePatterns.map((pattern) => ({
+    ...pattern,
+    extensionSegmentIndexes: [...pattern.extensionSegmentIndexes],
+    literalSegmentConstraints: { ...pattern.literalSegmentConstraints },
+  }));

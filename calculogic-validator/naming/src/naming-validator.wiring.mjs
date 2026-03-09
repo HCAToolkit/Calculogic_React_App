@@ -5,6 +5,7 @@ import {
   toReportableExtensionsSet,
   toReportableRootFilesSet,
   toSummaryBucketsRuntime,
+  toMissingRolePatternsRuntime,
 } from './naming-runtime-converters.logic.mjs';
 import {
   parseCanonicalName,
@@ -33,6 +34,7 @@ export const prepareNamingRuntimeInputs = (config) => {
     namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
     walkExclusions: getBuiltinWalkExclusions(),
     summaryBucketsRuntime: toSummaryBucketsRuntime(registryInputs.summaryBuckets),
+    missingRolePatternsRuntime: toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
     registry: {
       registryState: registryInputs.registryState,
       registrySource: registryInputs.registrySource,
@@ -87,7 +89,11 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
 
 export const classifyPath = (relativePath, namingRolesRuntime, options = {}) => {
   const runtimeInputs = prepareNamingRuntimeInputs(options.config);
-  return classifyPathRuntime(relativePath, namingRolesRuntime ?? runtimeInputs.namingRolesRuntime);
+  return classifyPathRuntime(
+    relativePath,
+    namingRolesRuntime ?? runtimeInputs.namingRolesRuntime,
+    runtimeInputs.missingRolePatternsRuntime,
+  );
 };
 
 export const summarizeFindings = (findings, options = {}) => {

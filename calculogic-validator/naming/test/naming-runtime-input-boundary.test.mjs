@@ -14,6 +14,7 @@ import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
   toReportableRootFilesSet,
+  toMissingRolePatternsRuntime,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
 
@@ -29,7 +30,11 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
   const reportableExtensions = toReportableExtensionsSet(registryInputs.reportableExtensions);
   const reportableRootFiles = toReportableRootFilesSet(registryInputs.reportableRootFiles);
 
-  const canonicalFinding = classifyPath('src/rightpanel.results-style.css', namingRolesRuntime);
+  const canonicalFinding = classifyPath(
+    'src/rightpanel.results-style.css',
+    namingRolesRuntime,
+    toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
+  );
   assert.equal(canonicalFinding.code, 'NAMING_CANONICAL');
 
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-runtime-inputs-'));
@@ -47,6 +52,7 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
         walkExclusions: getBuiltinWalkExclusions(),
       }),
       namingRolesRuntime,
+      missingRolePatternsRuntime: toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
       targets: [],
     });
 
@@ -67,9 +73,21 @@ test('runtime enforces prepared dependency injection contract', () => {
   );
 
   assert.throws(
+    () =>
+      classifyPath(
+        'src/rightpanel.results-style.css',
+        toNamingRolesRuntime(resolveNamingRegistryInputs({ config: {} }).roles),
+      ),
+    /requires prepared missingRolePatternsRuntime/u,
+  );
+
+  assert.throws(
     () => runNamingValidator({
       scope: 'repo',
       namingRolesRuntime: toNamingRolesRuntime(resolveNamingRegistryInputs({ config: {} }).roles),
+      missingRolePatternsRuntime: toMissingRolePatternsRuntime(
+        resolveNamingRegistryInputs({ config: {} }).missingRolePatterns,
+      ),
       targets: [],
     }),
     /requires prepared selectedPaths/u,

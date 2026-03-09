@@ -33,6 +33,7 @@ test('prepareNamingRuntimeInputs exposes prepared dependencies and stable regist
   assert.ok(prepared.walkExclusions.allowDotFiles instanceof Set);
   assert.ok(Array.isArray(prepared.summaryBucketsRuntime.classificationBuckets));
   assert.ok(Array.isArray(prepared.summaryBucketsRuntime.secondaryBucketFamilies));
+  assert.ok(Array.isArray(prepared.missingRolePatternsRuntime));
   assert.ok(prepared.registry);
 
   const result = runNamingValidator(process.cwd(), { scope: 'system', config: {} });

@@ -1,0 +1,21 @@
+{
+  "missingRolePatterns": [
+    {
+      "patternId": "single-extension",
+      "dotSegments": 2,
+      "semanticSegmentIndex": 0,
+      "extensionSegmentIndexes": [1]
+    },
+    {
+      "patternId": "module-css-compound-extension",
+      "dotSegments": 3,
+      "semanticSegmentIndex": 0,
+      "extensionSegmentIndexes": [1, 2],
+      "compoundExtension": "module.css",
+      "literalSegmentConstraints": {
+        "1": "module",
+        "2": "css"
+      }
+    }
+  ]
+}
