@@ -16,6 +16,7 @@ import {
 } from './rules/naming-rule-classify-special-case.logic.mjs';
 import { hasHyphenAppendedRoleAmbiguity } from './rules/naming-rule-check-hyphen-role-ambiguity.logic.mjs';
 import { isCanonicalSemanticName } from './rules/naming-rule-check-semantic-case.logic.mjs';
+import { deriveDisambiguationHints } from './rules/naming-rule-derive-disambiguation-hints.logic.mjs';
 import {
   getRoleMetadata,
   isDeprecatedRole,
@@ -350,6 +351,12 @@ export const classifyPath = (
       });
     }
 
+    const disambiguationHints = deriveDisambiguationHints({
+      normalizedPath,
+      parsed,
+      namingRolesRuntime: runtime,
+    });
+
     return createFindingFromOutcome({
       outcomeId: NAMING_DECISION_OUTCOME_IDS.CANONICAL,
       path: normalizedPath,
@@ -358,6 +365,7 @@ export const classifyPath = (
         ...parsed,
         roleStatus: roleMetadata.status,
         roleCategory: roleMetadata.category,
+        ...(disambiguationHints ? { disambiguation: disambiguationHints } : {}),
       },
     });
   }
