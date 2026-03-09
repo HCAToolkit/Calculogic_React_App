@@ -5,6 +5,7 @@ import { stableStringify, sha256Hex } from '../../../src/core/validator-report-m
 import { loadSummaryBucketsFromFile } from './naming-summary-buckets.registry.logic.mjs';
 import { loadMissingRolePatternsFromFile } from './naming-missing-role-patterns.registry.logic.mjs';
 import { loadFindingPolicyFromFile } from './naming-finding-policy.registry.logic.mjs';
+import { loadOverlayCapabilitiesFromFile } from './naming-overlay-capabilities.registry.logic.mjs';
 
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -17,6 +18,7 @@ const REQUIRED_BUILTIN_REGISTRY_FILES = [
   'summary-buckets.registry.json',
   'missing-role-patterns.registry.json',
   'finding-policy.registry.json',
+  'overlay-capabilities.registry.json',
 ];
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
@@ -312,9 +314,45 @@ const buildBuiltinPayload = ({ builtinRegistryDir }) => ({
   findingPolicy: loadBuiltinFindingPolicy({ builtinRegistryDir }),
 });
 
+const loadBuiltinOverlayCapabilities = ({ builtinRegistryDir }) =>
+  loadOverlayCapabilitiesFromFile(path.join(builtinRegistryDir, 'overlay-capabilities.registry.json'));
+
+const readOverlayAddPayload = ({ config, configPath, payloadType }) => {
+  const [rootKey, registryKey] = configPath.split('.');
+  const addPayload = config?.[rootKey]?.[registryKey]?.add;
+  if (addPayload === undefined) {
+    return [];
+  }
+
+  if (payloadType === 'string-array' || payloadType === 'role-array') {
+    return addPayload;
+  }
+
+  return [];
+};
+
 const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
-  const extensionAdds = config?.naming?.reportableExtensions?.add ?? [];
-  const roleAdds = config?.naming?.roles?.add ?? [];
+  const overlayCapabilities = loadBuiltinOverlayCapabilities({ builtinRegistryDir });
+  const reportableExtensionsCapability =
+    overlayCapabilities.byPathOperation['naming.reportableExtensions:add'];
+  const rolesCapability = overlayCapabilities.byPathOperation['naming.roles:add'];
+
+  if (!reportableExtensionsCapability || !rolesCapability) {
+    throw new Error(
+      'Invalid overlay-capabilities registry: required naming.reportableExtensions:add and naming.roles:add capabilities are missing.',
+    );
+  }
+
+  const extensionAdds = readOverlayAddPayload({
+    config,
+    configPath: reportableExtensionsCapability.configPath,
+    payloadType: reportableExtensionsCapability.payloadType,
+  });
+  const roleAdds = readOverlayAddPayload({
+    config,
+    configPath: rolesCapability.configPath,
+    payloadType: rolesCapability.payloadType,
+  });
   const allowedCategories = loadBuiltinCategorySet({ builtinRegistryDir });
 
   const mergedExtensions = canonicalizeExtensions([
