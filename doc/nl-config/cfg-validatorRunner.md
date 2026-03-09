@@ -97,6 +97,7 @@ Each validator entry includes:
   - Fallback suspicious env detection uses stable ordering and low-false-positive rules: known scopes (`repo|app|docs|validator|system`), non-empty target/config, truthy strict (`true|1|yes`), and validator list indicators (`naming` or comma-list).
 - Executes runner with selected options.
 - Writes JSON report to stdout.
+- Resolves ordered exit-policy mappings from builtin validator registry payload (`src/registries/_builtin/exit-policy.registry.json`) via runtime loader while keeping predicate evaluation deterministic in code.
 - Exits `2` when any aggregated finding has `severity="warn"`.
 - Exits `1` only in strict mode when no warnings exist and any aggregated finding has `classification="legacy-exception"`.
 - Exits `0` when neither condition applies.

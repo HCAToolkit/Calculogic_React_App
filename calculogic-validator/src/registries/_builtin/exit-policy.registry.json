@@ -1,0 +1,28 @@
+{
+  "version": "1",
+  "policies": [
+    {
+      "id": "warn-findings",
+      "exitCode": 2,
+      "predicate": {
+        "anyWarnFindings": true
+      }
+    },
+    {
+      "id": "strict-legacy-exception",
+      "exitCode": 1,
+      "predicate": {
+        "strictMode": true,
+        "anyLegacyExceptionFindings": true,
+        "noWarnFindings": true
+      }
+    },
+    {
+      "id": "default-success",
+      "exitCode": 0,
+      "predicate": {
+        "always": true
+      }
+    }
+  ]
+}
