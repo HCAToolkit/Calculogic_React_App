@@ -19,6 +19,8 @@ These areas are already registry-backed and should not be redundantly re-extract
 - Builtin roles registry (`roles.registry.json`) via `registry-state.logic.mjs`.
 - Reportable extensions registry (`reportable-extensions.registry.json`) via `registry-state.logic.mjs`.
 - Reportable root-file adjunct registry (`reportable-root-files.registry.json`) via `registry-state.logic.mjs`.
+- Missing-role patterns registry (`missing-role-patterns.registry.json`) via `registry-state.logic.mjs` + `naming-missing-role-patterns.registry.logic.mjs`.
+- Summary buckets registry (`summary-buckets.registry.json`) via `registry-state.logic.mjs` + `naming-summary-buckets.registry.logic.mjs` + `naming-validator.logic.mjs`.
 - Scope profiles registry (`scope-profiles.registry.json`) via `validator-scopes.runtime.mjs`.
 - Default validator scope policy via `DEFAULT_VALIDATOR_SCOPE` in `validator-scopes.runtime.mjs` (canonical suite-owned default consumed by runtime + naming CLI/wiring).
 - Special cases registry (`special-cases.registry.json`) via `naming-special-case-rules.registry.logic.mjs`.
