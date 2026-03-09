@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { stableStringify, sha256Hex } from '../../../src/core/validator-report-meta.logic.mjs';
 import { loadSummaryBucketsFromFile } from './naming-summary-buckets.registry.logic.mjs';
+import { loadMissingRolePatternsFromFile } from './naming-missing-role-patterns.registry.logic.mjs';
 
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -13,6 +14,7 @@ const REQUIRED_BUILTIN_REGISTRY_FILES = [
   'reportable-extensions.registry.json',
   'reportable-root-files.registry.json',
   'summary-buckets.registry.json',
+  'missing-role-patterns.registry.json',
 ];
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
@@ -238,6 +240,9 @@ const loadBuiltinReportableRootFiles = ({ builtinRegistryDir }) => {
 const loadBuiltinSummaryBuckets = ({ builtinRegistryDir }) =>
   loadSummaryBucketsFromFile(path.join(builtinRegistryDir, 'summary-buckets.registry.json'));
 
+const loadBuiltinMissingRolePatterns = ({ builtinRegistryDir }) =>
+  loadMissingRolePatternsFromFile(path.join(builtinRegistryDir, 'missing-role-patterns.registry.json'));
+
 const loadRegistryState = (registryRootDir) => {
   const statePath = path.join(registryRootDir, 'registry-state.json');
   if (!fs.existsSync(statePath)) {
@@ -288,6 +293,7 @@ const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
     reportableExtensions: canonicalizeExtensions(extensionsRaw),
     reportableRootFiles: loadBuiltinReportableRootFiles({ builtinRegistryDir }),
     summaryBuckets: loadBuiltinSummaryBuckets({ builtinRegistryDir }),
+    missingRolePatterns: loadBuiltinMissingRolePatterns({ builtinRegistryDir }),
   };
 };
 
@@ -296,6 +302,7 @@ const buildBuiltinPayload = ({ builtinRegistryDir }) => ({
   reportableExtensions: loadBuiltinReportableExtensions({ builtinRegistryDir }),
   reportableRootFiles: loadBuiltinReportableRootFiles({ builtinRegistryDir }),
   summaryBuckets: loadBuiltinSummaryBuckets({ builtinRegistryDir }),
+  missingRolePatterns: loadBuiltinMissingRolePatterns({ builtinRegistryDir }),
 });
 
 const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
@@ -324,6 +331,7 @@ const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
     reportableExtensions: mergedExtensions,
     reportableRootFiles: builtinPayload.reportableRootFiles,
     summaryBuckets: builtinPayload.summaryBuckets,
+    missingRolePatterns: builtinPayload.missingRolePatterns,
   };
 };
 
@@ -386,5 +394,6 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
     reportableExtensions: resolvedPayload.reportableExtensions,
     reportableRootFiles: resolvedPayload.reportableRootFiles,
     summaryBuckets: resolvedPayload.summaryBuckets,
+    missingRolePatterns: resolvedPayload.missingRolePatterns,
   };
 };

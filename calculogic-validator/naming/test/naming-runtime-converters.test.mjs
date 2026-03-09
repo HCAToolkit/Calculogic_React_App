@@ -8,6 +8,7 @@ import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,
   toReportableRootFilesSet,
+  toMissingRolePatternsRuntime,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming-validator.logic.mjs';
 import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
@@ -55,6 +56,25 @@ test('shared reportable root files converter returns a Set preserving filename m
   assert.equal(reportableRootFiles.size, 2);
 });
 
+
+test('missing-role pattern runtime converter preserves deterministic pattern entries', () => {
+  const runtimePatterns = toMissingRolePatternsRuntime([
+    {
+      patternId: 'single-extension',
+      dotSegments: 2,
+      semanticSegmentIndex: 0,
+      extensionSegmentIndexes: [1],
+      literalSegmentConstraints: {},
+      compoundExtension: '',
+    },
+  ]);
+
+  assert.equal(Array.isArray(runtimePatterns), true);
+  assert.equal(runtimePatterns[0].patternId, 'single-extension');
+  assert.deepEqual(runtimePatterns[0].extensionSegmentIndexes, [1]);
+  assert.deepEqual(runtimePatterns[0].literalSegmentConstraints, {});
+});
+
 test('direct runtime and wiring derive equivalent runtime validation output from the same resolver payload', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-runtime-converter-parity-'));
 
@@ -74,6 +94,7 @@ test('direct runtime and wiring derive equivalent runtime validation output from
       }),
       targets: [],
       namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
+      missingRolePatternsRuntime: toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
     });
 
     const wiringResult = runNamingValidatorWiring(tempRoot, { scope: 'repo', config: {} });

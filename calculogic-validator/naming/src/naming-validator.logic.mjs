@@ -72,6 +72,16 @@ const assertPreparedNamingRolesRuntime = (namingRolesRuntime) => {
 
 
 
+const assertPreparedMissingRolePatternsRuntime = (missingRolePatternsRuntime) => {
+  if (Array.isArray(missingRolePatternsRuntime)) {
+    return missingRolePatternsRuntime;
+  }
+
+  throw new Error(
+    'Naming runtime requires prepared missingRolePatternsRuntime from wiring/runtime adapter.',
+  );
+};
+
 const assertPreparedSummaryBucketsRuntime = (summaryBucketsRuntime) => {
   if (
     summaryBucketsRuntime &&
@@ -156,20 +166,29 @@ export const listNamingValidatorScopes = () => listValidatorScopes();
 
 export const getScopeProfile = (scope) => getValidatorScopeProfile(scope);
 
-const detectMissingRoleCandidate = (basename) => {
+const detectMissingRoleCandidate = (basename, missingRolePatternsRuntime) => {
   const segments = basename.split('.');
 
-  if (segments.length === 2) {
-    return {
-      semanticNameCandidate: segments[0],
-      extension: segments[1],
-    };
-  }
+  for (const pattern of missingRolePatternsRuntime) {
+    if (segments.length !== pattern.dotSegments) {
+      continue;
+    }
 
-  if (segments.length === 3 && segments[1] === 'module' && segments[2] === 'css') {
+    const doesMatchLiteralConstraints = Object.entries(pattern.literalSegmentConstraints).every(
+      ([segmentIndexRaw, segmentValue]) => segments[Number(segmentIndexRaw)] === segmentValue,
+    );
+
+    if (!doesMatchLiteralConstraints) {
+      continue;
+    }
+
+    const extension =
+      pattern.compoundExtension ||
+      pattern.extensionSegmentIndexes.map((segmentIndex) => segments[segmentIndex]).join('.');
+
     return {
-      semanticNameCandidate: segments[0],
-      extension: 'module.css',
+      semanticNameCandidate: segments[pattern.semanticSegmentIndex],
+      extension,
     };
   }
 
@@ -196,8 +215,9 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
   return filterScopedPathsByProfile(allReportablePaths, profile);
 };
 
-export const classifyPath = (relativePath, namingRolesRuntime) => {
+export const classifyPath = (relativePath, namingRolesRuntime, missingRolePatternsRuntime) => {
   const runtime = assertPreparedNamingRolesRuntime(namingRolesRuntime);
+  const missingRolePatterns = assertPreparedMissingRolePatternsRuntime(missingRolePatternsRuntime);
   const normalizedPath = normalizePath(relativePath);
   const basename = path.posix.basename(normalizedPath);
 
@@ -217,7 +237,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
 
   const parsed = parseCanonicalName(basename);
   if (parsed) {
-    const missingRoleCandidate = detectMissingRoleCandidate(basename);
+    const missingRoleCandidate = detectMissingRoleCandidate(basename, missingRolePatterns);
     if (missingRoleCandidate && parsed.role === 'module' && parsed.extension === 'css') {
       return {
         code: 'NAMING_MISSING_ROLE',
@@ -316,7 +336,7 @@ export const classifyPath = (relativePath, namingRolesRuntime) => {
     };
   }
 
-  const missingRoleCandidate = detectMissingRoleCandidate(basename);
+  const missingRoleCandidate = detectMissingRoleCandidate(basename, missingRolePatterns);
   if (missingRoleCandidate) {
     return {
       code: 'NAMING_MISSING_ROLE',
@@ -348,7 +368,12 @@ export const runNamingValidator = (preparedInputs = {}) => {
   const selectedPaths = assertPreparedSelectedPaths(preparedInputs.selectedPaths);
   const namingRolesRuntime = assertPreparedNamingRolesRuntime(preparedInputs.namingRolesRuntime);
   const resolvedTargets = Array.isArray(preparedInputs.targets) ? preparedInputs.targets : [];
-  const findings = selectedPaths.map((pathname) => classifyPath(pathname, namingRolesRuntime));
+  const missingRolePatternsRuntime = assertPreparedMissingRolePatternsRuntime(
+    preparedInputs.missingRolePatternsRuntime,
+  );
+  const findings = selectedPaths.map((pathname) =>
+    classifyPath(pathname, namingRolesRuntime, missingRolePatternsRuntime),
+  );
 
   return {
     findings,

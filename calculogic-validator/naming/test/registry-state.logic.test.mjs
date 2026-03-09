@@ -54,6 +54,7 @@ test('resolver contract shape remains stable', () => {
   const result = resolveNamingRegistryInputs();
 
   assert.deepEqual(Object.keys(result).sort((a, b) => a.localeCompare(b)), [
+    'missingRolePatterns',
     'registryDigests',
     'registrySource',
     'registryState',
@@ -150,6 +151,15 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
     classificationBuckets: builtinSummaryBucketsRegistry.classificationBuckets,
     secondaryBucketFamilies: builtinSummaryBucketsRegistry.secondaryBucketFamilies,
   });
+
+  const builtinMissingRolePatternsRegistry = JSON.parse(
+    fs.readFileSync(
+      path.join(REGISTRY_MODULE_ROOT, '_builtin', 'missing-role-patterns.registry.json'),
+      'utf8',
+    ),
+  );
+
+  assert.deepEqual(result.missingRolePatterns.length, builtinMissingRolePatternsRegistry.missingRolePatterns.length);
 });
 
 test('registryRootDir drives builtin roles, extensions, and categories from the same _builtin root', () => {
@@ -179,6 +189,17 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       secondaryBucketFamilies: ['codeCounts'],
     });
 
+    writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), {
+      missingRolePatterns: [
+        {
+          patternId: 'single-extension',
+          dotSegments: 2,
+          semanticSegmentIndex: 0,
+          extensionSegmentIndexes: [1],
+        },
+      ],
+    });
+
     const builtinResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
     assert.deepEqual(builtinResult.roles, [
       { role: 'temp-builtin-role', category: 'from-temp-root', status: 'active' },
@@ -189,6 +210,7 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       classificationBuckets: ['bucket-a', 'bucket-b'],
       secondaryBucketFamilies: ['codeCounts'],
     });
+    assert.equal(builtinResult.missingRolePatterns.length, 1);
 
     writeJson(path.join(tempRoot, 'registry-state.json'), {
       schemaVersion: '1',
@@ -205,6 +227,7 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       classificationBuckets: ['bucket-a', 'bucket-b'],
       secondaryBucketFamilies: ['codeCounts'],
     });
+    assert.equal(customResult.missingRolePatterns.length, 1);
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }

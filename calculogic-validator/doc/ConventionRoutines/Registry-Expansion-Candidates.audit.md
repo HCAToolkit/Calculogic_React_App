@@ -30,7 +30,7 @@ These areas are already registry-backed and should not be redundantly re-extract
 | Area | File | Current hardcoded thing | Why it is policy-like | Candidate registry type | Extraction readiness | Recommended action | Notes |
 |---|---|---|---|---|---|---|---|
 | Naming reportability adjunct policy | `naming/src/naming-validator.logic.mjs` | Runtime now consumes `reportableRootFiles` from registry inputs as additive reportability adjunct policy. | This is repo policy vocabulary for reportability, not traversal mechanics. | `reportable-root-files.registry.json` | `completed` | Keep defaults bounded (`package.json`, `package-lock.json`) and maintain deterministic additive behavior with extension reportability. | Extraction completed without changing report semantics. |
-| Missing-role heuristic | `naming/src/naming-validator.logic.mjs` | `detectMissingRoleCandidate(...)` hardcodes only 2-segment and `module.css` forms. | Heuristic encodes extension-pattern policy and legacy exception semantics. | `missing-role-patterns.registry.json` with deterministic pattern forms. | `registry-ready-after-normalization` | Normalize to explicit pattern descriptors before extraction to avoid regex sprawl. | Explicit hotspot requested, includes module.css branch. |
+| Missing-role heuristic | `naming/src/naming-validator.logic.mjs` + `naming/src/registries/_builtin/missing-role-patterns.registry.json` | Runtime now consumes normalized missing-role pattern descriptors (2-segment and `module.css`) from builtin registry payload. | Heuristic remains engine-owned while extension-pattern policy vocabulary is registry-owned. | `missing-role-patterns.registry.json` with deterministic pattern forms. | `completed` | Keep schema bounded (`dotSegments`, segment indexes, literal constraints, optional compound extension) and preserve exact legacy exception semantics. | Extraction completed after normalization-first pass; parser/tokenization remains code-owned. |
 | Default scope fallback (runtime) | `naming/src/naming-validator.logic.mjs` and `naming/src/naming-validator.wiring.mjs` | Fallback now reads suite-owned `DEFAULT_VALIDATOR_SCOPE` (no local `'repo'` hardcoding). | Default scope selection is policy; now centralized to suite runtime owner. | `DEFAULT_VALIDATOR_SCOPE` in suite runtime. | `completed` | Keep centralized owner and guard with drift tests. | Consolidation completed in scope-default unification slice. |
 | Default scope fallback (CLI) | `naming/src/cli/naming-cli-args.logic.mjs` and `src/core/validator-scopes.runtime.mjs` | CLI parser now initializes from suite-owned `DEFAULT_VALIDATOR_SCOPE`; runtime normalizes from same owner. | Canonical owner removes CLI/runtime drift risk. | `DEFAULT_VALIDATOR_SCOPE` in suite runtime. | `completed` | Preserve behavior (`repo`) while keeping one owner. | Parser behavior unchanged; ownership consolidated. |
 | Finding severity/classification/message family mapping | `naming/src/naming-validator.logic.mjs` | `classifyPath(...)` hardcodes `severity`, `classification`, `code`, and message templates per branch. | Branch-to-finding mapping is policy vocabulary and enforcement semantics, not parsing mechanics. | `finding-policy.registry.json` keyed by decision outcome IDs. | `registry-ready-after-normalization` | First normalize decision outcome IDs; then map outcomes → finding metadata via registry. | Explicit hotspot requested. |
@@ -50,7 +50,6 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 ### registry-ready-after-normalization
 
-- Missing-role and extension-pattern heuristics.
 - Finding outcome-to-metadata mapping (severity/classification/message families).
 - Config overlay capability matrix.
 - Exit policy mapping.
@@ -65,15 +64,13 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 Prioritized by structural ROI (clean policy ownership boundaries first):
 
-1. **Missing-role / extension-pattern policy**
-   - Normalize and extract `detectMissingRoleCandidate(...)` patterns.
-2. **Severity/classification defaults**
+1. **Severity/classification defaults**
    - Introduce stable decision outcomes and externalize finding metadata mapping.
-3. **Overlay capability contract expansion**
+2. **Overlay capability contract expansion**
    - Add explicit capability declarations for newly extracted registry surfaces.
-4. **Exit policy mapping**
+3. **Exit policy mapping**
    - Externalize severity/classification-to-exit predicates after finding outcomes stabilize.
-5. **Deeper semantic relationship metadata (tree signals)**
+4. **Deeper semantic relationship metadata (tree signals)**
    - Add bounded registries for shim signal semantics and cross-surface suppression behavior.
 
 ## Keep-hardcoded-for-now
@@ -94,24 +91,19 @@ Retain hardcoded implementation behavior for now where code is primarily **engin
 
 ## Next-step implementation slices
 
-1. **Slice A — Missing-role pattern registry introduction**
-   - Define normalized pattern schema (`dotSegments`, `compoundExtension`, optional constraints).
-   - Replace direct hardcoded branches with runtime-compiled pattern checks.
-   - Verify current `module.css` semantics remain exact.
-
-2. **Slice B — Finding policy map**
+1. **Slice A — Finding policy map**
    - Introduce stable internal decision outcome IDs.
    - Move outcome→`{code,severity,classification,message,ruleRef,suggestedFix}` mapping to registry.
    - Keep rule evaluation flow unchanged.
 
-3. **Slice C — Overlay capability expansion contract**
+2. **Slice B — Overlay capability expansion contract**
    - Add deterministic overlay capability declarations for newly extracted registries.
    - Keep add-only semantics where required and explicit.
 
-4. **Slice D — Exit policy mapping extraction**
+3. **Slice C — Exit policy mapping extraction**
    - Externalize ordered exit predicates after finding policy outcomes are stable.
    - Preserve strict/legacy exception behavior semantics.
 
-5. **Slice E — Tree signal policy extraction**
+4. **Slice D — Tree signal policy extraction**
    - Extract validator-owned basename/shim signals after schema normalization.
    - Keep tree known-roots extraction completed and isolated from broader signal policy work.
