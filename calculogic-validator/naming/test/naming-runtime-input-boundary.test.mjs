@@ -139,9 +139,10 @@ test('runtime enforces prepared dependency injection contract', () => {
 test('toNamingRolesRuntime prepares disambiguation role token set for runtime consumers', () => {
   const registryInputs = resolveNamingRegistryInputs({ config: {} });
   const namingRolesRuntime = toNamingRolesRuntime(registryInputs.roles);
+  const disambiguationRoleTokens = namingRolesRuntime.disambiguationRoleTokens;
 
-  assert.ok(namingRolesRuntime.disambiguationRoleTokens instanceof Set);
-  assert.equal(namingRolesRuntime.disambiguationRoleTokens.has('host'), true);
-  assert.equal(namingRolesRuntime.disambiguationRoleTokens.has('wiring'), true);
-  assert.equal(namingRolesRuntime.disambiguationRoleTokens.has('logic'), false);
+  assert.ok(disambiguationRoleTokens instanceof Set);
+  assert.equal(disambiguationRoleTokens.has('host'), true);
+  assert.equal(disambiguationRoleTokens.has('wiring'), true);
+  assert.equal(disambiguationRoleTokens.has('logic'), false);
 });
