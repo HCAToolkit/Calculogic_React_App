@@ -134,9 +134,9 @@ When a valid config is supplied, naming reports may include:
 
 Strict-exit resolution for naming CLI uses existing exit-policy semantics:
 
-- CLI `--strict` enables strict exit behavior.
-- Config `strictExit: true` enables strict exit behavior even without CLI `--strict`.
-- CLI precedence is deterministic: `--strict` wins over config when both are present.
+- Effective strictness is `true` when CLI `--strict` is present.
+- Otherwise, effective strictness is `true` when `config.strictExit === true`.
+- Otherwise, effective strictness is `false`.
 - Report JSON is emitted before exit code is derived/applied.
 
 This behavior applies to:

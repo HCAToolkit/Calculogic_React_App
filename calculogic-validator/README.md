@@ -128,9 +128,9 @@ calculogic-validator/
 
 Current intentional pattern:
 
-- Naming centralizes major extracted policy surfaces through `naming/src/registries/registry-state.logic.mjs`.
-- Tree signal/core-scope policy uses direct local builtin loaders under tree-owned registry logic modules.
-- Suite-core runtime composition remains locally owned under `src/core/**` instead of acting as a universal registry-state host.
+- Naming centralizes extracted registry-state ownership through `naming/src/registries/registry-state.logic.mjs`.
+- Tree slice policy payloads remain under direct local builtin-loader ownership in tree-owned registry logic modules.
+- Suite-core scope/runtime composition ownership remains local under `src/core/**` instead of acting as a universal registry-state host.
 
 ## 3) Quickstart (repo root)
 
