@@ -20,6 +20,7 @@ These areas are already registry-backed and should not be redundantly re-extract
 - Reportable extensions registry (`reportable-extensions.registry.json`) via `registry-state.logic.mjs`.
 - Reportable root-file adjunct registry (`reportable-root-files.registry.json`) via `registry-state.logic.mjs`.
 - Missing-role patterns registry (`missing-role-patterns.registry.json`) via `registry-state.logic.mjs` + `naming-missing-role-patterns.registry.logic.mjs`.
+- Finding policy registry (`finding-policy.registry.json`) via `registry-state.logic.mjs` + `naming-finding-policy.registry.logic.mjs` + `naming-validator.logic.mjs`.
 - Summary buckets registry (`summary-buckets.registry.json`) via `registry-state.logic.mjs` + `naming-summary-buckets.registry.logic.mjs` + `naming-validator.logic.mjs`.
 - Scope profiles registry (`scope-profiles.registry.json`) via `validator-scopes.runtime.mjs`.
 - Default validator scope policy via `DEFAULT_VALIDATOR_SCOPE` in `validator-scopes.runtime.mjs` (canonical suite-owned default consumed by runtime + naming CLI/wiring).
@@ -35,7 +36,7 @@ These areas are already registry-backed and should not be redundantly re-extract
 | Missing-role heuristic | `naming/src/naming-validator.logic.mjs` + `naming/src/registries/_builtin/missing-role-patterns.registry.json` | Runtime now consumes normalized missing-role pattern descriptors (2-segment and `module.css`) from builtin registry payload. | Heuristic remains engine-owned while extension-pattern policy vocabulary is registry-owned. | `missing-role-patterns.registry.json` with deterministic pattern forms. | `completed` | Keep schema bounded (`dotSegments`, segment indexes, literal constraints, optional compound extension) and preserve exact legacy exception semantics. | Extraction completed after normalization-first pass; parser/tokenization remains code-owned. |
 | Default scope fallback (runtime) | `naming/src/naming-validator.logic.mjs` and `naming/src/naming-validator.wiring.mjs` | Fallback now reads suite-owned `DEFAULT_VALIDATOR_SCOPE` (no local `'repo'` hardcoding). | Default scope selection is policy; now centralized to suite runtime owner. | `DEFAULT_VALIDATOR_SCOPE` in suite runtime. | `completed` | Keep centralized owner and guard with drift tests. | Consolidation completed in scope-default unification slice. |
 | Default scope fallback (CLI) | `naming/src/cli/naming-cli-args.logic.mjs` and `src/core/validator-scopes.runtime.mjs` | CLI parser now initializes from suite-owned `DEFAULT_VALIDATOR_SCOPE`; runtime normalizes from same owner. | Canonical owner removes CLI/runtime drift risk. | `DEFAULT_VALIDATOR_SCOPE` in suite runtime. | `completed` | Preserve behavior (`repo`) while keeping one owner. | Parser behavior unchanged; ownership consolidated. |
-| Finding severity/classification/message family mapping | `naming/src/naming-validator.logic.mjs` | `classifyPath(...)` hardcodes `severity`, `classification`, `code`, and message templates per branch. | Branch-to-finding mapping is policy vocabulary and enforcement semantics, not parsing mechanics. | `finding-policy.registry.json` keyed by decision outcome IDs. | `registry-ready-after-normalization` | First normalize decision outcome IDs; then map outcomes → finding metadata via registry. | Explicit hotspot requested. |
+| Finding severity/classification/message family mapping | `naming/src/naming-validator.logic.mjs` + `naming/src/registries/_builtin/finding-policy.registry.json` | Runtime now resolves finding metadata (`severity`, `classification`, `code`, message templates, rule refs, optional suggested fix) from registry entries keyed by stable outcome IDs. | Branch-to-finding mapping is policy vocabulary and enforcement semantics, with algorithmic decision flow staying code-owned. | `finding-policy.registry.json` keyed by decision outcome IDs. | `completed` | Keep outcome IDs stable and preserve deterministic metadata lookup semantics. | Extraction completed via registry loader/state wiring with runtime lookup ownership in naming validator logic. |
 | Summary bucket structure | `naming/src/registries/_builtin/summary-buckets.registry.json` + `naming/src/naming-validator.logic.mjs` | `summarizeFindings(...)` now consumes wiring-prepared summary bucket policy sourced from builtin registry. | Report vocabulary and summary grouping are policy surface decisions and now have a deterministic owner. | `summary-buckets.registry.json` (classification buckets + optional facets). | `completed` | Keep schema bounded and preserve deterministic sort/count behavior. | Extracted in V0.1.24 without output-shape changes. |
 | Config overlay limits | `naming/src/registries/registry-state.logic.mjs` | `applyConfigOverlay(...)` only supports `naming.reportableExtensions.add` and `naming.roles.add`. | Overlay capability is narrow policy contract, currently not extensible to other policy surfaces. | `overlay-capabilities.registry.json` (declared add-only fields and merge mode). | `registry-ready-after-normalization` | Define bounded overlay capability map before adding new policy registries. | Explicit hotspot requested. |
 | Exit behavior mapping | `src/core/validator-exit-code.logic.mjs` | Exit code derivation is hardcoded (`warn => 2`, strict+legacy exception => 1). | Severity/classification → exit code is policy contract. | `exit-policy.registry.json` (ordered predicates). | `registry-ready-after-normalization` | Extract only after naming finding policy is normalized to stable outcome semantics. | Cross-validator relevance; keep deterministic ordering. |
@@ -48,7 +49,7 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 ### registry-ready-now
 
-- Finding outcome-to-metadata mapping (severity/classification/message families) — **completed** via naming finding-policy registry surface (`naming/src/registries/_builtin/finding-policy.registry.json`) with stable runtime outcome IDs.
+- No pending items in this class for the current audit scope.
 
 ### registry-ready-after-normalization
 
@@ -65,13 +66,11 @@ These areas are already registry-backed and should not be redundantly re-extract
 
 Prioritized by structural ROI (clean policy ownership boundaries first):
 
-1. **Severity/classification defaults**
-   - Introduce stable decision outcomes and externalize finding metadata mapping.
-2. **Overlay capability contract expansion**
+1. **Overlay capability contract expansion**
    - Add explicit capability declarations for newly extracted registry surfaces.
-3. **Exit policy mapping**
+2. **Exit policy mapping**
    - Externalize severity/classification-to-exit predicates after finding outcomes stabilize.
-4. **Deeper semantic relationship metadata (tree signals)**
+3. **Deeper semantic relationship metadata (tree signals)**
    - Add bounded registries for shim signal semantics and cross-surface suppression behavior.
 
 ## Keep-hardcoded-for-now
