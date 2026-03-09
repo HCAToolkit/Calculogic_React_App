@@ -53,6 +53,85 @@ test('classifies unknown role as invalid-ambiguous', () => {
   assert.equal(finding.suggestedFix, 'Use a role from the active role registry.');
 });
 
+test('disambiguation precedence matrix preserves explicit role slot authority', () => {
+  const cases = [
+    {
+      name: 'role-like folder token remains contextual when explicit role slot exists',
+      inputPath: 'src/host/rightpanel.logic.ts',
+      expected: {
+        classification: 'canonical',
+        code: 'NAMING_CANONICAL',
+        details: {
+          semanticName: 'rightpanel',
+          role: 'logic',
+          roleCategory: 'concern-core',
+          roleStatus: 'active',
+        },
+      },
+    },
+    {
+      name: 'role-like semantic token remains semantic when explicit role slot exists',
+      inputPath: 'src/rightpanel-host.logic.ts',
+      expected: {
+        classification: 'canonical',
+        code: 'NAMING_CANONICAL',
+        details: {
+          semanticName: 'rightpanel-host',
+          role: 'logic',
+          roleCategory: 'concern-core',
+          roleStatus: 'active',
+        },
+      },
+    },
+    {
+      name: 'hyphen-appended role ambiguity does not trigger when explicit role slot exists',
+      inputPath: 'src/leftpanel-wiring.logic.ts',
+      expected: {
+        classification: 'canonical',
+        code: 'NAMING_CANONICAL',
+        details: {
+          semanticName: 'leftpanel-wiring',
+          role: 'logic',
+          roleCategory: 'concern-core',
+          roleStatus: 'active',
+        },
+      },
+    },
+    {
+      name: 'role-like folder token does not rescue unknown filename role',
+      inputPath: 'src/host/rightpanel.widget.ts',
+      expected: {
+        classification: 'invalid-ambiguous',
+        code: 'NAMING_UNKNOWN_ROLE',
+        message: 'Unknown role segment "widget" in canonical position.',
+        suggestedFix: 'Use a role from the active role registry.',
+      },
+    },
+  ];
+
+  cases.forEach(({ name, inputPath, expected }) => {
+    const finding = classifyPath(inputPath);
+
+    assert.equal(finding.classification, expected.classification, `${name}: classification`);
+    assert.equal(finding.code, expected.code, `${name}: code`);
+
+    if (expected.details) {
+      assert.equal(finding.details?.semanticName, expected.details.semanticName, `${name}: semanticName`);
+      assert.equal(finding.details?.role, expected.details.role, `${name}: role`);
+      assert.equal(finding.details?.roleCategory, expected.details.roleCategory, `${name}: roleCategory`);
+      assert.equal(finding.details?.roleStatus, expected.details.roleStatus, `${name}: roleStatus`);
+    }
+
+    if (expected.message) {
+      assert.equal(finding.message, expected.message, `${name}: message`);
+    }
+
+    if (expected.suggestedFix) {
+      assert.equal(finding.suggestedFix, expected.suggestedFix, `${name}: suggestedFix`);
+    }
+  });
+});
+
 test('classifies semantic-name casing violation as invalid-ambiguous', () => {
   const finding = classifyPath('src/RightPanel.logic.ts');
   assert.equal(finding.classification, 'invalid-ambiguous');
