@@ -46,6 +46,7 @@ Allowed keys:
 
 - `reportableExtensions` (optional object)
 - `roles` (optional object)
+- `caseRules` (optional object)
 
 ### 4.3 `naming.reportableExtensions`
 
@@ -88,6 +89,8 @@ Unknown keys are rejected at:
 - `naming`
 - `naming.reportableExtensions`
 - `naming.roles`
+- `naming.caseRules`
+- `naming.caseRules.semanticName`
 - each `naming.roles.add[]` object
 
 Special case:
@@ -105,7 +108,8 @@ Runtime loading returns normalized config with deterministic shaping:
 - extension strings are trimmed.
 - extension additions are de-duplicated after trim (`Set` semantics).
 - `roles.add` entries are de-duplicated by trimmed `role` value; **first occurrence wins**.
-- `naming` is included in normalized output only when at least one supported naming addition list is present.
+- `naming` is included in normalized output only when at least one supported naming surface is present.
+- `naming.caseRules.semanticName.style` is retained (trimmed) when provided and valid.
 
 ## 7) Merge semantics in naming runtime
 
@@ -212,7 +216,22 @@ This behavior applies to:
 }
 ```
 
-### 9.5 Strict exit via config
+### 9.5 Case rules style override (current supported value)
+
+```json
+{
+  "version": "0.1",
+  "naming": {
+    "caseRules": {
+      "semanticName": {
+        "style": "kebab-case"
+      }
+    }
+  }
+}
+```
+
+### 9.6 Strict exit via config
 
 ```json
 {

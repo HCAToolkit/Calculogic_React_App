@@ -13,3 +13,17 @@ test('validator config schema version const matches runtime contract version', (
 
   assert.equal(schema?.properties?.version?.const, VALIDATOR_CONFIG_VERSION);
 });
+
+
+test('validator config schema allows naming.caseRules.semanticName.style kebab-case only', () => {
+  const schemaPath = path.join(
+    process.cwd(),
+    'calculogic-validator/src/validator-config.schema.json',
+  );
+  const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+
+  assert.equal(
+    schema?.properties?.naming?.properties?.caseRules?.properties?.semanticName?.properties?.style?.const,
+    'kebab-case',
+  );
+});
