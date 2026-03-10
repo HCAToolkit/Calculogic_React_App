@@ -439,7 +439,7 @@ Suggested codes (V0.0.1):
 - `TREE_SHARED_LANE_FIRST_PARTITION_PRESENT` (`info`)
 - `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (`warn`/`info`)
 - `TREE_SHARED_SEMANTIC_ROOT_RECOMMENDED` (`warn`/`info`)
-- `TREE_OWNED_SLICE_BOUNDARY_DRIFT` (`warn`/`info`) — future advisory direction
+- `TREE_OWNED_SLICE_BOUNDARY_DRIFT` (`info`) — implemented in bounded deterministic form for conservative subtree-local growth signals under suite-core
 - `TREE_OWNED_SLICE_EXTRACTION_RECOMMENDED` (`warn`/`info`) — future advisory direction
 
 ---
