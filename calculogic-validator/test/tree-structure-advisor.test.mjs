@@ -498,7 +498,7 @@ test('tree-structure-advisor prepared runtime contract rejects missing lazy cont
   );
 });
 
-test('tree-structure-advisor wiring provides lazy memoized content accessor', async () => {
+test('tree-structure-advisor wiring provides lazy memoized content accessor and deterministic scope boundary error', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-lazy-content-'));
 
   try {
@@ -521,7 +521,10 @@ test('tree-structure-advisor wiring provides lazy memoized content accessor', as
     const secondRead = prepared.getFileContent(selectedPath);
 
     assert.equal(firstRead, secondRead);
-    assert.equal(prepared.getFileContent('src/not-selected.logic.mjs'), undefined);
+    assert.throws(
+      () => prepared.getFileContent('src/not-selected.logic.mjs'),
+      /Tree prepared getFileContent received out-of-scope path: src\/not-selected\.logic\.mjs/u,
+    );
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
