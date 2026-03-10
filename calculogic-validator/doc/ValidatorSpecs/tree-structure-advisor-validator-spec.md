@@ -454,6 +454,19 @@ Report object SHOULD include:
 - `addressing.hostBindings[]` (required)
 - `findings[]` (sorted deterministically)
 
+### Prepared runtime input contract (wiring/runtime boundary)
+
+The runtime entrypoint expects prepared inputs from wiring/runtime adapters and must fail clearly when the contract is bypassed.
+
+Required prepared fields:
+
+- `selectedPaths` (array)
+- `topLevelDirectoryNames` (array)
+- `targets` (array)
+- `getFileContent(relativePath)` (function)
+
+Runtime must treat file content access as lazy and callable on demand by path, instead of requiring an eagerly materialized full-file map.
+
 ---
 
 ## Determinism Requirements

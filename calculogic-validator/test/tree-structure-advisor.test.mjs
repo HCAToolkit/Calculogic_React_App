@@ -7,6 +7,8 @@ import {
   runTreeStructureAdvisor,
   summarizeFindings,
 } from '../tree/src/tree-structure-advisor.host.mjs';
+import { prepareTreeStructureAdvisorInputs } from '../tree/src/tree-structure-advisor.wiring.mjs';
+import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../tree/src/tree-structure-advisor.logic.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 
 const writeJson = async (filePath, value) => {
@@ -477,6 +479,49 @@ test('tree-structure-advisor no-target behavior remains unchanged for findings',
     assert.deepEqual(withoutTargets.findings, explicitEmptyTargets.findings);
     assert.equal(withoutTargets.filters.isFiltered, false);
     assert.equal(explicitEmptyTargets.filters.isFiltered, false);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+
+test('tree-structure-advisor prepared runtime contract rejects missing lazy content accessor', () => {
+  assert.throws(
+    () =>
+      runTreeStructureAdvisorRuntime({
+        scope: 'repo',
+        selectedPaths: [],
+        topLevelDirectoryNames: [],
+        targets: [],
+      }),
+    /getFileContent\(relativePath\)/u,
+  );
+});
+
+test('tree-structure-advisor wiring provides lazy memoized content accessor', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-lazy-content-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'src', 'compat'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'compat', 'legacy-api.logic.mjs'),
+      "export * from '../../calculogic-validator/src/core/validator-runner.logic.mjs';\\n",
+      'utf8',
+    );
+
+    const prepared = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo' });
+
+    assert.equal(typeof prepared.getFileContent, 'function');
+    assert.equal('fileContentsByPath' in prepared, false);
+
+    const selectedPath = 'src/compat/legacy-api.logic.mjs';
+    const firstRead = prepared.getFileContent(selectedPath);
+    await fs.writeFile(path.join(fixtureDir, selectedPath), 'export const changed = true\\n', 'utf8');
+    const secondRead = prepared.getFileContent(selectedPath);
+
+    assert.equal(firstRead, secondRead);
+    assert.equal(prepared.getFileContent('src/not-selected.logic.mjs'), undefined);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }

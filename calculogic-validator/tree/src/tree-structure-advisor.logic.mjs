@@ -85,15 +85,20 @@ export const summarizeFindings = (findings) => {
 };
 
 const assertPreparedTreeInputs = (preparedInputs) => {
-  if (
+  const hasPreparedRuntimeInputs =
     preparedInputs &&
     Array.isArray(preparedInputs.selectedPaths) &&
-    Array.isArray(preparedInputs.topLevelDirectoryNames)
-  ) {
+    Array.isArray(preparedInputs.topLevelDirectoryNames) &&
+    Array.isArray(preparedInputs.targets) &&
+    typeof preparedInputs.getFileContent === 'function';
+
+  if (hasPreparedRuntimeInputs) {
     return preparedInputs;
   }
 
-  throw new Error('Tree runtime requires prepared inputs from wiring/runtime adapter.');
+  throw new Error(
+    'Tree runtime requires prepared inputs from wiring/runtime adapter: selectedPaths[], topLevelDirectoryNames[], targets[], and getFileContent(relativePath).',
+  );
 };
 
 export const runTreeStructureAdvisor = (preparedInputs = {}) => {
@@ -102,7 +107,7 @@ export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const findings = [
     ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
     ...collectValidatorOwnedOutsideTreeFindings(prepared.selectedPaths),
-    ...collectShimCompatFindings(prepared.selectedPaths, prepared.fileContentsByPath),
+    ...collectShimCompatFindings(prepared.selectedPaths, prepared.getFileContent),
   ].sort(sortByPathThenCode);
 
   return {
