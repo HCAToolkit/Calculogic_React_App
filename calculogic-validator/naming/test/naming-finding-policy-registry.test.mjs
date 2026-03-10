@@ -5,7 +5,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { loadFindingPolicyFromFile } from '../src/registries/naming-finding-policy.registry.logic.mjs';
 import { resolveNamingRegistryInputs } from '../src/registries/registry-state.logic.mjs';
-import { toNamingRolesRuntime, toMissingRolePatternsRuntime } from '../src/naming-runtime-converters.logic.mjs';
+import {
+  toNamingRolesRuntime,
+  toMissingRolePatternsRuntime,
+  toCaseRulesRuntime,
+} from '../src/naming-runtime-converters.logic.mjs';
 import { classifyPath } from '../src/naming-validator.logic.mjs';
 
 const writeJson = (filePath, value) => {
@@ -47,6 +51,7 @@ test('missing outcome policy entry fails deterministically during classification
         toNamingRolesRuntime(registryInputs.roles),
         toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
         new Map(),
+        toCaseRulesRuntime(registryInputs.caseRules),
       ),
     /Missing naming finding policy for outcome "canonical"/u,
   );

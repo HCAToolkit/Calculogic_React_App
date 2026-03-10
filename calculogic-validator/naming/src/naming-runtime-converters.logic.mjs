@@ -61,3 +61,29 @@ export const toFindingPolicyRuntime = (findingPolicy) =>
       },
     ]),
   );
+
+const CANONICAL_KEBAB_CASE_SEMANTIC_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+export const toCaseRulesRuntime = (caseRules) => {
+  if (!caseRules || typeof caseRules !== 'object' || Array.isArray(caseRules)) {
+    throw new Error('Naming runtime case rules must be an object.');
+  }
+
+  if (!caseRules.semanticName || typeof caseRules.semanticName !== 'object') {
+    throw new Error('Naming runtime case rules semanticName must be an object.');
+  }
+
+  const semanticStyle =
+    typeof caseRules.semanticName.style === 'string' ? caseRules.semanticName.style.trim() : '';
+
+  if (semanticStyle !== 'kebab-case') {
+    throw new Error(`Unsupported semantic-name style in case rules runtime: ${semanticStyle}`);
+  }
+
+  return {
+    semanticName: {
+      style: semanticStyle,
+      pattern: CANONICAL_KEBAB_CASE_SEMANTIC_PATTERN,
+    },
+  };
+};

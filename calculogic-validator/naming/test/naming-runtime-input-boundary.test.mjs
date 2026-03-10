@@ -16,6 +16,7 @@ import {
   toReportableRootFilesSet,
   toMissingRolePatternsRuntime,
   toFindingPolicyRuntime,
+  toCaseRulesRuntime,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
 
@@ -36,6 +37,7 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
     namingRolesRuntime,
     toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
     toFindingPolicyRuntime(registryInputs.findingPolicy),
+    toCaseRulesRuntime(registryInputs.caseRules),
   );
   assert.equal(canonicalFinding.code, 'NAMING_CANONICAL');
 
@@ -56,6 +58,7 @@ test('runtime accepts externally prepared naming runtime dependencies', () => {
       namingRolesRuntime,
       missingRolePatternsRuntime: toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
       findingPolicyRuntime: toFindingPolicyRuntime(registryInputs.findingPolicy),
+      caseRulesRuntime: toCaseRulesRuntime(registryInputs.caseRules),
       targets: [],
     });
 
@@ -95,6 +98,17 @@ test('runtime enforces prepared dependency injection contract', () => {
   );
 
   assert.throws(
+    () =>
+      classifyPath(
+        'src/rightpanel.results-style.css',
+        toNamingRolesRuntime(resolveNamingRegistryInputs({ config: {} }).roles),
+        toMissingRolePatternsRuntime(resolveNamingRegistryInputs({ config: {} }).missingRolePatterns),
+        toFindingPolicyRuntime(resolveNamingRegistryInputs({ config: {} }).findingPolicy),
+      ),
+    /requires prepared caseRulesRuntime/u,
+  );
+
+  assert.throws(
     () => runNamingValidator({
       scope: 'repo',
       namingRolesRuntime: toNamingRolesRuntime(resolveNamingRegistryInputs({ config: {} }).roles),
@@ -102,6 +116,7 @@ test('runtime enforces prepared dependency injection contract', () => {
         resolveNamingRegistryInputs({ config: {} }).missingRolePatterns,
       ),
       findingPolicyRuntime: toFindingPolicyRuntime(resolveNamingRegistryInputs({ config: {} }).findingPolicy),
+      caseRulesRuntime: toCaseRulesRuntime(resolveNamingRegistryInputs({ config: {} }).caseRules),
       targets: [],
     }),
     /requires prepared selectedPaths/u,
