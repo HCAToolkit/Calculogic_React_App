@@ -601,6 +601,58 @@ test('tree-structure-advisor no-target behavior remains unchanged for findings',
 });
 
 
+
+test('tree-structure-advisor docs scope includes declared root README when present', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-scope-docs-root-file-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(path.join(fixtureDir, 'README.md'), '# root readme\n', 'utf8');
+
+    const prepared = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'docs' });
+
+    assert.deepEqual(prepared.selectedPaths, ['doc/README.md', 'README.md']);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor system scope includes present root files and ignores missing declarations', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-scope-system-root-files-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(path.join(fixtureDir, 'eslint.config.mjs'), 'export default []\n', 'utf8');
+    await fs.writeFile(path.join(fixtureDir, 'tsconfig.json'), '{"compilerOptions":{}}\n', 'utf8');
+
+    const prepared = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'system' });
+
+    assert.deepEqual(prepared.selectedPaths, ['eslint.config.mjs', 'package.json', 'tsconfig.json']);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor root-file target filtering works for docs scope target', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-scope-docs-target-root-file-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(path.join(fixtureDir, 'README.md'), '# root readme\n', 'utf8');
+
+    const result = runTreeStructureAdvisor(fixtureDir, {
+      scope: 'docs',
+      targets: ['README.md'],
+    });
+
+    assert.equal(result.filters.isFiltered, true);
+    assert.deepEqual(result.filters.targets, ['README.md']);
+    assert.equal(result.totalFilesScanned, 1);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor prepared runtime contract rejects missing lazy content accessor', () => {
   assert.throws(
     () =>

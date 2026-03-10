@@ -25,7 +25,7 @@ const WALK_EXCLUDED_DIRECTORIES = new Set([
 
 const sortPaths = (paths) => Array.from(paths).sort((left, right) => left.localeCompare(right));
 
-const getScopeRoots = (scope) => {
+const getScopeCollectionProfile = (scope) => {
   const selectedScope = scope ?? 'repo';
   const profile = getValidatorScopeProfile(selectedScope);
 
@@ -34,10 +34,13 @@ const getScopeRoots = (scope) => {
   }
 
   if (selectedScope === 'repo') {
-    return ['.'];
+    return { includeRoots: ['.'], includeRootFiles: [] };
   }
 
-  return profile.includeRoots;
+  return {
+    includeRoots: profile.includeRoots,
+    includeRootFiles: profile.includeRootFiles,
+  };
 };
 
 const collectPathsFromScopeRoot = (repositoryRoot, scopeRoot) => {
@@ -79,6 +82,26 @@ const collectPathsFromScopeRoot = (repositoryRoot, scopeRoot) => {
   return collected;
 };
 
+
+const collectPathsFromRootFiles = (repositoryRoot, includeRootFiles) => {
+  const repositoryAbsoluteRoot = path.resolve(repositoryRoot);
+
+  return includeRootFiles.flatMap((rootFilePath) => {
+    const absolutePath = path.resolve(repositoryRoot, rootFilePath);
+
+    if (path.dirname(absolutePath) !== repositoryAbsoluteRoot || !fs.existsSync(absolutePath)) {
+      return [];
+    }
+
+    const rootFileStat = fs.statSync(absolutePath);
+    if (!rootFileStat.isFile()) {
+      return [];
+    }
+
+    return [normalizePath(path.relative(repositoryRoot, absolutePath))];
+  });
+};
+
 const collectTopLevelDirectoryNames = (repositoryRoot) =>
   fs
     .readdirSync(repositoryRoot, { withFileTypes: true })
@@ -90,11 +113,15 @@ const collectTopLevelDirectoryNames = (repositoryRoot) =>
 
 export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targets } = {}) => {
   const selectedScope = scope ?? 'repo';
-  const scopeRoots = getScopeRoots(selectedScope);
-  const scopedPaths = scopeRoots.flatMap((scopeRoot) =>
+  const scopeCollectionProfile = getScopeCollectionProfile(selectedScope);
+  const scopedPaths = scopeCollectionProfile.includeRoots.flatMap((scopeRoot) =>
     collectPathsFromScopeRoot(repositoryRoot, scopeRoot),
   );
-  const inScopePaths = sortPaths(new Set(scopedPaths));
+  const rootFilePaths = collectPathsFromRootFiles(
+    repositoryRoot,
+    scopeCollectionProfile.includeRootFiles,
+  );
+  const inScopePaths = sortPaths(new Set([...scopedPaths, ...rootFilePaths]));
   const resolvedTargets = resolveScopedTargets(repositoryRoot, targets ?? []);
   const selectedPaths = filterScopedPathsByTargets(repositoryRoot, inScopePaths, resolvedTargets);
   const contentByPathCache = new Map();
