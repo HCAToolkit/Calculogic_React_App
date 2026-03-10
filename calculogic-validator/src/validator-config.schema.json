@@ -74,6 +74,21 @@
               }
             }
           }
+        },
+        "caseRules": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "semanticName": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "style": {
+                  "const": "kebab-case"
+                }
+              }
+            }
+          }
         }
       }
     }

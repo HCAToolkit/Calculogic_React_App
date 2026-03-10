@@ -132,6 +132,8 @@ Naming validator supports optional runtime config input with deterministic JSON 
   - required `category` string, validated against `calculogic-validator/naming/src/registries/_builtin/categories.registry.json` `categories[].category`
   - required `status` from `active | deprecated`
   - optional `notes` string
+- optional `naming.caseRules.semanticName.style` string
+  - when provided, must be `kebab-case` for current runtime support
 
 Normalization and merge semantics for `naming.roles.add` are deterministic and additive-only:
 
@@ -171,6 +173,8 @@ Runtime and schema strictness are intentionally aligned. Unknown keys are reject
 - `naming`
 - `naming.reportableExtensions`
 - `naming.roles`
+- `naming.caseRules`
+- `naming.caseRules.semanticName`
 - each `naming.roles.add[]` entry object
 
 ### 2.7 Report metadata contract (V0.1.12)

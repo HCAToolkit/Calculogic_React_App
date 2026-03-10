@@ -9,6 +9,7 @@ const VALID_ROLE_CATEGORIES = new Set([
   'deprecated',
 ]);
 const VALID_ROLE_STATUSES = new Set(['active', 'deprecated']);
+const VALID_SEMANTIC_NAME_STYLES = new Set(['kebab-case']);
 
 const fail = (message) => {
   throw new Error(`Invalid validator config: ${message}`);
@@ -56,8 +57,9 @@ const normalizeConfig = (config) => {
 
   const extensionAdditions = config?.naming?.reportableExtensions?.add;
   const roleAdditions = config?.naming?.roles?.add;
+  const semanticNameStyle = config?.naming?.caseRules?.semanticName?.style;
 
-  if (extensionAdditions || roleAdditions) {
+  if (extensionAdditions || roleAdditions || semanticNameStyle !== undefined) {
     normalized.naming = {};
   }
 
@@ -70,6 +72,14 @@ const normalizeConfig = (config) => {
   if (roleAdditions) {
     normalized.naming.roles = {
       add: normalizeRoleAdditions(roleAdditions),
+    };
+  }
+
+  if (semanticNameStyle !== undefined) {
+    normalized.naming.caseRules = {
+      semanticName: {
+        style: semanticNameStyle.trim(),
+      },
     };
   }
 
@@ -159,6 +169,43 @@ const validateRoleAdditions = (config) => {
   additions.forEach(validateRoleAdditionEntry);
 };
 
+const validateNamingCaseRules = (config) => {
+  const caseRules = config?.naming?.caseRules;
+  if (caseRules === undefined) {
+    return;
+  }
+
+  if (!caseRules || typeof caseRules !== 'object' || Array.isArray(caseRules)) {
+    fail('naming.caseRules must be an object when provided.');
+  }
+
+  assertOnlyKeys(caseRules, ['semanticName'], 'naming.caseRules');
+
+  const semanticName = caseRules.semanticName;
+  if (semanticName === undefined) {
+    return;
+  }
+
+  if (!semanticName || typeof semanticName !== 'object' || Array.isArray(semanticName)) {
+    fail('naming.caseRules.semanticName must be an object when provided.');
+  }
+
+  assertOnlyKeys(semanticName, ['style'], 'naming.caseRules.semanticName');
+
+  const style = semanticName.style;
+  if (style === undefined) {
+    return;
+  }
+
+  if (typeof style !== 'string' || style.trim().length === 0) {
+    fail('naming.caseRules.semanticName.style must be a non-empty string when provided.');
+  }
+
+  if (!VALID_SEMANTIC_NAME_STYLES.has(style.trim())) {
+    fail('naming.caseRules.semanticName.style must be "kebab-case".');
+  }
+};
+
 const validateConfig = (config) => {
   if (!config || typeof config !== 'object' || Array.isArray(config)) {
     fail('root must be an object.');
@@ -180,11 +227,12 @@ const validateConfig = (config) => {
       fail('naming must be an object when provided.');
     }
 
-    assertOnlyKeys(naming, ['reportableExtensions', 'roles'], 'naming');
+    assertOnlyKeys(naming, ['reportableExtensions', 'roles', 'caseRules'], 'naming');
   }
 
   validateReportableExtensionAdditions(config);
   validateRoleAdditions(config);
+  validateNamingCaseRules(config);
 };
 
 export const loadValidatorConfigFromFile = (configPath, { cwd = process.cwd() } = {}) => {
