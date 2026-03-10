@@ -6,6 +6,21 @@ import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy.regi
 const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
 const TREE_SIGNAL_POLICY = getBuiltinTreeSignalPolicy();
 
+const VALIDATOR_SUITE_CORE_ROOT = 'calculogic-validator/src/';
+const SUITE_CORE_BOUNDARY_DRIFT_CARVEOUT_PREFIXES = [
+  'calculogic-validator/src/core/',
+  'calculogic-validator/src/compat/',
+  'calculogic-validator/src/registries/',
+];
+const SUITE_CORE_BOUNDARY_DRIFT_CARVEOUT_EXACT_PATHS = new Set([
+  'calculogic-validator/src/index.mjs',
+  'calculogic-validator/src/validator-config.schema.json',
+]);
+const SUITE_CORE_BOUNDARY_DRIFT_OWNED_SUBSYSTEM_MIN_FILES = 2;
+
+const BOUNDARY_DRIFT_BASENAME_SIGNAL_MATCHER =
+  /(?:\.host\.|\.wiring\.|\.logic\.|\.knowledge\.|\.contracts\.|\.runtime\.|registry|registries)/u;
+
 const sortByPathThenCode = (left, right) => {
   const byPath = left.path.localeCompare(right.path);
   if (byPath !== 0) {
@@ -60,6 +75,68 @@ const collectValidatorOwnedOutsideTreeFindings = (paths) =>
       },
     }));
 
+const isBoundaryDriftCarveoutPath = (relativePath) =>
+  SUITE_CORE_BOUNDARY_DRIFT_CARVEOUT_EXACT_PATHS.has(relativePath) ||
+  SUITE_CORE_BOUNDARY_DRIFT_CARVEOUT_PREFIXES.some((prefix) => relativePath.startsWith(prefix));
+
+const collectOwnedSliceBoundaryDriftFindings = (paths) => {
+  const filesBySuiteCoreSubtree = new Map();
+
+  for (const relativePath of paths) {
+    if (!relativePath.startsWith(VALIDATOR_SUITE_CORE_ROOT)) {
+      continue;
+    }
+
+    if (isBoundaryDriftCarveoutPath(relativePath)) {
+      continue;
+    }
+
+    const suffix = relativePath.slice(VALIDATOR_SUITE_CORE_ROOT.length);
+    const [topLevelSegment] = suffix.split('/');
+    if (!topLevelSegment || topLevelSegment.includes('.')) {
+      continue;
+    }
+
+    const siblingPaths = filesBySuiteCoreSubtree.get(topLevelSegment) ?? [];
+    siblingPaths.push(relativePath);
+    filesBySuiteCoreSubtree.set(topLevelSegment, siblingPaths);
+  }
+
+  return Array.from(filesBySuiteCoreSubtree.entries())
+    .sort(([left], [right]) => left.localeCompare(right))
+    .flatMap(([topLevelSegment, siblingPaths]) => {
+      const matchedOwnedSignals = siblingPaths
+        .filter((candidatePath) =>
+          BOUNDARY_DRIFT_BASENAME_SIGNAL_MATCHER.test(path.posix.basename(candidatePath)),
+        )
+        .sort((left, right) => left.localeCompare(right));
+
+      if (matchedOwnedSignals.length < SUITE_CORE_BOUNDARY_DRIFT_OWNED_SUBSYSTEM_MIN_FILES) {
+        return [];
+      }
+
+      return [
+        {
+          code: 'TREE_OWNED_SLICE_BOUNDARY_DRIFT',
+          severity: 'info',
+          path: `${VALIDATOR_SUITE_CORE_ROOT}${topLevelSegment}/`,
+          classification: 'advisory-structure',
+          message:
+            'Likely validator-owned subsystem growth is accumulating under suite-core calculogic-validator/src/** rather than an owned slice root.',
+          ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
+          details: {
+            suiteCoreRoot: VALIDATOR_SUITE_CORE_ROOT,
+            observedSubtree: topLevelSegment,
+            matchedOwnedSignalPaths: matchedOwnedSignals,
+            threshold: {
+              minOwnedSignalFiles: SUITE_CORE_BOUNDARY_DRIFT_OWNED_SUBSYSTEM_MIN_FILES,
+            },
+          },
+        },
+      ];
+    });
+};
+
 const incrementCounter = (counts, key) => {
   counts[key] = (counts[key] ?? 0) + 1;
 };
@@ -107,6 +184,7 @@ export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const findings = [
     ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
     ...collectValidatorOwnedOutsideTreeFindings(prepared.selectedPaths),
+    ...collectOwnedSliceBoundaryDriftFindings(prepared.selectedPaths),
     ...collectShimCompatFindings(prepared.selectedPaths, prepared.getFileContent),
   ].sort(sortByPathThenCode);
 
