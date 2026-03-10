@@ -8,6 +8,8 @@ This document defines the V0.1.7 filename naming validator slice for determinist
 
 This naming slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md): Calculogic Validator is modular, configurable, policy-driven, and report-first by default. Mode policy changes exit behavior and optional fix execution, not detection.
 
+Naming scope handling explicitly inherits the suite-owned scope boundary contract from [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md): suite scope profiles select which paths are in play, then naming applies naming-local interpretation to those in-scope paths.
+
 V0.1.7 scope is intentionally narrow:
 
 - filename validation only
@@ -114,6 +116,13 @@ Parsing assumptions:
 
 V0.1.2 implements deterministic scope profiles selected by CLI.
 
+Scope profile ownership model for this slice:
+
+- suite-owned: scope vocabulary and shared path-selection boundary
+- naming-owned: interpretation semantics for selected in-scope paths during naming analysis
+
+This section documents naming consumption of shared suite scope profiles; it does not redefine suite scope semantics.
+
 ### Default scope
 
 - default scope is `repo`
@@ -158,6 +167,11 @@ V0.1.2 implements deterministic scope profiles selected by CLI.
 
 ## Scope Contract (V0.1.3)
 
+Scope contract ownership model:
+
+- suite-owned: canonical scope names and base input-selection boundary
+- naming-owned: how selected paths are interpreted for naming findings/reporting
+
 Supported scopes:
 
 - `repo`
@@ -181,6 +195,11 @@ Inclusion/exclusion summary:
 Invalid scope behavior:
 
 - Unknown scope values are usage errors with non-zero exit and valid-scope usage text.
+
+Guardrail:
+
+- Scope profile behavior documented here is not a naming-specific reinvention of scope semantics.
+- Naming documents slice-local interpretation after the shared suite scope boundary has selected paths.
 
 ## Validator Config Input (Report-only, V0.1.7)
 
