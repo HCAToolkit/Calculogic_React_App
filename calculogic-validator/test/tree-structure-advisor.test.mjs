@@ -375,6 +375,122 @@ test('tree-structure-advisor flags validator-owned-looking file outside validato
   }
 });
 
+
+test('tree-structure-advisor boundary drift keeps suite-core shared infra carveouts quiet', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-boundary-shared-infra-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'core', 'naming'), {
+      recursive: true,
+    });
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'core', 'naming', 'naming-validator.logic.mjs'),
+      'export const namingCore = true\n',
+      'utf8',
+    );
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'core', 'naming', 'naming-validator.wiring.mjs'),
+      'export const namingWiring = true\n',
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+
+    assert.equal(
+      result.findings.some((finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT'),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor emits owned-slice boundary drift for clear subsystem growth under suite-core', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-boundary-drift-owned-growth-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'tree-structure-advisor'), {
+      recursive: true,
+    });
+    await fs.writeFile(
+      path.join(
+        fixtureDir,
+        'calculogic-validator',
+        'src',
+        'tree-structure-advisor',
+        'tree-structure-advisor.logic.mjs',
+      ),
+      'export const treeLogic = true\n',
+      'utf8',
+    );
+    await fs.writeFile(
+      path.join(
+        fixtureDir,
+        'calculogic-validator',
+        'src',
+        'tree-structure-advisor',
+        'tree-structure-advisor.wiring.mjs',
+      ),
+      'export const treeWiring = true\n',
+      'utf8',
+    );
+
+    const first = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const second = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const firstDriftFindings = first.findings.filter(
+      (finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT',
+    );
+    const secondDriftFindings = second.findings.filter(
+      (finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT',
+    );
+
+    assert.equal(firstDriftFindings.length, 1);
+    assert.deepEqual(firstDriftFindings, secondDriftFindings);
+    assert.equal(firstDriftFindings[0].path, 'calculogic-validator/src/tree-structure-advisor/');
+    assert.deepEqual(firstDriftFindings[0].details.matchedOwnedSignalPaths, [
+      'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.logic.mjs',
+      'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.wiring.mjs',
+    ]);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor boundary drift preserves compat and public-entry carveouts', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-boundary-drift-carveouts-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'compat'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'compat', 'legacy-validator.logic.mjs'),
+      'export const compatLogic = true\n',
+      'utf8',
+    );
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'compat', 'legacy-validator.wiring.mjs'),
+      'export const compatWiring = true\n',
+      'utf8',
+    );
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'index.mjs'),
+      "export * from './core/validator-runner.logic.mjs';\n",
+      'utf8',
+    );
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+
+    assert.equal(
+      result.findings.some((finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT'),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor directory target narrows analyzed paths/findings', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-target-dir-'));
 
