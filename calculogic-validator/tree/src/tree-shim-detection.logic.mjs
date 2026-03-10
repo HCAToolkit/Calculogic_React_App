@@ -178,7 +178,7 @@ export const collectShimEvidence = (relativePath, rawContent) => {
   };
 };
 
-export const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
+export const collectShimCompatFindings = (paths, getFileContent) => {
   const findings = [];
 
   for (const relativePath of paths) {
@@ -187,7 +187,8 @@ export const collectShimCompatFindings = (paths, fileContentsByPath = {}) => {
       continue;
     }
 
-    const evidence = collectShimEvidence(relativePath, fileContentsByPath[relativePath]);
+    const rawContent = typeof getFileContent === 'function' ? getFileContent(relativePath) : undefined;
+    const evidence = collectShimEvidence(relativePath, rawContent);
     const hasWeakSignalOnly =
       !evidence.thinReexportShim &&
       (evidence.folderSignals.length > 0 || evidence.nameTokenSignals.length > 0);

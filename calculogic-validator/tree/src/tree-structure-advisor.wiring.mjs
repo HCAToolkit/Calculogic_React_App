@@ -97,19 +97,28 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
   const inScopePaths = sortPaths(new Set(scopedPaths));
   const resolvedTargets = resolveScopedTargets(repositoryRoot, targets ?? []);
   const selectedPaths = filterScopedPathsByTargets(repositoryRoot, inScopePaths, resolvedTargets);
-  const fileContentsByPath = Object.fromEntries(
-    selectedPaths.map((relativePath) => [
-      relativePath,
-      fs.readFileSync(path.resolve(repositoryRoot, relativePath), 'utf8'),
-    ]),
-  );
+  const contentByPathCache = new Map();
+  const selectedPathSet = new Set(selectedPaths);
+  const getFileContent = (relativePath) => {
+    if (!selectedPathSet.has(relativePath)) {
+      return undefined;
+    }
+
+    if (contentByPathCache.has(relativePath)) {
+      return contentByPathCache.get(relativePath);
+    }
+
+    const rawContent = fs.readFileSync(path.resolve(repositoryRoot, relativePath), 'utf8');
+    contentByPathCache.set(relativePath, rawContent);
+    return rawContent;
+  };
 
   return {
     scope: selectedScope,
     selectedPaths,
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: resolvedTargets.map((target) => target.relPath),
-    fileContentsByPath,
+    getFileContent,
   };
 };
 
