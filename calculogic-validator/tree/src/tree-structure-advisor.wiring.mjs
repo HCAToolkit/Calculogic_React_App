@@ -101,7 +101,9 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
   const selectedPathSet = new Set(selectedPaths);
   const getFileContent = (relativePath) => {
     if (!selectedPathSet.has(relativePath)) {
-      return undefined;
+      throw new Error(
+        `Tree prepared getFileContent received out-of-scope path: ${relativePath}`,
+      );
     }
 
     if (contentByPathCache.has(relativePath)) {
