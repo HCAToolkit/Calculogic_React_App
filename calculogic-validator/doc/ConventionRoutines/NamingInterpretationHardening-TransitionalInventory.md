@@ -22,7 +22,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Explicit role-slot authority over incidental role-like tokens | **Partially implemented** | Canonical parse + role checks exist; role-like semantic/folder override behavior is contract-defined but not yet fully locked as dedicated disambiguation behavior/tests for all edge patterns. |
 | Optional semantic-family / semantic-group interpretation | **Intentionally out of scope for now** | Contract marks this as optional; no mandatory runtime lane required in current tranche. |
 | Folder-token context as contextual (not canonical authority by default) | **Partially implemented** | Folder context is used as scope/traversal input for walking/reporting mechanics. Folder-token interpretation remains a separate interpretation lane (contextual by default and non-overriding vs an explicit role slot), and that lane is not yet fully hard-locked as a dedicated behavior matrix. |
-| Lane-aware case policy surface (shared concept) | **Partially implemented** | Semantic-name case policy is registry-backed today; lane-specific policy expansion (for additional interpretation lanes) is not fully represented. |
+| Lane-aware case policy surface (shared concept) | **Partially implemented (semantic-name baseline implemented)** | Semantic-name case policy baseline is registry-resolved and prepared-runtime-backed today; lane-specific policy expansion (for additional interpretation lanes) remains future-facing/partial. |
 | Suite-owned implementation pairing rule (shared impl must have slice consumer) | **Already implemented (architecture guardrail)** | Current naming/runtime boundaries already reflect slice-owned enforcement with suite contracts; no speculative suite-only implementation is required in this tranche. |
 
 ### 2.2 `naming-semantic-name-and-role-disambiguation-spec.md` (naming specialization)
@@ -35,7 +35,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Role-like tokens in semantic name treated as semantic by default when explicit role exists | **Partially implemented** | Contract exists; behavior is covered indirectly by existing parser/role checks, but dedicated disambiguation scenarios remain a hardening target. |
 | Role-like folder tokens remain contextual by default | **Partially implemented** | Contract exists; folder context is currently used operationally for scoped traversal/reporting, while folder-token meaning as an interpretation lane (contextual and non-overriding vs explicit role slot) is not yet expressed as a dedicated, test-locked disambiguation matrix. |
 | Ambiguity signaling allowed without ownership reassignment | **Already implemented (baseline), hardening recommended** | Ambiguity signaling exists (for example hyphen-appended role ambiguity). Additional disambiguation classes should be broadened before registry expansion. |
-| Naming-case application points beyond current semantic case checks | **Partially implemented** | Current case-rules surface is focused on semantic-name style; lane-aware extensions are a later hardening step. |
+| Naming-case application points beyond current semantic case checks | **Partially implemented (semantic-name baseline implemented)** | Naming currently applies a prepared semantic-name case-policy baseline sourced from registry payload and runtime preparation; additional lane-aware policy surfaces remain a later hardening step. |
 | Optional semantic-family-style interpretation | **Intentionally out of scope for now** | Optional by contract; no mandatory runtime addition needed in this tranche. |
 
 ### 2.3 `registry-model-and-slice-interaction-spec.md` (suite-level registry ownership model)
@@ -57,7 +57,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Explicit role-slot authority rule text | **Suite-shared contract only** (consumed by naming slice) |
 | Naming disambiguation behavior for semantic/folder role-like tokens | **Naming-slice implementation** |
 | Ambiguity findings and naming-slice disambiguation diagnostics | **Naming-slice implementation** |
-| Semantic-name case style policy currently in builtin case-rules payload | **Builtin registry candidate** (already active in bounded form) |
+| Semantic-name case style policy currently in builtin case-rules payload | **Builtin registry payload (implemented baseline)** |
 | Potential lane-aware case-policy expansion metadata (future) | **Builtin registry candidate** (after behavior hardening) |
 | Registry-state selection, normalization, digesting, converter prep | **Code-owned loader/converter mechanism (registry-state + runtime preparation)** |
 | Canonical filename parsing (`<semantic>.<role>.<ext>` and extension handling) | **Code-owned runtime/parser/disambiguation mechanic** |
@@ -68,7 +68,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 
 ### 4.1 Policy surfaces that are valid builtin-registry candidates
 
-- Lane policy metadata (for example semantic-name case style; later lane-aware case policy metadata once behavior is stable).
+- Lane policy metadata (for example the implemented semantic-name case style baseline; later lane-aware case policy metadata once behavior is stable).
 - Vocabulary/state payloads (roles/categories/status, finding policy mappings, allowed special-case classifications, summary-bucket policy).
 - Optional future disambiguation policy toggles **only** when they express bounded policy choices rather than parser algorithm flow.
 
@@ -79,7 +79,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 - Traversal and scoped path-collection mechanics.
 - Runtime normalization/converter mechanics that compile payload shapes into executable runtime state.
 
-Guardrail: do not push parser/disambiguation/traversal engines into registries; registries hold policy data, while runtime code owns deterministic mechanics.
+Guardrail: do not push parser/disambiguation/traversal engines into registries; registry payloads own policy data, converter/runtime preparation owns style-to-pattern compilation, and naming rule/helper code consumes prepared runtime state for deterministic enforcement.
 
 ## 5) Recommended bounded implementation order (naming interpretation hardening tranche)
 

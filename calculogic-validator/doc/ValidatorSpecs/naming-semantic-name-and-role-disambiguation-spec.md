@@ -21,8 +21,9 @@ Naming-slice specialization in this document does not redefine those shared noun
 
 Ownership clarification:
 
-- Suite-owned implementation surfaces may provide shared parsing/normalization/case-policy infrastructure.
-- Naming-slice implementation is one concrete slice-owned enforcement/specialization surface that consumes that shared infrastructure.
+- Registry payloads own case-policy data surfaces.
+- Converter/runtime preparation owns compilation of case-style policy into prepared runtime pattern state.
+- Naming-slice rule/helper execution consumes prepared runtime state when applying naming-slice case-policy behavior.
 - Suite-owned implementation does not replace naming-slice ownership of naming-slice interpretation outcomes.
 - This spec does not assume naming owns the entire filename interpretation and case-policy implementation surface.
 
@@ -102,12 +103,19 @@ Classification: Normative
 
 Case-policy foundations are inherited from suite-level shared contract.
 
-Naming-slice specialization may define how those shared case-policy surfaces apply to:
+Naming-slice specialization currently applies a prepared semantic-name case-policy baseline through naming runtime preparation and consumption.
+
+Naming-slice specialization may define how shared case-policy surfaces apply to:
 
 - semantic-name lane text,
 - semantic-name token segments,
 - optional semantic-family-style segments,
 - role token segments in the explicit canonical role slot.
+
+Current runtime boundary for this specialization:
+
+- Implemented baseline: prepared semantic-name lane case-policy application.
+- Future/optional expansion: additional family/group/folder lane-aware policy remains future-facing and is not required by the current runtime contract.
 
 Case-policy guardrail:
 
