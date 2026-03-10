@@ -48,87 +48,101 @@ const writeJson = (filePath, value) => {
   fs.writeFileSync(filePath, JSON.stringify(value, null, 2));
 };
 
+const seedCaseRulesRegistryFixture = (
+  tempRoot,
+  {
+    includeCustomCaseRules = false,
+    customCaseRules = { semanticName: { style: 'kebab-case' } },
+  } = {},
+) => {
+  writeJson(path.join(tempRoot, 'registry-state.json'), {
+    schemaVersion: '1',
+    activeRegistry: 'custom',
+  });
+
+  writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
+    categories: [{ category: 'architecture-support' }],
+  });
+  writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+    rolesByCategory: {
+      'architecture-support': [{ role: 'host', status: 'active' }],
+    },
+  });
+  writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), {
+    reportableExtensions: ['.ts'],
+  });
+  writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), {
+    reportableRootFiles: ['package.json'],
+  });
+  writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), {
+    classificationBuckets: ['canonical'],
+    secondaryBucketFamilies: ['codeCounts'],
+  });
+  writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), {
+    missingRolePatterns: [
+      {
+        patternId: 'single-extension',
+        dotSegments: 2,
+        semanticSegmentIndex: 0,
+        extensionSegmentIndexes: [1],
+      },
+    ],
+  });
+  writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), {
+    outcomes: {
+      canonical: {
+        code: 'NAMING_CANONICAL',
+        severity: 'info',
+        classification: 'canonical',
+        message: 'ok',
+        ruleRef: 'naming-spec',
+      },
+    },
+  });
+  writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), {
+    version: '1',
+    capabilities: [
+      {
+        configPath: 'naming.reportableExtensions',
+        operation: 'add',
+        payloadType: 'string-array',
+        target: 'reportableExtensions',
+      },
+      {
+        configPath: 'naming.roles',
+        operation: 'add',
+        payloadType: 'role-array',
+        target: 'roles',
+      },
+      {
+        configPath: 'naming.caseRules',
+        operation: 'set',
+        payloadType: 'case-rules-object',
+        target: 'caseRules',
+      },
+    ],
+  });
+  writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), {
+    semanticName: { style: 'kebab-case' },
+  });
+
+  writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    { role: 'host', category: 'architecture-support', status: 'active' },
+  ]);
+  writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.ts']);
+
+  if (includeCustomCaseRules) {
+    writeJson(path.join(tempRoot, '_custom', 'case-rules.registry.custom.json'), customCaseRules);
+  }
+};
+
 test('custom case-rules file overrides builtin when present', () => {
   const tempRoot = makeTempRegistryRoot();
 
   try {
-    writeJson(path.join(tempRoot, 'registry-state.json'), {
-      schemaVersion: '1',
-      activeRegistry: 'custom',
-    });
-
-    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
-      categories: [{ category: 'architecture-support' }],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
-      rolesByCategory: {
-        'architecture-support': [{ role: 'host', status: 'active' }],
-      },
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), {
-      reportableExtensions: ['.ts'],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), {
-      reportableRootFiles: ['package.json'],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), {
-      classificationBuckets: ['canonical'],
-      secondaryBucketFamilies: ['codeCounts'],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), {
-      missingRolePatterns: [
-        {
-          patternId: 'single-extension',
-          dotSegments: 2,
-          semanticSegmentIndex: 0,
-          extensionSegmentIndexes: [1],
-        },
-      ],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), {
-      outcomes: {
-        canonical: {
-          code: 'NAMING_CANONICAL',
-          severity: 'info',
-          classification: 'canonical',
-          message: 'ok',
-          ruleRef: 'naming-spec',
-        },
-      },
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), {
-      version: '1',
-      capabilities: [
-        {
-          configPath: 'naming.reportableExtensions',
-          operation: 'add',
-          payloadType: 'string-array',
-          target: 'reportableExtensions',
-        },
-        {
-          configPath: 'naming.roles',
-          operation: 'add',
-          payloadType: 'role-array',
-          target: 'roles',
-        },
-        {
-          configPath: 'naming.caseRules',
-          operation: 'set',
-          payloadType: 'case-rules-object',
-          target: 'caseRules',
-        },
-      ],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), {
-      semanticName: { style: 'kebab-case' },
-    });
-
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
-      { role: 'host', category: 'architecture-support', status: 'active' },
-    ]);
-    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.ts']);
-    writeJson(path.join(tempRoot, '_custom', 'case-rules.registry.custom.json'), {
-      semanticName: { style: 'kebab-case' },
+    seedCaseRulesRegistryFixture(tempRoot, {
+      includeCustomCaseRules: true,
+      customCaseRules: { semanticName: { style: 'kebab-case' } },
     });
 
     const result = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
@@ -142,81 +156,7 @@ test('custom registry falls back to builtin case-rules when custom case-rules fi
   const tempRoot = makeTempRegistryRoot();
 
   try {
-    writeJson(path.join(tempRoot, 'registry-state.json'), {
-      schemaVersion: '1',
-      activeRegistry: 'custom',
-    });
-
-    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
-      categories: [{ category: 'architecture-support' }],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
-      rolesByCategory: {
-        'architecture-support': [{ role: 'host', status: 'active' }],
-      },
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), {
-      reportableExtensions: ['.ts'],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), {
-      reportableRootFiles: ['package.json'],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), {
-      classificationBuckets: ['canonical'],
-      secondaryBucketFamilies: ['codeCounts'],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), {
-      missingRolePatterns: [
-        {
-          patternId: 'single-extension',
-          dotSegments: 2,
-          semanticSegmentIndex: 0,
-          extensionSegmentIndexes: [1],
-        },
-      ],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), {
-      outcomes: {
-        canonical: {
-          code: 'NAMING_CANONICAL',
-          severity: 'info',
-          classification: 'canonical',
-          message: 'ok',
-          ruleRef: 'naming-spec',
-        },
-      },
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), {
-      version: '1',
-      capabilities: [
-        {
-          configPath: 'naming.reportableExtensions',
-          operation: 'add',
-          payloadType: 'string-array',
-          target: 'reportableExtensions',
-        },
-        {
-          configPath: 'naming.roles',
-          operation: 'add',
-          payloadType: 'role-array',
-          target: 'roles',
-        },
-        {
-          configPath: 'naming.caseRules',
-          operation: 'set',
-          payloadType: 'case-rules-object',
-          target: 'caseRules',
-        },
-      ],
-    });
-    writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), {
-      semanticName: { style: 'kebab-case' },
-    });
-
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
-      { role: 'host', category: 'architecture-support', status: 'active' },
-    ]);
-    writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.ts']);
+    seedCaseRulesRegistryFixture(tempRoot);
 
     const result = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
     assert.deepEqual(result.caseRules, { semanticName: { style: 'kebab-case' } });
