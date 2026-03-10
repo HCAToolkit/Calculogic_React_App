@@ -192,6 +192,13 @@ Tree advisor scope selection should reuse the existing validator scope discovery
 
 Target filtering applies after scope discovery and before analysis.
 
+Scope discovery for non-`repo` profiles must consume both scope-profile surfaces exposed by the shared runtime contract:
+
+- `includeRoots`: directory roots to walk recursively
+- `includeRootFiles`: explicit repository-root files to include when present
+
+Runtime collection must ignore missing declared root files, normalize collected root-file paths the same way as walked paths, then merge + deduplicate before target filtering.
+
 ---
 
 ## Analysis Heuristics (Deterministic)
