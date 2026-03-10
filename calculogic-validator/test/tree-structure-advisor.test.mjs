@@ -10,10 +10,77 @@ import {
 import { prepareTreeStructureAdvisorInputs } from '../tree/src/tree-structure-advisor.wiring.mjs';
 import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../tree/src/tree-structure-advisor.logic.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
+import { getValidatorScopeProfile } from '../src/core/validator-scopes.runtime.mjs';
 
 const writeJson = async (filePath, value) => {
   await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');
 };
+
+
+const collectExpectedPathsFromScopeProfile = async (fixtureDir, scope) => {
+  const profile = getValidatorScopeProfile(scope);
+
+  if (!profile) {
+    throw new Error(`Expected known scope profile: ${scope}`);
+  }
+
+  const collected = new Set();
+
+  for (const scopeRoot of profile.includeRoots) {
+    const absoluteRoot = path.join(fixtureDir, scopeRoot);
+
+    try {
+      const rootStat = await fs.stat(absoluteRoot);
+      if (!rootStat.isDirectory()) {
+        continue;
+      }
+    } catch {
+      continue;
+    }
+
+    const walk = async (absoluteDirectoryPath) => {
+      const entries = await fs.readdir(absoluteDirectoryPath, { withFileTypes: true });
+      entries.sort((left, right) => left.name.localeCompare(right.name));
+
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          if (entry.name.startsWith('.') || entry.name === 'node_modules') {
+            continue;
+          }
+
+          await walk(path.join(absoluteDirectoryPath, entry.name));
+          continue;
+        }
+
+        collected.add(path.relative(fixtureDir, path.join(absoluteDirectoryPath, entry.name)).replace(/\\/gu, '/'));
+      }
+    };
+
+    await walk(absoluteRoot);
+  }
+
+  for (const rootFilePath of profile.includeRootFiles) {
+    const absolutePath = path.join(fixtureDir, rootFilePath);
+
+    if (path.dirname(absolutePath) !== fixtureDir) {
+      continue;
+    }
+
+    try {
+      const rootFileStat = await fs.stat(absolutePath);
+      if (!rootFileStat.isFile()) {
+        continue;
+      }
+    } catch {
+      continue;
+    }
+
+    collected.add(path.relative(fixtureDir, absolutePath).replace(/\\/gu, '/'));
+  }
+
+  return [...collected].sort((left, right) => left.localeCompare(right));
+};
+
 
 const writeBaseFixtureRepo = async (fixtureDir) => {
   await fs.mkdir(path.join(fixtureDir, 'src'), { recursive: true });
@@ -662,6 +729,42 @@ test('tree-structure-advisor root-file target filtering works for docs scope tar
     assert.equal(result.filters.isFiltered, true);
     assert.deepEqual(result.filters.targets, ['README.md']);
     assert.equal(result.totalFilesScanned, 1);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+
+test('tree-structure-advisor scope collection follows suite profiles uniformly, including repo', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-scope-uniform-suite-profile-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(path.join(fixtureDir, 'README.md'), '# root readme\n', 'utf8');
+    await fs.writeFile(path.join(fixtureDir, 'eslint.config.mjs'), 'export default []\n', 'utf8');
+    await fs.writeFile(path.join(fixtureDir, 'tsconfig.json'), '{"compilerOptions":{}}\n', 'utf8');
+
+    for (const scope of ['repo', 'docs', 'system']) {
+      const prepared = prepareTreeStructureAdvisorInputs(fixtureDir, { scope });
+      const expectedPaths = await collectExpectedPathsFromScopeProfile(fixtureDir, scope);
+
+      assert.deepEqual(prepared.selectedPaths, expectedPaths);
+    }
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor rejects invalid scope deterministically', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-invalid-scope-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    assert.throws(
+      () => prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'unknown-scope' }),
+      /Invalid scope profile: unknown-scope/u,
+    );
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }

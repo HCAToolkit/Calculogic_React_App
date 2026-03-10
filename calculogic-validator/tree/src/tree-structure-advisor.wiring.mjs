@@ -33,10 +33,6 @@ const getScopeCollectionProfile = (scope) => {
     throw new Error(`Invalid scope profile: ${selectedScope}`);
   }
 
-  if (selectedScope === 'repo') {
-    return { includeRoots: ['.'], includeRootFiles: [] };
-  }
-
   return {
     includeRoots: profile.includeRoots,
     includeRootFiles: profile.includeRootFiles,
