@@ -155,6 +155,30 @@ const canonicalizeExtensions = (extensions) => {
   return [...deduped].sort((a, b) => a.localeCompare(b));
 };
 
+const canonicalizeCaseRules = (caseRulesValue, { sourceLabel }) => {
+  if (!caseRulesValue || typeof caseRulesValue !== 'object' || Array.isArray(caseRulesValue)) {
+    throw new Error(`Invalid ${sourceLabel} case-rules registry: expected an object.`);
+  }
+
+  const semanticName = caseRulesValue.semanticName;
+  if (!semanticName || typeof semanticName !== 'object' || Array.isArray(semanticName)) {
+    throw new Error(`Invalid ${sourceLabel} case-rules registry: expected semanticName object.`);
+  }
+
+  const style = typeof semanticName.style === 'string' ? semanticName.style.trim() : '';
+  if (!style) {
+    throw new Error(
+      `Invalid ${sourceLabel} case-rules registry: semanticName.style must be a non-empty string.`,
+    );
+  }
+
+  return {
+    semanticName: {
+      style,
+    },
+  };
+};
+
 const digestPayload = (payload) => sha256Hex(stableStringify(payload));
 
 function loadJsonFile(filePath) {
@@ -254,25 +278,7 @@ const loadBuiltinFindingPolicy = ({ builtinRegistryDir }) =>
 const loadBuiltinCaseRules = ({ builtinRegistryDir }) => {
   const parsed = loadJsonFile(path.join(builtinRegistryDir, 'case-rules.registry.json'));
 
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('Invalid builtin case-rules registry: expected an object.');
-  }
-
-  const semanticName = parsed.semanticName;
-  if (!semanticName || typeof semanticName !== 'object' || Array.isArray(semanticName)) {
-    throw new Error('Invalid builtin case-rules registry: expected semanticName object.');
-  }
-
-  const style = typeof semanticName.style === 'string' ? semanticName.style.trim() : '';
-  if (!style) {
-    throw new Error('Invalid builtin case-rules registry: semanticName.style must be a non-empty string.');
-  }
-
-  return {
-    semanticName: {
-      style,
-    },
-  };
+  return canonicalizeCaseRules(parsed, { sourceLabel: 'builtin' });
 };
 
 const loadRegistryState = (registryRootDir) => {
@@ -300,6 +306,11 @@ const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
     '_custom',
     'reportable-extensions.registry.custom.json',
   );
+  const customCaseRulesPath = path.join(
+    registryRootDir,
+    '_custom',
+    'case-rules.registry.custom.json',
+  );
 
   if (!fs.existsSync(customRolesPath)) {
     throw new Error('Custom registry file missing: _custom/roles.registry.custom.json.');
@@ -317,6 +328,10 @@ const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
   }
 
   const extensionsRaw = loadJsonFile(customExtensionsPath);
+  const builtinCaseRules = loadBuiltinCaseRules({ builtinRegistryDir });
+  const caseRules = fs.existsSync(customCaseRulesPath)
+    ? canonicalizeCaseRules(loadJsonFile(customCaseRulesPath), { sourceLabel: 'custom' })
+    : builtinCaseRules;
 
   return {
     roles: canonicalizeRoles(rolesRaw, {
@@ -327,7 +342,7 @@ const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
     summaryBuckets: loadBuiltinSummaryBuckets({ builtinRegistryDir }),
     missingRolePatterns: loadBuiltinMissingRolePatterns({ builtinRegistryDir }),
     findingPolicy: loadBuiltinFindingPolicy({ builtinRegistryDir }),
-    caseRules: loadBuiltinCaseRules({ builtinRegistryDir }),
+    caseRules,
   };
 };
 
@@ -344,18 +359,31 @@ const buildBuiltinPayload = ({ builtinRegistryDir }) => ({
 const loadBuiltinOverlayCapabilities = ({ builtinRegistryDir }) =>
   loadOverlayCapabilitiesFromFile(path.join(builtinRegistryDir, 'overlay-capabilities.registry.json'));
 
-const readOverlayAddPayload = ({ config, configPath, payloadType }) => {
+const readOverlayPayload = ({ config, configPath, payloadType, operation }) => {
   const [rootKey, registryKey] = configPath.split('.');
-  const addPayload = config?.[rootKey]?.[registryKey]?.add;
-  if (addPayload === undefined) {
+
+  if (operation === 'add') {
+    const addPayload = config?.[rootKey]?.[registryKey]?.add;
+    if (addPayload === undefined) {
+      return [];
+    }
+
+    if (payloadType === 'string-array' || payloadType === 'role-array') {
+      return addPayload;
+    }
+
     return [];
   }
 
-  if (payloadType === 'string-array' || payloadType === 'role-array') {
-    return addPayload;
+  if (operation === 'set') {
+    if (payloadType === 'case-rules-object') {
+      return config?.[rootKey]?.[registryKey];
+    }
+
+    return undefined;
   }
 
-  return [];
+  return undefined;
 };
 
 const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
@@ -363,22 +391,31 @@ const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
   const reportableExtensionsCapability =
     overlayCapabilities.byPathOperation['naming.reportableExtensions:add'];
   const rolesCapability = overlayCapabilities.byPathOperation['naming.roles:add'];
+  const caseRulesCapability = overlayCapabilities.byPathOperation['naming.caseRules:set'];
 
-  if (!reportableExtensionsCapability || !rolesCapability) {
+  if (!reportableExtensionsCapability || !rolesCapability || !caseRulesCapability) {
     throw new Error(
-      'Invalid overlay-capabilities registry: required naming.reportableExtensions:add and naming.roles:add capabilities are missing.',
+      'Invalid overlay-capabilities registry: required naming.reportableExtensions:add, naming.roles:add, and naming.caseRules:set capabilities are missing.',
     );
   }
 
-  const extensionAdds = readOverlayAddPayload({
+  const extensionAdds = readOverlayPayload({
     config,
     configPath: reportableExtensionsCapability.configPath,
     payloadType: reportableExtensionsCapability.payloadType,
+    operation: 'add',
   });
-  const roleAdds = readOverlayAddPayload({
+  const roleAdds = readOverlayPayload({
     config,
     configPath: rolesCapability.configPath,
     payloadType: rolesCapability.payloadType,
+    operation: 'add',
+  });
+  const caseRulesSet = readOverlayPayload({
+    config,
+    configPath: caseRulesCapability.configPath,
+    payloadType: caseRulesCapability.payloadType,
+    operation: 'set',
   });
   const allowedCategories = loadBuiltinCategorySet({ builtinRegistryDir });
 
@@ -405,7 +442,10 @@ const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
     summaryBuckets: builtinPayload.summaryBuckets,
     missingRolePatterns: builtinPayload.missingRolePatterns,
     findingPolicy: builtinPayload.findingPolicy,
-    caseRules: builtinPayload.caseRules,
+    caseRules:
+      caseRulesSet === undefined
+        ? builtinPayload.caseRules
+        : canonicalizeCaseRules(caseRulesSet, { sourceLabel: 'config overlay' }),
   };
 };
 

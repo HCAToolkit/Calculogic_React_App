@@ -1,8 +1,14 @@
 import fs from 'node:fs';
 
-const ALLOWED_TARGETS = new Set(['reportableExtensions', 'roles']);
-const ALLOWED_PAYLOAD_TYPES = new Set(['string-array', 'role-array']);
-const ALLOWED_OPERATION = 'add';
+const ALLOWED_TARGETS = new Set(['reportableExtensions', 'roles', 'caseRules']);
+const ALLOWED_PAYLOAD_TYPES = new Set(['string-array', 'role-array', 'case-rules-object']);
+const ALLOWED_OPERATIONS = new Set(['add', 'set']);
+
+const CAPABILITY_CONTRACT_BY_TARGET = {
+  reportableExtensions: { operation: 'add', payloadType: 'string-array' },
+  roles: { operation: 'add', payloadType: 'role-array' },
+  caseRules: { operation: 'set', payloadType: 'case-rules-object' },
+};
 
 const assertNonEmptyString = (value, fieldName) => {
   if (typeof value !== 'string' || !value.trim()) {
@@ -24,9 +30,9 @@ const canonicalizeCapabilityEntry = (entry, index) => {
   const payloadType = assertNonEmptyString(entry.payloadType, `capabilities[${index}].payloadType`);
   const target = assertNonEmptyString(entry.target, `capabilities[${index}].target`);
 
-  if (operation !== ALLOWED_OPERATION) {
+  if (!ALLOWED_OPERATIONS.has(operation)) {
     throw new Error(
-      `Invalid overlay-capabilities registry: capabilities[${index}].operation must be "${ALLOWED_OPERATION}".`,
+      `Invalid overlay-capabilities registry: capabilities[${index}].operation must be one of ${[...ALLOWED_OPERATIONS].join(', ')}.`,
     );
   }
 
@@ -39,6 +45,19 @@ const canonicalizeCapabilityEntry = (entry, index) => {
   if (!ALLOWED_TARGETS.has(target)) {
     throw new Error(
       `Invalid overlay-capabilities registry: capabilities[${index}].target must be one of ${[...ALLOWED_TARGETS].join(', ')}.`,
+    );
+  }
+
+  const targetContract = CAPABILITY_CONTRACT_BY_TARGET[target];
+  if (targetContract.operation !== operation) {
+    throw new Error(
+      `Invalid overlay-capabilities registry: capabilities[${index}] target "${target}" must use operation "${targetContract.operation}".`,
+    );
+  }
+
+  if (targetContract.payloadType !== payloadType) {
+    throw new Error(
+      `Invalid overlay-capabilities registry: capabilities[${index}] target "${target}" must use payloadType "${targetContract.payloadType}".`,
     );
   }
 

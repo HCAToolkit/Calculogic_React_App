@@ -24,6 +24,12 @@ const DEFAULT_OVERLAY_CAPABILITIES_REGISTRY = {
       payloadType: 'role-array',
       target: 'roles',
     },
+    {
+      configPath: 'naming.caseRules',
+      operation: 'set',
+      payloadType: 'case-rules-object',
+      target: 'caseRules',
+    },
   ],
 };
 
@@ -570,6 +576,42 @@ test('unsupported config overlay paths remain ignored', () => {
   assert.deepEqual(withUnsupportedOverlay.roles, builtin.roles);
   assert.deepEqual(withUnsupportedOverlay.reportableExtensions, builtin.reportableExtensions);
   assert.deepEqual(withUnsupportedOverlay.summaryBuckets, builtin.summaryBuckets);
+  assert.deepEqual(withUnsupportedOverlay.caseRules, builtin.caseRules);
+});
+
+
+
+test('config overlay supports bounded case-rules set semantics', () => {
+  const result = resolveNamingRegistryInputs({
+    config: {
+      naming: {
+        caseRules: {
+          semanticName: { style: 'kebab-case' },
+        },
+      },
+    },
+  });
+
+  assert.equal(result.registrySource, 'config');
+  assert.deepEqual(result.caseRules, {
+    semanticName: { style: 'kebab-case' },
+  });
+});
+
+test('config overlay case-rules invalid semanticName.style throws deterministically', () => {
+  assert.throws(
+    () =>
+      resolveNamingRegistryInputs({
+        config: {
+          naming: {
+            caseRules: {
+              semanticName: { style: '' },
+            },
+          },
+        },
+      }),
+    /semanticName\.style must be a non-empty string/u,
+  );
 });
 
 test('throws when overlay capabilities registry is malformed', () => {

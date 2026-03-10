@@ -194,7 +194,7 @@ When provided, config only affects naming report inputs for:
 - naming role registry runtime (defaults + add-only role additions)
 - missing-role pattern policy runtime (builtin normalized schema for legacy exception detection)
 - finding-policy runtime (builtin outcome→finding metadata mapping for stable decision outcomes)
-- overlay capability contract runtime (`overlay-capabilities.registry.json`) that bounds supported config overlay surfaces to add-only `naming.reportableExtensions.add` and `naming.roles.add`
+- overlay capability contract runtime (`overlay-capabilities.registry.json`) that bounds supported config overlay surfaces to `naming.reportableExtensions.add`, `naming.roles.add`, and bounded whole-surface `naming.caseRules` set/replace semantics
 
 In current behavior, these config effects are limited to classification/runtime registries only for report generation.
 
