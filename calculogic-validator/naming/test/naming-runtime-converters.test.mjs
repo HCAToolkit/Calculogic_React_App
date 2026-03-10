@@ -10,6 +10,7 @@ import {
   toReportableRootFilesSet,
   toMissingRolePatternsRuntime,
   toFindingPolicyRuntime,
+  toCaseRulesRuntime,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming-validator.logic.mjs';
 import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
@@ -118,6 +119,7 @@ test('direct runtime and wiring derive equivalent runtime validation output from
       namingRolesRuntime: toNamingRolesRuntime(registryInputs.roles),
       missingRolePatternsRuntime: toMissingRolePatternsRuntime(registryInputs.missingRolePatterns),
       findingPolicyRuntime: toFindingPolicyRuntime(registryInputs.findingPolicy),
+      caseRulesRuntime: toCaseRulesRuntime(registryInputs.caseRules),
     });
 
     const wiringResult = runNamingValidatorWiring(tempRoot, { scope: 'repo', config: {} });

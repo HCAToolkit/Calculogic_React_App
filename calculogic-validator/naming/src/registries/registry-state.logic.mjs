@@ -19,6 +19,7 @@ const REQUIRED_BUILTIN_REGISTRY_FILES = [
   'missing-role-patterns.registry.json',
   'finding-policy.registry.json',
   'overlay-capabilities.registry.json',
+  'case-rules.registry.json',
 ];
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
@@ -250,6 +251,30 @@ const loadBuiltinMissingRolePatterns = ({ builtinRegistryDir }) =>
 const loadBuiltinFindingPolicy = ({ builtinRegistryDir }) =>
   loadFindingPolicyFromFile(path.join(builtinRegistryDir, 'finding-policy.registry.json'));
 
+const loadBuiltinCaseRules = ({ builtinRegistryDir }) => {
+  const parsed = loadJsonFile(path.join(builtinRegistryDir, 'case-rules.registry.json'));
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Invalid builtin case-rules registry: expected an object.');
+  }
+
+  const semanticName = parsed.semanticName;
+  if (!semanticName || typeof semanticName !== 'object' || Array.isArray(semanticName)) {
+    throw new Error('Invalid builtin case-rules registry: expected semanticName object.');
+  }
+
+  const style = typeof semanticName.style === 'string' ? semanticName.style.trim() : '';
+  if (!style) {
+    throw new Error('Invalid builtin case-rules registry: semanticName.style must be a non-empty string.');
+  }
+
+  return {
+    semanticName: {
+      style,
+    },
+  };
+};
+
 const loadRegistryState = (registryRootDir) => {
   const statePath = path.join(registryRootDir, 'registry-state.json');
   if (!fs.existsSync(statePath)) {
@@ -302,6 +327,7 @@ const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
     summaryBuckets: loadBuiltinSummaryBuckets({ builtinRegistryDir }),
     missingRolePatterns: loadBuiltinMissingRolePatterns({ builtinRegistryDir }),
     findingPolicy: loadBuiltinFindingPolicy({ builtinRegistryDir }),
+    caseRules: loadBuiltinCaseRules({ builtinRegistryDir }),
   };
 };
 
@@ -312,6 +338,7 @@ const buildBuiltinPayload = ({ builtinRegistryDir }) => ({
   summaryBuckets: loadBuiltinSummaryBuckets({ builtinRegistryDir }),
   missingRolePatterns: loadBuiltinMissingRolePatterns({ builtinRegistryDir }),
   findingPolicy: loadBuiltinFindingPolicy({ builtinRegistryDir }),
+  caseRules: loadBuiltinCaseRules({ builtinRegistryDir }),
 });
 
 const loadBuiltinOverlayCapabilities = ({ builtinRegistryDir }) =>
@@ -378,6 +405,7 @@ const applyConfigOverlay = ({ builtinPayload, config, builtinRegistryDir }) => {
     summaryBuckets: builtinPayload.summaryBuckets,
     missingRolePatterns: builtinPayload.missingRolePatterns,
     findingPolicy: builtinPayload.findingPolicy,
+    caseRules: builtinPayload.caseRules,
   };
 };
 
@@ -442,5 +470,6 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
     summaryBuckets: resolvedPayload.summaryBuckets,
     missingRolePatterns: resolvedPayload.missingRolePatterns,
     findingPolicy: resolvedPayload.findingPolicy,
+    caseRules: resolvedPayload.caseRules,
   };
 };

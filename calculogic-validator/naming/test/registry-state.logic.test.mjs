@@ -73,6 +73,7 @@ test('resolver contract shape remains stable', () => {
   const result = resolveNamingRegistryInputs();
 
   assert.deepEqual(Object.keys(result).sort((a, b) => a.localeCompare(b)), [
+    'caseRules',
     'findingPolicy',
     'missingRolePatterns',
     'registryDigests',
@@ -246,6 +247,9 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'),
       DEFAULT_OVERLAY_CAPABILITIES_REGISTRY,
     );
+    writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), {
+      semanticName: { style: 'kebab-case' },
+    });
 
     const builtinResult = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
     assert.deepEqual(builtinResult.roles, [
@@ -616,6 +620,10 @@ test('throws when overlay capabilities registry is malformed', () => {
           ruleRef: 'naming-spec',
         },
       },
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), {
+      semanticName: { style: 'kebab-case' },
     });
 
     writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), {

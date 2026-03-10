@@ -93,6 +93,21 @@ const assertPreparedFindingPolicyRuntime = (findingPolicyRuntime) => {
   );
 };
 
+const assertPreparedCaseRulesRuntime = (caseRulesRuntime) => {
+  if (
+    caseRulesRuntime &&
+    caseRulesRuntime.semanticName &&
+    typeof caseRulesRuntime.semanticName.style === 'string' &&
+    caseRulesRuntime.semanticName.pattern instanceof RegExp
+  ) {
+    return caseRulesRuntime;
+  }
+
+  throw new Error(
+    'Naming runtime requires prepared caseRulesRuntime from wiring/runtime adapter.',
+  );
+};
+
 const NAMING_DECISION_OUTCOME_IDS = Object.freeze({
   ALLOWED_SPECIAL_CASE: 'allowed-special-case',
   DEPRECATED_ROLE: 'deprecated-role',
@@ -281,10 +296,12 @@ export const classifyPath = (
   namingRolesRuntime,
   missingRolePatternsRuntime,
   findingPolicyRuntime,
+  caseRulesRuntime,
 ) => {
   const runtime = assertPreparedNamingRolesRuntime(namingRolesRuntime);
   const missingRolePatterns = assertPreparedMissingRolePatternsRuntime(missingRolePatternsRuntime);
   const findingPolicy = assertPreparedFindingPolicyRuntime(findingPolicyRuntime);
+  const caseRules = assertPreparedCaseRulesRuntime(caseRulesRuntime);
   const normalizedPath = normalizePath(relativePath);
   const basename = path.posix.basename(normalizedPath);
 
@@ -337,7 +354,7 @@ export const classifyPath = (
       });
     }
 
-    if (!isCanonicalSemanticName(parsed.semanticName)) {
+    if (!isCanonicalSemanticName(parsed.semanticName, caseRules)) {
       return createFindingFromOutcome({
         outcomeId: NAMING_DECISION_OUTCOME_IDS.BAD_SEMANTIC_CASE,
         path: normalizedPath,
@@ -407,8 +424,15 @@ export const runNamingValidator = (preparedInputs = {}) => {
   const findingPolicyRuntime = assertPreparedFindingPolicyRuntime(
     preparedInputs.findingPolicyRuntime,
   );
+  const caseRulesRuntime = assertPreparedCaseRulesRuntime(preparedInputs.caseRulesRuntime);
   const findings = selectedPaths.map((pathname) =>
-    classifyPath(pathname, namingRolesRuntime, missingRolePatternsRuntime, findingPolicyRuntime),
+    classifyPath(
+      pathname,
+      namingRolesRuntime,
+      missingRolePatternsRuntime,
+      findingPolicyRuntime,
+      caseRulesRuntime,
+    ),
   );
 
   return {
