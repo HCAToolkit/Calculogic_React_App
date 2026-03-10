@@ -114,7 +114,7 @@ Naming-slice specialization may define how shared case-policy surfaces apply to:
 
 Current runtime boundary for this specialization:
 
-- Implemented baseline: prepared semantic-name lane case-policy application.
+- Implemented baseline: prepared semantic-name lane case-policy application, including bounded optional registry integration for semantic-name `caseRules`.
 - Future/optional expansion: additional family/group/folder lane-aware policy remains future-facing and is not required by the current runtime contract.
 
 Case-policy guardrail:
