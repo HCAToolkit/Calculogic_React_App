@@ -12,6 +12,12 @@
       "operation": "add",
       "payloadType": "role-array",
       "target": "roles"
+    },
+    {
+      "configPath": "naming.caseRules",
+      "operation": "set",
+      "payloadType": "case-rules-object",
+      "target": "caseRules"
     }
   ]
 }
