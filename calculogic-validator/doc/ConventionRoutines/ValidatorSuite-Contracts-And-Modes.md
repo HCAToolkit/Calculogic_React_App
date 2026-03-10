@@ -58,9 +58,13 @@ Current implementation policy:
 
 This is the current implementation policy and may later be generalized under suite modes (`soft-fail` / `hard-fail` / `correct` / `replace`), while detection remains unchanged.
 
-## 6) Shared scope vocabulary (Canonical)
+## 6) Suite-owned scope boundary contract (Canonical)
 
-Current supported scope names are:
+This section defines a bounded ownership contract for scope vocabulary and scoped input selection.
+
+### 6.1 Scope vocabulary is suite-owned
+
+Current canonical suite scope names are:
 
 - `repo`
 - `app`
@@ -68,7 +72,41 @@ Current supported scope names are:
 - `validator`
 - `system`
 
-Slices may implement scope-specific include/exclude details, but the scope vocabulary should remain consistent across suite docs and slice specs.
+These names are suite-owned vocabulary and should stay consistent across suite docs, slice specs, and runner/composed-validator docs.
+
+### 6.2 Scope selection is suite-owned
+
+Suite scope profiles own the shared scope-selection boundary, including:
+
+- `includeRoots`
+- `includeRootFiles`
+- shared scope intent
+
+Slice validators should start from this suite-owned scope selection layer instead of redefining base path collection locally.
+
+### 6.3 Slice-local meaning remains slice-owned
+
+After suite scope selection, each slice owns interpretation semantics for in-scope paths.
+
+Examples:
+
+- naming decides what in-scope paths mean for naming analysis
+- tree decides what in-scope paths mean for tree analysis
+
+Scope selection defines which paths are in play; it does not dictate slice interpretation semantics.
+
+### 6.4 Cross-slice validators use the same boundary
+
+Cross-slice validators should begin from the same suite-scoped snapshot/input boundary used by slices.
+
+Cross-slice composition logic may add additional composition rules after scope selection, but should not fork basic scope semantics unless explicitly documented as a suite contract extension.
+
+### 6.5 Guardrail
+
+Scope selection is not a dumping ground for slice heuristics.
+
+- suite scope answers: "which paths are in play"
+- slice or cross-slice logic answers: "what those paths mean"
 
 ## 7) Shared Report Envelope (Canonical)
 
