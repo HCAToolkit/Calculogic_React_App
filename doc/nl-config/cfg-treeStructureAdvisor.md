@@ -44,6 +44,7 @@ V0.1.x uses deterministic path-based signals only:
 
 1. **Top-level unexpected-folder advisory**
    - Emit info advisory for clearly unusual non-hidden top-level folders outside known repo shape.
+   - Builtin known-root baseline remains bounded/deterministic and includes stable current peers: `bin`, `calculogic-doc-engine`, `calculogic-validator`, `doc`, `docs`, `public`, `scripts`, `src`, `test`, `tools`.
 2. **Validator-owned-looking file outside validator tree**
    - Emit info advisory when filename/path signal strongly indicates validator ownership but file is outside `calculogic-validator/**`.
 

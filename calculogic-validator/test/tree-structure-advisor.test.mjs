@@ -18,6 +18,7 @@ const writeJson = async (filePath, value) => {
 const writeBaseFixtureRepo = async (fixtureDir) => {
   await fs.mkdir(path.join(fixtureDir, 'src'), { recursive: true });
   await fs.mkdir(path.join(fixtureDir, 'doc'), { recursive: true });
+  await fs.mkdir(path.join(fixtureDir, 'calculogic-doc-engine', 'src'), { recursive: true });
   await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src'), { recursive: true });
 
   await writeJson(path.join(fixtureDir, 'package.json'), {
@@ -26,6 +27,11 @@ const writeBaseFixtureRepo = async (fixtureDir) => {
   });
   await fs.writeFile(path.join(fixtureDir, 'src', 'app-shell.logic.ts'), 'export const app = true\n', 'utf8');
   await fs.writeFile(path.join(fixtureDir, 'doc', 'README.md'), '# fixture\n', 'utf8');
+  await fs.writeFile(
+    path.join(fixtureDir, 'calculogic-doc-engine', 'src', 'doc-engine.logic.mjs'),
+    'export const docEngine = true\n',
+    'utf8',
+  );
   await fs.writeFile(
     path.join(fixtureDir, 'calculogic-validator', 'src', 'naming-validator.logic.mjs'),
     'export const fixture = true\n',
@@ -67,9 +73,17 @@ test('tree-structure-advisor known roots come from bounded registry policy witho
       (finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER' && finding.path === 'experiments',
     );
 
+    assert.equal(
+      result.findings.some(
+        (finding) =>
+          finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER' && finding.path === 'calculogic-doc-engine',
+      ),
+      false,
+    );
     assert.ok(advisory);
     assert.deepEqual(advisory.details.knownRoots, [
       'bin',
+      'calculogic-doc-engine',
       'calculogic-validator',
       'doc',
       'docs',
