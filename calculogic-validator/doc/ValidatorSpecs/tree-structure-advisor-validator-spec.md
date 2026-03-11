@@ -73,6 +73,28 @@ This validator treats **folders as scope roots** (host-like boundaries), and fil
 
 Goal: surface emergent patterns and recommend a structure that makes those patterns obvious.
 
+### Naming-signal consumption boundary
+
+Tree advisor may consume naming-shaped filename metadata as **structural signal input** for clustering and lane interpretation.
+
+Tree advisor may use these parsed naming-shaped signals when present:
+
+- `semanticName`
+- semantic family/group derived from `semanticName`
+- `role`
+- role category/status metadata
+
+Tree advisor does **not** re-own naming validity judgments. Naming validity remains owned by naming conventions/specs and the naming validator slice.
+
+Examples of naming validity judgments that tree advisor must not duplicate:
+
+- bad semantic case
+- missing role
+- deprecated role
+- hyphen-role ambiguity
+
+When usable naming-shaped metadata is unavailable, incomplete, or weak, tree advisor should reduce confidence and/or recommend running naming validation, rather than inventing naming-invalid findings inside tree output.
+
 Boundary note (canonical_target for this slice): tree validator ownership is under `calculogic-validator/tree/src/**`. Legacy flat suite-core paths such as `calculogic-validator/src/tree-structure-advisor.*.mjs` are compatibility wrappers only, not canonical ownership.
 
 ---
