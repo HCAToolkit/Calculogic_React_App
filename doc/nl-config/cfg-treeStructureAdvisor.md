@@ -1,5 +1,18 @@
 # cfg-treeStructureAdvisor
 
+Status labeling for this NL/config note:
+
+- **Current implementation target** = currently shipped/active runtime target for this slice.
+- **Deferred Behavior** = future advisory direction, not shipped runtime behavior.
+- Repo-shape examples are current-repo implementation reality, not universal published builtin requirements.
+
+Canonical reading order for tree implementation work:
+
+1. `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
+2. `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
+3. `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
+4. `doc/nl-config/cfg-treeStructureAdvisor.md` (this document)
+
 ## 0.0 Version
 
 Current implementation target: **V0.1.5** (shim evidence hardening with robust public-entrypoint barrel carveout coverage for `export *`, `export * as <name>`, and optional `export { ... } from` pass-through forms while preserving thin re-export shim detection).
@@ -120,7 +133,7 @@ Each finding follows existing report conventions:
 - Dedicated `validate-tree` execution includes only `tree-structure-advisor` while preserving shared runner scope/target semantics.
 - No fix mode, no move/rename behavior.
 
-## 5.0 Deferred Behavior
+## 5.0 Deferred Behavior (future advisory direction; not current runtime behavior)
 
 Deferred to later slices:
 

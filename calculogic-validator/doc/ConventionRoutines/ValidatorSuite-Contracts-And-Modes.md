@@ -1,5 +1,11 @@
 # Validator Suite Contracts and Modes
 
+Status labeling note for this document:
+
+- **Canonical** sections are current suite contract behavior/boundary.
+- **Current implementation policy** sections describe currently shipped runtime policy.
+- Any explicit future wording is planning guidance only and does not imply currently shipped behavior.
+
 ## 1) Identity and Vocabulary (Canonical)
 
 Calculogic Validator is a modular, configurable, policy-driven validator suite. It is report-first by default and can optionally escalate findings via soft-fail/hard-fail policies or execute deterministic fix plans (correct/replace) when explicitly enabled.
@@ -109,6 +115,8 @@ Scope selection is not a dumping ground for slice heuristics.
 - slice or cross-slice logic answers: "what those paths mean"
 
 ### 6.6 Shared scoped snapshot/input helper boundary
+
+Status: Canonical suite boundary contract (current runtime/shared ownership truth)
 
 Suite-core owns a shared scoped snapshot/input helper boundary for suite scope profiles.
 

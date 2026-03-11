@@ -1,6 +1,6 @@
 # Tree Structure Advisor Validator Spec (Report-Only Advisory, V0.1.5)
 
-## Purpose and Scope
+## Purpose and Scope (Status: Current runtime behavior)
 
 This document defines a **Tree Structure Advisor** validator slice whose output is **advisory**:
 
@@ -21,7 +21,23 @@ Tree advisor structural reasoning also includes an ownership-boundary principle 
 
 This principle is advisory and architecture-oriented; it does not mean one universal folder layout is required for every repo.
 
-## Suite Contract Alignment
+## Tree Implementation Canonical Reading Path (Status: Current implementation guidance)
+
+Read these first before tree implementation work (runtime, wiring, or contracts):
+
+1. Suite contract and scope boundary: [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md)
+2. Tree validator spec (this document): runtime behavior + bounded modeling notes
+3. Naming boundary context: [`NamingValidatorSpec.md`](../ConventionRoutines/NamingValidatorSpec.md)
+4. Tree NL/config implementation note: [`doc/nl-config/cfg-treeStructureAdvisor.md`](../../../doc/nl-config/cfg-treeStructureAdvisor.md)
+
+Status interpretation used in this document:
+
+- **Current runtime behavior**: implemented or currently enforced report behavior.
+- **Bounded modeling note**: current architecture interpretation guidance that intentionally does not claim new runtime behavior.
+- **Future advisory direction**: planned or deferred direction, not shipped behavior.
+- **Dogfooding/current-repo reality**: currently observed repo-specific shape that should not be overgeneralized into package-wide builtin truth.
+
+## Suite Contract Alignment (Status: Current runtime behavior)
 
 This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md): the validator suite is modular, configurable, policy-driven, and report-first by default. Tree advisor V0.1.5 remains report-only even though additional policy modes exist suite-wide.
 
@@ -60,7 +76,7 @@ This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-M
 
 ---
 
-## Conceptual Model
+## Conceptual Model (Status: Current architectural/modeling guidance)
 
 This validator treats **folders as scope roots** (host-like boundaries), and filenames as **lane signals**:
 
@@ -73,7 +89,7 @@ This validator treats **folders as scope roots** (host-like boundaries), and fil
 
 Goal: surface emergent patterns and recommend a structure that makes those patterns obvious.
 
-### Naming-signal consumption boundary
+### Naming-signal consumption boundary (Status: Current runtime boundary)
 
 Tree advisor may consume naming-shaped filename metadata as **structural signal input** for clustering and lane interpretation.
 
@@ -97,7 +113,7 @@ When usable naming-shaped metadata is unavailable, incomplete, or weak, tree adv
 
 Boundary note (canonical_target for this slice): tree validator ownership is under `calculogic-validator/tree/src/**`. Legacy flat suite-core paths such as `calculogic-validator/src/tree-structure-advisor.*.mjs` are compatibility wrappers only, not canonical ownership.
 
-## Top-Root Registry Classes and Ownership Boundary (Bounded Modeling Note)
+## Top-Root Registry Classes and Ownership Boundary (Status: Bounded modeling note)
 
 Classification: Informative
 
@@ -116,7 +132,7 @@ This section clarifies modeling intent for tree root registries without changing
 
 - Generic structural roots are appropriate builtin tree-owned defaults.
 - Semantic/custom-style roots may be valid and high-value, but are not automatically universal builtin truth.
-- Repo-specific roots used for dogfooding or implementation convenience may exist in current policy, but they should not automatically become permanent published-package builtins.
+- Repo-specific roots used for dogfooding or implementation convenience may exist in current policy (**dogfooding/current-repo reality**), but they should not automatically become permanent published-package builtins.
 
 ### 3) Case/style distinction
 
@@ -124,7 +140,7 @@ This section clarifies modeling intent for tree root registries without changing
 - This style signal does not make them filename roles.
 - Tree remains the owner of structural interpretation for folder roots.
 
-### 4) Future registry direction (modeling only)
+### 4) Future registry direction (modeling only; Status: Future advisory direction)
 
 Future tree root registries may require metadata richer than a flat string list, for example:
 
@@ -136,7 +152,7 @@ This is a modeling direction note only, not an implementation claim for this ver
 
 ---
 
-## Tree Addressing (Report-Only)
+## Tree Addressing (Report-Only, Status: Current runtime behavior)
 
 This slice assigns **Tree Addresses** for reporting and internal clustering.
 They are not canonical persistent IDs and must not be embedded into filenames.
@@ -203,7 +219,7 @@ Notes:
 
 ---
 
-## Tree Snapshot Inputs (TreeManifest / TreeSnapshot)
+## Tree Snapshot Inputs (TreeManifest / TreeSnapshot, Status: Current runtime behavior)
 
 Tree advisor analysis input is a deterministic **TreeSnapshot** (also called a TreeManifest): a stable list of repo-relative paths selected for analysis.
 
@@ -227,7 +243,7 @@ Important metadata clarifications:
 - stably sort snapshot entries
 - same snapshot inputs and same options => same report output
 
-### Recommended shape-level schema (doc-only)
+### Recommended shape-level schema (doc-only; Status: Bounded modeling note)
 
 - `sourceSnapshot.source`: `fs | git`
 - `sourceSnapshot.gitRef`: optional string (for example `HEAD`)
@@ -241,7 +257,7 @@ Important metadata clarifications:
 
 ---
 
-## Input Scope Profiles
+## Input Scope Profiles (Status: Current runtime behavior)
 
 Tree advisor scope selection follows the suite-owned scope boundary contract in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md#6-suite-owned-scope-boundary-contract-canonical): suite owns canonical scope vocabulary and scoped input selection, and tree advisor applies tree-local interpretation after that shared boundary.
 
@@ -264,7 +280,7 @@ Runtime collection must ignore missing declared root files, normalize collected 
 
 ---
 
-## Analysis Heuristics (Deterministic)
+## Analysis Heuristics (Deterministic, Status: Current runtime behavior)
 
 V0.0.1 uses deterministic heuristics that are explainable in findings.
 
@@ -308,7 +324,7 @@ All scoring thresholds MUST be explicit constants in code and reported in `detai
 - `MIN_FILES_IN_FAMILY_FOR_RECOMMENDATION = 2`
 - `LANE_FIRST_FOLDER_SIGNAL_SET = { build, build-style, logic, knowledge, results, results-style, tests, docs }`
 
-## Recommendation Patterns (Advisory Only)
+## Recommendation Patterns (Advisory Only, Status: Current runtime behavior)
 
 The following outputs are advisory recommendation patterns only. They are not mandatory rules and should be emitted as explainable `suggested-reorg` findings.
 
@@ -439,7 +455,7 @@ Constraints:
 
 ---
 
-## Classification Outputs
+## Classification Outputs (Status: Current runtime behavior)
 
 Stable classifications (suggested V0.0.1):
 
@@ -453,7 +469,7 @@ Severity:
 
 ---
 
-## Finding Schema
+## Finding Schema (Status: Current runtime behavior)
 
 Each finding uses the same stable envelope shape used by existing validators:
 
@@ -466,7 +482,7 @@ Each finding uses the same stable envelope shape used by existing validators:
 - `suggestedFix` (optional, advisory-only; e.g., proposed move set)
 - `details` (object, deterministic)
 
-### Tree-Advisor details fields (recommended)
+### Tree-Advisor details fields (recommended; Status: Current architectural/modeling guidance)
 
 - `addressing.treeAddress` (string; report-only)
 - `addressing.host` (string)
@@ -493,7 +509,7 @@ Each finding uses the same stable envelope shape used by existing validators:
 
 ---
 
-## Finding / Code Set (Draft)
+## Finding / Code Set (Draft; Status: Mixed current runtime behavior + future advisory direction)
 
 Suggested codes (V0.0.1):
 
@@ -504,7 +520,7 @@ Suggested codes (V0.0.1):
 - `TREE_SUBSYSTEM_SCAFFOLD_ASYMMETRY`
 - `TREE_TOOL_SURFACE_MIX`
 - `TREE_SHIM_SURFACE_PRESENT` (`info`) — implemented (thin-reexport high-confidence + runtimeish token-only info)
-- `TREE_SHIM_SCATTERED` (`warn`/`info`) — planned
+- `TREE_SHIM_SCATTERED` (`warn`/`info`) — planned (**future advisory direction**)
 - `TREE_SHIM_OUTSIDE_COMPAT` (`warn`) — implemented (thin re-export evidence only)
 - `TREE_SHARED_LANE_FIRST_PARTITION_PRESENT` (`info`)
 - `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (`warn`/`info`)
@@ -514,7 +530,7 @@ Suggested codes (V0.0.1):
 
 ---
 
-## Report Object Additions
+## Report Object Additions (Status: Current runtime behavior)
 
 Report object SHOULD include:
 
@@ -525,7 +541,7 @@ Report object SHOULD include:
 - `addressing.hostBindings[]` (required)
 - `findings[]` (sorted deterministically)
 
-### Prepared runtime input contract (wiring/runtime boundary)
+### Prepared runtime input contract (wiring/runtime boundary; Status: Current runtime behavior)
 
 The runtime entrypoint expects prepared inputs from wiring/runtime adapters and must fail clearly when the contract is bypassed.
 
@@ -540,7 +556,7 @@ Runtime must treat file content access as lazy and callable on demand by path, i
 
 ---
 
-## Determinism Requirements
+## Determinism Requirements (Status: Current runtime behavior)
 
 - Normalize path separators to `/`
 - Use explicit include/exclude sets per scope
@@ -555,7 +571,7 @@ Runtime must treat file content access as lazy and callable on demand by path, i
 
 ---
 
-## Rollout Modes
+## Rollout Modes (Status: Current runtime behavior + future advisory direction)
 
 Mode semantics are centralized in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md).
 
@@ -565,11 +581,11 @@ Tree advisor V0.0.1 implementation status:
   - never fails due to tree findings
   - fails only on invalid CLI usage (unknown scope, nonexistent target)
 
-Suite policy options (`soft-fail`, `hard-fail`, `correct`, `replace`) are contract-level modes and are deferred for this slice.
+Suite policy options (`soft-fail`, `hard-fail`, `correct`, `replace`) are contract-level modes and are deferred for this slice (**future advisory direction**).
 
 ---
 
-## CLI Usage (Draft)
+## CLI Usage (Draft, Status: Bounded modeling note)
 
 Suggested entrypoints (aligning to existing patterns):
 
@@ -582,7 +598,7 @@ Npm forwarding requirement remains: flags must be passed after `--`.
 
 ---
 
-## Non-Goals (Restated)
+## Non-Goals (Restated, Status: Current runtime boundary)
 
 - This slice is not a “tree linter that blocks PRs” yet.
 - It does not define a single canonical folder layout.
