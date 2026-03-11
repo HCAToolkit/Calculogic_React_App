@@ -97,6 +97,43 @@ When usable naming-shaped metadata is unavailable, incomplete, or weak, tree adv
 
 Boundary note (canonical_target for this slice): tree validator ownership is under `calculogic-validator/tree/src/**`. Legacy flat suite-core paths such as `calculogic-validator/src/tree-structure-advisor.*.mjs` are compatibility wrappers only, not canonical ownership.
 
+## Top-Root Registry Classes and Ownership Boundary (Bounded Modeling Note)
+
+Classification: Informative
+
+This section clarifies modeling intent for tree root registries without changing current runtime behavior.
+
+### 1) Top-root classes
+
+- **Structural top roots**:
+  - generic surface-like roots such as `src`, `test`, `doc`, `docs`, `scripts`, `tools`, `public`, `bin`
+  - these are interpreted by tree as structural folder surfaces
+- **Semantic/custom-style top roots**:
+  - top roots that encode semantic/package identity or repo-local ownership style
+  - examples can include package-style roots used by a specific repository architecture
+
+### 2) Builtin vs custom ownership
+
+- Generic structural roots are appropriate builtin tree-owned defaults.
+- Semantic/custom-style roots may be valid and high-value, but are not automatically universal builtin truth.
+- Repo-specific roots used for dogfooding or implementation convenience may exist in current policy, but they should not automatically become permanent published-package builtins.
+
+### 3) Case/style distinction
+
+- Semantic/custom-style roots may follow naming-like style conventions.
+- This style signal does not make them filename roles.
+- Tree remains the owner of structural interpretation for folder roots.
+
+### 4) Future registry direction (modeling only)
+
+Future tree root registries may require metadata richer than a flat string list, for example:
+
+- root kind (`structural` vs `semantic`)
+- ownership/source (`builtin` vs `custom`)
+- style classification (`generic-builtin`, `custom-style`, or similar)
+
+This is a modeling direction note only, not an implementation claim for this version.
+
 ---
 
 ## Tree Addressing (Report-Only)
