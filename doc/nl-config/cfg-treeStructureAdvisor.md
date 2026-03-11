@@ -63,14 +63,14 @@ V0.1.x uses deterministic path-based signals only:
    - Runtimeish token/path-only matches remain info-level observability (`TREE_SHIM_SURFACE_PRESENT`) and do not emit debt-style `TREE_SHIM_OUTSIDE_COMPAT` unless thin re-export evidence exists.
 
 
-### 2.4 Input ownership split (V0.1.2)
+### 2.4 Input ownership split (V0.1.6)
 
-V0.1.2 aligns tree with naming input ownership discipline:
+V0.1.6 introduces a suite-core scoped snapshot/input helper boundary and migrates tree as the first consumer:
 
-- wiring resolves scope profile and validates target paths
-- wiring prepares scoped path inventory and target-filtered selected paths
-- wiring prepares top-level directory inventory used by repo-scope top-level advisory checks
-- runtime consumes prepared inputs only and emits deterministic findings/summary-compatible output
+- suite-core helper owns scope profile read, includeRoots walk, includeRootFiles inclusion, normalized path collection, target filtering, and deterministic sort/dedupe
+- tree wiring consumes the shared scoped snapshot input and still prepares tree-local top-level directory inventory
+- tree runtime remains slice-owned for findings and lazy content access over selected tree paths
+- naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
 
 Target behaviors in V0.1.2:
 
