@@ -199,6 +199,8 @@ Scope discovery for all profiles (including `repo`) must consume both scope-prof
 - `includeRoots`: directory roots to walk recursively
 - `includeRootFiles`: explicit repository-root files to include when present
 
+Runtime collection should consume the suite-core shared scoped snapshot/input helper boundary (scope profile read + includeRoots/includeRootFiles collection + normalization + target filtering + deterministic sort/dedupe) before tree-local interpretation.
+
 Runtime collection must ignore missing declared root files, normalize collected root-file paths the same way as walked paths, then merge + deduplicate before target filtering.
 
 ---

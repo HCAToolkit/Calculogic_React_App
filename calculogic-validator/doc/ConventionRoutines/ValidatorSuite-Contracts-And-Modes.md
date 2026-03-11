@@ -108,6 +108,23 @@ Scope selection is not a dumping ground for slice heuristics.
 - suite scope answers: "which paths are in play"
 - slice or cross-slice logic answers: "what those paths mean"
 
+### 6.6 Shared scoped snapshot/input helper boundary
+
+Suite-core owns a shared scoped snapshot/input helper boundary for suite scope profiles.
+
+Helper ownership includes:
+
+- reading suite scope profiles
+- applying `includeRoots`
+- applying `includeRootFiles`
+- normalized path collection
+- optional target filtering
+- deterministic sort/dedupe for selected path sets
+
+Guardrail: the helper does not own slice meaning. Slice runtimes remain responsible for interpreting in-scope paths.
+
+Cross-slice validators should start from this shared scoped snapshot/input layer before applying cross-slice interpretation rules.
+
 ## 7) Shared Report Envelope (Canonical)
 
 This document defines the suite-level shape contract. For the canonical full schema reference (including slice report vs runner report envelopes, finding baseline shape, and deterministic ordering rules), see [`ValidatorReportSchema-V0_1.md`](./ValidatorReportSchema-V0_1.md).
