@@ -48,7 +48,7 @@ Updated public-entrypoint pass-through detection to accept canonical tree barrel
 Updated canonical tree path references to align docs with the new ownership boundary:
 
 - `calculogic-validator/README.md` projected layout and compatibility note
-- `doc/nl-config/cfg-treeStructureAdvisor.md`
+- `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
 - `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
 - shim cleanup planning/audit docs that referenced tree canonical ownership under `src/tree/**`
 
