@@ -28,7 +28,7 @@ Read these first before tree implementation work (runtime, wiring, or contracts)
 1. Suite contract and scope boundary: [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md)
 2. Tree validator spec (this document): runtime behavior + bounded modeling notes
 3. Naming boundary context: [`NamingValidatorSpec.md`](../ConventionRoutines/NamingValidatorSpec.md)
-4. Tree NL/config implementation note: [`doc/nl-config/cfg-treeStructureAdvisor.md`](../../../doc/nl-config/cfg-treeStructureAdvisor.md)
+4. Tree NL/config implementation note: [`calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`](./nl-config/cfg-treeStructureAdvisor.md)
 
 Status interpretation used in this document:
 
