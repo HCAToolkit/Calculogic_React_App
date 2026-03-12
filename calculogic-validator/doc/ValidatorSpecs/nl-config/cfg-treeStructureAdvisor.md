@@ -6,6 +6,12 @@ Status labeling for this NL/config note:
 - **Deferred Behavior** = future advisory direction, not shipped runtime behavior.
 - Repo-shape examples are current-repo implementation reality, not universal published builtin requirements.
 
+Navigation backlinks:
+
+- Tree validator spec (runtime authority): [`calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`](../tree-structure-advisor-validator-spec.md)
+- Tree documentation map (navigation metadata): [`calculogic-validator/doc/ValidatorSpecs/tree-documentation-map-and-reorg-inventory.md`](../tree-documentation-map-and-reorg-inventory.md)
+- Pointer stub at prior path: [`doc/nl-config/cfg-treeStructureAdvisor.md`](../../../../doc/nl-config/cfg-treeStructureAdvisor.md)
+
 Canonical reading order for tree implementation work:
 
 1. `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
