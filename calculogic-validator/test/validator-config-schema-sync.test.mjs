@@ -27,3 +27,13 @@ test('validator config schema allows naming.caseRules.semanticName.style kebab-c
     'kebab-case',
   );
 });
+
+test('legacy core schema path is not independently maintained', () => {
+  const legacySchemaPath = path.join(
+    process.cwd(),
+    'calculogic-validator/src/core/config/validator-config.schema.json',
+  );
+
+  assert.equal(fs.existsSync(legacySchemaPath), false);
+});
+

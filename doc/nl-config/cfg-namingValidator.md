@@ -165,6 +165,7 @@ Runtime output for host-wiring now includes additive registry metadata for obser
 Validator config contract includes a publishable JSON Schema for editor/tool integration:
 
 - schema path: `calculogic-validator/src/validator-config.schema.json`
+- canonical authority: this top-level schema file is the single maintained source (no independently maintained duplicate under `src/core/config`)
 - schema `properties.version.const` must match runtime `VALIDATOR_CONFIG_VERSION`
 
 Runtime and schema strictness are intentionally aligned. Unknown keys are rejected at the following levels:
