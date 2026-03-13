@@ -1,4 +1,66 @@
 {
+  "topRoots": [
+    {
+      "root": "bin",
+      "kind": "structural",
+      "ownershipSource": "builtin",
+      "styleClass": "generic-builtin"
+    },
+    {
+      "root": "calculogic-doc-engine",
+      "kind": "semantic",
+      "ownershipSource": "custom",
+      "styleClass": "custom-style"
+    },
+    {
+      "root": "calculogic-validator",
+      "kind": "semantic",
+      "ownershipSource": "custom",
+      "styleClass": "custom-style"
+    },
+    {
+      "root": "doc",
+      "kind": "structural",
+      "ownershipSource": "builtin",
+      "styleClass": "generic-builtin"
+    },
+    {
+      "root": "docs",
+      "kind": "structural",
+      "ownershipSource": "builtin",
+      "styleClass": "generic-builtin"
+    },
+    {
+      "root": "public",
+      "kind": "structural",
+      "ownershipSource": "builtin",
+      "styleClass": "generic-builtin"
+    },
+    {
+      "root": "scripts",
+      "kind": "structural",
+      "ownershipSource": "builtin",
+      "styleClass": "generic-builtin"
+    },
+    {
+      "root": "src",
+      "kind": "structural",
+      "ownershipSource": "builtin",
+      "styleClass": "generic-builtin"
+    },
+    {
+      "root": "test",
+      "kind": "structural",
+      "ownershipSource": "builtin",
+      "styleClass": "generic-builtin"
+    },
+    {
+      "root": "tools",
+      "kind": "structural",
+      "ownershipSource": "builtin",
+      "styleClass": "generic-builtin"
+    }
+  ],
   "knownTopLevelDirectories": [
     "bin",
     "calculogic-doc-engine",
