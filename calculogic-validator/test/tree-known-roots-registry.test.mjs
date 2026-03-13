@@ -98,6 +98,76 @@ test('tree-known-roots registry fails clearly for invalid structured enums', () 
   );
 });
 
+test('tree-known-roots registry fails clearly for duplicate structured root metadata conflicts', () => {
+  assert.throws(
+    () =>
+      normalizeTreeKnownRootsRegistryPayload({
+        topRoots: [
+          { root: 'src', kind: 'structural', ownershipSource: 'builtin', styleClass: 'generic-builtin' },
+          { root: 'src', kind: 'semantic', ownershipSource: 'builtin', styleClass: 'generic-builtin' },
+        ],
+      }),
+    /duplicate topRoots entry for root "src" has conflicting metadata/u,
+  );
+
+  assert.throws(
+    () =>
+      normalizeTreeKnownRootsRegistryPayload({
+        topRoots: [
+          { root: 'src', kind: 'structural', ownershipSource: 'builtin', styleClass: 'generic-builtin' },
+          { root: 'src', kind: 'structural', ownershipSource: 'custom', styleClass: 'generic-builtin' },
+        ],
+      }),
+    /duplicate topRoots entry for root "src" has conflicting metadata/u,
+  );
+
+  assert.throws(
+    () =>
+      normalizeTreeKnownRootsRegistryPayload({
+        topRoots: [
+          { root: 'src', kind: 'structural', ownershipSource: 'builtin', styleClass: 'generic-builtin' },
+          { root: 'src', kind: 'structural', ownershipSource: 'builtin', styleClass: 'semantic-custom' },
+        ],
+      }),
+    /duplicate topRoots entry for root "src" has conflicting metadata/u,
+  );
+});
+
+test('tree-known-roots registry fails clearly for empty or missing accepted shapes', () => {
+  assert.throws(
+    () => normalizeTreeKnownRootsRegistryPayload({ topRoots: [] }),
+    /topRoots must contain at least one entry/u,
+  );
+
+  assert.throws(
+    () => normalizeTreeKnownRootsRegistryPayload({ knownTopLevelDirectories: [] }),
+    /knownTopLevelDirectories must contain at least one entry/u,
+  );
+
+  assert.throws(
+    () => normalizeTreeKnownRootsRegistryPayload({ someOtherShape: [] }),
+    /expected topRoots array or knownTopLevelDirectories array/u,
+  );
+});
+
+test('tree-known-roots registry fails clearly for invalid optional styleClass', () => {
+  assert.throws(
+    () =>
+      normalizeTreeKnownRootsRegistryPayload({
+        topRoots: [{ root: 'src', kind: 'structural', ownershipSource: 'builtin', styleClass: '' }],
+      }),
+    /topRoots\[0\]\.styleClass must be a non-empty string when provided/u,
+  );
+
+  assert.throws(
+    () =>
+      normalizeTreeKnownRootsRegistryPayload({
+        topRoots: [{ root: 'src', kind: 'structural', ownershipSource: 'builtin', styleClass: 123 }],
+      }),
+    /topRoots\[0\]\.styleClass must be a non-empty string when provided/u,
+  );
+});
+
 test('tree-known-roots registry keeps known roots stable with structured repo-local semantic entries', () => {
   const normalized = normalizeTreeKnownRootsRegistryPayload({
     topRoots: EXPECTED_KNOWN_ROOTS.map((root) => ({
