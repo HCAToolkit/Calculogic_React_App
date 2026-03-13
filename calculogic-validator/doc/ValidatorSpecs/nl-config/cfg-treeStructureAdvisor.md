@@ -68,7 +68,7 @@ V0.1.x uses deterministic path-based signals only:
    - Emit info advisory when filename/path signal strongly indicates validator ownership but file is outside `calculogic-validator/**`.
 
 3. **Shim/compat surface advisory (hardened evidence precedence, V0.1.5)**
-   - Collects deterministic shim evidence per file with bounded fields:
+   - Collects deterministic shim evidence with staged evaluation (path/surface/token-first; content reads only for deterministic shim candidates) and bounded fields:
      - `artifactSurface` (`quality|docs|examples|fixtures|runtimeish`)
      - folder token signals, basename token signals
      - `thinReexportShim`, `canonicalTargetPath`, `reexportTargetCount`
