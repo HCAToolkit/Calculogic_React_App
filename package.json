@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test --experimental-strip-types test/**/*.test.mjs calculogic-doc-engine/test/**/*.test.mjs calculogic-validator/test/**/*.test.mjs calculogic-validator/naming/test/**/*.test.mjs",
+    "test": "node --test --experimental-strip-types test/**/*.test.mjs calculogic-doc-engine/test/**/*.test.mjs calculogic-validator/test/**/*.test.mjs calculogic-validator/naming/test/**/*.test.mjs calculogic-validator/tree/test/**/*.test.mjs",
     "validate:naming": "node --experimental-strip-types calculogic-validator/scripts/validate-naming.mjs",
     "validate:all": "node --experimental-strip-types calculogic-validator/scripts/validate-all.mjs",
     "health:validator": "node --experimental-strip-types calculogic-validator/scripts/validator-health-check.host.mjs",

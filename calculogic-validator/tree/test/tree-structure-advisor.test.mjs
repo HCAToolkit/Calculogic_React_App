@@ -6,12 +6,12 @@ import { test } from 'node:test';
 import {
   runTreeStructureAdvisor,
   summarizeFindings,
-} from '../tree/src/tree-structure-advisor.host.mjs';
-import { prepareTreeStructureAdvisorInputs } from '../tree/src/tree-structure-advisor.wiring.mjs';
-import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../tree/src/tree-structure-advisor.logic.mjs';
-import { collectShimCompatFindings } from '../tree/src/tree-shim-detection.logic.mjs';
-import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
-import { getValidatorScopeProfile } from '../src/core/validator-scopes.runtime.mjs';
+} from '../src/tree-structure-advisor.host.mjs';
+import { prepareTreeStructureAdvisorInputs } from '../src/tree-structure-advisor.wiring.mjs';
+import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../src/tree-structure-advisor.logic.mjs';
+import { collectShimCompatFindings } from '../src/tree-shim-detection.logic.mjs';
+import { listRegisteredValidators } from '../../src/core/validator-registry.knowledge.mjs';
+import { getValidatorScopeProfile } from '../../src/core/validator-scopes.runtime.mjs';
 
 const writeJson = async (filePath, value) => {
   await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');
@@ -384,7 +384,7 @@ test('tree-structure-advisor does not treat public index entrypoint barrel as sh
       [
         "export * from './core/validator-runner.logic.mjs';",
         "export * as naming from '../naming/src/naming-validator.host.mjs';",
-        "export * as treeStructureAdvisor from '../tree/src/tree-structure-advisor.host.mjs';",
+        "export * as treeStructureAdvisor from '../src/tree-structure-advisor.host.mjs';",
       ].join('\n'),
       'utf8',
     );
