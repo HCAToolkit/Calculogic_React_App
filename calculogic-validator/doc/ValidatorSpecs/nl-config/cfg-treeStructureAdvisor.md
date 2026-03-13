@@ -88,7 +88,8 @@ V0.1.6 introduces a suite-core scoped snapshot/input helper boundary and migrate
 
 - suite-core helper owns scope profile read, includeRoots walk, includeRootFiles inclusion, normalized path collection, target filtering, and deterministic sort/dedupe
 - tree wiring consumes the shared scoped snapshot input and still prepares tree-local top-level directory inventory
-- tree runtime remains slice-owned for findings and lazy content access over selected tree paths
+- tree runtime remains slice-owned for tree-core findings using prepared tree-core inputs only (`selectedPaths`, `topLevelDirectoryNames`, `targets`)
+- shim/content-backed diagnostics are composed from wiring as contributor callbacks so tree-core runtime does not require file-content access
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
 
 Target behaviors in V0.1.2:
