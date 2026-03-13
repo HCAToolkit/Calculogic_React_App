@@ -546,14 +546,22 @@ Report object SHOULD include:
 
 The runtime entrypoint expects prepared inputs from wiring/runtime adapters and must fail clearly when the contract is bypassed.
 
-Required prepared fields:
+Required prepared tree-core fields:
 
 - `selectedPaths` (array)
 - `topLevelDirectoryNames` (array)
 - `targets` (array)
-- `getFileContent(relativePath)` (function)
 
-Runtime must treat file content access as lazy and callable on demand by path, instead of requiring an eagerly materialized full-file map.
+Optional prepared diagnostic-composition fields:
+
+- `findingContributors` (array of contributor callbacks)
+
+Contributor callback contract:
+
+- receives the prepared tree-core inputs object
+- returns an array of tree findings (or an empty array)
+
+Tree-core runtime must not require file content access. File-content-backed diagnostics (for example shim detection) are composed by wiring through contributor callbacks and may use lazy staged reads internally.
 
 ---
 

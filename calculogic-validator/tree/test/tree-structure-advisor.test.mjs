@@ -824,20 +824,19 @@ test('tree-structure-advisor rejects invalid scope deterministically', async () 
   }
 });
 
-test('tree-structure-advisor prepared runtime contract rejects missing lazy content accessor', () => {
-  assert.throws(
-    () =>
-      runTreeStructureAdvisorRuntime({
-        scope: 'repo',
-        selectedPaths: [],
-        topLevelDirectoryNames: [],
-        targets: [],
-      }),
-    /getFileContent\(relativePath\)/u,
-  );
+test('tree-structure-advisor prepared runtime contract accepts tree-core inputs without contributors', () => {
+  const result = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: [],
+    topLevelDirectoryNames: [],
+    targets: [],
+  });
+
+  assert.deepEqual(result.findings, []);
+  assert.equal(result.totalFilesScanned, 0);
 });
 
-test('tree-structure-advisor wiring provides lazy memoized content accessor and deterministic scope boundary error', async () => {
+test('tree-structure-advisor wiring composes shim contributor with lazy staged content reads', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-lazy-content-'));
 
   try {
@@ -851,18 +850,25 @@ test('tree-structure-advisor wiring provides lazy memoized content accessor and 
 
     const prepared = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo' });
 
-    assert.equal(typeof prepared.getFileContent, 'function');
-    assert.equal('fileContentsByPath' in prepared, false);
+    assert.equal(Array.isArray(prepared.findingContributors), true);
+    assert.equal(prepared.findingContributors.length, 1);
 
-    const selectedPath = 'src/compat/legacy-api.logic.mjs';
-    const firstRead = prepared.getFileContent(selectedPath);
-    await fs.writeFile(path.join(fixtureDir, selectedPath), 'export const changed = true\\n', 'utf8');
-    const secondRead = prepared.getFileContent(selectedPath);
+    const shimFindingsFirst = prepared.findingContributors[0](prepared);
+    assert.deepEqual(
+      shimFindingsFirst.filter((finding) => finding.path === 'src/compat/legacy-api.logic.mjs').map((finding) => finding.code),
+      ['TREE_SHIM_SURFACE_PRESENT'],
+    );
 
-    assert.equal(firstRead, secondRead);
-    assert.throws(
-      () => prepared.getFileContent('src/not-selected.logic.mjs'),
-      /Tree prepared getFileContent received out-of-scope path: src\/not-selected\.logic\.mjs/u,
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'compat', 'legacy-api.logic.mjs'),
+      'export const changed = true\\n',
+      'utf8',
+    );
+
+    const shimFindingsSecond = prepared.findingContributors[0](prepared);
+    assert.deepEqual(
+      shimFindingsSecond.filter((finding) => finding.path === 'src/compat/legacy-api.logic.mjs').map((finding) => finding.code),
+      ['TREE_SHIM_SURFACE_PRESENT'],
     );
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });

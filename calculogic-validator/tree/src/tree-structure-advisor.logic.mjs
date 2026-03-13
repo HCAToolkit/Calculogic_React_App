@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { collectShimCompatFindings } from './tree-shim-detection.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots.registry.logic.mjs';
 import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy.registry.logic.mjs';
 
@@ -166,16 +165,36 @@ const assertPreparedTreeInputs = (preparedInputs) => {
     preparedInputs &&
     Array.isArray(preparedInputs.selectedPaths) &&
     Array.isArray(preparedInputs.topLevelDirectoryNames) &&
-    Array.isArray(preparedInputs.targets) &&
-    typeof preparedInputs.getFileContent === 'function';
+    Array.isArray(preparedInputs.targets);
 
   if (hasPreparedRuntimeInputs) {
     return preparedInputs;
   }
 
   throw new Error(
-    'Tree runtime requires prepared inputs from wiring/runtime adapter: selectedPaths[], topLevelDirectoryNames[], targets[], and getFileContent(relativePath).',
+    'Tree runtime requires prepared tree-core inputs from wiring/runtime adapter: selectedPaths[], topLevelDirectoryNames[], and targets[].',
   );
+};
+
+const collectContributorFindings = (preparedInputs) => {
+  const { findingContributors } = preparedInputs;
+
+  if (!Array.isArray(findingContributors) || findingContributors.length === 0) {
+    return [];
+  }
+
+  return findingContributors.flatMap((contributor) => {
+    if (typeof contributor !== 'function') {
+      throw new Error('Tree runtime findingContributors must contain functions only.');
+    }
+
+    const contributedFindings = contributor(preparedInputs);
+    if (!Array.isArray(contributedFindings)) {
+      throw new Error('Tree runtime finding contributor must return an array of findings.');
+    }
+
+    return contributedFindings;
+  });
 };
 
 export const runTreeStructureAdvisor = (preparedInputs = {}) => {
@@ -185,7 +204,7 @@ export const runTreeStructureAdvisor = (preparedInputs = {}) => {
     ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
     ...collectValidatorOwnedOutsideTreeFindings(prepared.selectedPaths),
     ...collectOwnedSliceBoundaryDriftFindings(prepared.selectedPaths),
-    ...collectShimCompatFindings(prepared.selectedPaths, prepared.getFileContent),
+    ...collectContributorFindings(prepared),
   ].sort(sortByPathThenCode);
 
   return {
