@@ -52,7 +52,7 @@ This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-M
   - consolidation of scattered semantic families
   - separation of mixed lanes where mixing predicts growth pain
   - normalization of repeated validator-subtree scaffolds (for future validators)
-- Shim/compat advisory hardening with bounded evidence precedence and intentional pass-through carveouts, including package/public barrel pass-through (`calculogic-validator/src/index.mjs`) with `export * from`, `export * as <name> from`, and optional `export { ... } from` forms
+- Shim/compat advisory hardening with staged evidence precedence (path/surface/token-first, content reads only for deterministic shim candidates) and intentional pass-through carveouts, including package/public barrel pass-through (`calculogic-validator/src/index.mjs`) with `export * from`, `export * as <name> from`, and optional `export { ... } from` forms
 - Weak token/path-only shim observability may suppress detector-implementation modules inside `calculogic-validator/tree/src/` when `shim` appears only as part of the detector semantic name (for example `*shim-detection*`) and no thin re-export evidence exists
 - Bounded owned-slice boundary drift advisory under suite-core: emit `TREE_OWNED_SLICE_BOUNDARY_DRIFT` only for deterministic, conservative subtree-local growth signals under `calculogic-validator/src/**` while preserving explicit shared-infra/compat/public-entry carveouts
 

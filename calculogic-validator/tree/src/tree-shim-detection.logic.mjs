@@ -59,6 +59,27 @@ export const collectPathShimSignals = (relativePath) => {
   };
 };
 
+const isDeterministicShimContentCandidate = (relativePath, pathSignals) => {
+  if (pathSignals.insideCompatSurface) {
+    return true;
+  }
+
+  if (pathSignals.folderSignals.length > 0 || pathSignals.basenameTokens.length > 0) {
+    return true;
+  }
+
+  const basename = path.posix.basename(relativePath);
+  if (basename.includes('.host.')) {
+    return true;
+  }
+
+  if (TREE_SIGNAL_POLICY.validatorOwnedBasenameSignalMatchers.some(({ matcher }) => matcher.test(basename))) {
+    return true;
+  }
+
+  return relativePath === 'calculogic-validator/src/index.mjs';
+};
+
 export const parseThinReexportShim = (rawContent) => {
   if (typeof rawContent !== 'string') {
     return null;
@@ -178,6 +199,35 @@ export const collectShimEvidence = (relativePath, rawContent) => {
   };
 };
 
+const collectPathOnlyShimEvidence = (relativePath) => {
+  const shimSignals = collectPathShimSignals(relativePath);
+  const basenameTokens = tokenizeBasename(path.posix.basename(relativePath));
+
+  return {
+    surface: inferArtifactSurface(relativePath),
+    folderSignals: shimSignals.folderSignals,
+    nameTokenSignals: shimSignals.basenameTokens,
+    insideCompatSurface: shimSignals.insideCompatSurface,
+    shouldReadContent: isDeterministicShimContentCandidate(relativePath, shimSignals),
+    isShimDetectorImplementationModule:
+      relativePath.startsWith('calculogic-validator/tree/src/') &&
+      basenameTokens.includes('shim') &&
+      basenameTokens.some((token) => TREE_SIGNAL_POLICY.shimDetectorImplementationTokens.has(token)),
+  };
+};
+
+const collectContentBackedShimEvidence = (relativePath, rawContent) => {
+  const thinReexportSignal = parseThinReexportShim(rawContent);
+
+  return {
+    thinReexportShim: thinReexportSignal !== null,
+    canonicalTargetPath: thinReexportSignal?.canonicalTargetPath,
+    reexportTargetCount: thinReexportSignal?.reexportTargetCount ?? 0,
+    isCanonicalHostPassThrough: detectCanonicalHostPassThrough(relativePath, thinReexportSignal),
+    isPublicEntryPointPassThrough: detectPublicEntrypointPassThrough(relativePath, rawContent),
+  };
+};
+
 export const collectShimCompatFindings = (paths, getFileContent) => {
   const findings = [];
 
@@ -187,8 +237,25 @@ export const collectShimCompatFindings = (paths, getFileContent) => {
       continue;
     }
 
-    const rawContent = typeof getFileContent === 'function' ? getFileContent(relativePath) : undefined;
-    const evidence = collectShimEvidence(relativePath, rawContent);
+    const pathEvidence = collectPathOnlyShimEvidence(relativePath);
+
+    let contentEvidence = {
+      thinReexportShim: false,
+      canonicalTargetPath: undefined,
+      reexportTargetCount: 0,
+      isCanonicalHostPassThrough: false,
+      isPublicEntryPointPassThrough: false,
+    };
+
+    if (pathEvidence.shouldReadContent && typeof getFileContent === 'function') {
+      const rawContent = getFileContent(relativePath);
+      contentEvidence = collectContentBackedShimEvidence(relativePath, rawContent);
+    }
+
+    const evidence = {
+      ...pathEvidence,
+      ...contentEvidence,
+    };
     const hasWeakSignalOnly =
       !evidence.thinReexportShim &&
       (evidence.folderSignals.length > 0 || evidence.nameTokenSignals.length > 0);

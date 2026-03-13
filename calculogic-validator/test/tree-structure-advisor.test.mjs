@@ -9,6 +9,7 @@ import {
 } from '../tree/src/tree-structure-advisor.host.mjs';
 import { prepareTreeStructureAdvisorInputs } from '../tree/src/tree-structure-advisor.wiring.mjs';
 import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../tree/src/tree-structure-advisor.logic.mjs';
+import { collectShimCompatFindings } from '../tree/src/tree-shim-detection.logic.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 import { getValidatorScopeProfile } from '../src/core/validator-scopes.runtime.mjs';
 
@@ -431,6 +432,59 @@ test('tree-structure-advisor does not flag normal non-shim files for shim findin
   }
 });
 
+
+
+test('tree shim detection stages content reads and skips non-candidate runtime files', () => {
+  const selectedPaths = [
+    'src/app-shell.logic.ts',
+    'src/compat/legacy-api.logic.mjs',
+    'src/bridge-runtime.logic.mjs',
+  ];
+  const readCalls = [];
+  const contentByPath = new Map([
+    [
+      'src/compat/legacy-api.logic.mjs',
+      "export * from '../../calculogic-validator/src/core/validator-runner.logic.mjs';\n",
+    ],
+    ['src/bridge-runtime.logic.mjs', 'export const bridge = true\n'],
+  ]);
+
+  const findings = collectShimCompatFindings(selectedPaths, (relativePath) => {
+    readCalls.push(relativePath);
+    return contentByPath.get(relativePath) ?? 'export const noop = true\n';
+  });
+
+  assert.deepEqual(readCalls, ['src/compat/legacy-api.logic.mjs', 'src/bridge-runtime.logic.mjs']);
+  assert.equal(readCalls.includes('src/app-shell.logic.ts'), false);
+  assert.deepEqual(
+    findings.filter((finding) => finding.path === 'src/compat/legacy-api.logic.mjs').map((finding) => finding.code),
+    ['TREE_SHIM_SURFACE_PRESENT'],
+  );
+  assert.deepEqual(
+    findings.filter((finding) => finding.path === 'src/bridge-runtime.logic.mjs').map((finding) => finding.code),
+    ['TREE_SHIM_SURFACE_PRESENT'],
+  );
+});
+
+test('tree shim detection emits outside-compat warning only for thin re-export evidence outside compat', () => {
+  const selectedPaths = [
+    'src/bridge-runtime.logic.mjs',
+    'src/compat/legacy-api.logic.mjs',
+    'src/validator-runner.logic.mjs',
+  ];
+  const contentByPath = new Map([
+    ['src/bridge-runtime.logic.mjs', 'export const bridge = true\n'],
+    ['src/compat/legacy-api.logic.mjs', "export * from '../../calculogic-validator/src/core/validator-runner.logic.mjs';\n"],
+    ['src/validator-runner.logic.mjs', "export * from '../calculogic-validator/src/core/validator-runner.logic.mjs';\n"],
+  ]);
+
+  const findings = collectShimCompatFindings(selectedPaths, (relativePath) => contentByPath.get(relativePath));
+  const outsideCompatCodes = findings
+    .filter((finding) => finding.code === 'TREE_SHIM_OUTSIDE_COMPAT')
+    .map((finding) => finding.path);
+
+  assert.deepEqual(outsideCompatCodes, ['src/validator-runner.logic.mjs']);
+});
 test('tree-structure-advisor flags validator-owned-looking file outside validator tree', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-misplaced-'));
 
