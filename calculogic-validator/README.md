@@ -36,6 +36,7 @@ calculogic-validator/
 │  └─ report-capture-summarize.mjs
 ├─ src/                               # suite-core only (suite-level infra + compat boundary)
 │  ├─ index.mjs
+│  ├─ validator-config.schema.json      # canonical validator config schema authority
 │  ├─ core/
 │  │  ├─ repository-root.logic.mjs
 │  │  ├─ npm-arg-forwarding-guard.logic.mjs
@@ -55,7 +56,6 @@ calculogic-validator/
 │  │  └─ config/
 │  │     ├─ validator-config.contracts.mjs
 │  │     ├─ validator-config.logic.mjs
-│  │     └─ validator-config.schema.json
 │  ├─ registries/
 │  │  └─ _builtin/
 │  │     └─ scope-profiles.registry.json
