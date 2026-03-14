@@ -245,15 +245,25 @@ Classification: Normative
 
 Example filename (validator-doc-realistic): `tree-occurrence-model-and-addressing-spec.md`
 
-- Intended semantic name (full semantic lane text): `tree-occurrence-model-and-addressing-spec`
-- Intended role form: docs role signal aligned to `spec` intent
-- Extension: `.md`
-- Ambiguity note (`-spec` vs `.spec`): this filename shape is realistic in current validator docs and can be interpreted as a compressed role-form signal (`-spec`) inside semantic text, rather than canonical dotted-role-slot form.
+- Observed filename form: `tree-occurrence-model-and-addressing-spec.md`
+- Likely canonicalized interpretation candidate:
+  - semantic-name candidate: `tree-occurrence-model-and-addressing`
+  - role candidate: `spec`
+  - extension: `.md`
+- Disambiguation note (no explicit dotted role slot present):
+  - This observed filename does not already expose explicit canonical `.<role>.<ext>` ownership.
+  - `spec` matches a known role token, so it is a strong candidate for intended role ownership rather than being casually left inside semantic-family interpretation.
+  - This ambiguity is therefore preserved and surfaced as likely role ownership intent.
+- Explicit-role contrast:
+  - If the file were `tree-occurrence-model-and-addressing.spec.md`, `.spec` would remain canonical role authority.
+  - In that explicit-slot case, any additional role-like token remaining inside semantic-name text would be interpreted as semantic content by default.
 
 Illustrative semantic-name interpretation snapshot (report-first phase):
 
-- `semanticName`: `tree-occurrence-model-and-addressing-spec`
-- `semanticTokens`: `[tree, occurrence, model, and, addressing, spec]`
+- Observed semantic lane tokens: `[tree, occurrence, model, and, addressing, spec]`
+- Likely canonicalized semantic-name candidate: `tree-occurrence-model-and-addressing`
+- Canonicalized semantic tokens (after likely role-candidate separation): `[tree, occurrence, model, and, addressing]`
+- Role candidate (separated from semantic-family interpretation lane): `spec`
 - `semanticFamily`: `tree-occurrence-model-and-addressing`
 - `familyRoot`: `tree` (repeated grouping anchor across related tree docs)
 - Candidate `familySubgroup` interpretations (ambiguity preserved):
@@ -273,6 +283,7 @@ Connective-token note (`and`):
 Boundary reinforcement:
 
 - `semantic-family` remains inside semantic-name interpretation; it does not replace semantic-name.
+- For this shape, semantic-family reasoning applies to the semantic-name portion that remains after the likely role candidate (`spec`) is separated.
 - `familyRoot`, `familySubgroup`, and `relatedSemanticNames` remain naming-owned derived outputs.
 - Those naming-owned outputs may later be handed to results first and tree later through cross-slice contracts.
 - Tree does not re-own semantic-family derivation in this model.
