@@ -825,6 +825,43 @@ test('tree-structure-advisor rejects invalid scope deterministically', async () 
 });
 
 
+
+
+test('tree-structure-advisor computes occurrence-derived file reasoning input once per runtime run', () => {
+  let occurrenceRecordReads = 0;
+  const occurrenceSnapshot = {};
+
+  Object.defineProperty(occurrenceSnapshot, 'occurrenceRecords', {
+    get() {
+      occurrenceRecordReads += 1;
+      return [
+        {
+          resolvedPath: 'src/validator-runner.logic.mjs',
+          occurrenceType: 'file',
+        },
+      ];
+    },
+  });
+
+  const result = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: ['doc/README.md'],
+    occurrenceSnapshot,
+    topLevelDirectoryNames: [],
+    targets: [],
+  });
+
+  assert.equal(occurrenceRecordReads, 1);
+  assert.equal(result.totalFilesScanned, 1);
+  assert.equal(
+    result.findings.some(
+      (finding) =>
+        finding.code === 'TREE_VALIDATOR_OWNED_FILE_OUTSIDE_TREE' &&
+        finding.path === 'src/validator-runner.logic.mjs',
+    ),
+    true,
+  );
+});
 test('tree-structure-advisor consumes occurrence snapshot file records for validator-owned outside-tree reasoning', () => {
   const fromOccurrenceSnapshot = runTreeStructureAdvisorRuntime({
     scope: 'repo',

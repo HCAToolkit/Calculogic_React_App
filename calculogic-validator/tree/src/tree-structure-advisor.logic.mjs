@@ -137,40 +137,35 @@ const collectOwnedSliceBoundaryDriftFindings = (paths) => {
 };
 
 
-const collectOccurrenceDerivedFileReasoningInput = (preparedInputs) => {
+const collectFileReasoningInput = (preparedInputs) => {
   const occurrenceSnapshot = preparedInputs?.occurrenceSnapshot;
 
-  if (!occurrenceSnapshot || !Array.isArray(occurrenceSnapshot.occurrenceRecords)) {
-    return null;
+  const occurrenceRecords = occurrenceSnapshot?.occurrenceRecords;
+
+  if (Array.isArray(occurrenceRecords)) {
+    const fileRecords = occurrenceRecords.filter(
+      (record) =>
+        record &&
+        record.occurrenceType === 'file' &&
+        typeof record.resolvedPath === 'string' &&
+        record.resolvedPath.length > 0,
+    );
+    const resolvedFilePaths = [...new Set(fileRecords.map((record) => record.resolvedPath))].sort((left, right) =>
+      left.localeCompare(right),
+    );
+
+    return {
+      source: 'occurrenceSnapshot',
+      fileRecords,
+      resolvedFilePaths,
+    };
   }
-
-  const fileRecords = occurrenceSnapshot.occurrenceRecords.filter(
-    (record) =>
-      record &&
-      record.occurrenceType === 'file' &&
-      typeof record.resolvedPath === 'string' &&
-      record.resolvedPath.length > 0,
-  );
-
-  const uniqueResolvedFilePaths = [...new Set(fileRecords.map((record) => record.resolvedPath))].sort((left, right) =>
-    left.localeCompare(right),
-  );
 
   return {
-    fileRecords,
-    resolvedFilePaths: uniqueResolvedFilePaths,
-    recordsByResolvedPath: new Map(fileRecords.map((record) => [record.resolvedPath, record])),
+    source: 'selectedPaths-fallback',
+    fileRecords: [],
+    resolvedFilePaths: preparedInputs.selectedPaths,
   };
-};
-
-const collectSelectedPathsForReasoning = (preparedInputs) => {
-  const occurrenceDerivedFileReasoningInput = collectOccurrenceDerivedFileReasoningInput(preparedInputs);
-
-  if (occurrenceDerivedFileReasoningInput) {
-    return occurrenceDerivedFileReasoningInput.resolvedFilePaths;
-  }
-
-  return preparedInputs.selectedPaths;
 };
 
 const incrementCounter = (counts, key) => {
@@ -236,17 +231,13 @@ const collectContributorFindings = (preparedInputs) => {
 
 export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const prepared = assertPreparedTreeInputs(preparedInputs);
-
-  const occurrenceDerivedFileReasoningInput = collectOccurrenceDerivedFileReasoningInput(prepared);
-  const selectedPathsForReasoning = collectSelectedPathsForReasoning(prepared);
-  const pathsForOwnedSliceBoundaryDriftReasoning = occurrenceDerivedFileReasoningInput
-    ? occurrenceDerivedFileReasoningInput.resolvedFilePaths
-    : prepared.selectedPaths;
+  const fileReasoningInput = collectFileReasoningInput(prepared);
+  const selectedPathsForReasoning = fileReasoningInput.resolvedFilePaths;
 
   const findings = [
     ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
     ...collectValidatorOwnedOutsideTreeFindings(selectedPathsForReasoning),
-    ...collectOwnedSliceBoundaryDriftFindings(pathsForOwnedSliceBoundaryDriftReasoning),
+    ...collectOwnedSliceBoundaryDriftFindings(selectedPathsForReasoning),
     ...collectContributorFindings(prepared),
   ].sort(sortByPathThenCode);
 
