@@ -9,6 +9,7 @@ import {
 import {
   collectSuiteScopedSnapshotInputs,
 } from '../../src/core/suite-scoped-snapshot-input.logic.mjs';
+import { prepareTreeOccurrenceSnapshot } from './tree-occurrence-snapshot.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -43,6 +44,11 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
   return {
     scope: scopedSnapshotInputs.scope,
     selectedPaths,
+    occurrenceSnapshot: prepareTreeOccurrenceSnapshot({
+      selectedPaths,
+      targets: scopedSnapshotInputs.targets,
+      includeRoots: scopedSnapshotInputs.includeRoots,
+    }),
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: scopedSnapshotInputs.targets,
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
