@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots.registry.logic.mjs';
 import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy.registry.logic.mjs';
+import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.logic.mjs';
 
 const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
 const TREE_SIGNAL_POLICY = getBuiltinTreeSignalPolicy();
@@ -143,7 +144,11 @@ const collectFileReasoningInput = (preparedInputs) => {
   const occurrenceRecords = occurrenceSnapshot?.occurrenceRecords;
 
   if (Array.isArray(occurrenceRecords)) {
-    const fileRecords = occurrenceRecords.filter(
+    const classifiedOccurrenceRecords = classifyTreeOccurrenceRecords({
+      occurrenceRecords,
+      treeKnownRoots: TREE_KNOWN_ROOTS,
+    });
+    const fileRecords = classifiedOccurrenceRecords.filter(
       (record) =>
         record &&
         record.occurrenceType === 'file' &&
@@ -156,6 +161,7 @@ const collectFileReasoningInput = (preparedInputs) => {
 
     return {
       source: 'occurrenceSnapshot',
+      occurrenceRecords: classifiedOccurrenceRecords,
       fileRecords,
       resolvedFilePaths,
     };

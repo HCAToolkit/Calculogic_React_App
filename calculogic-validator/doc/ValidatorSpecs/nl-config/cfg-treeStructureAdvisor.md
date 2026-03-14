@@ -21,7 +21,7 @@ Canonical reading order for tree implementation work:
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.6** (suite-scoped snapshot ownership split plus bounded occurrence-driven file-path adoption in tree core for validator-owned-outside-tree and owned-slice-boundary-drift structural helpers while preserving resolved-path findings output).
+Current implementation target: **V0.1.7** (bounded occurrence-level structural class assignment over tree occurrence records, consumed in tree-core occurrence-driven file reasoning while preserving resolved-path findings output).
 
 ## 1.0 Purpose
 
@@ -82,13 +82,14 @@ V0.1.x uses deterministic path-based signals only:
    - Runtimeish token/path-only matches remain info-level observability (`TREE_SHIM_SURFACE_PRESENT`) and do not emit debt-style `TREE_SHIM_OUTSIDE_COMPAT` unless thin re-export evidence exists.
 
 
-### 2.4 Input ownership split (V0.1.6)
+### 2.4 Input ownership split (V0.1.7)
 
-V0.1.6 introduces a suite-core scoped snapshot/input helper boundary and migrates tree as the first consumer:
+V0.1.7 introduces a suite-core scoped snapshot/input helper boundary and migrates tree as the first consumer:
 
 - suite-core helper owns scope profile read, includeRoots walk, includeRootFiles inclusion, normalized path collection, target filtering, and deterministic sort/dedupe
 - tree wiring consumes the shared scoped snapshot input and still prepares tree-local top-level directory inventory
 - tree runtime remains slice-owned for tree-core findings using prepared tree-core inputs only (`selectedPaths`, `topLevelDirectoryNames`, `targets`) and consumes occurrence-derived file-path reasoning input when `occurrenceSnapshot.occurrenceRecords` is available (bounded fallback to `selectedPaths` when occurrence snapshot is absent/malformed)
+- occurrence-driven file reasoning now carries bounded structural class metadata on occurrence records (`structuralClass`, `structuralKind`, repo-top known-root flags, scoped-root flag, subtree-partition candidate flag) for near-term tree-local interpretation
 - tree-run default contributor selection is owned by a dedicated assembly/wiring module so tree wiring only prepares tree-core inputs
 - shim/content-backed diagnostics are attached from a shim-owned contributor helper that prepares lazy content access (cache + selected-path guard) so tree-core runtime does not require file-content access
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
