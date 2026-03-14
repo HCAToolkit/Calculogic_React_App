@@ -83,6 +83,8 @@ Classification: Normative
 
 Descriptive filename lane content already parsed below the canonical dominant role slot. It carries domain meaning and may contain role-like or category-adjacent vocabulary, without becoming a second canonical role declaration.
 
+`semantic-name` remains the full semantic lane before any role/ext interpretation and before any optional family/subgroup interpretation.
+
 ### 4.2 `semantic-token`
 
 A token derived from semantic-name segmentation (for current naming direction: deterministic split tokens such as hyphen/dot-separated semantic-name segments), used for interpretation hints and bounded relationships.
@@ -91,17 +93,21 @@ A token derived from semantic-name segmentation (for current naming direction: d
 
 An interpreted grouping signal that clusters semantic-names judged related under current naming interpretation context. In this tranche it is run-scoped interpreted meaning, not authoritative declared registry truth.
 
+`semantic-family` does **not** replace `semantic-name`. It is interpreted structure inside semantic-name interpretation.
+
 ### 4.4 `family-root`
 
-A semantic-name or normalized representative token-set used as the current run's anchor for a semantic-family interpretation.
+A naming-derived anchor (semantic-name or normalized representative token-set) used as the current run's anchor for semantic-family interpretation.
 
 ### 4.5 `family-subgroup`
 
-A bounded subgroup interpretation inside a semantic-family when related names cluster into subpatterns that should remain distinct in reporting.
+A bounded subgroup interpretation inside semantic-family when related names cluster into subpatterns that should remain distinct in reporting.
 
 ### 4.6 `related-semantic-name`
 
 A semantic-name interpreted as materially related to another semantic-name/family under bounded naming interpretation rules for the run.
+
+`semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, and `relatedSemanticNames` are derived interpretation outputs from semantic-name interpretation; they do not replace semantic-name.
 
 ### 4.7 `ambiguous-semantic-name`
 
@@ -162,6 +168,26 @@ Conceptual signal candidates for this phase (concept-first, field-name-flexible)
 
 Guardrail: this spec intentionally does not over-commit exact runtime field names in this tranche.
 
+Ownership clarification (naming-owned derived outputs):
+
+- `semanticName`
+- `semanticTokens`
+- `semanticFamily`
+- `ambiguityFlags`
+- `splitFamilyFlags`
+- `familyRoot`
+- `familySubgroup`
+- `relatedSemanticNames`
+
+These remain naming-owned derived interpretation signals in this tranche.
+
+Cross-slice boundary clarification:
+
+- Cross-slice contracts define which naming-owned outputs are stable enough to expose and consume.
+- Cross-slice contracts define what results/tree may consume.
+- Cross-slice contracts do **not** re-own derivation logic.
+- `familyRoot`, `familySubgroup`, and `relatedSemanticNames` are not cross-slice owned; they are naming-owned outputs with later cross-slice utility.
+
 Classification: Normative
 
 ## 7) Runtime/report maturity boundary
@@ -172,6 +198,13 @@ Current maturity boundary remains unchanged:
 - semantic-family interpretation is report-first in this phase,
 - results/reporting is the first intended consumer,
 - tree runtime consumption is deferred until implementation maturity justifies it.
+
+Results-first, tree-later handoff clarification:
+
+- Results/reporting consumes naming-owned semantic-family outputs first.
+- Tree consumption is later and explicitly deferred in this tranche.
+- Tree may later consume `semanticFamily`/`familyRoot`/`familySubgroup`/`relatedSemanticNames` for semantic-folder expectations or grouping reasoning.
+- Tree must not derive semantic-family independently as a competing source.
 
 Classification: Normative
 
@@ -184,9 +217,31 @@ Future boundary contract:
 - such signals may later help tree reason about expected semantic folders/subtrees,
 - tree must not independently derive semantic-family as a competing source of truth.
 
+Interpretation posture alignment:
+
+- semantic-family is modeled as a run-scoped interpreted signal,
+- derived from resolved runtime inputs and semantic-name interpretation,
+- emitted as derived interpretation output,
+- eligible for later declared/custom policy without changing current ownership boundaries.
+
 Classification: Normative
 
-## 9) Guardrails
+## 9) Boundary example (`semanticName` vs `semanticFamily`)
+
+Example filename: `order-payment-refund-reconcile.logic.mjs`
+
+- `semanticName`: `order-payment-refund-reconcile` (full semantic lane remains intact)
+- `semanticTokens`: `[order, payment, refund, reconcile]`
+- `semanticFamily`: `order-payment`
+- `familyRoot`: `order`
+- `familySubgroup`: `payment-refund`
+- `relatedSemanticNames`: may include `order-payment-adjustment` (if interpreted related in the same run)
+
+Boundary note: these are naming-owned derived outputs from semantic-name interpretation. They may later be passed through cross-slice contracts for results first, and tree later, without transferring derivation ownership out of naming.
+
+Classification: Normative
+
+## 10) Guardrails
 
 - Do not redesign naming runtime concepts already normalized today.
 - Semantic-family is not a naive shared-prefix matcher.
@@ -196,7 +251,7 @@ Classification: Normative
 
 Classification: Normative
 
-## 10) Relationship to current specs
+## 11) Relationship to current specs
 
 This spec extends (and does not replace):
 
@@ -206,7 +261,7 @@ This spec extends (and does not replace):
 
 Classification: Normative
 
-## 11) Non-goals for this tranche
+## 12) Non-goals for this tranche
 
 - No runtime behavior changes.
 - No custom-registry implementation changes.
