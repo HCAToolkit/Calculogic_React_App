@@ -178,41 +178,59 @@ D├─ src/
 
 ### Example Interpreted Occurrences
 
+Interpretation principle used below (Illustrative, tree-specific):
+
+- occurrence marker ≠ actual folder/file name,
+- marker identifies position/type within the illustrative lineage system,
+- actual name is the folder/file token resolved at that occurrence.
+
 - `A.1`
+  - Address: `A.1`
   - Occurrence type: `file occurrence`
-  - Label: `1`
+  - Occurrence marker: `1`
+  - Actual name: `LICENSE`
   - Resolved path: `calculogic-validator/LICENSE`
   - Meaning: first file occurrence directly under repo-root occurrence `A`.
 
 - `A.A`
+  - Address: `A.A`
   - Occurrence type: `folder occurrence`
-  - Label: `A`
+  - Occurrence marker: `A`
+  - Actual name: `doc`
   - Resolved path: `calculogic-validator/doc/`
-  - Meaning: first folder occurrence under repo-root occurrence `A` (the `doc` folder occurrence).
+  - Meaning: first folder occurrence under repo-root occurrence `A`.
 
 - `A.A.A`
+  - Address: `A.A.A`
   - Occurrence type: `folder occurrence`
-  - Label: `A`
+  - Occurrence marker: `A`
+  - Actual name: `ConventionRoutines`
   - Resolved path: `calculogic-validator/doc/ConventionRoutines/`
-  - Meaning: first folder occurrence under `calculogic-validator/doc/`, distinguished by lineage from other `A` labels.
+  - Meaning: first folder occurrence under `calculogic-validator/doc/`, distinguished by lineage from other `A` markers.
 
 - `A.D`
+  - Address: `A.D`
   - Occurrence type: `folder occurrence`
-  - Label: `D`
+  - Occurrence marker: `D`
+  - Actual name: `src`
   - Resolved path: `calculogic-validator/src/`
   - Meaning: fourth folder occurrence directly under repo-root occurrence `A`.
 
 - `A.D.A`
+  - Address: `A.D.A`
   - Occurrence type: `folder occurrence`
-  - Label: `A`
+  - Occurrence marker: `A`
+  - Actual name: `core`
   - Resolved path: `calculogic-validator/src/core/`
-  - Meaning: first folder occurrence under `calculogic-validator/src/`, showing reused letter labels remain lineage-scoped.
+  - Meaning: first folder occurrence under `calculogic-validator/src/`, showing reused letter markers remain lineage-scoped.
 
 - `A.D.A.3`
+  - Address: `A.D.A.3`
   - Occurrence type: `file occurrence`
-  - Label: `3`
+  - Occurrence marker: `3`
+  - Actual name: `validator-exit-code.logic.mjs`
   - Resolved path: `calculogic-validator/src/core/validator-exit-code.logic.mjs`
-  - Meaning: third file occurrence under `calculogic-validator/src/core/`, interpreted by parent chain plus file segment type.
+  - Meaning: third file occurrence under `calculogic-validator/src/core/`, interpreted by parent chain plus file-segment typing.
 
 ### Why This Illustration Matters
 
@@ -267,18 +285,19 @@ A simple illustrative notation may be used for examples:
 - folder lineage segments are alphabetic labels,
 - terminal file occurrence uses numeric segment typing.
 
-Example illustration only:
+Example illustration only (aligned with the concrete validator-tree style in this document):
 
-- Folder occurrence lineage: `R.calculogic-validator.naming.src`
-- Terminal file occurrence under that lineage: `R.calculogic-validator.naming.src.01`
+- Folder occurrence lineage: `A.D.A`
+- Terminal file occurrence under that lineage: `A.D.A.3`
 
 Interpretation of the example:
 
-- `R...src` identifies a folder occurrence,
-- `...src.01` identifies a file occurrence under that folder occurrence lineage,
+- `A.D.A` identifies a folder occurrence (marker chain resolves to `calculogic-validator/src/core/`),
+- `A.D.A.3` identifies a file occurrence under that same lineage (`validator-exit-code.logic.mjs`),
+- marker tokens (`A`, `D`, `3`) are occurrence markers in this illustrative system, not the actual folder/file names,
 - identity derives from lineage + terminal kind, not name-only.
 
-(Notation above is intentionally non-canonical and modeling-scoped in this document.)
+(Notation above remains intentionally non-canonical and modeling-scoped in this document.)
 
 ## Interpreted Occurrence Walkthrough for Repeated `src`
 
