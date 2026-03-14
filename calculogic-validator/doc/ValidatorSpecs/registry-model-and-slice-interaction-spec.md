@@ -186,6 +186,7 @@ Likely future perspective registries include:
 - Definition registries (expanded descriptors and deterministic glossary-level semantics).
 - Relationship registries (entity-to-entity policy overlays).
 - Allowed-surface mapping registries (bounded compatibility matrices).
+- Naming semantic-family interpreted-signal registries or overlays, where naming keeps run-scoped interpreted outcomes separate from later declared/pinned policy truth.
 
 These are model extensions, not immediate implementation requirements.
 
