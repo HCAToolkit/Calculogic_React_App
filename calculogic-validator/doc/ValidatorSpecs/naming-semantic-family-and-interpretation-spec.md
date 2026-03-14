@@ -264,8 +264,11 @@ Illustrative semantic-name interpretation snapshot (report-first phase):
 - Likely canonicalized semantic-name candidate: `tree-occurrence-model-and-addressing`
 - Canonicalized semantic tokens (after likely role-candidate separation): `[tree, occurrence, model, and, addressing]`
 - Role candidate (separated from semantic-family interpretation lane): `spec`
-- `semanticFamily`: `tree-occurrence-model-and-addressing`
-- `familyRoot`: `tree` (repeated grouping anchor across related tree docs)
+- Layering note:
+  - Full semantic-name candidate (`tree-occurrence-model-and-addressing`) remains the broad descriptive semantic lane.
+  - `semanticFamily` is the bounded grouping signal interpreted inside that semantic lane, not the lane repeated verbatim.
+- `semanticFamily`: `tree-occurrence-model` (bounded family grouping label, narrower than the full semantic-name candidate)
+- `familyRoot`: `tree` (dominant grouping anchor across related tree docs; narrower than `semanticFamily`)
 - Candidate `familySubgroup` interpretations (ambiguity preserved):
   - `occurrence-model`
   - `addressing`
