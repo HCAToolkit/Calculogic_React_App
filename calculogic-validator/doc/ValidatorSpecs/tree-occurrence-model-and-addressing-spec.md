@@ -232,6 +232,25 @@ Interpretation principle used below (Illustrative, tree-specific):
   - Resolved path: `calculogic-validator/src/core/validator-exit-code.logic.mjs`
   - Meaning: third file occurrence under `calculogic-validator/src/core/`, interpreted by parent chain plus file-segment typing.
 
+### Nested Lineage and Depth Semantics (Illustrative, Tree-Specific)
+
+In this document's tree-specific illustrative notation, each appended segment extends the occurrence lineage and therefore the interpreted nesting depth.
+
+- `A` = repo-root occurrence in the current tree scope.
+- `A.D` = fourth folder occurrence directly under that scoped root.
+- `A.D.A` = first folder occurrence nested under `A.D`.
+- `A.D.A.3` = third file occurrence under `A.D.A`.
+
+Interpretation rule for this illustration:
+
+- alphabetic lineage segments represent nested folder-occurrence depth,
+- terminal numeric segment represents file-occurrence sibling position under that folder lineage.
+
+Status boundary reminder:
+
+- This is tree-specific modeling guidance for deterministic interpretation examples.
+- It remains non-canonical runtime grammar in this pass.
+
 ### Why This Illustration Matters
 
 - The same token/segment marker may appear multiple times under different parent chains.
@@ -257,6 +276,15 @@ This section defines a tree-focused addressing concept that is separate from, bu
 - This document defines a tree-local occurrence identity model that can align with that draft over time.
 - This document does **not** finalize open draft decisions or replace draft authority.
 
+### Comparison to more constrained local-rooted addressing elsewhere
+
+This tree-local rebasing behavior is similar in principle to more constrained semantic-scope/local-rooted addressing used elsewhere in NL/C-style documentation and reasoning contexts.
+
+Boundary note:
+
+- tree occurrence addressing and NL/C-style local addressing are **not the same system**,
+- tree addressing here is broader because it must model arbitrary repeated names, mixed folder/file occurrence typing, and deep lineage across real filesystem structure.
+
 ### Tree occurrence identity requirements
 
 A tree occurrence address should represent at minimum:
@@ -264,6 +292,26 @@ A tree occurrence address should represent at minimum:
 1. rooted lineage from `repo-root`,
 2. parent-relative occurrence context,
 3. terminal node kind (folder vs file).
+
+### Scope Binding, Rebasing, and Reasoning Use
+
+Tree occurrence addressing in this document is **scope-bound and locally rebased**.
+
+Scoped-root rebasing rule (normative for this modeling contract):
+
+- **Occurrence addressing is local to the active tree scope; when tree is run against a targeted folder/subtree, counting and addressing rebase from that scoped root rather than always from repository-root.**
+
+Implications:
+
+- the same address tail (for example `A.D.A.3`) may appear in multiple independent scopes,
+- identity remains deterministic only when the scope binding is explicit,
+- cross-scope comparisons must include both scope root and address tail.
+
+Reasoning-vs-output boundary:
+
+- tree uses occurrence addresses for deterministic internal reasoning and interpreted occurrence identity,
+- user-facing findings/reports should still expose the resolved real filesystem path,
+- occurrence markers are not a replacement for resolved paths in findings output.
 
 ### Folder/file typing rule (tree modeling direction)
 
