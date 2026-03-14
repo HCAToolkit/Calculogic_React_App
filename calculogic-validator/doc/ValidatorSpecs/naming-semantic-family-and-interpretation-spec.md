@@ -241,6 +241,44 @@ Boundary note: these are naming-owned derived outputs from semantic-name interpr
 
 Classification: Normative
 
+### 9.1 Validator-doc-realistic example (`tree-occurrence-model-and-addressing-spec.md`)
+
+Example filename (validator-doc-realistic): `tree-occurrence-model-and-addressing-spec.md`
+
+- Intended semantic name (full semantic lane text): `tree-occurrence-model-and-addressing-spec`
+- Intended role form: docs role signal aligned to `spec` intent
+- Extension: `.md`
+- Ambiguity note (`-spec` vs `.spec`): this filename shape is realistic in current validator docs and can be interpreted as a compressed role-form signal (`-spec`) inside semantic text, rather than canonical dotted-role-slot form.
+
+Illustrative semantic-name interpretation snapshot (report-first phase):
+
+- `semanticName`: `tree-occurrence-model-and-addressing-spec`
+- `semanticTokens`: `[tree, occurrence, model, and, addressing, spec]`
+- `semanticFamily`: `tree-occurrence-model-and-addressing`
+- `familyRoot`: `tree` (repeated grouping anchor across related tree docs)
+- Candidate `familySubgroup` interpretations (ambiguity preserved):
+  - `occurrence-model`
+  - `addressing`
+  - `occurrence-model-and-addressing` (bounded combined alternative)
+- Candidate `relatedSemanticNames` (run-scoped and interpretation-dependent):
+  - `tree-structural-vocabulary-and-root-classification-spec`
+  - `tree-registry-definitions-and-relationships-spec`
+
+Connective-token note (`and`):
+
+- Connective tokens such as `and` may still be preserved in `semanticTokens`.
+- They may carry lower interpretive weight or connective meaning relative to domain anchors.
+- They should not automatically be promoted to dominant family anchors.
+
+Boundary reinforcement:
+
+- `semantic-family` remains inside semantic-name interpretation; it does not replace semantic-name.
+- `familyRoot`, `familySubgroup`, and `relatedSemanticNames` remain naming-owned derived outputs.
+- Those naming-owned outputs may later be handed to results first and tree later through cross-slice contracts.
+- Tree does not re-own semantic-family derivation in this model.
+
+Classification: Normative
+
 ## 10) Guardrails
 
 - Do not redesign naming runtime concepts already normalized today.
