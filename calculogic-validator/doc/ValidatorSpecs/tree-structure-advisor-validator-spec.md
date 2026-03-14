@@ -561,7 +561,7 @@ Contributor callback contract:
 - receives the prepared tree-core inputs object
 - returns an array of tree findings (or an empty array)
 
-Tree-core runtime must not require file content access. File-content-backed diagnostics (for example shim detection) are composed by wiring through contributor callbacks and may use lazy staged reads internally.
+Tree-core runtime must not require file content access. File-content-backed diagnostics (for example shim detection) are composed through contributor callbacks selected by tree-run assembly wiring and may use lazy staged reads internally.
 
 ---
 

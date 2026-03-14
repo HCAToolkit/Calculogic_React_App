@@ -89,6 +89,7 @@ V0.1.6 introduces a suite-core scoped snapshot/input helper boundary and migrate
 - suite-core helper owns scope profile read, includeRoots walk, includeRootFiles inclusion, normalized path collection, target filtering, and deterministic sort/dedupe
 - tree wiring consumes the shared scoped snapshot input and still prepares tree-local top-level directory inventory
 - tree runtime remains slice-owned for tree-core findings using prepared tree-core inputs only (`selectedPaths`, `topLevelDirectoryNames`, `targets`)
+- tree-run default contributor selection is owned by a dedicated assembly/wiring module so tree wiring only prepares tree-core inputs
 - shim/content-backed diagnostics are attached from a shim-owned contributor helper that prepares lazy content access (cache + selected-path guard) so tree-core runtime does not require file-content access
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
 
@@ -131,6 +132,7 @@ Each finding follows existing report conventions:
 - Canonical tree slice boundary lives at:
   - `calculogic-validator/tree/src/tree-structure-advisor.host.mjs`
   - `calculogic-validator/tree/src/tree-structure-advisor.wiring.mjs`
+  - `calculogic-validator/tree/src/tree-structure-advisor-contributors.assembly.wiring.mjs`
   - `calculogic-validator/tree/src/tree-structure-advisor.logic.mjs`
   - shim evidence/runtime helpers: `calculogic-validator/tree/src/tree-shim-detection.logic.mjs`
   - optional contracts surface: `calculogic-validator/tree/src/tree-structure-advisor.contracts.mjs`
