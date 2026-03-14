@@ -136,6 +136,29 @@ const collectOwnedSliceBoundaryDriftFindings = (paths) => {
     });
 };
 
+
+const collectSelectedPathRecordsFromOccurrenceSnapshot = (occurrenceSnapshot) => {
+  if (!occurrenceSnapshot || !Array.isArray(occurrenceSnapshot.occurrenceRecords)) {
+    return null;
+  }
+
+  return occurrenceSnapshot.occurrenceRecords.filter(
+    (record) => record && record.occurrenceType === 'file' && typeof record.resolvedPath === 'string',
+  );
+};
+
+const collectSelectedPathsForReasoning = (preparedInputs) => {
+  const selectedPathRecords = collectSelectedPathRecordsFromOccurrenceSnapshot(preparedInputs.occurrenceSnapshot);
+
+  if (selectedPathRecords) {
+    return selectedPathRecords
+      .map((record) => record.resolvedPath)
+      .sort((left, right) => left.localeCompare(right));
+  }
+
+  return preparedInputs.selectedPaths;
+};
+
 const incrementCounter = (counts, key) => {
   counts[key] = (counts[key] ?? 0) + 1;
 };
@@ -200,16 +223,18 @@ const collectContributorFindings = (preparedInputs) => {
 export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const prepared = assertPreparedTreeInputs(preparedInputs);
 
+  const selectedPathsForReasoning = collectSelectedPathsForReasoning(prepared);
+
   const findings = [
     ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
-    ...collectValidatorOwnedOutsideTreeFindings(prepared.selectedPaths),
+    ...collectValidatorOwnedOutsideTreeFindings(selectedPathsForReasoning),
     ...collectOwnedSliceBoundaryDriftFindings(prepared.selectedPaths),
     ...collectContributorFindings(prepared),
   ].sort(sortByPathThenCode);
 
   return {
     findings,
-    totalFilesScanned: prepared.selectedPaths.length,
+    totalFilesScanned: selectedPathsForReasoning.length,
     scope: prepared.scope ?? 'repo',
     filters: {
       isFiltered: prepared.targets.length > 0,

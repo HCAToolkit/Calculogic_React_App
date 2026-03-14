@@ -328,6 +328,24 @@ Status boundary:
 - It is not declared as canonical runtime grammar in this pass.
 - Promotion to canonical runtime/addressing rules requires explicit follow-up adoption work.
 
+
+### Runtime alignment notes for current substrate hardening
+
+The current tree occurrence snapshot runtime aligns to this document's illustration as follows:
+
+- Folder occurrence markers are generated as uppercase alphabetic segments (`A`, `B`, ..., `AA`, ...).
+- File occurrence markers remain numeric sibling counters (`1`, `2`, ...).
+- Snapshot records use `isScopeTopOccurrence` (scoped-root-relative semantics) instead of `isRepoTopOccurrence`.
+
+Scoped target rebasing behavior used by runtime snapshot generation:
+
+- directory targets: the targeted directory path is used as the scoped-root rebase anchor,
+- file targets: the containing directory is used as the scoped-root rebase anchor,
+- file targets are not treated as directory lineage roots.
+
+This keeps tree-local occurrence reasoning deterministic while preserving resolved-path findings output.
+
+
 ### Visual deterministic notation (documentation example)
 
 A simple illustrative notation may be used for examples:

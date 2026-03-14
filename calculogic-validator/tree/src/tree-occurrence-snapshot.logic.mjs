@@ -8,8 +8,13 @@ const normalizeRelativePath = (relativePath) =>
 
 const sortStrings = (values) => [...values].sort((left, right) => left.localeCompare(right));
 
-const isPathInsideDirectoryPath = (candidatePath, directoryPath) =>
-  candidatePath === directoryPath || candidatePath.startsWith(`${directoryPath}${POSIX_SEPARATOR}`);
+const isPathInsideDirectoryPath = (candidatePath, directoryPath) => {
+  if (directoryPath === '' || directoryPath === '.') {
+    return true;
+  }
+
+  return candidatePath === directoryPath || candidatePath.startsWith(`${directoryPath}${POSIX_SEPARATOR}`);
+};
 
 const toAlphabeticMarker = (index) => {
   let marker = '';
@@ -17,7 +22,7 @@ const toAlphabeticMarker = (index) => {
 
   while (value > 0) {
     const remainder = (value - 1) % 26;
-    marker = String.fromCharCode(97 + remainder) + marker;
+    marker = String.fromCharCode(65 + remainder) + marker;
     value = Math.floor((value - 1) / 26);
   }
 
@@ -52,9 +57,43 @@ const normalizeTargetDescriptors = (targetDescriptors = []) => {
   return [...deduped.values()].sort((left, right) => left.relPath.localeCompare(right.relPath));
 };
 
+const inferTargetKind = (targetDescriptor, selectedPathSet) => {
+  if (targetDescriptor.kind === 'file' || targetDescriptor.kind === 'dir') {
+    return targetDescriptor.kind;
+  }
+
+  const hasNestedMatch = [...selectedPathSet].some((selectedPath) =>
+    selectedPath.startsWith(`${targetDescriptor.relPath}${POSIX_SEPARATOR}`),
+  );
+
+  if (hasNestedMatch) {
+    return 'dir';
+  }
+
+  return selectedPathSet.has(targetDescriptor.relPath) ? 'file' : 'dir';
+};
+
+const toScopeRootPath = (targetDescriptor, selectedPathSet) => {
+  const targetKind = inferTargetKind(targetDescriptor, selectedPathSet);
+
+  if (targetKind === 'dir') {
+    return targetDescriptor.relPath;
+  }
+
+  if (!targetDescriptor.relPath.includes(POSIX_SEPARATOR)) {
+    return '.';
+  }
+
+  return targetDescriptor.relPath.slice(0, targetDescriptor.relPath.lastIndexOf(POSIX_SEPARATOR));
+};
+
 const buildScopeRoots = ({ selectedPaths, targets, includeRoots }) => {
   if (targets.length > 0) {
-    return targets;
+    const selectedPathSet = new Set(selectedPaths);
+    const targetScopeRoots = sortStrings(
+      new Set(targets.map((targetDescriptor) => toScopeRootPath(targetDescriptor, selectedPathSet))),
+    );
+    return targetScopeRoots.map((relPath) => ({ relPath, kind: 'dir' }));
   }
 
   if (includeRoots.length > 0) {
@@ -85,7 +124,7 @@ const resolveScopeRootPathForNode = (resolvedPath, scopeRoots) => {
 };
 
 const collectAllOccurrencePaths = (selectedPaths, scopeRoots) => {
-  const directoryPaths = new Set(scopeRoots.map((scopeRoot) => scopeRoot.relPath));
+  const directoryPaths = new Set(scopeRoots.map((scopeRoot) => scopeRoot.relPath).filter((scopeRoot) => scopeRoot !== '.'));
   const filePaths = new Set();
 
   for (const selectedPath of selectedPaths) {
@@ -101,6 +140,22 @@ const collectAllOccurrencePaths = (selectedPaths, scopeRoots) => {
     directoryPaths,
     filePaths,
   };
+};
+
+const buildLineageSegments = (resolvedPath, scopeRootPath) => {
+  if (scopeRootPath === '.') {
+    return resolvedPath.split(POSIX_SEPARATOR).filter(Boolean);
+  }
+
+  const lineageTail =
+    scopeRootPath === resolvedPath
+      ? []
+      : resolvedPath
+          .slice(scopeRootPath.length + 1)
+          .split(POSIX_SEPARATOR)
+          .filter(Boolean);
+
+  return [scopeRootPath, ...lineageTail].filter(Boolean);
 };
 
 export const prepareTreeOccurrenceSnapshot = ({
@@ -132,14 +187,7 @@ export const prepareTreeOccurrenceSnapshot = ({
       ? resolvedPath.slice(resolvedPath.lastIndexOf(POSIX_SEPARATOR) + 1)
       : resolvedPath;
     const scopeRootPath = resolveScopeRootPathForNode(resolvedPath, scopeRoots);
-    const lineageTail =
-      scopeRootPath === resolvedPath
-        ? []
-        : resolvedPath
-            .slice(scopeRootPath.length + 1)
-            .split(POSIX_SEPARATOR)
-            .filter(Boolean);
-    const lineageSegments = [scopeRootPath, ...lineageTail].filter(Boolean);
+    const lineageSegments = buildLineageSegments(resolvedPath, scopeRootPath);
 
     let parentResolvedPath = null;
     if (resolvedPath !== scopeRootPath && resolvedPath.includes(POSIX_SEPARATOR)) {
@@ -160,7 +208,7 @@ export const prepareTreeOccurrenceSnapshot = ({
       markerSegments: [],
       occurrenceMarker: '',
       isScopedRoot: resolvedPath === scopeRootPath,
-      isRepoTopOccurrence: lineageSegments.length === 1,
+      isScopeTopOccurrence: lineageSegments.length === 1,
     });
   }
 
