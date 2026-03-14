@@ -95,7 +95,9 @@ Rules:
 - It remains secondary to canonical dominant role ownership.
 - It remains subordinate to explicit ownership grammar.
 
-This section is an interpretation option, not a mandatory runtime requirement.
+For bounded semantic-family entities/definitions/relationships and run-scoped interpreted-signal framing, see `naming-semantic-family-and-interpretation-spec.md`.
+
+This section remains an interpretation option, not a mandatory runtime requirement.
 
 Classification: Normative
 
