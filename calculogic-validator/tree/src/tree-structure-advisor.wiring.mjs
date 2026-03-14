@@ -4,7 +4,9 @@ import {
   runTreeStructureAdvisor as runTreeStructureAdvisorRuntime,
   summarizeFindings,
 } from './tree-structure-advisor.logic.mjs';
-import { collectShimCompatFindings } from './tree-shim-detection.logic.mjs';
+import {
+  createTreeShimDiagnosticsContributor,
+} from './contributors/tree-shim-diagnostics.contributor.wiring.mjs';
 import {
   collectSuiteScopedSnapshotInputs,
 } from '../../src/core/suite-scoped-snapshot-input.logic.mjs';
@@ -20,10 +22,6 @@ const WALK_EXCLUDED_DIRECTORIES = new Set([
   'dist',
   'node_modules',
 ]);
-
-
-const createShimFindingContributor = ({ selectedPaths, getFileContent }) => () =>
-  collectShimCompatFindings(selectedPaths, getFileContent);
 
 const collectTopLevelDirectoryNames = (repositoryRoot) =>
   fs
@@ -66,7 +64,7 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: scopedSnapshotInputs.targets,
     findingContributors: [
-      createShimFindingContributor({
+      createTreeShimDiagnosticsContributor({
         selectedPaths,
         getFileContent,
       }),
