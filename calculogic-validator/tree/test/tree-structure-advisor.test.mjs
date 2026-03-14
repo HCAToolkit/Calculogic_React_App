@@ -824,6 +824,35 @@ test('tree-structure-advisor rejects invalid scope deterministically', async () 
   }
 });
 
+
+test('tree-structure-advisor consumes occurrence snapshot file records for validator-owned outside-tree reasoning', () => {
+  const fromOccurrenceSnapshot = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: ['calculogic-validator/tree/src/tree-structure-advisor.logic.mjs'],
+    occurrenceSnapshot: {
+      scopeRoots: ['src'],
+      occurrenceRecords: [
+        {
+          resolvedPath: 'src/validator-runner.logic.mjs',
+          occurrenceType: 'file',
+        },
+      ],
+    },
+    topLevelDirectoryNames: [],
+    targets: [],
+  });
+
+  const withoutOccurrenceSnapshot = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: ['src/validator-runner.logic.mjs'],
+    topLevelDirectoryNames: [],
+    targets: [],
+  });
+
+  assert.deepEqual(fromOccurrenceSnapshot.findings, withoutOccurrenceSnapshot.findings);
+  assert.equal(fromOccurrenceSnapshot.totalFilesScanned, 1);
+});
+
 test('tree-structure-advisor prepared runtime contract accepts tree-core inputs without contributors', () => {
   const result = runTreeStructureAdvisorRuntime({
     scope: 'repo',

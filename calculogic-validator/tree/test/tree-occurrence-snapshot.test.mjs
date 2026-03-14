@@ -24,10 +24,7 @@ test('tree occurrence snapshot disambiguates repeated names by lineage', () => {
 
   assert.equal(srcRecords.every((record) => record.actualName === 'src'), true);
   assert.equal(new Set(srcRecords.map((record) => record.occurrenceMarker)).size, 3);
-  assert.equal(
-    new Set(srcRecords.map((record) => record.lineageSegments.join('/'))).size,
-    3,
-  );
+  assert.equal(new Set(srcRecords.map((record) => record.lineageSegments.join('/'))).size, 3);
 });
 
 test('tree occurrence snapshot preserves deterministic lineage and depth', () => {
@@ -46,13 +43,12 @@ test('tree occurrence snapshot preserves deterministic lineage and depth', () =>
   ]);
   assert.equal(recordsByPath['calculogic-validator/tree/src'].depth, 2);
   assert.equal(
-    recordsByPath['calculogic-validator/tree/src/registries/tree-known-roots.registry.logic.mjs']
-      .parentResolvedPath,
+    recordsByPath['calculogic-validator/tree/src/registries/tree-known-roots.registry.logic.mjs'].parentResolvedPath,
     'calculogic-validator/tree/src/registries',
   );
 });
 
-test('tree occurrence snapshot distinguishes folders and files from path structure', () => {
+test('tree occurrence snapshot distinguishes folders and files from path structure with uppercase folder markers', () => {
   const snapshot = prepareTreeOccurrenceSnapshot({
     selectedPaths: ['calculogic-validator/tree/src/tree-structure-advisor.logic.mjs'],
     targets: [],
@@ -66,10 +62,10 @@ test('tree occurrence snapshot distinguishes folders and files from path structu
     recordsByPath['calculogic-validator/tree/src/tree-structure-advisor.logic.mjs'].occurrenceType,
     'file',
   );
-  assert.match(recordsByPath['calculogic-validator/tree/src'].occurrenceMarker, /^[a-z]+(?:\.[a-z0-9]+)*$/u);
+  assert.match(recordsByPath['calculogic-validator/tree/src'].occurrenceMarker, /^[A-Z]+(?:\.[A-Z0-9]+)*$/u);
   assert.match(
     recordsByPath['calculogic-validator/tree/src/tree-structure-advisor.logic.mjs'].occurrenceMarker,
-    /^[a-z]+(?:\.[a-z0-9]+)*\.[0-9]+$/u,
+    /^[A-Z]+(?:\.[A-Z0-9]+)*\.[0-9]+$/u,
   );
 });
 
@@ -85,11 +81,28 @@ test('tree occurrence snapshot rebases scoped lineage from targeted subtree root
   const nestedSrc = recordsByPath['calculogic-validator/tree/src'];
 
   assert.equal(scopedRoot.isScopedRoot, true);
+  assert.equal(scopedRoot.isScopeTopOccurrence, true);
   assert.equal(scopedRoot.depth, 0);
   assert.deepEqual(scopedRoot.lineageSegments, ['calculogic-validator/tree']);
   assert.equal(nestedSrc.scopeRootPath, 'calculogic-validator/tree');
   assert.deepEqual(nestedSrc.lineageSegments, ['calculogic-validator/tree', 'src']);
   assert.equal(nestedSrc.depth, 1);
+});
+
+test('tree occurrence snapshot file targets rebase from containing folder and avoid file-root lineage', () => {
+  const snapshot = prepareTreeOccurrenceSnapshot({
+    selectedPaths: ['calculogic-validator/tree/src/tree-structure-advisor.logic.mjs'],
+    targets: [{ relPath: 'calculogic-validator/tree/src/tree-structure-advisor.logic.mjs', kind: 'file' }],
+    includeRoots: ['calculogic-validator'],
+  });
+
+  const recordsByPath = byResolvedPath(snapshot.occurrenceRecords);
+  const fileRecord = recordsByPath['calculogic-validator/tree/src/tree-structure-advisor.logic.mjs'];
+
+  assert.deepEqual(snapshot.scopeRoots, ['calculogic-validator/tree/src']);
+  assert.equal(fileRecord.scopeRootPath, 'calculogic-validator/tree/src');
+  assert.equal(fileRecord.isScopedRoot, false);
+  assert.deepEqual(fileRecord.lineageSegments, ['calculogic-validator/tree/src', 'tree-structure-advisor.logic.mjs']);
 });
 
 test('tree structure advisor wiring attaches occurrence snapshot with resolved paths', () => {
