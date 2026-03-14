@@ -1,11 +1,10 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import {
   runTreeStructureAdvisor as runTreeStructureAdvisorRuntime,
   summarizeFindings,
 } from './tree-structure-advisor.logic.mjs';
 import {
-  createTreeShimDiagnosticsContributor,
+  attachTreeShimDiagnosticsContributor,
 } from './contributors/tree-shim-diagnostics.contributor.wiring.mjs';
 import {
   collectSuiteScopedSnapshotInputs,
@@ -40,23 +39,6 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
     skipDotDirectories: true,
   });
   const selectedPaths = scopedSnapshotInputs.selectedPaths;
-  const contentByPathCache = new Map();
-  const selectedPathSet = new Set(selectedPaths);
-  const getFileContent = (relativePath) => {
-    if (!selectedPathSet.has(relativePath)) {
-      throw new Error(
-        `Tree prepared getFileContent received out-of-scope path: ${relativePath}`,
-      );
-    }
-
-    if (contentByPathCache.has(relativePath)) {
-      return contentByPathCache.get(relativePath);
-    }
-
-    const rawContent = fs.readFileSync(path.resolve(repositoryRoot, relativePath), 'utf8');
-    contentByPathCache.set(relativePath, rawContent);
-    return rawContent;
-  };
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -64,9 +46,9 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: scopedSnapshotInputs.targets,
     findingContributors: [
-      createTreeShimDiagnosticsContributor({
+      attachTreeShimDiagnosticsContributor({
+        repositoryRoot,
         selectedPaths,
-        getFileContent,
       }),
     ],
   };
