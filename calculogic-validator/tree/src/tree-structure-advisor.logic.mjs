@@ -137,23 +137,37 @@ const collectOwnedSliceBoundaryDriftFindings = (paths) => {
 };
 
 
-const collectSelectedPathRecordsFromOccurrenceSnapshot = (occurrenceSnapshot) => {
+const collectOccurrenceDerivedFileReasoningInput = (preparedInputs) => {
+  const occurrenceSnapshot = preparedInputs?.occurrenceSnapshot;
+
   if (!occurrenceSnapshot || !Array.isArray(occurrenceSnapshot.occurrenceRecords)) {
     return null;
   }
 
-  return occurrenceSnapshot.occurrenceRecords.filter(
-    (record) => record && record.occurrenceType === 'file' && typeof record.resolvedPath === 'string',
+  const fileRecords = occurrenceSnapshot.occurrenceRecords.filter(
+    (record) =>
+      record &&
+      record.occurrenceType === 'file' &&
+      typeof record.resolvedPath === 'string' &&
+      record.resolvedPath.length > 0,
   );
+
+  const uniqueResolvedFilePaths = [...new Set(fileRecords.map((record) => record.resolvedPath))].sort((left, right) =>
+    left.localeCompare(right),
+  );
+
+  return {
+    fileRecords,
+    resolvedFilePaths: uniqueResolvedFilePaths,
+    recordsByResolvedPath: new Map(fileRecords.map((record) => [record.resolvedPath, record])),
+  };
 };
 
 const collectSelectedPathsForReasoning = (preparedInputs) => {
-  const selectedPathRecords = collectSelectedPathRecordsFromOccurrenceSnapshot(preparedInputs.occurrenceSnapshot);
+  const occurrenceDerivedFileReasoningInput = collectOccurrenceDerivedFileReasoningInput(preparedInputs);
 
-  if (selectedPathRecords) {
-    return selectedPathRecords
-      .map((record) => record.resolvedPath)
-      .sort((left, right) => left.localeCompare(right));
+  if (occurrenceDerivedFileReasoningInput) {
+    return occurrenceDerivedFileReasoningInput.resolvedFilePaths;
   }
 
   return preparedInputs.selectedPaths;
@@ -223,12 +237,16 @@ const collectContributorFindings = (preparedInputs) => {
 export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const prepared = assertPreparedTreeInputs(preparedInputs);
 
+  const occurrenceDerivedFileReasoningInput = collectOccurrenceDerivedFileReasoningInput(prepared);
   const selectedPathsForReasoning = collectSelectedPathsForReasoning(prepared);
+  const pathsForOwnedSliceBoundaryDriftReasoning = occurrenceDerivedFileReasoningInput
+    ? occurrenceDerivedFileReasoningInput.resolvedFilePaths
+    : prepared.selectedPaths;
 
   const findings = [
     ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
     ...collectValidatorOwnedOutsideTreeFindings(selectedPathsForReasoning),
-    ...collectOwnedSliceBoundaryDriftFindings(prepared.selectedPaths),
+    ...collectOwnedSliceBoundaryDriftFindings(pathsForOwnedSliceBoundaryDriftReasoning),
     ...collectContributorFindings(prepared),
   ].sort(sortByPathThenCode);
 

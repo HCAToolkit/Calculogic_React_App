@@ -1,4 +1,4 @@
-# Tree Structure Advisor Validator Spec (Report-Only Advisory, V0.1.5)
+# Tree Structure Advisor Validator Spec (Report-Only Advisory, V0.1.6)
 
 ## Purpose and Scope (Status: Current runtime behavior)
 
@@ -40,16 +40,16 @@ Status interpretation used in this document:
 
 ## Suite Contract Alignment (Status: Current runtime behavior)
 
-This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md): the validator suite is modular, configurable, policy-driven, and report-first by default. Tree advisor V0.1.5 remains report-only even though additional policy modes exist suite-wide.
+This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-Modes.md`](../ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md): the validator suite is modular, configurable, policy-driven, and report-first by default. Tree advisor V0.1.6 remains report-only even though additional policy modes exist suite-wide.
 
-### In scope (V0.1.5 hardened subset)
+### In scope (V0.1.6 hardened subset)
 
 - Tree-core structural checks over prepared `selectedPaths` + `topLevelDirectoryNames` + `targets`
 - Optional contributor composition through `findingContributors[]` prepared by wiring/assembly
 - Shim/compat diagnostics attached through the tree contributor assembly default (`tree-shim-diagnostics`)
 - Report-only output with deterministic sorting and no filesystem mutation
 
-### Out of scope (V0.1.5)
+### Out of scope (V0.1.6)
 
 - Applying any filesystem changes (no auto-move, no auto-fix)
 - Enforcing a single “correct tree” (recommendations are heuristic + explainable)
@@ -524,6 +524,8 @@ Suggested codes (V0.0.1):
 ### Runtime boundary
 
 - Tree core consumes **prepared tree-core inputs only** and fails closed when that contract is bypassed.
+- Tree core consumes occurrence-derived file records from `occurrenceSnapshot.occurrenceRecords` when available for bounded structural helpers (`TREE_VALIDATOR_OWNED_FILE_OUTSIDE_TREE`, `TREE_OWNED_SLICE_BOUNDARY_DRIFT`) while keeping findings path output on resolved paths.
+- If occurrence snapshot is missing or malformed, tree core deterministically falls back to prepared `selectedPaths` for file-path reasoning.
 - Required prepared tree-core fields:
   - `selectedPaths` (array)
   - `topLevelDirectoryNames` (array)

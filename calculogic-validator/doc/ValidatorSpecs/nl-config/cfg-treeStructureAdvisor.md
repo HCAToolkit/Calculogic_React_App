@@ -21,7 +21,7 @@ Canonical reading order for tree implementation work:
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.5** (shim evidence hardening with robust public-entrypoint barrel carveout coverage for `export *`, `export * as <name>`, and optional `export { ... } from` pass-through forms while preserving thin re-export shim detection).
+Current implementation target: **V0.1.6** (suite-scoped snapshot ownership split plus bounded occurrence-driven file-path adoption in tree core for validator-owned-outside-tree and owned-slice-boundary-drift structural helpers while preserving resolved-path findings output).
 
 ## 1.0 Purpose
 
@@ -88,7 +88,7 @@ V0.1.6 introduces a suite-core scoped snapshot/input helper boundary and migrate
 
 - suite-core helper owns scope profile read, includeRoots walk, includeRootFiles inclusion, normalized path collection, target filtering, and deterministic sort/dedupe
 - tree wiring consumes the shared scoped snapshot input and still prepares tree-local top-level directory inventory
-- tree runtime remains slice-owned for tree-core findings using prepared tree-core inputs only (`selectedPaths`, `topLevelDirectoryNames`, `targets`)
+- tree runtime remains slice-owned for tree-core findings using prepared tree-core inputs only (`selectedPaths`, `topLevelDirectoryNames`, `targets`) and consumes occurrence-derived file-path reasoning input when `occurrenceSnapshot.occurrenceRecords` is available (bounded fallback to `selectedPaths` when occurrence snapshot is absent/malformed)
 - tree-run default contributor selection is owned by a dedicated assembly/wiring module so tree wiring only prepares tree-core inputs
 - shim/content-backed diagnostics are attached from a shim-owned contributor helper that prepares lazy content access (cache + selected-path guard) so tree-core runtime does not require file-content access
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
