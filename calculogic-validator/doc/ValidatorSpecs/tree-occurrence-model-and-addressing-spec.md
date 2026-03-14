@@ -105,7 +105,7 @@ Therefore, tree must interpret **occurrences**, not names alone.
 
 Repeated folder names can appear under different parents and at different depths.
 
-Example set:
+Example occurrence set:
 
 - `calculogic-validator/src`
 - `calculogic-validator/naming/src`
@@ -116,6 +116,118 @@ All three terminal tokens are `src`, but tree modeling must treat them as three 
 Required statement:
 
 - Same token + different lineage => different occurrence identity.
+
+## Concrete Validator Tree Illustration (Illustrative, Tree-Specific)
+
+### Status Note (Scope and Authority)
+
+This section is a concrete **illustrative tree-occurrence** example for this document.
+
+- Letters represent **folder occurrences**.
+- Numbers represent **file occurrences**.
+- This notation is **tree-specific modeling guidance** scoped to this doc.
+- It is **not** declared canonical runtime grammar in this pass.
+- It does **not** replace `calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`.
+
+### Concrete Tree Excerpt
+
+`A` = `calculogic-validator/`
+
+```text
+A: calculogic-validator/
+1├─ LICENSE
+2├─ README.md
+3├─ package.json
+A├─ doc/
+│ A├─ ConventionRoutines/
+│ B├─ ValidatorSpecs/
+│ C└─ Indexes/
+B├─ bin/
+│ 1├─ calculogic-validate.mjs
+│ 2├─ calculogic-validate-naming.mjs
+│ 3└─ calculogic-validator-health.mjs
+C├─ scripts/
+│ 1├─ validate-all.mjs
+│ 2├─ validate-naming.mjs
+│ 3├─ validator-health-check.host.mjs
+│ 4├─ report-capture-verify.mjs
+│ 5└─ report-capture-summarize.mjs
+D├─ src/
+│ 1├─ index.mjs
+│ 2├─ validator-config.schema.json
+│ A├─ core/
+│ │ 1├─ repository-root.logic.mjs
+│ │ 2├─ npm-arg-forwarding-guard.logic.mjs
+│ │ 3├─ validator-exit-code.logic.mjs
+│ │ A├─ cli/
+│ │ │ 1├─ validator-cli-output.logic.mjs
+│ │ │ 2├─ validator-cli-scopes.logic.mjs
+│ │ │ 3├─ validator-cli-targets.logic.mjs
+│ │ │ 4└─ validator-cli-usage.logic.mjs
+│ │ 4├─ validator-report.contracts.mjs
+│ │ 5├─ validator-report-meta.logic.mjs
+│ │ 6├─ validator-runner.logic.mjs
+│ │ 7├─ validator-registry.knowledge.mjs
+│ │ 8├─ validator-scopes.runtime.mjs
+│ │ 9├─ validator-root-files.knowledge.mjs
+│ │ 10└─ source-snapshot.logic.mjs
+│ B└─ config/
+│   1├─ validator-config.contracts.mjs
+│   2└─ validator-config.logic.mjs
+```
+
+### Example Interpreted Occurrences
+
+- `A.1`
+  - Occurrence type: `file occurrence`
+  - Label: `1`
+  - Resolved path: `calculogic-validator/LICENSE`
+  - Meaning: first file occurrence directly under repo-root occurrence `A`.
+
+- `A.A`
+  - Occurrence type: `folder occurrence`
+  - Label: `A`
+  - Resolved path: `calculogic-validator/doc/`
+  - Meaning: first folder occurrence under repo-root occurrence `A` (the `doc` folder occurrence).
+
+- `A.A.A`
+  - Occurrence type: `folder occurrence`
+  - Label: `A`
+  - Resolved path: `calculogic-validator/doc/ConventionRoutines/`
+  - Meaning: first folder occurrence under `calculogic-validator/doc/`, distinguished by lineage from other `A` labels.
+
+- `A.D`
+  - Occurrence type: `folder occurrence`
+  - Label: `D`
+  - Resolved path: `calculogic-validator/src/`
+  - Meaning: fourth folder occurrence directly under repo-root occurrence `A`.
+
+- `A.D.A`
+  - Occurrence type: `folder occurrence`
+  - Label: `A`
+  - Resolved path: `calculogic-validator/src/core/`
+  - Meaning: first folder occurrence under `calculogic-validator/src/`, showing reused letter labels remain lineage-scoped.
+
+- `A.D.A.3`
+  - Occurrence type: `file occurrence`
+  - Label: `3`
+  - Resolved path: `calculogic-validator/src/core/validator-exit-code.logic.mjs`
+  - Meaning: third file occurrence under `calculogic-validator/src/core/`, interpreted by parent chain plus file segment type.
+
+### Why This Illustration Matters
+
+- The same token/segment marker may appear multiple times under different parent chains.
+- Tree interpretation must distinguish `path occurrence` identity by lineage, not token only.
+- Repeated names such as multiple `src` occurrences under different parents are a motivating case for explicit occurrence addressing.
+
+### Modeling Takeaway
+
+Tree determinism requires both:
+
+1. structural vocabulary/root-partition classification, and
+2. occurrence addressing/lineage identity.
+
+Neither layer is sufficient alone for reliable interpreted tree occurrence modeling.
 
 ## Tree-Specific Occurrence Addressing Guidance (Modeling Direction)
 
@@ -218,4 +330,3 @@ This document is modeling-first and intentionally non-disruptive to current runt
 1. Define a small tree-local address example registry (documentation-only) that exercises repeated-name scenarios across top-root and subtree contexts.
 2. Add a traceability table mapping each interpreted occurrence field to current tree findings payload fields and explicit "missing today" markers.
 3. Open a bounded alignment note with the deterministic structural addressing draft for any grammar decisions needed before runtime adoption.
-
