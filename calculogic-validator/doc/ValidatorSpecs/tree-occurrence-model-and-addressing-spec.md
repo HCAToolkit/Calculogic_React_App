@@ -254,7 +254,7 @@ Status boundary reminder:
 ### Why This Illustration Matters
 
 - The same actual name/token may appear in multiple `path occurrence` instances under different parent chains.
-- The same illustrative occurrence marker may also appear in different branches of the tree-specific notation.
+- The same illustrative occurrence marker may also appear under different parent lineages in the tree-specific notation.
 - Tree interpretation must distinguish `path occurrence` identity by lineage, not token only.
 - Tree interpretation must also distinguish `path occurrence` identity by lineage when occurrence markers are reused.
 - Repeated names such as multiple `src` occurrences under different parents are a motivating case for explicit occurrence addressing.
