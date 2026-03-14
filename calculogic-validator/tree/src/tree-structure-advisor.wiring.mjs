@@ -4,8 +4,8 @@ import {
   summarizeFindings,
 } from './tree-structure-advisor.logic.mjs';
 import {
-  attachTreeShimDiagnosticsContributor,
-} from './contributors/tree-shim-diagnostics.contributor.wiring.mjs';
+  collectDefaultTreeStructureAdvisorContributors,
+} from './tree-structure-advisor-contributors.assembly.wiring.mjs';
 import {
   collectSuiteScopedSnapshotInputs,
 } from '../../src/core/suite-scoped-snapshot-input.logic.mjs';
@@ -45,12 +45,10 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
     selectedPaths,
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: scopedSnapshotInputs.targets,
-    findingContributors: [
-      attachTreeShimDiagnosticsContributor({
-        repositoryRoot,
-        selectedPaths,
-      }),
-    ],
+    findingContributors: collectDefaultTreeStructureAdvisorContributors({
+      repositoryRoot,
+      selectedPaths,
+    }),
   };
 };
 
