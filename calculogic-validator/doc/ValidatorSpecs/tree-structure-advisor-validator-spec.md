@@ -4,9 +4,9 @@
 
 This document defines a **Tree Structure Advisor** validator slice whose output is **advisory**:
 
-- it analyzes repository **folder structure + filename semantics**
-- it assigns **report-only tree addresses** (derived from the Deterministic Structural Addressing grammar)
-- it emits **reorganization suggestions** that make patterns more explicit and future additions easier to navigate
+- it analyzes repository **folder structure** using prepared tree-core inputs
+- it emits **advisory findings** for currently implemented structural and shim-compat checks
+- contributor-backed diagnostics are optional and attached outside tree core
 - it never renames or moves files
 
 This slice exists to reduce “tree drift” as additional validators beyond naming are added.
@@ -44,17 +44,10 @@ This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-M
 
 ### In scope (V0.1.5 hardened subset)
 
-- Parse `<semantic-name>.<role>.<ext>` metadata when applicable
-- Use role registry metadata (role category/status) as structured signal
-- Analyze _where_ semantic families and lanes (roles/categories) cluster or scatter
-- Emit findings that recommend:
-  - new namespace folders (domain roots)
-  - consolidation of scattered semantic families
-  - separation of mixed lanes where mixing predicts growth pain
-  - normalization of repeated validator-subtree scaffolds (for future validators)
-- Shim/compat advisory hardening with staged evidence precedence (path/surface/token-first, content reads only for deterministic shim candidates) and intentional pass-through carveouts, including package/public barrel pass-through (`calculogic-validator/src/index.mjs`) with `export * from`, `export * as <name> from`, and optional `export { ... } from` forms
-- Weak token/path-only shim observability may suppress detector-implementation modules inside `calculogic-validator/tree/src/` when `shim` appears only as part of the detector semantic name (for example `*shim-detection*`) and no thin re-export evidence exists
-- Bounded owned-slice boundary drift advisory under suite-core: emit `TREE_OWNED_SLICE_BOUNDARY_DRIFT` only for deterministic, conservative subtree-local growth signals under `calculogic-validator/src/**` while preserving explicit shared-infra/compat/public-entry carveouts
+- Tree-core structural checks over prepared `selectedPaths` + `topLevelDirectoryNames` + `targets`
+- Optional contributor composition through `findingContributors[]` prepared by wiring/assembly
+- Shim/compat diagnostics attached through the tree contributor assembly default (`tree-shim-diagnostics`)
+- Report-only output with deterministic sorting and no filesystem mutation
 
 ### Out of scope (V0.1.5)
 
@@ -153,7 +146,7 @@ This is a modeling direction note only, not an implementation claim for this ver
 
 ---
 
-## Tree Addressing (Report-Only, Status: Current runtime behavior)
+## Tree Addressing (Report-Only, Status: Future advisory direction)
 
 This slice assigns **Tree Addresses** for reporting and internal clustering.
 They are not canonical persistent IDs and must not be embedded into filenames.
@@ -220,7 +213,7 @@ Notes:
 
 ---
 
-## Tree Snapshot Inputs (TreeManifest / TreeSnapshot, Status: Current runtime behavior)
+## Tree Snapshot Inputs (TreeManifest / TreeSnapshot, Status: Bounded modeling note)
 
 Tree advisor analysis input is a deterministic **TreeSnapshot** (also called a TreeManifest): a stable list of repo-relative paths selected for analysis.
 
@@ -281,7 +274,7 @@ Runtime collection must ignore missing declared root files, normalize collected 
 
 ---
 
-## Analysis Heuristics (Deterministic, Status: Current runtime behavior)
+## Analysis Heuristics (Deterministic, Status: Future advisory direction)
 
 V0.0.1 uses deterministic heuristics that are explainable in findings.
 
@@ -325,7 +318,7 @@ All scoring thresholds MUST be explicit constants in code and reported in `detai
 - `MIN_FILES_IN_FAMILY_FOR_RECOMMENDATION = 2`
 - `LANE_FIRST_FOLDER_SIGNAL_SET = { build, build-style, logic, knowledge, results, results-style, tests, docs }`
 
-## Recommendation Patterns (Advisory Only, Status: Current runtime behavior)
+## Recommendation Patterns (Advisory Only, Status: Future advisory direction)
 
 The following outputs are advisory recommendation patterns only. They are not mandatory rules and should be emitted as explainable `suggested-reorg` findings.
 
@@ -458,15 +451,10 @@ Constraints:
 
 ## Classification Outputs (Status: Current runtime behavior)
 
-Stable classifications (suggested V0.0.1):
+Current tree-runtime and attached shim contributor findings use:
 
-- `observed-structure` (info): a pattern recognized and recorded (useful for mapping)
-- `suggested-reorg` (warn/info): an actionable recommendation
-- `non-actionable` (info): recognized but intentionally not recommended (to avoid churn)
-
-Severity:
-
-- `info` or `warn` (no error in report mode)
+- `classification`: `advisory-structure`
+- `severity`: `info` and `warn` only (report-mode, no tree finding errors)
 
 ---
 
@@ -531,37 +519,47 @@ Suggested codes (V0.0.1):
 
 ---
 
-## Report Object Additions (Status: Current runtime behavior)
+## Current Runtime Boundary and Shipped Findings (Status: Current runtime behavior)
 
-Report object SHOULD include:
+### Runtime boundary
 
-- `mode` (always `report` in V0.0.1)
-- `scope`
+- Tree core consumes **prepared tree-core inputs only** and fails closed when that contract is bypassed.
+- Required prepared tree-core fields:
+  - `selectedPaths` (array)
+  - `topLevelDirectoryNames` (array)
+  - `targets` (array)
+- Optional composition field:
+  - `findingContributors` (array of contributor callbacks)
+- Tree core does **not** require `getFileContent(relativePath)`.
+
+### Composition ownership
+
+- Tree wiring prepares tree-core inputs and calls tree contributor assembly for default contributors.
+- Default contributor selection is owned by `tree-structure-advisor-contributors.assembly.wiring.mjs`, not by tree core.
+- Shim diagnostics are attached as a contributor (`tree-shim-diagnostics`) during normal tree runs.
+- Shim/content reads are owned by the shim contributor attachment boundary and are guarded to selected paths.
+
+### Current shipped finding codes
+
+Tree core currently ships:
+
+- `TREE_UNEXPECTED_TOP_LEVEL_FOLDER`
+- `TREE_VALIDATOR_OWNED_FILE_OUTSIDE_TREE`
+- `TREE_OWNED_SLICE_BOUNDARY_DRIFT`
+
+Attached shim contributor currently ships during normal tree runs:
+
+- `TREE_SHIM_SURFACE_PRESENT`
+- `TREE_SHIM_OUTSIDE_COMPAT`
+
+### Current report payload from tree runtime
+
+The tree runtime result includes:
+
+- `findings[]` (deterministically sorted)
 - `totalFilesScanned`
-- `summary` counts by classification + by lane index
-- `addressing.hostBindings[]` (required)
-- `findings[]` (sorted deterministically)
-
-### Prepared runtime input contract (wiring/runtime boundary; Status: Current runtime behavior)
-
-The runtime entrypoint expects prepared inputs from wiring/runtime adapters and must fail clearly when the contract is bypassed.
-
-Required prepared tree-core fields:
-
-- `selectedPaths` (array)
-- `topLevelDirectoryNames` (array)
-- `targets` (array)
-
-Optional prepared diagnostic-composition fields:
-
-- `findingContributors` (array of contributor callbacks)
-
-Contributor callback contract:
-
-- receives the prepared tree-core inputs object
-- returns an array of tree findings (or an empty array)
-
-Tree-core runtime must not require file content access. File-content-backed diagnostics (for example shim detection) are composed through contributor callbacks selected by tree-run assembly wiring and may use lazy staged reads internally.
+- `scope`
+- `filters` with `isFiltered` and optional `targets`
 
 ---
 
@@ -594,16 +592,15 @@ Suite policy options (`soft-fail`, `hard-fail`, `correct`, `replace`) are contra
 
 ---
 
-## CLI Usage (Draft, Status: Bounded modeling note)
+## CLI Usage (Status: Current runtime behavior)
 
-Suggested entrypoints (aligning to existing patterns):
+Current script usage:
 
-- `npm run validate:tree` (defaults to `--scope=repo`)
-- `npm run validate:tree -- --scope=app`
-- `npm run validate:tree -- --scope=validator`
-- `npm run validate:tree -- --scope=app --target calculogic-validator/tree/src`
+- `npm run validate:tree -- --scope=validator` runs tree-structure-advisor only for validator scope.
+- `--target` is repeatable (`--target <path>` and `--target=<path>`) and filters analysis to the union of selected in-scope targets.
+- The command remains report-only: tree findings are advisory and do not fail by themselves.
 
-Npm forwarding requirement remains: flags must be passed after `--`.
+Npm forwarding requirement remains: pass flags after `--` (for example `npm run validate:tree -- --scope=validator --target calculogic-validator/tree/src`).
 
 ---
 
