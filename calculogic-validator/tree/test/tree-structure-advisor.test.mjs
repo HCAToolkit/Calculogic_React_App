@@ -853,6 +853,132 @@ test('tree-structure-advisor consumes occurrence snapshot file records for valid
   assert.equal(fromOccurrenceSnapshot.totalFilesScanned, 1);
 });
 
+
+
+test('tree-structure-advisor consumes occurrence-derived file paths for owned-slice boundary drift reasoning', () => {
+  const fromOccurrenceSnapshot = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: ['doc/README.md'],
+    occurrenceSnapshot: {
+      scopeRoots: ['calculogic-validator'],
+      occurrenceRecords: [
+        {
+          resolvedPath: 'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.logic.mjs',
+          occurrenceType: 'file',
+        },
+        {
+          resolvedPath: 'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.wiring.mjs',
+          occurrenceType: 'file',
+        },
+      ],
+    },
+    topLevelDirectoryNames: [],
+    targets: [],
+  });
+
+  const withoutOccurrenceSnapshot = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: [
+      'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.logic.mjs',
+      'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.wiring.mjs',
+    ],
+    topLevelDirectoryNames: [],
+    targets: [],
+  });
+
+  const fromSnapshotBoundaryDrift = fromOccurrenceSnapshot.findings.filter(
+    (finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT',
+  );
+  const fromSelectedPathsBoundaryDrift = withoutOccurrenceSnapshot.findings.filter(
+    (finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT',
+  );
+
+  assert.deepEqual(fromSnapshotBoundaryDrift, fromSelectedPathsBoundaryDrift);
+  assert.equal(fromSnapshotBoundaryDrift.length, 1);
+});
+
+test('tree-structure-advisor occurrence-derived boundary drift reasoning remains stable for repeated-name subtree paths', () => {
+  const result = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: ['doc/README.md'],
+    occurrenceSnapshot: {
+      scopeRoots: ['calculogic-validator'],
+      occurrenceRecords: [
+        {
+          resolvedPath: 'calculogic-validator/src/src-helper/src-helper.logic.mjs',
+          occurrenceType: 'file',
+        },
+        {
+          resolvedPath: 'calculogic-validator/src/src-helper/src-helper.wiring.mjs',
+          occurrenceType: 'file',
+        },
+      ],
+    },
+    topLevelDirectoryNames: [],
+    targets: [],
+  });
+
+  const driftFinding = result.findings.find((finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT');
+
+  assert.ok(driftFinding);
+  assert.equal(driftFinding.path, 'calculogic-validator/src/src-helper/');
+  assert.deepEqual(driftFinding.details.matchedOwnedSignalPaths, [
+    'calculogic-validator/src/src-helper/src-helper.logic.mjs',
+    'calculogic-validator/src/src-helper/src-helper.wiring.mjs',
+  ]);
+});
+
+test('tree-structure-advisor occurrence-derived boundary drift reasoning remains stable for rebased scope roots', () => {
+  const result = runTreeStructureAdvisorRuntime({
+    scope: 'validator',
+    selectedPaths: ['doc/README.md'],
+    occurrenceSnapshot: {
+      scopeRoots: ['calculogic-validator/tree'],
+      occurrenceRecords: [
+        {
+          resolvedPath: 'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.logic.mjs',
+          occurrenceType: 'file',
+          scopeRootPath: 'calculogic-validator/tree',
+          isScopeTopOccurrence: false,
+        },
+        {
+          resolvedPath: 'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.wiring.mjs',
+          occurrenceType: 'file',
+          scopeRootPath: 'calculogic-validator/tree',
+          isScopeTopOccurrence: false,
+        },
+      ],
+    },
+    topLevelDirectoryNames: [],
+    targets: ['calculogic-validator/tree'],
+  });
+
+  const driftFinding = result.findings.find((finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT');
+
+  assert.ok(driftFinding);
+  assert.equal(driftFinding.path, 'calculogic-validator/src/tree-structure-advisor/');
+});
+
+test('tree-structure-advisor falls back to selectedPaths when occurrence snapshot is malformed', () => {
+  const result = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: [
+      'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.logic.mjs',
+      'calculogic-validator/src/tree-structure-advisor/tree-structure-advisor.wiring.mjs',
+    ],
+    occurrenceSnapshot: {
+      occurrenceRecords: 'malformed',
+    },
+    topLevelDirectoryNames: [],
+    targets: [],
+  });
+
+  assert.equal(
+    result.findings.some((finding) => finding.code === 'TREE_OWNED_SLICE_BOUNDARY_DRIFT'),
+    true,
+  );
+});
+
 test('tree-structure-advisor prepared runtime contract accepts tree-core inputs without contributors', () => {
   const result = runTreeStructureAdvisorRuntime({
     scope: 'repo',
