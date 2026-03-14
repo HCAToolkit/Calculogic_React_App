@@ -168,6 +168,30 @@ Conceptual signal candidates for this phase (concept-first, field-name-flexible)
 
 Guardrail: this spec intentionally does not over-commit exact runtime field names in this tranche.
 
+### 6.1 Bounded semantic-family interpretation grammar notes (report-first)
+
+Interpretation in this phase may apply bounded grammar-like guidance for semantic-family normalization.
+
+Connector-token guidance:
+
+- Connector tokens such as `and`, `or`, `with` (or similar connective forms) may be treated as low-weight connector tokens in semantic-family interpretation.
+- Connector tokens do not become family roots.
+- Connector tokens may justify keeping adjacent semantic tokens joined as one normalized subgroup phrase rather than treating them as a loose list or as multiple equally primary subgroups.
+- Absence of connector tokens may increase ambiguity or list-like interpretation pressure.
+- This is a report-first interpretation rule/policy surface in this phase, not a strict runtime law yet.
+
+Descriptor-token guidance:
+
+- Some tokens may function as adjacent semantic descriptors rather than isolated list items.
+- Example: `occurrence-model` may be interpreted as one connected subgroup unit, with `model` acting as a descriptor-style token adjacent to `occurrence`.
+- Descriptor-style token behavior may justify preserving adjacent terms as a connected subgroup phrase.
+- This is interpretation guidance, not final hard-coded runtime grammar in this tranche.
+
+Future policy direction (deferred):
+
+- These interpretation rules may later live in naming-owned semantic-family interpretation policy, registry-backed interpretation surfaces, and customizable commands/overrides.
+- That policy/customization expansion is intentionally deferred until customization commands are no longer deferred and report maturity is stronger.
+
 Ownership clarification (naming-owned derived outputs):
 
 - `semanticName`
@@ -267,21 +291,22 @@ Illustrative semantic-name interpretation snapshot (report-first phase):
 - Layering note:
   - Full semantic-name candidate (`tree-occurrence-model-and-addressing`) remains the broad descriptive semantic lane.
   - `semanticFamily` is the bounded grouping signal interpreted inside that semantic lane, not the lane repeated verbatim.
-- `semanticFamily`: `tree-occurrence-model` (bounded family grouping label, narrower than the full semantic-name candidate)
-- `familyRoot`: `tree` (dominant grouping anchor across related tree docs; narrower than `semanticFamily`)
-- Candidate `familySubgroup` interpretations (ambiguity preserved):
-  - `occurrence-model`
-  - `addressing`
-  - `occurrence-model-and-addressing` (bounded combined alternative)
+- `semanticFamily`: `tree` (primary bounded family grouping label)
+- `familyRoot`: `tree` (dominant grouping anchor across related tree docs)
+- Primary normalized `familySubgroup`: `occurrence-model-and-addressing`
+  - connector-token rationale: `and` is treated as a low-weight connector token that justifies keeping nearby semantic terms joined as one normalized subgroup phrase.
+  - descriptor-token rationale: `model` is treated as a descriptor-like adjacent token that justifies preserving `occurrence-model` as a connected unit inside the subgroup phrase.
+- Secondary ambiguity notes (non-primary, report-first):
+  - lower-confidence fragment candidate: `occurrence-model`
+  - lower-confidence fragment candidate: `addressing`
 - Candidate `relatedSemanticNames` (run-scoped and interpretation-dependent):
   - `tree-structural-vocabulary-and-root-classification-spec`
   - `tree-registry-definitions-and-relationships-spec`
 
-Connective-token note (`and`):
+Connector/descriptor interpretation note for this example:
 
-- Connective tokens such as `and` may still be preserved in `semanticTokens`.
-- They may carry lower interpretive weight or connective meaning relative to domain anchors.
-- They should not automatically be promoted to dominant family anchors.
+- Connector token `and` is preserved in `semanticTokens` as low-weight connective meaning and is not promoted to a family root.
+- Descriptor-style use of `model` helps preserve `occurrence-model` adjacency while still normalizing the primary subgroup as one connected phrase: `occurrence-model-and-addressing`.
 
 Boundary reinforcement:
 
