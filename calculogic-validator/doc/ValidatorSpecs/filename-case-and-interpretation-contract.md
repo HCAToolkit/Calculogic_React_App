@@ -8,6 +8,8 @@ This contract is intentionally shape-level and cross-slice oriented. It does **n
 
 Classification: Normative
 
+Authority posture note: This is a bounded normative supporting spec in naming documentation maps; it remains a shared contract lane and does not replace primary canonical naming authorities.
+
 ## 2) Scope and Ownership Boundary
 
 - This is a **suite-level shared-contract** document.

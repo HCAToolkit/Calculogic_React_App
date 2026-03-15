@@ -42,7 +42,8 @@ Use this sequence for naming implementation tasks (runtime behavior, wiring/cont
 Interpretation notes:
 
 - Runtime/spec authority comes from the suite contract, naming slice spec, and explicit canonical contracts.
-- Supporting and transitional docs provide implementation context and migration routing; they do not redefine canonical behavior.
+- Bounded normative supporting specs provide active interpretation/model constraints for their lane, but they do not supersede primary canonical authorities.
+- Repo-local supporting implementation notes and transitional inventories provide local context/routing only; they do not redefine canonical behavior.
 - This map is navigation metadata only.
 
 ## Inventory (Bounded Naming-Adjacent Set)
@@ -53,10 +54,10 @@ Interpretation notes:
 | `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md` | Naming-slice runtime/spec authority | **Canonical slice spec** | Naming runtime behavior/spec implementation and validation | **Stay put** | **Keep** |
 | `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` | Naming grammar/taxonomy authority (filename grammar + role/category/status vocabulary) | **Canonical contract** (cross-slice naming authority) | Naming taxonomy/governance, classification semantics, change-control | **Stay put** | **Keep** |
 | `calculogic-validator/doc/ValidatorSpecs/validator-config-spec.md` | Validator config semantics authority | **Canonical contract** (config) | Config modeling, schema/runtime strictness, merge/normalization behavior | **Stay put** | **Keep** |
-| `calculogic-validator/doc/ValidatorSpecs/filename-case-and-interpretation-contract.md` | Shared filename interpretation and case-policy contract surface | **Supporting implementation guidance** for naming routing in this map | Cross-slice interpretation vocabulary, implementation alignment context | **Stay put** | **Reference only** |
-| `calculogic-validator/doc/ValidatorSpecs/naming-semantic-name-and-role-disambiguation-spec.md` | Naming interpretation spec for semantic-name vs role disambiguation | **Supporting implementation guidance** | Naming interpretation implementation tasks and bounded design alignment | **Stay put** | **Keep; split later only if scanability degrades materially** |
-| `calculogic-validator/doc/ValidatorSpecs/naming-semantic-family-and-interpretation-spec.md` | Naming interpretation spec for semantic-family semantics | **Supporting implementation guidance** | Naming interpretation implementation tasks and bounded design alignment | **Stay put** | **Keep; do not merge into master list authority** |
-| `calculogic-validator/doc/ValidatorSpecs/registry-model-and-slice-interaction-spec.md` | Naming registry model and slice interaction reference | **Supporting implementation guidance** | Wiring/modeling decisions and slice-boundary context | **Stay put** | **Keep; consider later split by concern only if document growth harms scanability** |
+| `calculogic-validator/doc/ValidatorSpecs/filename-case-and-interpretation-contract.md` | Shared filename interpretation and case-policy contract surface | **Bounded normative supporting spec** (shared contract lane; non-primary canonical authority in this map) | Cross-slice interpretation vocabulary, implementation alignment context | **Stay put** | **Reference and maintain as bounded supporting contract lane** |
+| `calculogic-validator/doc/ValidatorSpecs/naming-semantic-name-and-role-disambiguation-spec.md` | Naming interpretation spec for semantic-name vs role disambiguation | **Bounded normative supporting spec** | Naming interpretation implementation tasks and bounded design alignment | **Stay put** | **Keep; split later only if scanability degrades materially** |
+| `calculogic-validator/doc/ValidatorSpecs/naming-semantic-family-and-interpretation-spec.md` | Naming interpretation spec for semantic-family semantics | **Bounded normative supporting spec** (active for documentation-first modeling) | Naming interpretation implementation tasks and bounded design alignment | **Stay put** | **Keep; do not merge into master list authority** |
+| `calculogic-validator/doc/ValidatorSpecs/registry-model-and-slice-interaction-spec.md` | Naming registry model and slice interaction reference | **Bounded normative supporting spec** (suite-level model constraints) | Wiring/modeling decisions and slice-boundary context | **Stay put** | **Keep; consider later split by concern only if document growth harms scanability** |
 | `doc/nl-config/cfg-namingValidator.md` | Repo-local naming NL/config note | **Supporting implementation guidance** (repo-local/external to validator-owned canonical set) | Implementation sequencing/context for local repo tasks | **Stay put** | **Reference only** |
 | `calculogic-validator/doc/naming-compatibility-inventory.md` | Naming migration/compatibility snapshot | **Transitional inventory** | Migration context, retirements, follow-up hardening routing | **Stay put** | **Keep as transitional inventory** |
 | `calculogic-validator/doc/ValidatorSpecs/naming-documentation-map-and-reorg-inventory.md` | Naming routing and bounded reorg map | **Transitional inventory** | First-stop navigation for naming documentation and ownership decisions | **Stay put** | **Keep and maintain** |
@@ -72,7 +73,7 @@ Interpretation notes:
 - Keep `ValidatorSuite-Contracts-And-Modes.md` as suite-owned canonical authority in `ConventionRoutines`.
 - Keep `NamingValidatorSpec.md` as naming-slice canonical runtime/spec authority in `ConventionRoutines`.
 - Keep `FileNamingMasterList-V1_1.md` as canonical naming grammar/taxonomy authority in `ConventionRoutines`.
-- Keep naming interpretation specs and registry interaction spec in `ValidatorSpecs` as implementation-facing supporting specs.
+- Keep naming interpretation specs and registry interaction spec in `ValidatorSpecs` as bounded normative supporting specs (implementation-facing, non-primary canonical).
 - Keep transitional inventories (`naming-compatibility-inventory.md` and this map) as transitional artifacts, not canonical behavior authorities.
 
 ### Reference-only posture
