@@ -42,7 +42,9 @@ Authority labels used in this index:
 - `doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
   **Authority:** canonical slice spec (tree). **Intended use:** normative tree-slice runtime/spec behavior for diagnostics and snapshot-driven structure checks.
 
-## 4) Supporting implementation guidance (non-canonical runtime authority)
+## 4) Non-canonical implementation/spec guidance
+
+### 4.1 Bounded normative supporting specs
 
 - `doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
   **Authority:** bounded normative supporting spec. **Intended use:** shared filename interpretation/case-policy contract lane for cross-slice alignment; defer primary runtime authority to suite contract + slice specs.
@@ -55,6 +57,8 @@ Authority labels used in this index:
 
 - `doc/ValidatorSpecs/registry-model-and-slice-interaction-spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** suite-level registry model/interaction constraints for implementation design and ownership boundaries; defer primary runtime authority to canonical contracts/slice specs.
+
+### 4.2 Supporting implementation guidance
 
 - `doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
   **Authority:** supporting implementation guidance. **Intended use:** tree NL/config implementation context and sequencing notes; defer runtime authority to suite contract + tree slice spec.
