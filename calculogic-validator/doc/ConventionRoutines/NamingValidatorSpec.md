@@ -114,7 +114,7 @@ Parsing assumptions:
 
 ## Input Scope Profiles (V0.1.2)
 
-V0.1.2 implements deterministic scope profiles selected by CLI.
+V0.1.2 implements deterministic scope profiles selected by CLI, using suite-owned scope-profile runtime data.
 
 Scope profile ownership model for this slice:
 
@@ -301,18 +301,27 @@ Rule ID note (canonical linkage):
 - map `code` to canonical `ruleId` for suite-wide contracts and future slice alignment
 - canonical contract reference: [`ValidatorRuleIds-Contract.md`](./ValidatorRuleIds-Contract.md)
 
-Report object includes:
+Report object includes (canonical current contract for naming slice output):
 
 - `mode`
+- `validatorId`
+- `toolVersion` (plus transitional `validatorVersion` alias)
+- `sourceSnapshot`
+- `startedAt` / `endedAt` / `durationMs`
 - `scope`
 - `totalFilesScanned`
-- summary count objects
+- `filters`
+- `scopeSummary`
+- `scopeContract`
+- summary count objects (`counts`, `codeCounts`, `specialCaseTypeCounts`, `warningRoleStatusCounts`, `warningRoleCategoryCounts`)
 - `findings`
 
-When `--config=<path>` is supplied, report metadata may also include:
+When `--config=<path>` is supplied, report metadata may include:
 
 - `configDigest`
-  - emitted by the CLI when config input is active
+- `registryState`
+- `registrySource`
+- `registryDigests`
 
 ### Special-case subtype metadata
 
@@ -336,11 +345,12 @@ When a canonical-like parse resolves to a known deprecated role (currently `view
   - optional `deprecationNote`
 - validator does not auto-map deprecated role to modern roles (manual migration required)
 
-## Finding / Error Codes (V0.1.2)
+## Finding / Error Codes (V0.1.2 current runtime set)
 
 - `NAMING_CANONICAL`
 - `NAMING_ALLOWED_SPECIAL_CASE`
 - `NAMING_LEGACY_EXCEPTION`
+- `NAMING_MISSING_ROLE`
 - `NAMING_UNKNOWN_ROLE`
 - `NAMING_DEPRECATED_ROLE`
 - `NAMING_BAD_SEMANTIC_CASE`
@@ -361,7 +371,7 @@ Naming V0.1.7 currently implements:
   - invalid CLI usage (e.g., unknown `--scope`) exits `1`
 
 `--strict` in this naming slice is an exit-policy modifier, not a separate detection mode. See [`ValidatorSuite-Contracts-And-Modes.md`](./ValidatorSuite-Contracts-And-Modes.md) for canonical policy framing.
-When both CLI and config are present, CLI `--strict` has precedence for strict-exit resolution.
+When both CLI and config are present, CLI `--strict` has precedence for strict-exit resolution. Config-only strict exit is currently `strictExit=true` with no CLI `--strict` required.
 
 Suite policy options are shared contracts but deferred for naming implementation:
 

@@ -8,7 +8,7 @@ The naming validator remains **report-first** for detection and findings emissio
 
 ## 1) Purpose
 
-This spec defines the canonical validator config contract for current naming-validator usage. The config provides strict, deterministic input for registry shaping (reportable extension additions and role metadata additions) and reproducible report metadata.
+This spec defines the canonical validator config contract for current suite runtime behavior. The config provides strict, deterministic input for naming registry shaping (reportable extension additions, role metadata additions, case-rules style) and reproducible report metadata.
 
 ## 2) Versioning
 
@@ -120,7 +120,7 @@ Current naming wiring applies normalized config additively:
 - active roles are derived from merged metadata where `status === "active"`.
 - role suffix list is derived from merged role keys sorted by descending string length.
 
-## 8) CLI consumption
+## 8) CLI consumption (current implementation policy)
 
 Config flag (exact form):
 
@@ -132,7 +132,12 @@ Current failure modes when config is supplied:
 - cannot parse JSON → error
 - invalid config shape/content → error
 
-When a valid config is supplied, naming reports may include:
+Current runtime support boundaries:
+
+- `validate:naming` and `validate:all` load/validate/normalize config and forward naming-supported surfaces.
+- `validate:tree` currently accepts `--config` and computes `configDigest` but does not apply tree-specific config semantics yet (deferred/planning for tree config surfaces).
+
+When a valid config is supplied, emitted reports may include:
 
 - `configDigest`
 
@@ -142,11 +147,6 @@ Strict-exit resolution for naming CLI uses existing exit-policy semantics:
 - Otherwise, effective strictness is `true` when `config.strictExit === true`.
 - Otherwise, effective strictness is `false`.
 - Report JSON is emitted before exit code is derived/applied.
-
-This behavior applies to:
-
-- `calculogic-validator/scripts/validate-naming.mjs`
-- `calculogic-validator/bin/calculogic-validate-naming.mjs`
 
 ## 9) Valid examples
 

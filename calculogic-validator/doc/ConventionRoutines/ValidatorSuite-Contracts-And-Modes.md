@@ -8,7 +8,7 @@ Status labeling note for this document:
 
 ## 1) Identity and Vocabulary (Canonical)
 
-Calculogic Validator is a modular, configurable, policy-driven validator suite. It is report-first by default and can optionally escalate findings via soft-fail/hard-fail policies or execute deterministic fix plans (correct/replace) when explicitly enabled.
+Calculogic Validator is a modular, configurable, policy-driven validator suite. **Current implementation policy** is report-mode execution with policy-derived exit behavior. Shared suite mode vocabulary also includes deferred policy/fix modes (`soft-fail`, `hard-fail`, `correct`, `replace`) as canonical contract terms, but those modes are not yet implemented as executable runtime modes.
 
 Canonical terms:
 
@@ -23,10 +23,10 @@ Canonical terms:
 Suite-wide policies over the same findings:
 
 - `report`: report findings first; exit behavior may still be policy-driven.
-- `soft-fail`: report findings and fail only under configured soft-fail thresholds/scope gates.
-- `hard-fail`: report findings and fail deterministically on configured hard-fail conditions.
-- `correct`: execute explicitly allowed safe fix plans in addition to reporting.
-- `replace`: execute explicitly allowed structural fix plans in addition to reporting.
+- `soft-fail`: deferred/planning-only mode label for threshold/gate-based failure policy.
+- `hard-fail`: deferred/planning-only mode label for deterministic hard-fail policy.
+- `correct`: deferred/planning-only mode label for explicitly allowed safe fix-plan execution.
+- `replace`: deferred/planning-only mode label for explicitly allowed structural fix-plan execution.
 
 Normative rule:
 
@@ -58,9 +58,15 @@ For canonical loader → converter → runtime ownership boundaries (including w
 Current implementation policy:
 
 - any `warn` findings => exit `2`
-- when no `warn` findings exist, `--strict` with any `legacy-exception` findings => exit `1`
+- when no `warn` findings exist, effective strict mode with any `legacy-exception` findings => exit `1`
 - otherwise => exit `0`
 - invalid CLI usage => exit `1`
+
+Strictness resolution in current implementation:
+
+- `validate:naming`: effective strict mode is enabled by CLI `--strict` or config `strictExit=true`.
+- `validate:all`: effective strict mode is enabled by CLI `--strict`.
+- `validate:tree`: does not currently expose strict-mode toggling.
 
 This is the current implementation policy and may later be generalized under suite modes (`soft-fail` / `hard-fail` / `correct` / `replace`), while detection remains unchanged.
 
@@ -133,38 +139,23 @@ Guardrail: the helper does not own slice meaning. Slice runtimes remain responsi
 
 Cross-slice validators should start from this shared scoped snapshot/input layer before applying cross-slice interpretation rules.
 
-## 7) Shared Report Envelope (Canonical)
+## 7) Shared report-envelope boundary (Canonical + transitional/current mapping)
 
-This document defines the suite-level shape contract. For the canonical full schema reference (including slice report vs runner report envelopes, finding baseline shape, and deterministic ordering rules), see [`ValidatorReportSchema-V0_1.md`](./ValidatorReportSchema-V0_1.md).
+Suite-level envelope authority is intentionally minimal here. Primary schema authority is [`ValidatorReportSchema-V0_1.md`](./ValidatorReportSchema-V0_1.md).
 
-Each validator slice should emit a stable high-level report envelope:
+Canonical suite-level boundary:
 
-- `validatorId`
-- `validatorVersion`
-- `mode`
-- `scope`
-- `targets[]` (optional)
-- `sourceSnapshot` (snapshot metadata only: filesystem state and/or git reference such as `HEAD`; dirty/untracked diagnostics are metadata)
-- `configFingerprint` (hash/fingerprint of resolved config)
-- `summary` (stable counts)
-- `findings[]` (deterministically sorted)
-- `suggestedFix[]` (optional; when fix planning is enabled)
-- `appliedFix[]` (optional; only when fixes are actually executed)
+- successful report runs emit structured JSON to `stdout`
+- envelope includes validator identity, report mode, reproducibility metadata, timing metadata, and deterministic findings payloads
+- runner envelope (`validatorId: "runner"`) composes deterministic per-slice entries under `validators[]`
 
-`sourceSnapshot` values are environment metadata for reproducibility and comparison, not naming roles and not detection categories.
+Current implementation mapping note:
 
-This contract is intentionally shape-level so slices can add deterministic details while preserving suite-wide comparability.
+- current emitted config digest field is `configDigest`
+- `validatorVersion` is emitted as a transitional compatibility alias with `toolVersion`
+- envelope-level fix-plan arrays are deferred/planning only and are not currently emitted
 
-### Current report mapping (naming slice)
-
-Canonical envelope is the stable suite contract; some slices currently emit equivalent fields under different names until runner unification.
-
-- `validatorVersion` → `toolVersion`
-- `validatorId` → `validatorId`
-- `configFingerprint` → `configDigest`
-- `summary` → `counts` + `codeCounts` (plus deterministic naming-specific breakdowns such as `specialCaseTypeCounts` and warning-category/status counts)
-- `findings[]` → `findings[]`
-- `sourceSnapshot` → `sourceSnapshot`
+`sourceSnapshot` remains reproducibility metadata only (`source`, optional git ref/sha and diagnostics), not semantic finding content.
 
 ## 8) Shared Determinism Rules (Canonical)
 
