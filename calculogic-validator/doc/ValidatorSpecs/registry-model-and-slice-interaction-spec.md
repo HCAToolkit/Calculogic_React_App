@@ -3,6 +3,7 @@
 - **Classification:** Normative
 - **Applies to:** Calculogic validator suite registry modeling and cross-slice registry interaction.
 - **Status:** Active suite-level contract.
+- **Authority posture note:** Bounded normative supporting spec for slice modeling/interaction in naming documentation maps; does not supersede primary canonical naming authorities.
 
 ## Purpose
 

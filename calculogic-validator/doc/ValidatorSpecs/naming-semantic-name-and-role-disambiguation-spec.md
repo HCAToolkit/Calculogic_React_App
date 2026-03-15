@@ -10,6 +10,8 @@ In this scope, semantic name is treated as a major naming interpretation lane di
 
 Classification: Normative
 
+Authority posture note: This is a bounded normative supporting spec for naming interpretation specialization; it does not supersede primary canonical naming authorities.
+
 ## 2) Relationship to Shared Contract and Ownership
 
 Inherited shared concepts come from:

@@ -6,6 +6,7 @@ Authority labels used in this index:
 
 - **Canonical contract**: suite-wide normative contract; controls runtime-facing semantics within stated scope.
 - **Canonical slice spec**: slice-owned normative behavior/spec authority.
+- **Bounded normative supporting spec**: active normative/spec guidance for a bounded lane; non-primary authority that must defer to canonical contracts/slice specs.
 - **Supporting implementation guidance**: implementation context only; does not redefine runtime authority.
 - **Draft**: governance-in-progress or scoped draft assumptions; non-final authority outside explicitly closed scope.
 - **Audit**: snapshot verification artifact; records findings at a point in time.
@@ -42,6 +43,18 @@ Authority labels used in this index:
   **Authority:** canonical slice spec (tree). **Intended use:** normative tree-slice runtime/spec behavior for diagnostics and snapshot-driven structure checks.
 
 ## 4) Supporting implementation guidance (non-canonical runtime authority)
+
+- `doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** shared filename interpretation/case-policy contract lane for cross-slice alignment; defer primary runtime authority to suite contract + slice specs.
+
+- `doc/ValidatorSpecs/naming-semantic-name-and-role-disambiguation-spec.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** naming semantic-name vs role-token disambiguation interpretation guidance; supports implementation and modeling without replacing canonical slice authority.
+
+- `doc/ValidatorSpecs/naming-semantic-family-and-interpretation-spec.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** active documentation-first semantic-family modeling tranche for naming interpretation; runtime behavior remains governed by canonical authorities unless implemented.
+
+- `doc/ValidatorSpecs/registry-model-and-slice-interaction-spec.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** suite-level registry model/interaction constraints for implementation design and ownership boundaries; defer primary runtime authority to canonical contracts/slice specs.
 
 - `doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
   **Authority:** supporting implementation guidance. **Intended use:** tree NL/config implementation context and sequencing notes; defer runtime authority to suite contract + tree slice spec.

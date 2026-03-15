@@ -3,6 +3,7 @@
 - **Classification:** Normative
 - **Applies to:** Naming-slice semantic-name interpretation extensions.
 - **Status:** Active for documentation-first modeling; runtime implementation deferred.
+- **Authority posture note:** Bounded normative supporting spec for naming interpretation modeling; does not supersede primary canonical naming authorities.
 
 ## 1) Purpose
 
