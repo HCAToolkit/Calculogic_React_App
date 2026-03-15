@@ -2,60 +2,81 @@
 
 Purpose: quick routing map for validator documentation so readers can distinguish canonical contracts from drafts and implementation notes.
 
-## 1) Canonical suite contracts
+Authority labels used in this index:
+
+- **Canonical contract**: suite-wide normative contract; controls runtime-facing semantics within stated scope.
+- **Canonical slice spec**: slice-owned normative behavior/spec authority.
+- **Supporting implementation guidance**: implementation context only; does not redefine runtime authority.
+- **Draft**: governance-in-progress or scoped draft assumptions; non-final authority outside explicitly closed scope.
+- **Audit**: snapshot verification artifact; records findings at a point in time.
+- **Transitional inventory**: migration/routing context; not runtime/spec authority.
+
+## 1) Canonical contract (suite-wide)
 
 - `doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
-  Canonical suite-wide contract for report-first semantics, mode vocabulary, report envelope, and exit-policy framing, including canonical-envelope-to-current naming-slice report mapping notes. Read this first when interpreting validator behavior.
+  **Authority:** canonical contract. **Intended use:** first-read suite authority for report-first semantics, mode vocabulary, report envelope, and exit-policy framing.
 
 - `doc/ConventionRoutines/ValidatorReportSchema-V0_1.md`
-  Canonical schema reference for validator JSON output envelopes (slice report and runner report), including deterministic field and ordering expectations.
+  **Authority:** canonical contract. **Intended use:** normative schema for validator JSON output envelopes (slice + runner), including deterministic field/order expectations.
 
 - `doc/ConventionRoutines/ValidatorRuleIds-Contract.md`
-  Canonical rule ID contract for stable finding identifiers and rule-to-document linkage via `ruleRef`.
+  **Authority:** canonical contract. **Intended use:** normative rule-ID contract for stable finding IDs and `ruleRef` linkage.
 
 - `doc/ConventionRoutines/ValidatorHelperAreas-And-Reuse-Conventions.md`
-  Canonical helper-area ownership and reuse guide for current validator helper surfaces (`src/core/cli/`, `naming/src/cli/`, `naming/src/health/`) and anti-generic-folder conventions.
+  **Authority:** canonical contract. **Intended use:** normative helper ownership/reuse boundaries for validator helper surfaces.
 
-## 2) Canonical config contract
+## 2) Canonical contract (config)
 
 - `doc/ValidatorSpecs/validator-config-spec.md`
-  Canonical config contract (report-only input, strict schema/validation, normalization + merge semantics, CLI `--config` behavior).
+  **Authority:** canonical contract. **Intended use:** normative config semantics (report-only input, strict schema/validation, normalization + merge semantics, CLI `--config` behavior).
 
-## 3) Naming
+## 3) Canonical slice specs
 
 - `doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
-  Canonical naming authority (roles, grammar, exception policy, rollout guidance). Read when defining or reviewing naming rules.
+  **Authority:** canonical contract (cross-slice naming authority). **Intended use:** normative source for filename grammar, role/category/status vocabulary, exception policy, and naming change-control.
 
 - `doc/ConventionRoutines/NamingValidatorSpec.md`
-  Naming-slice validator spec (scope profiles, classification contract, report details, current report/strict exit behavior), including the current runtime category vocabulary for naming role metadata. Read when implementing or validating naming checks.
-
-## 4) Tree advisor
+  **Authority:** canonical slice spec (naming). **Intended use:** normative naming-slice behavior/spec for scope profiles, classification contract, report details, and strict-exit behavior.
 
 - `doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
-  Tree-structure advisor validator spec. Read when working on tree diagnostics and snapshot-driven structure checks.
+  **Authority:** canonical slice spec (tree). **Intended use:** normative tree-slice runtime/spec behavior for diagnostics and snapshot-driven structure checks.
 
-## 5) Structural addressing
+## 4) Supporting implementation guidance (non-canonical runtime authority)
 
-- `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
-  Draft structural-addressing spec. Read for addressing model details; treat as draft/governance-in-progress, not naming authority.
-
-## 6) Implementation notes (non-canonical / external)
+- `doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
+  **Authority:** supporting implementation guidance. **Intended use:** tree NL/config implementation context and sequencing notes; defer runtime authority to suite contract + tree slice spec.
 
 - `doc/nl-config/cfg-namingValidator.md`
-  Non-canonical implementation notes for NL/config context in this repo. Use for implementation context only; defer normative behavior to canonical validator-owned docs under `calculogic-validator/doc/...`.
+  **Authority:** supporting implementation guidance (repo-local/external to validator-owned canonical set). **Intended use:** local implementation context only; defer normative behavior to validator-owned canonical docs.
 
-## 7) Drafts / ValidatorSpecs
+## 5) Transitional inventories / migration routing
+
+- `doc/ValidatorSpecs/tree-documentation-map-and-reorg-inventory.md`
+  **Authority:** transitional inventory. **Intended use:** tree-document routing/ownership guidance and bounded reorg context; does not define runtime behavior.
+
+- `doc/naming-compatibility-inventory.md`
+  **Authority:** transitional inventory. **Intended use:** naming runtime compatibility/migration tracking; does not define runtime behavior or naming-spec authority.
+
+## 6) Drafts
+
+- `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
+  **Authority:** draft. **Intended use:** structural-addressing modeling guidance while governance decisions remain in progress.
 
 - `doc/ValidatorSpecs/registry-customization-state-system-draft.md`
-  Draft spec for built-in vs custom registry state, customization commands, and digest-based default/custom switching (report-only).
+  **Authority:** draft. **Intended use:** draft spec for built-in vs custom registry state and customization commands (report-only).
 
-## 8) Audits
+## 7) Audits (snapshot artifacts)
 
 - `doc/Audits/current-validator-shim-audit.md`
-  Earlier shim audit snapshot (pre/post-hardening transition context).
+  **Authority:** audit snapshot. **Intended use:** earlier shim audit context for pre/post-hardening transition.
 
 - `doc/Audits/post-hardening-validator-shim-audit.md`
-  Current post-hardening re-audit comparing manually confirmed shim/shim-like inventory vs `validate:tree -- --scope=validator`, including hardened carveout validation and remaining follow-up opportunities.
+  **Authority:** audit snapshot. **Intended use:** post-hardening shim re-audit vs `validate:tree -- --scope=validator`.
 
 - `doc/Audits/final-state-validator-shim-verification-audit.md`
-  Final-state verification audit after detector-noise cleanup, confirming self-flag removal, preserved thin re-export debt detection (15), preserved canonical/public carveouts, and no new false positives or missed high-confidence shim debt.
+  **Authority:** audit snapshot. **Intended use:** final-state verification audit after detector-noise cleanup.
+
+## 8) Maintenance note
+
+- When adding a new validator doc, classify it in this index using one of the authority labels above.
+- If a document changes authority level (for example draft -> canonical slice spec), update this index in the same change set.

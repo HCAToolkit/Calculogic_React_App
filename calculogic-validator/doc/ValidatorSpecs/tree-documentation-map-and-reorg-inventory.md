@@ -1,5 +1,15 @@
 # Tree Documentation Map and Reorg Inventory
 
+Status/Authority:
+- **Status:** Transitional inventory (bounded reorg/routing metadata, current snapshot).
+- **Authority level:** Transitional inventory (non-canonical for runtime behavior).
+- **Intended use:** Route tree-adjacent docs, clarify ownership boundaries, and record "stay put" vs bounded move decisions.
+- **Does not control:** Tree runtime behavior, suite report/exit semantics, or naming/runtime contract definitions.
+- **Defer to (if conflict):**
+  - `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` (suite canonical contract)
+  - `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md` (tree canonical slice spec)
+  - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md` (naming canonical slice spec when naming boundaries are implicated)
+
 ## Purpose
 
 This document provides one bounded, implementation-facing navigation map for tree-adjacent documentation.
@@ -7,7 +17,7 @@ This document provides one bounded, implementation-facing navigation map for tre
 It is intended to:
 
 - identify what documents currently exist for the tree implementation slice,
-- distinguish canonical authority implementation guidance from supporting references,
+- distinguish canonical runtime/spec authority from supporting references,
 - make explicit “stay put for now” vs “move/split/merge later” decisions,
 - reduce ambiguity for human maintainers and Codex task setup before any physical folder reorganization.
 
