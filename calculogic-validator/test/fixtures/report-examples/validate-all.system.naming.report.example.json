@@ -1,0 +1,134 @@
+{
+  "version": "0.1.0",
+  "mode": "report",
+  "scope": "system",
+  "validatorId": "runner",
+  "toolVersion": "0.1.0",
+  "validatorVersion": "0.1.0",
+  "sourceSnapshot": {
+    "source": "fs",
+    "gitRef": "HEAD",
+    "gitHeadSha": "<git-head-sha>",
+    "diagnostics": {
+      "isDirty": false,
+      "changedCount": 0,
+      "untrackedCount": 0
+    }
+  },
+  "startedAt": "<iso-startedAt>",
+  "endedAt": "<iso-endedAt>",
+  "durationMs": 0,
+  "validators": [
+    {
+      "id": "naming",
+      "validatorId": "naming",
+      "description": "Filename naming validator (report-mode).",
+      "scope": "system",
+      "totalFilesScanned": 7,
+      "counts": {
+        "canonical": 0,
+        "allowed-special-case": 7,
+        "legacy-exception": 0,
+        "invalid-ambiguous": 0
+      },
+      "codeCounts": {
+        "NAMING_ALLOWED_SPECIAL_CASE": 7
+      },
+      "specialCaseTypeCounts": {
+        "ecosystem-required": 7
+      },
+      "warningRoleStatusCounts": {},
+      "warningRoleCategoryCounts": {},
+      "findings": [
+        {
+          "code": "NAMING_ALLOWED_SPECIAL_CASE",
+          "severity": "info",
+          "path": "eslint.config.mjs",
+          "classification": "allowed-special-case",
+          "message": "Filename matches an allowed reserved/special-case pattern.",
+          "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12",
+          "details": {
+            "specialCaseType": "ecosystem-required"
+          }
+        },
+        {
+          "code": "NAMING_ALLOWED_SPECIAL_CASE",
+          "severity": "info",
+          "path": "package-lock.json",
+          "classification": "allowed-special-case",
+          "message": "Filename matches an allowed reserved/special-case pattern.",
+          "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12",
+          "details": {
+            "specialCaseType": "ecosystem-required"
+          }
+        },
+        {
+          "code": "NAMING_ALLOWED_SPECIAL_CASE",
+          "severity": "info",
+          "path": "package.json",
+          "classification": "allowed-special-case",
+          "message": "Filename matches an allowed reserved/special-case pattern.",
+          "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12",
+          "details": {
+            "specialCaseType": "ecosystem-required"
+          }
+        },
+        {
+          "code": "NAMING_ALLOWED_SPECIAL_CASE",
+          "severity": "info",
+          "path": "tsconfig.app.json",
+          "classification": "allowed-special-case",
+          "message": "Filename matches an allowed reserved/special-case pattern.",
+          "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12",
+          "details": {
+            "specialCaseType": "ecosystem-required"
+          }
+        },
+        {
+          "code": "NAMING_ALLOWED_SPECIAL_CASE",
+          "severity": "info",
+          "path": "tsconfig.json",
+          "classification": "allowed-special-case",
+          "message": "Filename matches an allowed reserved/special-case pattern.",
+          "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12",
+          "details": {
+            "specialCaseType": "ecosystem-required"
+          }
+        },
+        {
+          "code": "NAMING_ALLOWED_SPECIAL_CASE",
+          "severity": "info",
+          "path": "tsconfig.node.json",
+          "classification": "allowed-special-case",
+          "message": "Filename matches an allowed reserved/special-case pattern.",
+          "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12",
+          "details": {
+            "specialCaseType": "ecosystem-required"
+          }
+        },
+        {
+          "code": "NAMING_ALLOWED_SPECIAL_CASE",
+          "severity": "info",
+          "path": "vite.config.ts",
+          "classification": "allowed-special-case",
+          "message": "Filename matches an allowed reserved/special-case pattern.",
+          "ruleRef": "calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#allowed-special-cases-and-reserved-filenames-v12",
+          "details": {
+            "specialCaseType": "ecosystem-required"
+          }
+        }
+      ],
+      "meta": {
+        "registry": {
+          "registryState": "builtin",
+          "registrySource": "builtin",
+          "registryDigests": {
+            "builtin": "6ccd841392efca3462f440f27abc5a2a915b704f2beef49790d80b618d693c43",
+            "custom": "8d5ccfbe4cc90cf86d4b03abcc68e003d7f6f05b7508eb241c9b8d49ac29dd8f",
+            "resolved": "6ccd841392efca3462f440f27abc5a2a915b704f2beef49790d80b618d693c43"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -32,7 +32,8 @@
     "report:tree:app": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-app -- node --experimental-strip-types calculogic-validator/scripts/validate-tree.mjs --scope=app",
     "report:tree:docs": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-docs -- node --experimental-strip-types calculogic-validator/scripts/validate-tree.mjs --scope=docs",
     "report:tree:validator": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-validator -- node --experimental-strip-types calculogic-validator/scripts/validate-tree.mjs --scope=validator",
-    "report:tree:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-system -- node --experimental-strip-types calculogic-validator/scripts/validate-tree.mjs --scope=system"
+    "report:tree:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-system -- node --experimental-strip-types calculogic-validator/scripts/validate-tree.mjs --scope=system",
+    "report:examples:validator": "node --experimental-strip-types calculogic-validator/scripts/generate-validator-report-examples.mjs"
   },
   "dependencies": {
     "json-logic-js": "^2.0.5",

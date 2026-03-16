@@ -128,3 +128,26 @@ Optional fields currently emitted by slices:
 - `validatorVersion` is a compatibility alias currently emitted alongside `toolVersion`.
 - Runner and slice reports use `configDigest`; any `configFingerprint` wording is deferred/planning only.
 - Fix-plan output fields (`suggestedFix[]`, `appliedFix[]` at envelope level) are deferred/planning only and are not part of the current emitted envelope.
+
+## 9) Current generated examples (illustrative)
+
+Classification: **Illustrative**
+
+Current-runtime report examples are generated from live validator entrypoints and checked in at:
+
+- `calculogic-validator/test/fixtures/report-examples/validate-naming.system.report.example.json`
+- `calculogic-validator/test/fixtures/report-examples/validate-all.system.naming.report.example.json`
+
+Refresh workflow:
+
+```bash
+node --experimental-strip-types calculogic-validator/scripts/generate-validator-report-examples.mjs
+```
+
+Normalization policy for these examples is intentionally bounded for deterministic repo artifacts:
+
+- normalize `startedAt`, `endedAt`, and `durationMs`
+- normalize `sourceSnapshot.gitHeadSha`
+- normalize `sourceSnapshot.diagnostics` dirty/changed counters
+
+Contract-significant fields remain runtime-faithful (for example `mode`, `validatorId`, `toolVersion`/`validatorVersion`, summary and findings structures).
