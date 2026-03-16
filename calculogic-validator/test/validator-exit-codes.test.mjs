@@ -14,6 +14,10 @@ const validateAllScriptPath = path.resolve(
   repositoryRoot,
   'calculogic-validator/scripts/validate-all.mjs',
 );
+const validateTreeScriptPath = path.resolve(
+  repositoryRoot,
+  'calculogic-validator/scripts/validate-tree.mjs',
+);
 
 const writeFixtureRepo = async (fixtureDir) => {
   await fs.mkdir(path.join(fixtureDir, 'src'), { recursive: true });
@@ -222,6 +226,52 @@ test('validate-all mirrors exit policy from aggregated findings', async () => {
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
+});
+
+test('validate-all strictness is CLI-driven and does not use config strictExit', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-exit-codes-'));
+  let configDir;
+
+  try {
+    await writeFixtureRepo(fixtureDir);
+
+    configDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validator-config-'));
+    const configPath = path.join(configDir, 'validator-config.strict-true.json');
+    await fs.writeFile(
+      configPath,
+      JSON.stringify({ version: '0.1', strictExit: true }, null, 2),
+      'utf8',
+    );
+
+    const configOnlyResult = runNodeScript(validateAllScriptPath, [`--config=${configPath}`], fixtureDir);
+    assert.equal(configOnlyResult.status, 0);
+
+    const cliStrictResult = runNodeScript(
+      validateAllScriptPath,
+      ['--strict', `--config=${configPath}`],
+      fixtureDir,
+    );
+    assert.equal(cliStrictResult.status, 1);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+    if (typeof configDir === 'string') {
+      await fs.rm(configDir, { recursive: true, force: true });
+    }
+  }
+});
+
+test('deferred mode labels are rejected as invalid CLI arguments', () => {
+  const namingResult = runNodeScript(namingScriptPath, ['--mode=soft-fail'], repositoryRoot);
+  const allResult = runNodeScript(validateAllScriptPath, ['--mode=hard-fail'], repositoryRoot);
+  const treeResult = runNodeScript(validateTreeScriptPath, ['--mode=correct'], repositoryRoot);
+
+  assert.equal(namingResult.status, 1);
+  assert.equal(allResult.status, 1);
+  assert.equal(treeResult.status, 1);
+
+  assert.match(namingResult.stderr, /Invalid argument: --mode=soft-fail/u);
+  assert.match(allResult.stderr, /Invalid argument: --mode=hard-fail/u);
+  assert.match(treeResult.stderr, /Invalid argument: --mode=correct/u);
 });
 
 test('validate-naming fails fast when npm script args are not forwarded', () => {
