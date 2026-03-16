@@ -54,3 +54,29 @@ test('validate-naming bin report aligns envelope and includes registry metadata 
   assert.match(report.registrySource, /^(builtin|custom|config)$/u);
   assertRegistryDigestShape(report.registryDigests);
 });
+
+test('validate-naming with config includes configDigest and config-backed registry source metadata', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      'calculogic-validator/scripts/validate-naming.mjs',
+      '--scope=system',
+      '--config=calculogic-validator/test/fixtures/validator-config.roles.contracts.json',
+    ],
+    { cwd: process.cwd(), encoding: 'utf8' },
+  );
+
+  assert.ok([0, 1, 2].includes(result.status));
+  const report = JSON.parse(result.stdout);
+
+  assert.equal(typeof report.configDigest, 'string');
+  assert.match(report.configDigest, digestPattern);
+  assert.equal(report.scopeSummary?.scope, report.scope);
+  assert.equal(report.scopeSummary?.findingsGenerated, report.findings.length);
+  assert.equal(typeof report.scopeContract?.description, 'string');
+
+  if (report.registrySource === 'config') {
+    assert.match(report.registryState, /^(builtin|custom)$/u);
+  }
+});

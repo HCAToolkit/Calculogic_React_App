@@ -5,6 +5,8 @@ import { classifyPath } from '../src/naming-validator.host.mjs';
 test('classifies two-segment reportable filename as missing role', () => {
   const finding = classifyPath('src/App.tsx');
   assert.equal(finding.code, 'NAMING_MISSING_ROLE');
+  assert.equal(finding.classification, 'legacy-exception');
+  assert.equal(finding.severity, 'info');
 });
 
 test('keeps hyphen-appended role ambiguity precedence', () => {

@@ -77,3 +77,24 @@ test('validate-tree prints usage when npm args are not forwarded', () => {
   assert.match(result.stderr, /Detected npm argument forwarding issue/);
   assert.match(result.stderr, /Usage: npm run validate:tree --/);
 });
+
+test('validate-tree does not expose strict-mode toggling', () => {
+  const result = runValidateTree(repositoryRoot, ['--strict']);
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Invalid argument: --strict/u);
+  assert.match(result.stderr, /Usage: npm run validate:tree --/u);
+});
+
+test('validate-tree accepts --config and includes configDigest in runner report envelope', () => {
+  const result = runValidateTree(repositoryRoot, [
+    '--scope=system',
+    '--config=calculogic-validator/test/fixtures/validator-config.extensions.contracts.json',
+  ]);
+
+  assert.ok([0, 1, 2].includes(result.status));
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.mode, 'report');
+  assert.equal(typeof report.configDigest, 'string');
+  assert.match(report.configDigest, /^[a-f0-9]{64}$/u);
+});

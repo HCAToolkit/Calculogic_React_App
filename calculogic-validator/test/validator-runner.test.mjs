@@ -12,8 +12,12 @@ test('runner report includes naming validator in deterministic order', () => {
   const report = runValidatorRunner(process.cwd(), { scope: 'app' });
 
   assert.ok(report.version);
+  assert.equal(report.mode, 'report');
   assert.equal(report.validatorId, 'runner');
   assert.equal(report.sourceSnapshot?.source, 'fs');
+  assert.equal(typeof report.startedAt, 'string');
+  assert.equal(typeof report.endedAt, 'string');
+  assert.equal(typeof report.durationMs, 'number');
   assert.ok(Array.isArray(report.validators));
   assert.equal(report.validators.length, 2);
   assert.deepEqual(
