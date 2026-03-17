@@ -21,6 +21,10 @@ Current validator helper areas are:
 - naming-owned CLI helper area: `calculogic-validator/naming/src/cli/`
 - naming-owned health helper area: `calculogic-validator/naming/src/health/`
 
+Current suite-core CLI area note:
+
+- `calculogic-validator/src/core/cli/validator-cli-runner.logic.mjs` is the suite-core home for shared runner-style CLI orchestration used by multiple runner-style suite CLIs (currently `validate:all` and `validate:tree`).
+
 Do not infer additional helper areas from this document beyond those that currently exist.
 
 ## 3) Ownership rules
@@ -63,8 +67,31 @@ Avoid the following:
 
 Current mapping examples:
 
-- report output, usage flow, and target parsing helpers -> `calculogic-validator/src/core/cli/`
+- report output, usage flow, target parsing helpers, and shared runner-style CLI orchestration (`validator-cli-runner.logic.mjs`) -> `calculogic-validator/src/core/cli/`
 - naming CLI parsing, usage, runner/report building helpers -> `calculogic-validator/naming/src/cli/`
 - naming health assertions and naming health host wrapper -> `calculogic-validator/naming/src/health/`
 
 These examples illustrate current ownership and reuse conventions only.
+
+## 8) Runner-style CLI orchestration boundary (suite-core CLI area)
+
+`calculogic-validator/src/core/cli/validator-cli-runner.logic.mjs` is a bounded suite-core helper for runner-style CLI orchestration shared by multiple consumers.
+
+What belongs in this helper boundary:
+
+- npm arg-forwarding guard integration for runner-style CLIs.
+- help / usage / usage-error flow orchestration.
+- scope validation handoff against suite scope profiles.
+- config loading and config-digest/tool-version wiring for runner-style CLIs.
+- runner invocation orchestration, report write orchestration, and report-derived exit-code application orchestration.
+
+What does **not** belong in this helper boundary:
+
+- slice-specific parsing semantics.
+- slice-specific validator-selection semantics that remain local to a script.
+- naming-specific or other slice-specific CLI behavior that is not truly shared by runner-style consumers.
+- generic catch-all utility dumping unrelated to runner-style CLI orchestration.
+
+Guardrail:
+
+- Keep this helper suite-core and runner-style focused because it exists due to multiple real consumers (`validate:all` and `validate:tree`), not as a generic CLI convenience bucket.
