@@ -1,30 +1,14 @@
 import {
-  getValidatorScopeProfile,
   listValidatorScopes,
 } from '../src/core/validator-scopes.runtime.mjs';
-import { runValidatorRunner } from '../src/core/validator-runner.logic.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
-import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
-import {
-  computeConfigDigest,
-  getValidatorToolVersion,
-} from '../src/core/validator-report-meta.logic.mjs';
-import { deriveExitCodeFromRunnerReport } from '../src/core/validator-exit-code.logic.mjs';
-import { detectNpmArgForwardingFootgun } from '../src/core/npm-arg-forwarding-guard.logic.mjs';
-import {
-  writeValidatorReportToStdout,
-  setValidatorReportExitCode,
-} from '../src/core/cli/validator-cli-output.logic.mjs';
-import {
-  printValidatorUsageToStdout,
-  printValidatorUsageErrorToStderr,
-} from '../src/core/cli/validator-cli-usage.logic.mjs';
 import { parseRepeatableTargetArgument } from '../src/core/cli/validator-cli-targets.logic.mjs';
 import {
   buildSupportedScopeToken,
   buildValidatorScopeUsageLinesFromRuntimeProfiles,
 } from '../src/core/cli/validator-cli-scopes.logic.mjs';
+import { runValidatorRunnerCli } from '../src/core/cli/validator-cli-runner.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
@@ -104,57 +88,24 @@ const parseCliArgs = (argv) => {
   return { helpRequested: false, selectedScope, validators, configPath, strict, targets };
 };
 
-let parsed;
-
-const npmArgForwardingMessage = detectNpmArgForwardingFootgun({
+const result = runValidatorRunnerCli({
   argv: process.argv.slice(2),
-  npmConfigArgvJson: process.env.npm_config_argv,
-  lifecycleEvent: process.env.npm_lifecycle_event,
+  usageLines,
+  repositoryRoot,
   expectedLifecycleEvent: 'validate:all',
   supportedFlagNames: ['scope', 'target', 'config', 'strict', 'validators'],
-});
-
-if (npmArgForwardingMessage) {
-  printValidatorUsageErrorToStderr(npmArgForwardingMessage, usageLines);
-  process.exit(1);
-}
-
-try {
-  parsed = parseCliArgs(process.argv.slice(2));
-} catch (error) {
-  printValidatorUsageErrorToStderr(error.message, usageLines);
-  process.exit(1);
-}
-
-if (parsed.helpRequested) {
-  printValidatorUsageToStdout(usageLines);
-  process.exit(0);
-}
-
-if (parsed.selectedScope && !getValidatorScopeProfile(parsed.selectedScope)) {
-  printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
-  process.exit(1);
-}
-
-try {
-  const config = parsed.configPath
-    ? loadValidatorConfigFromFile(parsed.configPath, { cwd: process.cwd() })
-    : undefined;
-
-  const toolVersion = getValidatorToolVersion();
-
-  const report = runValidatorRunner(repositoryRoot, {
+  parseCliArgs,
+  buildRunnerOptions: ({ parsed, config, toolVersion, configDigest }) => ({
     scope: parsed.selectedScope,
     validators: parsed.validators,
     config,
     targets: parsed.targets,
     toolVersion,
-    ...(config ? { configDigest: computeConfigDigest(config) } : {}),
-  });
+    ...(config ? { configDigest } : {}),
+  }),
+  buildExitCodeOptions: ({ parsed }) => ({ strict: parsed.strict }),
+});
 
-  writeValidatorReportToStdout(report);
-  setValidatorReportExitCode(deriveExitCodeFromRunnerReport(report, { strict: parsed.strict }));
-} catch (error) {
-  printValidatorUsageErrorToStderr(error.message, usageLines);
-  process.exit(1);
+if (result.shouldExit) {
+  process.exit(result.exitCode);
 }
