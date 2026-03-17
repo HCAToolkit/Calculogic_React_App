@@ -1,29 +1,13 @@
 import {
-  getValidatorScopeProfile,
   listValidatorScopes,
 } from '../src/core/validator-scopes.runtime.mjs';
-import { runValidatorRunner } from '../src/core/validator-runner.logic.mjs';
 import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
-import {
-  computeConfigDigest,
-  getValidatorToolVersion,
-} from '../src/core/validator-report-meta.logic.mjs';
-import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
-import { deriveExitCodeFromRunnerReport } from '../src/core/validator-exit-code.logic.mjs';
-import { detectNpmArgForwardingFootgun } from '../src/core/npm-arg-forwarding-guard.logic.mjs';
-import {
-  writeValidatorReportToStdout,
-  setValidatorReportExitCode,
-} from '../src/core/cli/validator-cli-output.logic.mjs';
-import {
-  printValidatorUsageToStdout,
-  printValidatorUsageErrorToStderr,
-} from '../src/core/cli/validator-cli-usage.logic.mjs';
 import { parseRepeatableTargetArgument } from '../src/core/cli/validator-cli-targets.logic.mjs';
 import {
   buildSupportedScopeToken,
   buildValidatorScopeUsageLinesFromRuntimeProfiles,
 } from '../src/core/cli/validator-cli-scopes.logic.mjs';
+import { runValidatorRunnerCli } from '../src/core/cli/validator-cli-runner.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
 
@@ -82,56 +66,23 @@ const parseCliArgs = (argv) => {
   return { helpRequested: false, selectedScope, configPath, targets };
 };
 
-const npmArgForwardingMessage = detectNpmArgForwardingFootgun({
+const result = runValidatorRunnerCli({
   argv: process.argv.slice(2),
-  npmConfigArgvJson: process.env.npm_config_argv,
-  lifecycleEvent: process.env.npm_lifecycle_event,
+  usageLines,
+  repositoryRoot,
   expectedLifecycleEvent: 'validate:tree',
   supportedFlagNames: ['scope', 'target', 'config'],
-});
-
-if (npmArgForwardingMessage) {
-  printValidatorUsageErrorToStderr(npmArgForwardingMessage, usageLines);
-  process.exit(1);
-}
-
-let parsed;
-try {
-  parsed = parseCliArgs(process.argv.slice(2));
-} catch (error) {
-  printValidatorUsageErrorToStderr(error.message, usageLines);
-  process.exit(1);
-}
-
-if (parsed.helpRequested) {
-  printValidatorUsageToStdout(usageLines);
-  process.exit(0);
-}
-
-if (parsed.selectedScope && !getValidatorScopeProfile(parsed.selectedScope)) {
-  printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
-  process.exit(1);
-}
-
-try {
-  const config = parsed.configPath
-    ? loadValidatorConfigFromFile(parsed.configPath, { cwd: process.cwd() })
-    : undefined;
-
-  const toolVersion = getValidatorToolVersion();
-
-  const report = runValidatorRunner(repositoryRoot, {
+  parseCliArgs,
+  buildRunnerOptions: ({ parsed, config, toolVersion, configDigest }) => ({
     scope: parsed.selectedScope,
     validators: ['tree-structure-advisor'],
     config,
     targets: parsed.targets,
     toolVersion,
-    ...(config ? { configDigest: computeConfigDigest(config) } : {}),
-  });
+    ...(config ? { configDigest } : {}),
+  }),
+});
 
-  writeValidatorReportToStdout(report);
-  setValidatorReportExitCode(deriveExitCodeFromRunnerReport(report));
-} catch (error) {
-  printValidatorUsageErrorToStderr(error.message, usageLines);
-  process.exit(1);
+if (result.shouldExit) {
+  process.exit(result.exitCode);
 }
