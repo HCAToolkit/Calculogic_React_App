@@ -2,6 +2,8 @@
 
 Purpose: quick routing map for validator documentation so readers can distinguish canonical contracts from drafts and implementation notes.
 
+Current `ValidatorSpecs` layout note: root-level files remain the stable canonical/shared entrypoints, while ownership-specialized supporting docs now live under `naming-owned/`, `tree-owned/`, `cross-cutting/`, and `suite-owned/`. Use the root entrypoints first, then drop into the ownership lane that matches the task.
+
 Authority labels used in this index:
 
 - **Canonical contract**: suite-wide normative contract; controls runtime-facing semantics within stated scope.

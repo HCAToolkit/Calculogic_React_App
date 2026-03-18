@@ -21,7 +21,17 @@ It is intended to:
 - distinguish canonical authority from supporting, draft, and transitional materials,
 - provide a practical reading order for naming tasks,
 - record deterministic "stay put" vs "move/split/merge later" decisions,
-- reduce future setup/discovery friction without broad folder reorganization in this pass.
+- reduce future setup/discovery friction now that the ownership split is live, without proposing another broad folder reorganization.
+
+## Current Layout Snapshot
+
+Naming implementation discovery now follows a stable mixed-layout posture:
+
+- shared canonical entrypoints stay at `calculogic-validator/doc/ValidatorSpecs/` root when they are first-read cross-slice contracts,
+- naming-specialized supporting specs and routing metadata live under `calculogic-validator/doc/ValidatorSpecs/naming-owned/`,
+- cross-slice registry-model guidance lives under `calculogic-validator/doc/ValidatorSpecs/cross-cutting/` because its ownership is not naming-only.
+
+Use the root-level contract lane first, then continue into the naming-owned lane for supporting interpretation work.
 
 ## Canonical Reading Order (Naming Implementation Work)
 
@@ -77,7 +87,7 @@ Interpretation notes:
 - Keep `filename-case-and-interpretation-contract.md` at the `ValidatorSpecs` root because it is a shared contract lane used by multiple slices and already acts as a stable first-read contract surface.
 - Keep `naming-compatibility-inventory.md` outside the ownership buckets because it remains a cross-path transitional inventory rather than a validator-spec owner document.
 
-### Completed bounded move (this pass)
+### Completed bounded move (current layout)
 
 - Move naming-specialized supporting specs into `ValidatorSpecs/naming-owned/` so the naming-owned lane scans cleanly without disturbing canonical contract entrypoints.
 - Move `registry-model-and-slice-interaction-spec.md` into `ValidatorSpecs/cross-cutting/` because it constrains slice interaction and registry modeling across ownership boundaries rather than belonging purely to naming.

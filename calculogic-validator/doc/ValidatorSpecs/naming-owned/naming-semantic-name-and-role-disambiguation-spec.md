@@ -97,7 +97,7 @@ Rules:
 - It remains secondary to canonical dominant role ownership.
 - It remains subordinate to explicit ownership grammar.
 
-For bounded semantic-family entities/definitions/relationships and run-scoped interpreted-signal framing, see `../naming-owned/naming-semantic-family-and-interpretation-spec.md`.
+For bounded semantic-family entities/definitions/relationships and run-scoped interpreted-signal framing, see `./naming-semantic-family-and-interpretation-spec.md`.
 
 This section documents a naming-owned interpretation lane whose runtime implementation is not yet activated in the current tranche.
 
