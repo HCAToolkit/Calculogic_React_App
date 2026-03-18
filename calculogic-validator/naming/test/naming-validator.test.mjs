@@ -9,6 +9,7 @@ import {
   parseCanonicalName,
   collectRepositoryPaths,
   summarizeFindings,
+  runNamingValidator,
 } from '../src/naming-validator.host.mjs';
 
 test('parse canonical filename with simple extension', () => {
@@ -152,6 +153,51 @@ disambiguationPrecedenceCases.forEach(({ name, inputPath, expected }) => {
       assert.equal(finding.suggestedFix, expected.suggestedFix);
     }
   });
+});
+
+
+
+test('classifies canonical file with semantic-family derived details when shape is supported', () => {
+  const finding = classifyPath('src/order-payment-refund-reconcile.logic.mjs');
+
+  assert.equal(finding.classification, 'canonical');
+  assert.equal(finding.code, 'NAMING_CANONICAL');
+  assert.deepEqual(finding.details?.semanticTokens, ['order', 'payment', 'refund', 'reconcile']);
+  assert.equal(finding.details?.semanticFamily, 'order-payment');
+  assert.equal(finding.details?.familyRoot, 'order');
+  assert.equal(finding.details?.familySubgroup, 'payment-refund');
+});
+
+test('runNamingValidator attaches run-scoped related semantic names without coupling tree runtime', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-semantic-family-run-'));
+
+  try {
+    fs.mkdirSync(path.join(tempRoot, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(tempRoot, 'src', 'naming-role-index.logic.mjs'), 'export const index = 1;\n');
+    fs.writeFileSync(path.join(tempRoot, 'src', 'naming-role-matrix.logic.mjs'), 'export const matrix = 1;\n');
+    fs.writeFileSync(path.join(tempRoot, 'src', 'tree.logic.mjs'), 'export const tree = 1;\n');
+
+    const result = runNamingValidator(tempRoot, { scope: 'app', targets: ['src'] });
+    const report = {
+      ...result,
+      ...summarizeFindings(result.findings),
+    };
+    const indexFinding = report.findings.find((finding) => finding.path === 'src/naming-role-index.logic.mjs');
+    const matrixFinding = report.findings.find((finding) => finding.path === 'src/naming-role-matrix.logic.mjs');
+    const treeFinding = report.findings.find((finding) => finding.path === 'src/tree.logic.mjs');
+
+    assert.deepEqual(indexFinding?.details?.relatedSemanticNames, ['naming-role-matrix']);
+    assert.deepEqual(matrixFinding?.details?.relatedSemanticNames, ['naming-role-index']);
+    assert.equal(treeFinding?.details?.relatedSemanticNames, undefined);
+    assert.deepEqual(report.familyRootCounts, { naming: 2 });
+    assert.deepEqual(report.familySubgroupCounts, {
+      'role-index': 1,
+      'role-matrix': 1,
+    });
+    assert.deepEqual(report.semanticFamilyCounts, { naming: 2 });
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
 });
 
 test('classifies semantic-name casing violation as invalid-ambiguous', () => {
@@ -333,6 +379,9 @@ test('summary keeps default classification buckets and empty secondary families 
   assert.deepEqual(summary.specialCaseTypeCounts, {});
   assert.deepEqual(summary.warningRoleStatusCounts, {});
   assert.deepEqual(summary.warningRoleCategoryCounts, {});
+  assert.deepEqual(summary.familyRootCounts, {});
+  assert.deepEqual(summary.familySubgroupCounts, {});
+  assert.deepEqual(summary.semanticFamilyCounts, {});
 });
 
 test('summary preserves deterministic ordering and warning facet behavior', () => {
@@ -378,4 +427,7 @@ test('summary preserves deterministic ordering and warning facet behavior', () =
     'architecture-support': 1,
     documentation: 1,
   });
+  assert.deepEqual(summary.familyRootCounts, {});
+  assert.deepEqual(summary.familySubgroupCounts, {});
+  assert.deepEqual(summary.semanticFamilyCounts, {});
 });

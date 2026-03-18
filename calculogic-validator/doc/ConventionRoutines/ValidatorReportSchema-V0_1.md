@@ -42,6 +42,9 @@ Current naming CLI output includes:
 - `specialCaseTypeCounts` (object)
 - `warningRoleStatusCounts` (object)
 - `warningRoleCategoryCounts` (object)
+- `familyRootCounts` (object; naming-observed derived family-root counts for this run)
+- `familySubgroupCounts` (object; naming-observed derived family-subgroup counts for this run)
+- `semanticFamilyCounts` (object; naming-observed derived semantic-family counts for this run)
 - `findings` (array)
 
 ### Optional / transitional fields
@@ -52,11 +55,11 @@ Current naming CLI output includes:
 - `registrySource` (`"builtin" | "custom" | "config"`)
 - `registryDigests` (object `{ builtin, custom, resolved }`)
 
-Slice-specific future-facing note (bounded, non-claiming):
+Slice-specific note (current naming emitted behavior):
 
-- Some slices may later document additional optional report surfaces before they become part of the canonical emitted contract.
-- For naming specifically, semantic-family-derived per-file details and aggregate observations (for example `familyRootCounts`, `familySubgroupCounts`, `semanticFamilyCounts`) remain slice-specific optional/future-facing surfaces until runtime emission is actually shipped.
-- Observed aggregate fields, if/when emitted by a slice, are report observations rather than automatic registry/policy declarations.
+- Naming now emits bounded semantic-family-derived per-file details inside `finding.details` when the semantic-name shape supports deterministic derivation. Current derived fields include `semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, and run-scoped `relatedSemanticNames` when observed.
+- Naming now also emits `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts` at the slice-report top level.
+- These aggregate fields are report observations rather than automatic registry/policy declarations.
 
 ## 4) Canonical current contract: Runner Report Envelope
 
@@ -98,7 +101,7 @@ Entry-level optional fields:
   - `meta.filters` (object; present when target filtering is active)
   - `meta.registry` (object; present when slice exposes registry metadata)
 
-Runner currently passes through deterministic slice summary fields in addition to `counts` (for example naming `codeCounts` and tree `codeCounts`).
+Runner currently passes through deterministic slice summary fields in addition to `counts` (for example naming `codeCounts`, `familyRootCounts`, `familySubgroupCounts`, `semanticFamilyCounts`, and tree `codeCounts`).
 
 ## 6) Canonical current contract: Finding Object Baseline
 

@@ -18,6 +18,10 @@ import { hasHyphenAppendedRoleAmbiguity } from './rules/naming-rule-check-hyphen
 import { isCanonicalSemanticName } from './rules/naming-rule-check-semantic-case.logic.mjs';
 import { deriveDisambiguationHints } from './rules/naming-rule-derive-disambiguation-hints.logic.mjs';
 import {
+  deriveSemanticFamilyDetails,
+  attachRelatedSemanticNames,
+} from './rules/naming-rule-derive-semantic-family.logic.mjs';
+import {
   getRoleMetadata,
   isDeprecatedRole,
   isUnknownOrInactiveRole,
@@ -368,6 +372,9 @@ export const classifyPath = (
       });
     }
 
+    const semanticFamilyDetails = deriveSemanticFamilyDetails({
+      semanticName: parsed.semanticName,
+    });
     const disambiguationHints = deriveDisambiguationHints({
       normalizedPath,
       parsed,
@@ -382,6 +389,7 @@ export const classifyPath = (
         ...parsed,
         roleStatus: roleMetadata.status,
         roleCategory: roleMetadata.category,
+        ...(semanticFamilyDetails ?? {}),
         ...(disambiguationHints ? { disambiguation: disambiguationHints } : {}),
       },
     });
@@ -425,13 +433,15 @@ export const runNamingValidator = (preparedInputs = {}) => {
     preparedInputs.findingPolicyRuntime,
   );
   const caseRulesRuntime = assertPreparedCaseRulesRuntime(preparedInputs.caseRulesRuntime);
-  const findings = selectedPaths.map((pathname) =>
-    classifyPath(
-      pathname,
-      namingRolesRuntime,
-      missingRolePatternsRuntime,
-      findingPolicyRuntime,
-      caseRulesRuntime,
+  const findings = attachRelatedSemanticNames(
+    selectedPaths.map((pathname) =>
+      classifyPath(
+        pathname,
+        namingRolesRuntime,
+        missingRolePatternsRuntime,
+        findingPolicyRuntime,
+        caseRulesRuntime,
+      ),
     ),
   );
 
@@ -475,6 +485,10 @@ export const summarizeFindings = (findings, summaryBucketsRuntime) => {
     summaryBuckets.secondaryBucketFamilies.map((bucketFamily) => [bucketFamily, {}]),
   );
 
+  secondaryCountsByFamily.familyRootCounts ??= {};
+  secondaryCountsByFamily.familySubgroupCounts ??= {};
+  secondaryCountsByFamily.semanticFamilyCounts ??= {};
+
   const incrementSecondaryFamilyCounter = (bucketFamily, counterKey) => {
     if (!secondaryCountsByFamily[bucketFamily]) {
       return;
@@ -498,6 +512,18 @@ export const summarizeFindings = (findings, summaryBucketsRuntime) => {
     if (finding.severity === 'warn' && finding.details?.roleCategory) {
       incrementSecondaryFamilyCounter('warningRoleCategoryCounts', finding.details.roleCategory);
     }
+
+    if (finding.details?.familyRoot) {
+      incrementSecondaryFamilyCounter('familyRootCounts', finding.details.familyRoot);
+    }
+
+    if (finding.details?.familySubgroup) {
+      incrementSecondaryFamilyCounter('familySubgroupCounts', finding.details.familySubgroup);
+    }
+
+    if (finding.details?.semanticFamily) {
+      incrementSecondaryFamilyCounter('semanticFamilyCounts', finding.details.semanticFamily);
+    }
   }
 
   return {
@@ -506,5 +532,8 @@ export const summarizeFindings = (findings, summaryBucketsRuntime) => {
     specialCaseTypeCounts: sortCountObject(secondaryCountsByFamily.specialCaseTypeCounts ?? {}),
     warningRoleStatusCounts: sortCountObject(secondaryCountsByFamily.warningRoleStatusCounts ?? {}),
     warningRoleCategoryCounts: sortCountObject(secondaryCountsByFamily.warningRoleCategoryCounts ?? {}),
+    familyRootCounts: sortCountObject(secondaryCountsByFamily.familyRootCounts ?? {}),
+    familySubgroupCounts: sortCountObject(secondaryCountsByFamily.familySubgroupCounts ?? {}),
+    semanticFamilyCounts: sortCountObject(secondaryCountsByFamily.semanticFamilyCounts ?? {}),
   };
 };

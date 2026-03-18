@@ -39,6 +39,9 @@
       },
       "warningRoleStatusCounts": {},
       "warningRoleCategoryCounts": {},
+      "familyRootCounts": {},
+      "familySubgroupCounts": {},
+      "semanticFamilyCounts": {},
       "findings": [
         {
           "code": "NAMING_ALLOWED_SPECIAL_CASE",
