@@ -49,15 +49,18 @@ Contract:
 - accepts optional repeatable targets via `--target <path>` and `--target=<path>`
 - preserves npm argument-forwarding guard behavior used by validator script surfaces
 - emits JSON report envelope aligned with runner report conventions
-- remains report-only (no fix/mutate behavior)
+- remains report-only (no fix/mutate behavior; report-first does not imply guaranteed exit `0`)
 
 ### 2.2 Repository signals
 
-V0.1.x uses deterministic path-based signals only:
+V0.1.x uses deterministic path-based and occurrence-backed signals only:
 
 - top-level directory names in repository root
 - repository-relative file paths
 - filename basename patterns that strongly indicate validator ownership
+- occurrence-derived structural records when `occurrenceSnapshot.occurrenceRecords` is available
+
+Current boundary note: shipped tree heuristics do **not** yet ingest naming-derived semantic-family/role outputs. That consumption path remains deferred and, when added later, must consume naming-owned signals rather than derive naming semantics independently.
 
 ### 2.3 Initial advisory heuristics (narrow slice)
 
@@ -109,13 +112,16 @@ Findings flow through the existing suite validator entry shape:
 - `id = tree-structure-advisor`
 - `summary.counts`
 - `findings[]`
+- optional `meta.filters` when `--target` is used
+
+When shared CLI `--config=<path>` is supplied, current behavior is limited to shared config validation/normalization plus runner-envelope `configDigest`. Tree-local config semantics remain deferred.
 
 ### 3.2 Finding shape (advisory-only)
 
 Each finding follows existing report conventions:
 
 - `code`
-- `severity` (`info` only in this slice)
+- `severity` (`info` for current structural findings; `warn` is currently possible for `TREE_SHIM_OUTSIDE_COMPAT`)
 - `path`
 - `classification = advisory-structure`
 - `message`
@@ -141,13 +147,16 @@ Each finding follows existing report conventions:
 - Flat legacy paths under `calculogic-validator/src/tree-structure-advisor.*.mjs` remain compatibility shims only (re-export wrappers) during migration.
 - Default runner execution includes both `naming` and `tree-structure-advisor` in deterministic registry order.
 - Dedicated `validate-tree` execution includes only `tree-structure-advisor` while preserving shared runner scope/target semantics.
+- Current dedicated CLI also accepts `--config=<path>` through shared runner plumbing, but unsupported tree-specific config surfaces are rejected by the canonical validator-config contract rather than interpreted locally by tree.
 - No fix mode, no move/rename behavior.
 
 ## 5.0 Deferred Behavior (future advisory direction; not current runtime behavior)
 
 Deferred to later slices:
 
+- naming-derived semantic-family/lane heuristics and clustering
 - docs/runtime/test co-location drift heuristics
 - mixed concern folder smell heuristics
 - structural recommendation planning and move proposals
+- tree-specific config semantics beyond shared config validation + digest plumbing
 - any mutating or fix-mode behavior

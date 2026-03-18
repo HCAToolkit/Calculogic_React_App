@@ -8,8 +8,9 @@ This document defines a **Tree Structure Advisor** validator slice whose output 
 - it emits **advisory findings** for currently implemented structural and shim-compat checks
 - contributor-backed diagnostics are optional and attached outside tree core
 - it never renames or moves files
+- it is report-only in the non-mutating/report-first sense, not in the sense of guaranteed exit `0`
 
-This slice exists to reduce “tree drift” as additional validators beyond naming are added.
+This slice exists to reduce “tree drift” as additional validators beyond naming are added. Current exit behavior still follows the shared suite policy after report emission, so warning-level tree findings can still produce exit `2`.
 
 ### Suite-core vs owned-slice boundary principle
 
@@ -72,22 +73,31 @@ This slice follows the shared suite contract in [`ValidatorSuite-Contracts-And-M
 
 ## Conceptual Model (Status: Current architectural/modeling guidance)
 
-This validator treats **folders as scope roots** (host-like boundaries), and filenames as **lane signals**:
+This validator treats **folders as scope roots** (host-like boundaries), and filenames as potential **lane signals**:
 
 - **Scope roots** (host-like boundaries):
   - `bin/`, `scripts/`, `src/`, `test/`, `tools/<tool>/...` (example surfaces)
-- **Lanes**:
-  - derived from `<role>` and role category/status (concern-core vs architecture-support vs documentation, etc.)
-- **Semantic families**:
-  - derived from `<semantic-name>` grouping (e.g., `validator-config.*`, `naming-rule-*`, `report-capture.*`)
+- **Current shipped heuristic substrate**:
+  - deterministic path/basename signals
+  - scope + target filtering from the shared suite boundary
+  - occurrence-derived structural records when available
+- **Lanes / semantic families**:
+  - remain valid modeling concepts for tree work
+  - should be treated as partially deferred concepts until explicit runtime consumption is documented below
 
-Goal: surface emergent patterns and recommend a structure that makes those patterns obvious.
+Goal: surface emergent patterns and recommend a structure that makes those patterns obvious without overstating what current runtime already emits.
 
 ### Naming-signal consumption boundary (Status: Current runtime boundary)
 
-Tree advisor may consume naming-shaped filename metadata as **structural signal input** for clustering and lane interpretation.
+Tree advisor consumes naming-shaped metadata only across an explicit slice boundary; it does **not** derive naming semantics independently.
 
-Tree advisor may use these parsed naming-shaped signals when present:
+**Current shipped runtime posture:**
+
+- current tree findings do **not** yet ingest parsed naming-validator outputs or semantic-family clustering data
+- current shipped tree findings are driven by deterministic path, basename, scope, target, shim-evidence, and occurrence-derived structural signals
+- the naming boundary still matters now because any later tree heuristic that needs semantic-family or role information must consume naming-derived signals rather than re-implement naming interpretation locally
+
+When naming-derived signal input is explicitly wired in later, intended consumable surfaces include:
 
 - `semanticName`
 - semantic family/group outputs derived by naming from `semanticName`
@@ -103,7 +113,7 @@ Examples of naming validity judgments that tree advisor must not duplicate:
 - deprecated role
 - hyphen-role ambiguity
 
-When usable naming-shaped metadata is unavailable, incomplete, or weak, tree advisor should reduce confidence and/or recommend running naming validation, rather than inventing naming-invalid findings inside tree output.
+When usable naming-shaped metadata is unavailable, incomplete, or not yet wired into tree runtime, tree advisor should reduce confidence and/or recommend running naming validation rather than inventing naming-invalid findings inside tree output.
 
 Boundary note (canonical_target for this slice): tree validator ownership is under `calculogic-validator/tree/src/**`. Legacy flat suite-core paths such as `calculogic-validator/src/tree-structure-advisor.*.mjs` are compatibility wrappers only, not canonical ownership.
 
@@ -276,7 +286,7 @@ Runtime collection must ignore missing declared root files, normalize collected 
 
 ## Analysis Heuristics (Deterministic, Status: Future advisory direction)
 
-V0.0.1 uses deterministic heuristics that are explainable in findings.
+This section is a deferred heuristic menu, not a statement of currently emitted tree behavior. Current runtime only ships the bounded findings listed later under **Current Runtime Boundary and Shipped Findings**. In particular, semantic-family/lane heuristics below remain future-facing until explicit runtime + conformance coverage lands.
 
 ### 1) Semantic family cohesion
 
@@ -320,7 +330,7 @@ All scoring thresholds MUST be explicit constants in code and reported in `detai
 
 ## Recommendation Patterns (Advisory Only, Status: Future advisory direction)
 
-The following outputs are advisory recommendation patterns only. They are not mandatory rules and should be emitted as explainable `suggested-reorg` findings.
+The following outputs are advisory recommendation patterns only. They are not mandatory rules and are **not currently emitted** by shipped tree runtime. Treat them as deterministic future-design guidance for later `suggested-reorg` findings, not as current contract behavior.
 
 ### 1) Semantic-family folder recommendation
 
@@ -500,7 +510,15 @@ Each finding uses the same stable envelope shape used by existing validators:
 
 ## Finding / Code Set (Draft; Status: Mixed current runtime behavior + future advisory direction)
 
-Suggested codes (V0.0.1):
+### Current shipped codes (current runtime behavior)
+
+- `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` (`info`)
+- `TREE_VALIDATOR_OWNED_FILE_OUTSIDE_TREE` (`info`)
+- `TREE_OWNED_SLICE_BOUNDARY_DRIFT` (`info`)
+- `TREE_SHIM_SURFACE_PRESENT` (`info`) — implemented (thin-reexport high-confidence + runtimeish token-only observability)
+- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`) — implemented (thin re-export evidence only)
+
+### Deferred/planning code candidates (future advisory direction)
 
 - `TREE_OBSERVED_FAMILY_CLUSTER`
 - `TREE_FAMILY_SCATTERED`
@@ -508,14 +526,13 @@ Suggested codes (V0.0.1):
 - `TREE_MISSING_NAMESPACE_ROOT`
 - `TREE_SUBSYSTEM_SCAFFOLD_ASYMMETRY`
 - `TREE_TOOL_SURFACE_MIX`
-- `TREE_SHIM_SURFACE_PRESENT` (`info`) — implemented (thin-reexport high-confidence + runtimeish token-only info)
-- `TREE_SHIM_SCATTERED` (`warn`/`info`) — planned (**future advisory direction**)
-- `TREE_SHIM_OUTSIDE_COMPAT` (`warn`) — implemented (thin re-export evidence only)
+- `TREE_SHIM_SCATTERED` (`warn`/`info`)
 - `TREE_SHARED_LANE_FIRST_PARTITION_PRESENT` (`info`)
 - `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (`warn`/`info`)
 - `TREE_SHARED_SEMANTIC_ROOT_RECOMMENDED` (`warn`/`info`)
-- `TREE_OWNED_SLICE_BOUNDARY_DRIFT` (`info`) — implemented in bounded deterministic form for conservative subtree-local growth signals under suite-core
-- `TREE_OWNED_SLICE_EXTRACTION_RECOMMENDED` (`warn`/`info`) — future advisory direction
+- `TREE_OWNED_SLICE_EXTRACTION_RECOMMENDED` (`warn`/`info`)
+
+Deferred candidates above are a documentation menu only. They are not current runtime claims and should not be treated as conformance expectations until shipped below the current-runtime boundary.
 
 ---
 
@@ -534,6 +551,8 @@ Suggested codes (V0.0.1):
 - Optional composition field:
   - `findingContributors` (array of contributor callbacks)
 - Tree core does **not** require `getFileContent(relativePath)`.
+- Current tree runtime does **not** consume tree-specific config surfaces. The dedicated CLI may accept `--config=<path>` through shared suite runner plumbing, but current tree behavior only validates/normalizes the shared config shape and exposes `configDigest` at the runner envelope when config is supplied.
+- Current tree runtime does **not** emit tree addresses, move proposals, semantic-family clustering payloads, or naming-derived parsed metadata in findings/report payloads.
 
 ### Composition ownership
 
@@ -564,6 +583,8 @@ The tree runtime result includes:
 - `scope`
 - `filters` with `isFiltered` and optional `targets`
 
+When tree runs through the shared validator runner / CLI surfaces, the composed validator entry additionally includes summary counts and optional `meta.filters`, and the runner envelope may include `configDigest` when `--config` is supplied. No tree-specific config payload is emitted today.
+
 ---
 
 ## Determinism Requirements (Status: Current runtime behavior)
@@ -588,8 +609,10 @@ Mode semantics are centralized in [`ValidatorSuite-Contracts-And-Modes.md`](../C
 Tree advisor V0.0.1 implementation status:
 
 - `report` only
-  - never fails due to tree findings
-  - fails only on invalid CLI usage (unknown scope, nonexistent target)
+  - no fix/mutate behavior is implemented
+  - report JSON is emitted before exit handling
+  - warning-level tree findings may still yield exit `2` under the shared suite exit policy
+  - invalid CLI usage / invalid config / nonexistent target still fail with exit `1`
 
 Suite policy options (`soft-fail`, `hard-fail`, `correct`, `replace`) are contract-level modes and are deferred for this slice (**future advisory direction**).
 
@@ -601,7 +624,8 @@ Current script usage:
 
 - `npm run validate:tree -- --scope=validator` runs tree-structure-advisor only for validator scope.
 - `--target` is repeatable (`--target <path>` and `--target=<path>`) and filters analysis to the union of selected in-scope targets.
-- The command remains report-only: tree findings are advisory and do not fail by themselves.
+- `--config=<path>` is accepted through shared suite CLI plumbing for config validation + runner-envelope `configDigest`; current tree runtime does not apply tree-local config semantics yet.
+- The command remains report-only in the non-mutating/report-first sense. Exit status still follows the shared suite exit contract after report emission, so warning-level advisory findings can currently yield exit `2`.
 
 Npm forwarding requirement remains: pass flags after `--` (for example `npm run validate:tree -- --scope=validator --target calculogic-validator/tree/src`).
 

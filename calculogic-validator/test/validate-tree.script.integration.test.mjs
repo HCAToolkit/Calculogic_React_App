@@ -63,6 +63,39 @@ test('validate-tree runs tree-structure-advisor only and preserves target filter
   }
 });
 
+test('validate-tree emits report JSON and exits 2 for warning-level advisory findings', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validate-tree-script-warn-'));
+
+  try {
+    await writeFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'calculogic-validator', 'src', 'core'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'calculogic-validator', 'src', 'core', 'validator-runner.logic.mjs'),
+      'export const runner = true\n',
+      'utf8',
+    );
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'validator-runner.logic.mjs'),
+      "export * from '../calculogic-validator/src/core/validator-runner.logic.mjs';\n",
+      'utf8',
+    );
+
+    const result = runValidateTree(fixtureDir, ['--scope=repo']);
+    assert.equal(result.status, 2);
+
+    const report = JSON.parse(result.stdout);
+    assert.equal(report.mode, 'report');
+    assert.equal(report.validators.length, 1);
+    assert.equal(report.validators[0].id, 'tree-structure-advisor');
+    assert.equal(
+      report.validators[0].findings.some((finding) => finding.code === 'TREE_SHIM_OUTSIDE_COMPAT'),
+      true,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('validate-tree prints usage when npm args are not forwarded', () => {
   const result = runValidateTree(repositoryRoot, [], {
     npm_lifecycle_event: 'validate:tree',
@@ -84,6 +117,60 @@ test('validate-tree does not expose strict-mode toggling', () => {
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Invalid argument: --strict/u);
   assert.match(result.stderr, /Usage: npm run validate:tree --/u);
+});
+
+test('validate-tree config strictExit does not act as a tree strict-mode toggle', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validate-tree-script-strict-exit-'));
+  const configPath = path.join(fixtureDir, 'validator-config.strict-true.json');
+
+  try {
+    await writeFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'experiments'), { recursive: true });
+    await fs.writeFile(
+      configPath,
+      JSON.stringify({ version: '0.1', strictExit: true }, null, 2),
+      'utf8',
+    );
+
+    const result = runValidateTree(fixtureDir, ['--scope=repo', `--config=${configPath}`]);
+    assert.equal(result.status, 0);
+
+    const report = JSON.parse(result.stdout);
+    assert.equal(report.mode, 'report');
+    assert.equal(typeof report.configDigest, 'string');
+    assert.equal(
+      report.validators[0].findings.some((finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER'),
+      true,
+    );
+    assert.equal(
+      report.validators[0].findings.some((finding) => finding.severity === 'warn'),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('validate-tree rejects unsupported tree-specific config surfaces', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'validate-tree-script-invalid-config-'));
+  const configPath = path.join(fixtureDir, 'validator-config.tree-unsupported.json');
+
+  try {
+    await writeFixtureRepo(fixtureDir);
+    await fs.writeFile(
+      configPath,
+      JSON.stringify({ version: '0.1', treeStructureAdvisor: { thresholds: {} } }, null, 2),
+      'utf8',
+    );
+
+    const result = runValidateTree(fixtureDir, ['--scope=repo', `--config=${configPath}`]);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /Invalid validator config:/u);
+    assert.match(result.stderr, /contains unknown key "treeStructureAdvisor"/u);
+    assert.equal(result.stdout, '');
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
 });
 
 test('validate-tree accepts --config and includes configDigest in runner report envelope', () => {
