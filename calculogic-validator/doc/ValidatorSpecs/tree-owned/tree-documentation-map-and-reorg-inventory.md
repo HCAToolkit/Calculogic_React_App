@@ -31,7 +31,7 @@ Use this sequence for tree implementation tasks (runtime, wiring, contracts, or 
 2. `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
 3. `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
 4. `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
-5. `calculogic-validator/doc/ValidatorSpecs/tree-documentation-map-and-reorg-inventory.md` (this doc, as navigation/index metadata)
+5. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md` (this doc; navigation/index metadata under `tree-owned/`)
 
 Interpretation note:
 
@@ -62,8 +62,15 @@ Interpretation note:
 ### Completed bounded move (this pass)
 
 1. `doc/nl-config/cfg-treeStructureAdvisor.md` -> `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
-   - **Outcome:** completed as a bounded colocation move with a tiny pointer stub left at the old path to preserve navigation continuity.
+   - **Outcome:** completed earlier as a bounded colocation move with a tiny pointer stub left at the old path to preserve navigation continuity.
    - **Authority posture:** remains supporting implementation guidance; canonical runtime authority stays with suite contract + tree validator spec.
+2. Tree-owned supporting specs and inventories now live under `calculogic-validator/doc/ValidatorSpecs/tree-owned/`:
+   - `tree-documentation-map-and-reorg-inventory.md`
+   - `tree-occurrence-model-and-addressing-spec.md`
+   - `tree-registry-definitions-and-relationships-spec.md`
+   - `tree-structural-vocabulary-and-root-classification-spec.md`
+   - `tree-top-root-registry-transition-inventory.md`
+   - **Outcome:** tree-specific supporting material is easier to scan without moving the canonical tree slice spec or the path-sensitive NL/config note.
 
 ### Split-later / merge-later posture
 

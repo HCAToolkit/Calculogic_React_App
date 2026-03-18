@@ -334,8 +334,8 @@ Classification: Normative
 This spec extends (and does not replace):
 
 - `calculogic-validator/doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
-- `calculogic-validator/doc/ValidatorSpecs/naming-semantic-name-and-role-disambiguation-spec.md`
-- `calculogic-validator/doc/ValidatorSpecs/registry-model-and-slice-interaction-spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation-spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction-spec.md`
 
 Classification: Normative
 

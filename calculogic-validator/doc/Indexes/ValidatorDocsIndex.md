@@ -49,14 +49,26 @@ Authority labels used in this index:
 - `doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
   **Authority:** bounded normative supporting spec. **Intended use:** shared filename interpretation/case-policy contract lane for cross-slice alignment; defer primary runtime authority to suite contract + slice specs.
 
-- `doc/ValidatorSpecs/naming-semantic-name-and-role-disambiguation-spec.md`
+- `doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation-spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** naming semantic-name vs role-token disambiguation interpretation guidance; supports implementation and modeling without replacing canonical slice authority.
 
-- `doc/ValidatorSpecs/naming-semantic-family-and-interpretation-spec.md`
+- `doc/ValidatorSpecs/naming-owned/naming-semantic-family-and-interpretation-spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** active documentation-first semantic-family modeling tranche for naming interpretation; runtime behavior remains governed by canonical authorities unless implemented.
 
-- `doc/ValidatorSpecs/registry-model-and-slice-interaction-spec.md`
+- `doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction-spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** suite-level registry model/interaction constraints for implementation design and ownership boundaries; defer primary runtime authority to canonical contracts/slice specs.
+
+- `doc/ValidatorSpecs/tree-owned/tree-structural-vocabulary-and-root-classification-spec.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** tree-owned structural vocabulary and root-classification modeling contract; supports tree interpretation work without replacing canonical tree runtime authority.
+
+- `doc/ValidatorSpecs/tree-owned/tree-occurrence-model-and-addressing-spec.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** tree-owned occurrence/addressing modeling contract used for deterministic path-occurrence reasoning; no runtime authority change implied.
+
+- `doc/ValidatorSpecs/tree-owned/tree-registry-definitions-and-relationships-spec.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** tree-owned interpretive registry definitions/relationships modeling contract that supports tree design work while deferring runtime authority to the canonical tree spec.
+
+- `doc/ValidatorSpecs/tree-owned/tree-top-root-registry-transition-inventory.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** transition-scoped top-root registry contract for tree modeling/migration work; does not replace the canonical tree slice spec.
 
 ### 4.2 Supporting implementation guidance
 
@@ -68,10 +80,10 @@ Authority labels used in this index:
 
 ## 5) Transitional inventories / migration routing
 
-- `doc/ValidatorSpecs/naming-documentation-map-and-reorg-inventory.md`
+- `doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg-inventory.md`
   **Authority:** transitional inventory. **Intended use:** naming-document routing/ownership guidance and bounded reorg context; does not define runtime behavior.
 
-- `doc/ValidatorSpecs/tree-documentation-map-and-reorg-inventory.md`
+- `doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`
   **Authority:** transitional inventory. **Intended use:** tree-document routing/ownership guidance and bounded reorg context; does not define runtime behavior.
 
 - `doc/naming-compatibility-inventory.md`
@@ -82,7 +94,10 @@ Authority labels used in this index:
 - `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
   **Authority:** draft. **Intended use:** structural-addressing modeling guidance while governance decisions remain in progress.
 
-- `doc/ValidatorSpecs/registry-customization-state-system-draft.md`
+- `doc/ValidatorSpecs/suite-owned/compat-shim-policy.md`
+  **Authority:** draft. **Intended use:** draft policy for time-bounded compat shims during refactor staging; does not establish canonical runtime behavior by itself.
+
+- `doc/ValidatorSpecs/suite-owned/registry-customization-state-system-draft.md`
   **Authority:** draft. **Intended use:** draft spec for built-in vs custom registry state and customization commands (report-only).
 
 ## 7) Audits (snapshot artifacts)

@@ -17,7 +17,7 @@ Authority posture note: This is a bounded normative supporting spec for naming i
 Inherited shared concepts come from:
 
 - `calculogic-validator/doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
-- `calculogic-validator/doc/ValidatorSpecs/registry-model-and-slice-interaction-spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction-spec.md`
 
 Naming-slice specialization in this document does not redefine those shared nouns. It applies and specializes them for naming-slice interpretation behavior.
 
@@ -97,7 +97,7 @@ Rules:
 - It remains secondary to canonical dominant role ownership.
 - It remains subordinate to explicit ownership grammar.
 
-For bounded semantic-family entities/definitions/relationships and run-scoped interpreted-signal framing, see `naming-semantic-family-and-interpretation-spec.md`.
+For bounded semantic-family entities/definitions/relationships and run-scoped interpreted-signal framing, see `../naming-owned/naming-semantic-family-and-interpretation-spec.md`.
 
 This section remains an interpretation option, not a mandatory runtime requirement.
 
