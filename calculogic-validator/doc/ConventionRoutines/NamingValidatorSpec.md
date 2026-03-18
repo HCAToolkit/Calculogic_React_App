@@ -323,6 +323,23 @@ When `--config=<path>` is supplied, report metadata may include:
 - `registrySource`
 - `registryDigests`
 
+### Semantic-family report surfaces (future/current-tranche direction)
+
+Current runtime contract remains the emitted surface listed above. This spec does **not** claim that semantic-family-derived report fields are already emitted today.
+
+When later naming-owned semantic-family reporting is implemented, slice-specific optional report surfaces may include:
+
+- per-file derived details when emitted from naming interpretation, such as `semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, `relatedSemanticNames`, and ambiguity/split markers
+- run-level aggregate naming observations such as `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts`
+
+Boundary clarifications:
+
+- these are naming-owned observed report surfaces, not shared registry declarations
+- aggregate counts represent what a naming run observed after derivation; they are not policy truth by themselves
+- results/report interpretation may use them once emitted
+- tree may later consume naming-owned emitted surfaces rather than deriving semantic-family independently
+- later custom-registry work may review recurring observations as candidate evidence for additions, overlays, or pinning, but registry truth must still be declared through a separate policy/customization lane
+
 ### Special-case subtype metadata
 
 V0.1.2 keeps top-level classification `allowed-special-case` and includes deterministic subtype metadata in `details.specialCaseType`:

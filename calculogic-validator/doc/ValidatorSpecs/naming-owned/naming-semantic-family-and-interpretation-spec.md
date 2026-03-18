@@ -150,26 +150,44 @@ Classification: Normative
 
 Phase guidance:
 
+- semantic-family/group presence may or may not be present in a filename shape,
+- when filename shape does support semantic-family interpretation, naming remains the derivation owner,
 - semantic-family is interpreted first from current naming interpretation context,
 - normalized during the validator run,
 - temporarily held in runtime/report/results context,
 - not yet authoritative declared registry truth,
 - later custom registry/overlay work may declare, override, or pin meanings.
 
-Conceptual signal candidates for this phase (concept-first, field-name-flexible):
-
-- `semanticName`
-- `semanticTokens`
-- `semanticFamily`
-- `familyRoot`
-- `familySubgroup`
-- `relatedSemanticNames`
-- `ambiguityFlags`
-- `splitFamilyFlags`
-
 Guardrail: this spec intentionally does not over-commit exact runtime field names in this tranche.
 
-### 6.1 Bounded semantic-family interpretation grammar notes (report-first)
+### 6.1 Intended report/output layers (bounded next-tranche direction)
+
+The intended naming-owned report surfaces for semantic-family work are separated into bounded layers so observation does not get confused with policy.
+
+1. **Per-file derived outputs** capture naming's filename-level interpretation when the semantic-name shape supports it. Conceptual candidates in this layer include:
+   - `semanticName`
+   - `semanticTokens`
+   - `semanticFamily`
+   - `familyRoot`
+   - `familySubgroup`
+   - `relatedSemanticNames`
+   - ambiguity markers such as `ambiguityFlags`
+   - split markers such as `splitFamilyFlags`
+2. **Run-level aggregate observations** summarize what a naming run observed across files after derivation. Conceptual candidates in this layer include:
+   - `familyRootCounts`
+   - `familySubgroupCounts`
+   - `semanticFamilyCounts`
+3. **Later candidate-policy direction** may use recurring observed roots/subgroups/families as evidence for future custom-registry additions, overlays, or pinning. The report itself does **not** declare registry membership or convert an observed count into policy truth.
+
+Observation/policy boundary for this tranche:
+
+- per-file derived outputs are naming-owned interpreted results,
+- aggregate count surfaces are naming-owned observed run statistics,
+- `familyRootCounts.tree = 12` means the naming run observed 12 files whose derived `familyRoot` was `tree`,
+- that observation does **not** mean `tree` is now a declared registry root or registry-approved family,
+- later customization/registry work may review these observations as candidate evidence, but policy declaration remains a separate later ownership lane.
+
+### 6.2 Bounded semantic-family interpretation grammar notes (report-first)
 
 Interpretation in this phase may apply bounded grammar-like guidance for semantic-family normalization when the semantic-name shape supports family/subgroup interpretation.
 
@@ -191,6 +209,8 @@ Descriptor-token guidance:
 Future policy direction (deferred):
 
 - These interpretation rules may later live in naming-owned semantic-family interpretation policy, registry-backed interpretation surfaces, and customizable commands/overrides once this intended naming-owned lane reaches later runtime/report maturity.
+- Recurring aggregate observations such as `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts` may later be reviewed as candidate evidence for what should be added, pinned, or overridden in a custom registry.
+- Those observed counts remain report evidence only; they do **not** become registry truth unless a later policy/customization surface explicitly declares them.
 - That policy/customization expansion is intentionally deferred until customization commands are no longer deferred and report maturity is stronger.
 
 Ownership clarification (naming-owned derived outputs):
@@ -229,6 +249,7 @@ Results-first, tree-later handoff clarification:
 - Results/reporting consumes naming-owned semantic-family outputs first.
 - Tree consumption is later and explicitly deferred in this tranche; that timing deferment does not make semantic-family derivation conceptually optional.
 - Tree may later consume `semanticFamily`/`familyRoot`/`familySubgroup`/`relatedSemanticNames` for semantic-folder expectations or grouping reasoning once naming emits those outputs.
+- Tree may later consume naming-owned aggregate observations such as `familyRootCounts`/`familySubgroupCounts`/`semanticFamilyCounts` only as report context, not as tree-owned policy declaration.
 - Tree must not derive semantic-family independently as a competing source.
 
 Classification: Normative
@@ -239,6 +260,7 @@ Future boundary contract:
 
 - naming owns semantic-family derivation as an intended implementation lane for later runtime/report/results maturity,
 - tree may later consume prepared family/root/subgroup signals produced by naming-owned derivation,
+- tree may later consume naming-owned aggregate observations as downstream context when useful,
 - such signals may later help tree reason about expected semantic folders/subtrees, and tree behavior depends on naming providing them rather than re-deriving them,
 - tree must not independently derive semantic-family as a competing source of truth.
 
