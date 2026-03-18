@@ -90,7 +90,7 @@ Tree advisor may consume naming-shaped filename metadata as **structural signal 
 Tree advisor may use these parsed naming-shaped signals when present:
 
 - `semanticName`
-- semantic family/group derived from `semanticName`
+- semantic family/group outputs derived by naming from `semanticName`
 - `role`
 - role category/status metadata
 
@@ -280,12 +280,12 @@ V0.0.1 uses deterministic heuristics that are explainable in findings.
 
 ### 1) Semantic family cohesion
 
-Detect when a semantic family (shared `<semantic-name>` prefix) is scattered across too many unrelated folders.
+Detect when a naming-derived semantic family signal is scattered across too many unrelated folders.
 
 Example family keys:
 
 - exact semantic name: `validator-config`
-- configured “family prefix rule” (optional): `naming-rule-*` → family `naming-rule`
+- configured family-prefix rule when enabled: `naming-rule-*` → family `naming-rule`
 
 ### 2) Lane purity / entropy
 
@@ -363,7 +363,7 @@ Detect (deterministic):
 - A shared root is one of a configured set (V0.0.1 default example: `src/shared`).
 - The shared root contains lane-first partitions as immediate child folders (examples):
   - `logic`, `knowledge`, `results`, `build`, `build-style`, `results-style`, `tests`, `docs`
-- A semantic family (derived from parsed `<semantic-name>`) appears under >= 2 distinct lane-first partitions within that shared root.
+- A semantic family output supplied by naming (derived from parsed `<semantic-name>`) appears under >= 2 distinct lane-first partitions within that shared root.
 - Guardrail: only recommend when the family has >= 2 files (reduces churn/noise).
 
 Recommend (advisory):

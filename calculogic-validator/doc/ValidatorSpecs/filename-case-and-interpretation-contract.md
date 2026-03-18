@@ -37,12 +37,12 @@ The semantic name is a high-priority filename interpretation lane directly below
 - Semantic name materially influences interpretation and diagnostics.
 - Semantic name does **not** override an explicit canonical dominant role slot.
 
-### 3.3 Optional semantic-family / semantic-group interpretation
+### 3.3 Semantic-family / semantic-group interpretation when filename shape supports it
 
-Semantic-family-like interpretation may exist and can be useful, but it is optional in this contract.
+Semantic-family-like interpretation is part of the intended naming-owned filename interpretation lane, but it only applies when filename shape exposes semantic-family/group structure.
 
-- It is not required as a structural lane for contract validity.
-- Slices may adopt it where ROI and domain semantics justify it.
+- Semantic-family/group presence is not required as a structural lane for contract validity in every filename.
+- Cross-slice contracts may reference it when naming exposes those outputs and ROI/domain semantics justify downstream use, while naming remains the primary derivation owner.
 
 ### 3.4 Folder-token context
 
@@ -61,7 +61,7 @@ Minimum precedence order:
 
 1. explicit canonical role slot
 2. semantic name lane
-3. optional semantic-family / semantic-group interpretation
+3. semantic-family / semantic-group interpretation when filename shape supports it
 4. folder-token context
 
 Deterministic precedence rule:
@@ -173,7 +173,7 @@ Classification: Normative
 
 - No runtime behavior changes in this task.
 - No requirement to implement all case lanes immediately.
-- No requirement to make semantic-family interpretation mandatory.
+- No requirement to make semantic-family/group presence mandatory in every filename shape.
 - No requirement to flatten naming logic into suite-core in this task.
 - No file renames/moves and no registry payload changes in this task.
 

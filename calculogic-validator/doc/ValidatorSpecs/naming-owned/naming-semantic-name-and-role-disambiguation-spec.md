@@ -37,7 +37,7 @@ Naming-slice interpretation precedence follows deterministic order:
 
 1. canonical dominant role slot
 2. semantic name lane
-3. optional semantic-family-style interpretation
+3. semantic-family-style interpretation when semantic-name shape supports it
 4. folder context
 
 Interpretation guardrail:
@@ -86,20 +86,20 @@ However, ambiguity signaling must not reinterpret or reassign explicit canonical
 
 Classification: Normative
 
-## 6) Optional Semantic-Family-Style Interpretation
+## 6) Semantic-Family-Style Interpretation When Shape Supports It
 
-Semantic-family-style grouping is an optional interpretation capability inside or around semantic naming.
+Semantic-family-style grouping is an intended naming-owned interpretation capability inside semantic naming, but it only applies when the semantic-name shape supports that interpretation.
 
 Rules:
 
-- It is not a required structural filename lane.
-- It may later be inferred, declared, or registry-assisted.
+- Semantic-family presence is not a required structural filename lane in every filename shape.
+- It may later be inferred, declared, or registry-assisted through naming-owned derivation.
 - It remains secondary to canonical dominant role ownership.
 - It remains subordinate to explicit ownership grammar.
 
 For bounded semantic-family entities/definitions/relationships and run-scoped interpreted-signal framing, see `../naming-owned/naming-semantic-family-and-interpretation-spec.md`.
 
-This section remains an interpretation option, not a mandatory runtime requirement.
+This section documents a naming-owned interpretation lane whose runtime implementation is not yet activated in the current tranche.
 
 Classification: Normative
 
@@ -113,13 +113,13 @@ Naming-slice specialization may define how shared case-policy surfaces apply to:
 
 - semantic-name lane text,
 - semantic-name token segments,
-- optional semantic-family-style segments,
+- semantic-family-style segments when the semantic-name shape exposes them,
 - role token segments in the explicit canonical role slot.
 
 Current runtime boundary for this specialization:
 
 - Implemented baseline: prepared semantic-name lane case-policy application, including bounded optional registry integration for semantic-name `caseRules`.
-- Future/optional expansion: additional family/group/folder lane-aware policy remains future-facing and is not required by the current runtime contract.
+- Future runtime expansion: additional family/group/folder lane-aware policy remains future-facing and is not required by the current runtime contract yet.
 
 Case-policy guardrail:
 
@@ -137,7 +137,7 @@ Classification: Illustrative
 
 - Canonical role: `contracts` (from explicit `.contracts.ts` slot)
 - Semantic name: `naming-role-matrix`
-- Optional semantic-family-style interpretation: `naming` family with `role-matrix` semantic grouping (optional)
+- Semantic-family-style interpretation when shape-supported: `naming` family with `role-matrix` semantic grouping
 - Why role-like tokens are not reclassified: explicit role slot already owns canonical role; `role` inside semantic name is descriptive text.
 
 ### 8.2 Role-like folder token with explicit role slot
@@ -146,7 +146,7 @@ Path example: `validators/host/naming-role-index.logic.mjs`
 
 - Canonical role: `logic` (from explicit `.logic.mjs` slot)
 - Semantic name: `naming-role-index`
-- Optional semantic-family-style interpretation: `naming` family with `role-index` grouping (optional)
+- Semantic-family-style interpretation when shape-supported: `naming` family with `role-index` grouping
 - Folder context: `host` is role-like but contextual in this interpretation lane
 - Why role-like tokens are not reclassified: explicit role slot remains authority; folder token and semantic-name token are contextual/semantic.
 
@@ -156,7 +156,7 @@ Filename example: `role-catalog-family-map.contracts.mjs`
 
 - Canonical role: `contracts`
 - Semantic name: `role-catalog-family-map`
-- Optional semantic-family-style interpretation: `catalog` or `family-map` grouping (optional and policy-dependent)
+- Semantic-family-style interpretation when shape-supported: `catalog` or `family-map` grouping (policy-dependent)
 - Why role-like tokens are not reclassified: `role` token is semantic reference content; explicit `.contracts.mjs` slot remains canonical ownership declaration.
 
 ## 9) Ambiguity Handling
@@ -179,7 +179,7 @@ Inherited shared concepts (not redefined here):
 
 - canonical dominant role slot as authoritative ownership lane,
 - semantic name as a major lane directly below canonical role,
-- optional semantic-family/semantic-group lane concept,
+- semantic-family/semantic-group lane concept when the semantic-name shape exposes it,
 - folder-token contextual interpretation,
 - shared case-policy contract surface.
 
@@ -187,7 +187,7 @@ Naming-slice-specific specialization in this spec:
 
 - how naming slice interprets semantic-name lane content,
 - default disambiguation behavior for role-like tokens in semantic/folder context,
-- optional semantic-family-style interpretation framing in naming slice,
+- semantic-family-style interpretation framing in naming slice when shape-supported,
 - naming-slice application points for shared case-policy surfaces.
 
 Classification: Normative
@@ -197,7 +197,7 @@ Classification: Normative
 This spec does not:
 
 - change runtime behavior,
-- require a mandatory semantic-family lane,
+- require semantic-family presence in every filename shape,
 - redefine suite-level core nouns,
 - finalize all future registry shapes,
 - rename files, move files, or mutate registry payloads.
