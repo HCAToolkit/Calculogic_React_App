@@ -60,6 +60,19 @@ const withSortedUniqueFlags = (details, fieldName, flags) => {
   };
 };
 
+const hasCompleteSemanticFamilyRootObservation = (finding) =>
+  SEMANTIC_FAMILY_EVIDENCE_CLASSIFICATIONS.has(finding.classification) &&
+  typeof finding.details?.semanticName === 'string' &&
+  typeof finding.details?.familyRoot === 'string';
+
+const hasCompleteSemanticFamilyObservation = (finding) =>
+  hasCompleteSemanticFamilyRootObservation(finding) &&
+  typeof finding.details?.semanticFamily === 'string';
+
+const hasNonSingularFamilyBoundary = (finding) =>
+  Array.isArray(finding.details?.ambiguityFlags) &&
+  finding.details.ambiguityFlags.includes(SEMANTIC_FAMILY_AMBIGUITY_FLAGS.FAMILY_BOUNDARY_HEURISTIC);
+
 export const deriveSemanticFamilyDetails = ({ semanticName }) => {
   const semanticTokens = splitSemanticTokens(semanticName);
 
@@ -80,18 +93,20 @@ export const deriveSemanticFamilyDetails = ({ semanticName }) => {
   }, 'ambiguityFlags', deriveAmbiguityFlags({ semanticTokens }));
 };
 
-export const isSemanticFamilyEvidenceFinding = (finding) =>
-  SEMANTIC_FAMILY_EVIDENCE_CLASSIFICATIONS.has(finding.classification) &&
-  typeof finding.details?.semanticName === 'string' &&
-  typeof finding.details?.semanticFamily === 'string' &&
-  typeof finding.details?.familyRoot === 'string';
+export const isSemanticFamilyEvidenceFinding = (finding) => hasCompleteSemanticFamilyObservation(finding);
+
+export const isSemanticFamilyRootEvidenceFinding = (finding) => hasCompleteSemanticFamilyRootObservation(finding);
+
+export const isSingularSemanticFamilyEvidenceFinding = (finding) =>
+  hasCompleteSemanticFamilyObservation(finding) &&
+  !hasNonSingularFamilyBoundary(finding);
 
 const buildSemanticFamilyObservationMaps = (findings) => {
   const semanticNamesByFamily = new Map();
   const semanticFamiliesByRoot = new Map();
 
   for (const finding of findings) {
-    if (!isSemanticFamilyEvidenceFinding(finding)) {
+    if (!isSingularSemanticFamilyEvidenceFinding(finding)) {
       continue;
     }
 
@@ -134,6 +149,10 @@ export const attachRelatedSemanticNames = (findings) => {
 
   return findings.map((finding) => {
     if (!isSemanticFamilyEvidenceFinding(finding)) {
+      return finding;
+    }
+
+    if (!isSingularSemanticFamilyEvidenceFinding(finding)) {
       return finding;
     }
 

@@ -20,7 +20,8 @@ import { deriveDisambiguationHints } from './rules/naming-rule-derive-disambigua
 import {
   deriveSemanticFamilyDetails,
   attachRelatedSemanticNames,
-  isSemanticFamilyEvidenceFinding,
+  isSemanticFamilyRootEvidenceFinding,
+  isSingularSemanticFamilyEvidenceFinding,
 } from './rules/naming-rule-derive-semantic-family.logic.mjs';
 import {
   getRoleMetadata,
@@ -514,9 +515,11 @@ export const summarizeFindings = (findings, summaryBucketsRuntime) => {
       incrementSecondaryFamilyCounter('warningRoleCategoryCounts', finding.details.roleCategory);
     }
 
-    if (isSemanticFamilyEvidenceFinding(finding)) {
+    if (isSemanticFamilyRootEvidenceFinding(finding)) {
       incrementSecondaryFamilyCounter('familyRootCounts', finding.details.familyRoot);
+    }
 
+    if (isSingularSemanticFamilyEvidenceFinding(finding)) {
       if (finding.details.familySubgroup) {
         incrementSecondaryFamilyCounter('familySubgroupCounts', finding.details.familySubgroup);
       }

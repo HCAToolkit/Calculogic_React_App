@@ -332,15 +332,16 @@ Current naming runtime now emits bounded naming-owned semantic-family report sur
 
 Aggregate inclusion rule (explicit current runtime behavior):
 
-- only findings classified as `canonical` and carrying a complete naming-derived semantic-family observation (`semanticName`, `semanticFamily`, `familyRoot`) contribute to `familyRootCounts`, `familySubgroupCounts`, `semanticFamilyCounts`, `relatedSemanticNames`, and split-family observation markers
+- `familyRootCounts` uses canonical root evidence only: findings must be classified as `canonical` and carry naming-derived `semanticName` plus `familyRoot`
+- `familySubgroupCounts`, `semanticFamilyCounts`, `relatedSemanticNames`, and split-family observation markers require singular family evidence: findings must be `canonical`, carry `semanticName` + `semanticFamily` + `familyRoot`, and must not carry the non-singular boundary marker `ambiguityFlags: ["family-boundary-heuristic"]`
 - invalid, deprecated, missing-role, special-case, or other non-canonical findings never contribute semantic-family aggregates even if a caller manually injects similar-looking fields into `details`
-- this keeps aggregate counts aligned to trustworthy naming evidence instead of “any finding with family-looking fields”
+- this keeps family-root observation available while preventing heuristic/non-singular family assignments from inflating family/subgroup peer evidence
 
 Marker semantics (bounded, observational, non-policy):
 
 - `ambiguityFlags` mark bounded cases where current deterministic interpretation required a heuristic family boundary choice; current runtime emits `family-boundary-heuristic` for connector-free semantic names with four or more tokens
 - `splitFamilyFlags` mark bounded run-scoped divergence where one observed `familyRoot` maps to multiple observed `semanticFamily` values; current runtime emits `family-root-observed-multiple-families`
-- `relatedSemanticNames` is retained and now means same-`semanticFamily` peer semantic names observed in the current run's canonical evidence set, sorted deterministically; it is not a registry declaration or a generic semantic-relatedness engine
+- `relatedSemanticNames` is retained and now means same-`semanticFamily` peer semantic names observed in the current run's singular canonical evidence set, sorted deterministically; it is not a registry declaration or a generic semantic-relatedness engine
 
 Boundary clarifications:
 

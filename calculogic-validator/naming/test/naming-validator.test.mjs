@@ -196,17 +196,15 @@ test('runNamingValidator attaches run-scoped same-family peers and split markers
     assert.equal(orderPaymentFinding?.details?.relatedSemanticNames, undefined);
     assert.equal(treeFinding?.details?.relatedSemanticNames, undefined);
     assert.deepEqual(orderPaymentFinding?.details?.ambiguityFlags, ['family-boundary-heuristic']);
-    assert.deepEqual(orderPaymentFinding?.details?.splitFamilyFlags, ['family-root-observed-multiple-families']);
+    assert.equal(orderPaymentFinding?.details?.splitFamilyFlags, undefined);
     assert.deepEqual(orderShippingFinding?.details?.ambiguityFlags, ['family-boundary-heuristic']);
-    assert.deepEqual(orderShippingFinding?.details?.splitFamilyFlags, ['family-root-observed-multiple-families']);
+    assert.equal(orderShippingFinding?.details?.splitFamilyFlags, undefined);
     assert.deepEqual(report.familyRootCounts, { naming: 2, order: 2 });
     assert.deepEqual(report.familySubgroupCounts, {
-      'payment-refund': 1,
       'role-index': 1,
       'role-matrix': 1,
-      'shipping-tracker': 1,
     });
-    assert.deepEqual(report.semanticFamilyCounts, { naming: 2, 'order-payment': 1, 'order-shipping': 1 });
+    assert.deepEqual(report.semanticFamilyCounts, { naming: 2 });
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
