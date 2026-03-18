@@ -327,13 +327,25 @@ When `--config=<path>` is supplied, report metadata may include:
 
 Current naming runtime now emits bounded naming-owned semantic-family report surfaces in two layers:
 
-- per-file derived details in `finding.details` when the semantic-name shape supports deterministic semantic-family interpretation, currently including `semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, and run-scoped `relatedSemanticNames` when another same-family semantic name is observed in the run
+- per-file derived details in `finding.details` when the semantic-name shape supports deterministic semantic-family interpretation, currently including `semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, optional `ambiguityFlags`, optional `splitFamilyFlags`, and run-scoped `relatedSemanticNames` when another same-family peer is observed in the run
 - run-level aggregate naming observations in the report envelope: `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts`
+
+Aggregate inclusion rule (explicit current runtime behavior):
+
+- only findings classified as `canonical` and carrying a complete naming-derived semantic-family observation (`semanticName`, `semanticFamily`, `familyRoot`) contribute to `familyRootCounts`, `familySubgroupCounts`, `semanticFamilyCounts`, `relatedSemanticNames`, and split-family observation markers
+- invalid, deprecated, missing-role, special-case, or other non-canonical findings never contribute semantic-family aggregates even if a caller manually injects similar-looking fields into `details`
+- this keeps aggregate counts aligned to trustworthy naming evidence instead of “any finding with family-looking fields”
+
+Marker semantics (bounded, observational, non-policy):
+
+- `ambiguityFlags` mark bounded cases where current deterministic interpretation required a heuristic family boundary choice; current runtime emits `family-boundary-heuristic` for connector-free semantic names with four or more tokens
+- `splitFamilyFlags` mark bounded run-scoped divergence where one observed `familyRoot` maps to multiple observed `semanticFamily` values; current runtime emits `family-root-observed-multiple-families`
+- `relatedSemanticNames` is retained and now means same-`semanticFamily` peer semantic names observed in the current run's canonical evidence set, sorted deterministically; it is not a registry declaration or a generic semantic-relatedness engine
 
 Boundary clarifications:
 
 - these are naming-owned observed report surfaces, not shared registry declarations
-- aggregate counts represent what a naming run observed after derivation; they are not policy truth by themselves
+- aggregate counts represent what a naming run observed after canonical-evidence inclusion; they are not policy truth by themselves
 - current runtime only emits these derived details when the semantic-name shape supports bounded deterministic interpretation; it does not force every filename to have family outputs
 - tree may later consume naming-owned emitted surfaces rather than deriving semantic-family independently
 - later custom-registry work may review recurring observations as candidate evidence for additions, overlays, or pinning, but registry truth must still be declared through a separate policy/customization lane

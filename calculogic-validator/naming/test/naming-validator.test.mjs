@@ -166,15 +166,18 @@ test('classifies canonical file with semantic-family derived details when shape 
   assert.equal(finding.details?.semanticFamily, 'order-payment');
   assert.equal(finding.details?.familyRoot, 'order');
   assert.equal(finding.details?.familySubgroup, 'payment-refund');
+  assert.deepEqual(finding.details?.ambiguityFlags, ['family-boundary-heuristic']);
 });
 
-test('runNamingValidator attaches run-scoped related semantic names without coupling tree runtime', () => {
+test('runNamingValidator attaches run-scoped same-family peers and split markers without coupling tree runtime', () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'naming-semantic-family-run-'));
 
   try {
     fs.mkdirSync(path.join(tempRoot, 'src'), { recursive: true });
     fs.writeFileSync(path.join(tempRoot, 'src', 'naming-role-index.logic.mjs'), 'export const index = 1;\n');
     fs.writeFileSync(path.join(tempRoot, 'src', 'naming-role-matrix.logic.mjs'), 'export const matrix = 1;\n');
+    fs.writeFileSync(path.join(tempRoot, 'src', 'order-payment-refund-reconcile.logic.mjs'), 'export const refund = 1;\n');
+    fs.writeFileSync(path.join(tempRoot, 'src', 'order-shipping-tracker-sync.logic.mjs'), 'export const shipping = 1;\n');
     fs.writeFileSync(path.join(tempRoot, 'src', 'tree.logic.mjs'), 'export const tree = 1;\n');
 
     const result = runNamingValidator(tempRoot, { scope: 'app', targets: ['src'] });
@@ -184,17 +187,26 @@ test('runNamingValidator attaches run-scoped related semantic names without coup
     };
     const indexFinding = report.findings.find((finding) => finding.path === 'src/naming-role-index.logic.mjs');
     const matrixFinding = report.findings.find((finding) => finding.path === 'src/naming-role-matrix.logic.mjs');
+    const orderPaymentFinding = report.findings.find((finding) => finding.path === 'src/order-payment-refund-reconcile.logic.mjs');
+    const orderShippingFinding = report.findings.find((finding) => finding.path === 'src/order-shipping-tracker-sync.logic.mjs');
     const treeFinding = report.findings.find((finding) => finding.path === 'src/tree.logic.mjs');
 
     assert.deepEqual(indexFinding?.details?.relatedSemanticNames, ['naming-role-matrix']);
     assert.deepEqual(matrixFinding?.details?.relatedSemanticNames, ['naming-role-index']);
+    assert.equal(orderPaymentFinding?.details?.relatedSemanticNames, undefined);
     assert.equal(treeFinding?.details?.relatedSemanticNames, undefined);
-    assert.deepEqual(report.familyRootCounts, { naming: 2 });
+    assert.deepEqual(orderPaymentFinding?.details?.ambiguityFlags, ['family-boundary-heuristic']);
+    assert.deepEqual(orderPaymentFinding?.details?.splitFamilyFlags, ['family-root-observed-multiple-families']);
+    assert.deepEqual(orderShippingFinding?.details?.ambiguityFlags, ['family-boundary-heuristic']);
+    assert.deepEqual(orderShippingFinding?.details?.splitFamilyFlags, ['family-root-observed-multiple-families']);
+    assert.deepEqual(report.familyRootCounts, { naming: 2, order: 2 });
     assert.deepEqual(report.familySubgroupCounts, {
+      'payment-refund': 1,
       'role-index': 1,
       'role-matrix': 1,
+      'shipping-tracker': 1,
     });
-    assert.deepEqual(report.semanticFamilyCounts, { naming: 2 });
+    assert.deepEqual(report.semanticFamilyCounts, { naming: 2, 'order-payment': 1, 'order-shipping': 1 });
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }

@@ -1,5 +1,15 @@
 export const CONNECTOR_TOKENS = new Set(['and', 'or', 'with']);
 
+export const SEMANTIC_FAMILY_EVIDENCE_CLASSIFICATIONS = new Set(['canonical']);
+
+export const SEMANTIC_FAMILY_AMBIGUITY_FLAGS = Object.freeze({
+  FAMILY_BOUNDARY_HEURISTIC: 'family-boundary-heuristic',
+});
+
+export const SEMANTIC_FAMILY_SPLIT_FLAGS = Object.freeze({
+  ROOT_HAS_MULTIPLE_FAMILIES: 'family-root-observed-multiple-families',
+});
+
 const splitSemanticTokens = (semanticName) =>
   semanticName.split(/[-.]/u).map((token) => token.trim()).filter(Boolean);
 
@@ -31,6 +41,25 @@ const deriveFamilyGrouping = (semanticTokens) => {
   };
 };
 
+const deriveAmbiguityFlags = ({ semanticTokens }) => {
+  if (semanticTokens.length >= 4 && !semanticTokens.slice(1).some((token) => CONNECTOR_TOKENS.has(token))) {
+    return [SEMANTIC_FAMILY_AMBIGUITY_FLAGS.FAMILY_BOUNDARY_HEURISTIC];
+  }
+
+  return [];
+};
+
+const withSortedUniqueFlags = (details, fieldName, flags) => {
+  if (flags.length === 0) {
+    return details;
+  }
+
+  return {
+    ...details,
+    [fieldName]: toSortedUnique(flags),
+  };
+};
+
 export const deriveSemanticFamilyDetails = ({ semanticName }) => {
   const semanticTokens = splitSemanticTokens(semanticName);
 
@@ -43,61 +72,90 @@ export const deriveSemanticFamilyDetails = ({ semanticName }) => {
     ? grouping.familySubgroupTokens.join('-')
     : undefined;
 
-  return {
+  return withSortedUniqueFlags({
     semanticTokens,
     semanticFamily: grouping.semanticFamily,
     familyRoot: grouping.familyRoot,
     ...(familySubgroup ? { familySubgroup } : {}),
-  };
+  }, 'ambiguityFlags', deriveAmbiguityFlags({ semanticTokens }));
 };
 
-export const attachRelatedSemanticNames = (findings) => {
+export const isSemanticFamilyEvidenceFinding = (finding) =>
+  SEMANTIC_FAMILY_EVIDENCE_CLASSIFICATIONS.has(finding.classification) &&
+  typeof finding.details?.semanticName === 'string' &&
+  typeof finding.details?.semanticFamily === 'string' &&
+  typeof finding.details?.familyRoot === 'string';
+
+const buildSemanticFamilyObservationMaps = (findings) => {
   const semanticNamesByFamily = new Map();
+  const semanticFamiliesByRoot = new Map();
 
   for (const finding of findings) {
-    const semanticFamily = finding.details?.semanticFamily;
-    const semanticName = finding.details?.semanticName;
-
-    if (!semanticFamily || !semanticName) {
+    if (!isSemanticFamilyEvidenceFinding(finding)) {
       continue;
     }
+
+    const { semanticFamily, semanticName, familyRoot } = finding.details;
 
     if (!semanticNamesByFamily.has(semanticFamily)) {
       semanticNamesByFamily.set(semanticFamily, []);
     }
 
     semanticNamesByFamily.get(semanticFamily).push(semanticName);
+
+    if (!semanticFamiliesByRoot.has(familyRoot)) {
+      semanticFamiliesByRoot.set(familyRoot, []);
+    }
+
+    semanticFamiliesByRoot.get(familyRoot).push(semanticFamily);
   }
 
-  const relatedSemanticNamesByFamily = new Map(
-    Array.from(semanticNamesByFamily.entries(), ([semanticFamily, semanticNames]) => [
-      semanticFamily,
-      toSortedUnique(semanticNames),
-    ]),
-  );
+  return {
+    relatedSemanticNamesByFamily: new Map(
+      Array.from(semanticNamesByFamily.entries(), ([semanticFamily, semanticNames]) => [
+        semanticFamily,
+        toSortedUnique(semanticNames),
+      ]),
+    ),
+    semanticFamiliesByRoot: new Map(
+      Array.from(semanticFamiliesByRoot.entries(), ([familyRoot, semanticFamilies]) => [
+        familyRoot,
+        toSortedUnique(semanticFamilies),
+      ]),
+    ),
+  };
+};
+
+export const attachRelatedSemanticNames = (findings) => {
+  const {
+    relatedSemanticNamesByFamily,
+    semanticFamiliesByRoot,
+  } = buildSemanticFamilyObservationMaps(findings);
 
   return findings.map((finding) => {
-    const semanticFamily = finding.details?.semanticFamily;
-    const semanticName = finding.details?.semanticName;
-
-    if (!semanticFamily || !semanticName) {
+    if (!isSemanticFamilyEvidenceFinding(finding)) {
       return finding;
     }
 
+    const { semanticFamily, semanticName, familyRoot } = finding.details;
     const relatedSemanticNames = (relatedSemanticNamesByFamily.get(semanticFamily) ?? []).filter(
       (candidateSemanticName) => candidateSemanticName !== semanticName,
     );
 
-    if (relatedSemanticNames.length === 0) {
-      return finding;
-    }
+    const splitFamilyFlags = (semanticFamiliesByRoot.get(familyRoot) ?? []).length > 1
+      ? [SEMANTIC_FAMILY_SPLIT_FLAGS.ROOT_HAS_MULTIPLE_FAMILIES]
+      : [];
+
+    const detailsWithRelatedNames = relatedSemanticNames.length > 0
+      ? {
+          ...finding.details,
+          relatedSemanticNames,
+        }
+      : finding.details;
 
     return {
       ...finding,
-      details: {
-        ...finding.details,
-        relatedSemanticNames,
-      },
+      details: withSortedUniqueFlags(detailsWithRelatedNames, 'splitFamilyFlags', splitFamilyFlags),
     };
   });
 };

@@ -57,9 +57,11 @@ Current naming CLI output includes:
 
 Slice-specific note (current naming emitted behavior):
 
-- Naming now emits bounded semantic-family-derived per-file details inside `finding.details` when the semantic-name shape supports deterministic derivation. Current derived fields include `semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, and run-scoped `relatedSemanticNames` when observed.
+- Naming now emits bounded semantic-family-derived per-file details inside `finding.details` when the semantic-name shape supports deterministic derivation. Current derived fields include `semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, optional `ambiguityFlags`, optional `splitFamilyFlags`, and run-scoped `relatedSemanticNames` when observed.
+- `relatedSemanticNames` means same-`semanticFamily` peer semantic names observed in the current run's canonical semantic-family evidence set; it is intentionally narrower than generic semantic relatedness.
 - Naming now also emits `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts` at the slice-report top level.
-- These aggregate fields are report observations rather than automatic registry/policy declarations.
+- Aggregate inclusion is explicit: only `canonical` findings with complete naming-derived semantic-family evidence (`semanticName`, `semanticFamily`, `familyRoot`) contribute to these report-level family count objects.
+- These aggregate fields and per-file markers are report observations rather than automatic registry/policy declarations.
 
 ## 4) Canonical current contract: Runner Report Envelope
 
