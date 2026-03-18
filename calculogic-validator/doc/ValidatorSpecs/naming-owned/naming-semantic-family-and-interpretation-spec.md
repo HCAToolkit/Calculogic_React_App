@@ -2,7 +2,7 @@
 
 - **Classification:** Normative
 - **Applies to:** Naming-slice semantic-name interpretation extensions.
-- **Status:** Active for documentation-first modeling; runtime implementation deferred.
+- **Status:** Active for documentation-first modeling; semantic-family derivation remains an intended naming-owned implementation lane, but runtime activation in the current tranche is deferred.
 - **Authority posture note:** Bounded normative supporting spec for naming interpretation modeling; does not supersede primary canonical naming authorities.
 
 ## 1) Purpose
@@ -45,7 +45,7 @@ Current naming interpretation already provides bounded disambiguation hints in `
 
 Current baseline is already defined by existing specs:
 
-- shared filename interpretation precedence and optional semantic-family lane framing,
+- shared filename interpretation precedence and semantic-family lane framing that may or may not apply depending on semantic-name shape,
 - naming-slice semantic-name + role-token disambiguation framing,
 - suite-level registry model and normalization/resolution ownership boundaries.
 
@@ -53,7 +53,7 @@ Current baseline is already defined by existing specs:
 
 This spec adds a bounded interpretation vocabulary layer that was not yet explicitly defined:
 
-- first bounded naming entities for semantic-family interpretation,
+- first bounded naming entities for semantic-family interpretation when semantic-name shape supports that interpretation,
 - first bounded relationship types between those entities,
 - run-scoped normalized signal guidance for report/results consumption.
 
@@ -84,7 +84,7 @@ Classification: Normative
 
 Descriptive filename lane content already parsed below the canonical dominant role slot. It carries domain meaning and may contain role-like or category-adjacent vocabulary, without becoming a second canonical role declaration.
 
-`semantic-name` remains the full semantic lane before any role/ext interpretation and before any optional family/subgroup interpretation.
+`semantic-name` remains the full semantic lane before any role/ext interpretation and before any family/subgroup interpretation that may or may not apply for a given semantic-name shape.
 
 ### 4.2 `semantic-token`
 
@@ -171,7 +171,7 @@ Guardrail: this spec intentionally does not over-commit exact runtime field name
 
 ### 6.1 Bounded semantic-family interpretation grammar notes (report-first)
 
-Interpretation in this phase may apply bounded grammar-like guidance for semantic-family normalization.
+Interpretation in this phase may apply bounded grammar-like guidance for semantic-family normalization when the semantic-name shape supports family/subgroup interpretation.
 
 Connector-token guidance:
 
@@ -190,7 +190,7 @@ Descriptor-token guidance:
 
 Future policy direction (deferred):
 
-- These interpretation rules may later live in naming-owned semantic-family interpretation policy, registry-backed interpretation surfaces, and customizable commands/overrides.
+- These interpretation rules may later live in naming-owned semantic-family interpretation policy, registry-backed interpretation surfaces, and customizable commands/overrides once this intended naming-owned lane reaches later runtime/report maturity.
 - That policy/customization expansion is intentionally deferred until customization commands are no longer deferred and report maturity is stronger.
 
 Ownership clarification (naming-owned derived outputs):
@@ -219,16 +219,16 @@ Classification: Normative
 
 Current maturity boundary remains unchanged:
 
-- warn/error/strict/plan/fix behavior for semantic-family is deferred,
-- semantic-family interpretation is report-first in this phase,
+- warn/error/strict/plan/fix behavior for semantic-family is not implemented in the current runtime tranche yet,
+- semantic-family interpretation remains structurally important and report-first in this phase,
 - results/reporting is the first intended consumer,
-- tree runtime consumption is deferred until implementation maturity justifies it.
+- tree runtime consumption is not activated in this tranche yet and remains deferred until naming-owned implementation maturity justifies it.
 
 Results-first, tree-later handoff clarification:
 
 - Results/reporting consumes naming-owned semantic-family outputs first.
-- Tree consumption is later and explicitly deferred in this tranche.
-- Tree may later consume `semanticFamily`/`familyRoot`/`familySubgroup`/`relatedSemanticNames` for semantic-folder expectations or grouping reasoning.
+- Tree consumption is later and explicitly deferred in this tranche; that timing deferment does not make semantic-family derivation conceptually optional.
+- Tree may later consume `semanticFamily`/`familyRoot`/`familySubgroup`/`relatedSemanticNames` for semantic-folder expectations or grouping reasoning once naming emits those outputs.
 - Tree must not derive semantic-family independently as a competing source.
 
 Classification: Normative
@@ -237,9 +237,9 @@ Classification: Normative
 
 Future boundary contract:
 
-- naming owns semantic-family derivation,
-- tree may later consume prepared family/root/subgroup signals,
-- such signals may later help tree reason about expected semantic folders/subtrees,
+- naming owns semantic-family derivation as an intended implementation lane for later runtime/report/results maturity,
+- tree may later consume prepared family/root/subgroup signals produced by naming-owned derivation,
+- such signals may later help tree reason about expected semantic folders/subtrees, and tree behavior depends on naming providing them rather than re-deriving them,
 - tree must not independently derive semantic-family as a competing source of truth.
 
 Interpretation posture alignment:
@@ -315,7 +315,7 @@ Boundary reinforcement:
 - For this shape, semantic-family reasoning applies to the semantic-name portion that remains after the likely role candidate (`spec`) is separated.
 - `familyRoot`, `familySubgroup`, and `relatedSemanticNames` remain naming-owned derived outputs.
 - Those naming-owned outputs may later be handed to results first and tree later through cross-slice contracts.
-- Tree does not re-own semantic-family derivation in this model.
+- Tree does not re-own semantic-family derivation in this model and must remain downstream of naming-owned outputs.
 
 Classification: Normative
 
