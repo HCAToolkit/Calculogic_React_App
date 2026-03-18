@@ -43,6 +43,7 @@ Semantic-family-like interpretation is part of the intended naming-owned filenam
 
 - Semantic-family/group presence is not required as a structural lane for contract validity in every filename.
 - Cross-slice contracts may reference it when naming exposes those outputs and ROI/domain semantics justify downstream use, while naming remains the primary derivation owner.
+- Any aggregate counts derived from semantic-family interpretation are naming-owned report observations when emitted, not automatic registry declarations.
 
 ### 3.4 Folder-token context
 

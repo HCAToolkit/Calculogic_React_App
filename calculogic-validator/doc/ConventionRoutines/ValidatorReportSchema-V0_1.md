@@ -52,6 +52,12 @@ Current naming CLI output includes:
 - `registrySource` (`"builtin" | "custom" | "config"`)
 - `registryDigests` (object `{ builtin, custom, resolved }`)
 
+Slice-specific future-facing note (bounded, non-claiming):
+
+- Some slices may later document additional optional report surfaces before they become part of the canonical emitted contract.
+- For naming specifically, semantic-family-derived per-file details and aggregate observations (for example `familyRootCounts`, `familySubgroupCounts`, `semanticFamilyCounts`) remain slice-specific optional/future-facing surfaces until runtime emission is actually shipped.
+- Observed aggregate fields, if/when emitted by a slice, are report observations rather than automatic registry/policy declarations.
+
 ## 4) Canonical current contract: Runner Report Envelope
 
 Current runner output includes:

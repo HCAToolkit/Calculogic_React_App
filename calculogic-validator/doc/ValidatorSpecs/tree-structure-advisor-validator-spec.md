@@ -101,6 +101,7 @@ When naming-derived signal input is explicitly wired in later, intended consumab
 
 - `semanticName`
 - semantic family/group outputs derived by naming from `semanticName`
+- naming-owned aggregate observations such as `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts` when/if naming later emits them
 - `role`
 - role category/status metadata
 
@@ -113,7 +114,7 @@ Examples of naming validity judgments that tree advisor must not duplicate:
 - deprecated role
 - hyphen-role ambiguity
 
-When usable naming-shaped metadata is unavailable, incomplete, or not yet wired into tree runtime, tree advisor should reduce confidence and/or recommend running naming validation rather than inventing naming-invalid findings inside tree output.
+When usable naming-shaped metadata is unavailable, incomplete, or not yet wired into tree runtime, tree advisor should reduce confidence and/or recommend running naming validation rather than inventing naming-invalid findings inside tree output. Naming-owned aggregate observations are downstream evidence only and do not let tree declare registry truth on its own.
 
 Boundary note (canonical_target for this slice): tree validator ownership is under `calculogic-validator/tree/src/**`. Legacy flat suite-core paths such as `calculogic-validator/src/tree-structure-advisor.*.mjs` are compatibility wrappers only, not canonical ownership.
 
