@@ -50,6 +50,9 @@ export const buildNamingValidatorReport = ({
     specialCaseTypeCounts: summary.specialCaseTypeCounts,
     warningRoleStatusCounts: summary.warningRoleStatusCounts,
     warningRoleCategoryCounts: summary.warningRoleCategoryCounts,
+    familyRootCounts: summary.familyRootCounts,
+    familySubgroupCounts: summary.familySubgroupCounts,
+    semanticFamilyCounts: summary.semanticFamilyCounts,
     findings,
   };
 };

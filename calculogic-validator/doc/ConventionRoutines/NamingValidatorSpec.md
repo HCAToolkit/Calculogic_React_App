@@ -313,7 +313,7 @@ Report object includes (canonical current contract for naming slice output):
 - `filters`
 - `scopeSummary`
 - `scopeContract`
-- summary count objects (`counts`, `codeCounts`, `specialCaseTypeCounts`, `warningRoleStatusCounts`, `warningRoleCategoryCounts`)
+- summary count objects (`counts`, `codeCounts`, `specialCaseTypeCounts`, `warningRoleStatusCounts`, `warningRoleCategoryCounts`, `familyRootCounts`, `familySubgroupCounts`, `semanticFamilyCounts`)
 - `findings`
 
 When `--config=<path>` is supplied, report metadata may include:
@@ -323,20 +323,18 @@ When `--config=<path>` is supplied, report metadata may include:
 - `registrySource`
 - `registryDigests`
 
-### Semantic-family report surfaces (future/current-tranche direction)
+### Semantic-family report surfaces (current emitted behavior)
 
-Current runtime contract remains the emitted surface listed above. This spec does **not** claim that semantic-family-derived report fields are already emitted today.
+Current naming runtime now emits bounded naming-owned semantic-family report surfaces in two layers:
 
-When later naming-owned semantic-family reporting is implemented, slice-specific optional report surfaces may include:
-
-- per-file derived details when emitted from naming interpretation, such as `semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, `relatedSemanticNames`, and ambiguity/split markers
-- run-level aggregate naming observations such as `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts`
+- per-file derived details in `finding.details` when the semantic-name shape supports deterministic semantic-family interpretation, currently including `semanticTokens`, `semanticFamily`, `familyRoot`, `familySubgroup`, and run-scoped `relatedSemanticNames` when another same-family semantic name is observed in the run
+- run-level aggregate naming observations in the report envelope: `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts`
 
 Boundary clarifications:
 
 - these are naming-owned observed report surfaces, not shared registry declarations
 - aggregate counts represent what a naming run observed after derivation; they are not policy truth by themselves
-- results/report interpretation may use them once emitted
+- current runtime only emits these derived details when the semantic-name shape supports bounded deterministic interpretation; it does not force every filename to have family outputs
 - tree may later consume naming-owned emitted surfaces rather than deriving semantic-family independently
 - later custom-registry work may review recurring observations as candidate evidence for additions, overlays, or pinning, but registry truth must still be declared through a separate policy/customization lane
 

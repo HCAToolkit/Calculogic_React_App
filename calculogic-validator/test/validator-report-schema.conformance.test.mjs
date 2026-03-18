@@ -32,6 +32,9 @@ test('validate-naming emits current slice report envelope and finding identifier
   assert.equal(typeof report.totalFilesScanned, 'number');
   assert.ok(report.counts && typeof report.counts === 'object');
   assert.ok(report.codeCounts && typeof report.codeCounts === 'object');
+  assert.ok(report.familyRootCounts && typeof report.familyRootCounts === 'object');
+  assert.ok(report.familySubgroupCounts && typeof report.familySubgroupCounts === 'object');
+  assert.ok(report.semanticFamilyCounts && typeof report.semanticFamilyCounts === 'object');
   assert.ok(Array.isArray(report.findings));
 
   for (const finding of report.findings) {
@@ -70,6 +73,9 @@ test('validate-all emits current runner report envelope and forwards configDiges
   assert.equal(namingEntry.validatorId, 'naming');
   assert.equal(typeof namingEntry.description, 'string');
   assert.equal(typeof namingEntry.totalFilesScanned, 'number');
+  assert.ok(namingEntry.familyRootCounts && typeof namingEntry.familyRootCounts === 'object');
+  assert.ok(namingEntry.familySubgroupCounts && typeof namingEntry.familySubgroupCounts === 'object');
+  assert.ok(namingEntry.semanticFamilyCounts && typeof namingEntry.semanticFamilyCounts === 'object');
   assert.ok(Array.isArray(namingEntry.findings));
 
   for (const finding of namingEntry.findings) {
