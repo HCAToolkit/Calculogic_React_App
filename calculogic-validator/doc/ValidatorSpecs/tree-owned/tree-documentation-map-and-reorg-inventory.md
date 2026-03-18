@@ -19,9 +19,19 @@ It is intended to:
 - identify what documents currently exist for the tree implementation slice,
 - distinguish canonical runtime/spec authority from bounded normative supporting specs, supporting implementation guidance, draft references, and transitional metadata,
 - make explicit “stay put for now” vs “move/split/merge later” decisions,
-- reduce ambiguity for human maintainers and Codex task setup before any physical folder reorganization.
+- reduce ambiguity for human maintainers and Codex task setup now that the first ownership split has landed.
 
-Guardrail for this inventory pass: keep changes bounded to the tree NL/config note colocation move plus same-change-set cross-link updates (no broad folder reorganization).
+Guardrail for this stabilization pass: preserve the current physical layout, fix routing/discovery friction in place, and avoid proposing another broad folder reorganization.
+
+## Current Layout Snapshot
+
+Tree documentation discovery now follows a stable ownership split:
+
+- `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md` stays at the `ValidatorSpecs` root as the canonical tree slice entrypoint,
+- tree-specific supporting specs and routing metadata live under `calculogic-validator/doc/ValidatorSpecs/tree-owned/`,
+- the validator-owned tree NL/config note remains under `calculogic-validator/doc/ValidatorSpecs/nl-config/`.
+
+Read the root-level canonical tree spec first, then use the `tree-owned/` lane for supporting modeling/navigation material.
 
 ## Canonical Reading Order (Implementation Work)
 
@@ -53,13 +63,13 @@ Interpretation note:
 
 ## Reorg Recommendations (Bounded / First Move Completed)
 
-### Canonical now (do not relocate in this pass)
+### Canonical now (do not relocate in stabilization)
 
 - Keep suite contract in `ConventionRoutines` as validator-suite canonical authority.
 - Keep tree runtime spec in `ValidatorSpecs` as tree slice canonical authority.
 - Keep naming and naming-master docs in `ConventionRoutines` as cross-slice authorities consumed by tree.
 
-### Completed bounded move (this pass)
+### Completed bounded move (current layout)
 
 1. `doc/nl-config/cfg-treeStructureAdvisor.md` -> `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
    - **Outcome:** completed earlier as a bounded colocation move with a tiny pointer stub left at the old path to preserve navigation continuity.
