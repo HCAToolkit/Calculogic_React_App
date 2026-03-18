@@ -4,6 +4,8 @@ import {
   deriveSemanticFamilyDetails,
   attachRelatedSemanticNames,
   isSemanticFamilyEvidenceFinding,
+  isSemanticFamilyRootEvidenceFinding,
+  isSingularSemanticFamilyEvidenceFinding,
 } from '../src/rules/naming-rule-derive-semantic-family.logic.mjs';
 import { summarizeFindings } from '../src/naming-validator.host.mjs';
 
@@ -42,21 +44,23 @@ test('does not derive semantic-family details for unsupported single-token seman
   assert.equal(deriveSemanticFamilyDetails({ semanticName: 'tree' }), null);
 });
 
-test('semantic-family evidence gate only accepts canonical findings with complete derived signals', () => {
-  assert.equal(
-    isSemanticFamilyEvidenceFinding({
-      classification: 'canonical',
-      details: {
-        semanticName: 'naming-role-index',
-        semanticFamily: 'naming',
-        familyRoot: 'naming',
-      },
-    }),
-    true,
-  );
+test('semantic-family evidence gates distinguish root evidence from singular family evidence', () => {
+  const canonicalAmbiguousFinding = {
+    classification: 'canonical',
+    details: {
+      semanticName: 'order-payment-refund-reconcile',
+      semanticFamily: 'order-payment',
+      familyRoot: 'order',
+      ambiguityFlags: ['family-boundary-heuristic'],
+    },
+  };
+
+  assert.equal(isSemanticFamilyEvidenceFinding(canonicalAmbiguousFinding), true);
+  assert.equal(isSemanticFamilyRootEvidenceFinding(canonicalAmbiguousFinding), true);
+  assert.equal(isSingularSemanticFamilyEvidenceFinding(canonicalAmbiguousFinding), false);
 
   assert.equal(
-    isSemanticFamilyEvidenceFinding({
+    isSemanticFamilyRootEvidenceFinding({
       classification: 'invalid-ambiguous',
       details: {
         semanticName: 'naming-role-index',
@@ -68,13 +72,13 @@ test('semantic-family evidence gate only accepts canonical findings with complet
   );
 });
 
-test('attaches same-family peer names only for canonical semantic-family evidence', () => {
+test('attaches same-family peer names only for singular canonical semantic-family evidence', () => {
   const findings = attachRelatedSemanticNames([
     {
       classification: 'canonical',
       path: 'a',
       details: {
-        semanticName: 'naming-role-index',
+        semanticName: 'naming-role-matrix',
         semanticFamily: 'naming',
         familyRoot: 'naming',
       },
@@ -83,18 +87,76 @@ test('attaches same-family peer names only for canonical semantic-family evidenc
       classification: 'canonical',
       path: 'b',
       details: {
-        semanticName: 'naming-role-matrix',
+        semanticName: 'naming-role-index',
         semanticFamily: 'naming',
         familyRoot: 'naming',
       },
     },
     {
-      classification: 'invalid-ambiguous',
+      classification: 'canonical',
       path: 'c',
+      details: {
+        semanticName: 'order-payment-refund-reconcile',
+        semanticFamily: 'order-payment',
+        familyRoot: 'order',
+        ambiguityFlags: ['family-boundary-heuristic'],
+      },
+    },
+    {
+      classification: 'invalid-ambiguous',
+      path: 'd',
       details: {
         semanticName: 'naming-role-bad-case',
         semanticFamily: 'naming',
         familyRoot: 'naming',
+      },
+    },
+    {
+      classification: 'canonical',
+      path: 'e',
+      details: {
+        semanticName: 'tree-occurrence-model-and-addressing',
+        semanticFamily: 'tree',
+        familyRoot: 'tree',
+      },
+    },
+  ]);
+
+  assert.deepEqual(findings[0].details.relatedSemanticNames, ['naming-role-index']);
+  assert.deepEqual(findings[1].details.relatedSemanticNames, ['naming-role-matrix']);
+  assert.equal(findings[2].details.relatedSemanticNames, undefined);
+  assert.equal(findings[3].details.relatedSemanticNames, undefined);
+  assert.equal(findings[4].details.relatedSemanticNames, undefined);
+});
+
+test('adds split-family markers only when singular observed families share one root', () => {
+  const findings = attachRelatedSemanticNames([
+    {
+      classification: 'canonical',
+      path: 'a',
+      details: {
+        semanticName: 'order-payment-index',
+        semanticFamily: 'order',
+        familyRoot: 'order',
+      },
+    },
+    {
+      classification: 'canonical',
+      path: 'b',
+      details: {
+        semanticName: 'order-payment-refund-reconcile',
+        semanticFamily: 'order-payment',
+        familyRoot: 'order',
+        ambiguityFlags: ['family-boundary-heuristic'],
+      },
+    },
+    {
+      classification: 'canonical',
+      path: 'c',
+      details: {
+        semanticName: 'order-shipping-index',
+        semanticFamily: 'order-shipping',
+        familyRoot: 'order',
       },
     },
     {
@@ -108,49 +170,13 @@ test('attaches same-family peer names only for canonical semantic-family evidenc
     },
   ]);
 
-  assert.deepEqual(findings[0].details.relatedSemanticNames, ['naming-role-matrix']);
-  assert.deepEqual(findings[1].details.relatedSemanticNames, ['naming-role-index']);
-  assert.equal(findings[2].details.relatedSemanticNames, undefined);
-  assert.equal(findings[3].details.relatedSemanticNames, undefined);
-});
-
-test('adds split-family markers when one root maps to multiple observed families', () => {
-  const findings = attachRelatedSemanticNames([
-    {
-      classification: 'canonical',
-      path: 'a',
-      details: {
-        semanticName: 'order-payment-refund-reconcile',
-        semanticFamily: 'order-payment',
-        familyRoot: 'order',
-      },
-    },
-    {
-      classification: 'canonical',
-      path: 'b',
-      details: {
-        semanticName: 'order-shipping-tracker-sync',
-        semanticFamily: 'order-shipping',
-        familyRoot: 'order',
-      },
-    },
-    {
-      classification: 'canonical',
-      path: 'c',
-      details: {
-        semanticName: 'tree-occurrence-model-and-addressing',
-        semanticFamily: 'tree',
-        familyRoot: 'tree',
-      },
-    },
-  ]);
-
   assert.deepEqual(findings[0].details.splitFamilyFlags, ['family-root-observed-multiple-families']);
-  assert.deepEqual(findings[1].details.splitFamilyFlags, ['family-root-observed-multiple-families']);
-  assert.equal(findings[2].details.splitFamilyFlags, undefined);
+  assert.equal(findings[1].details.splitFamilyFlags, undefined);
+  assert.deepEqual(findings[2].details.splitFamilyFlags, ['family-root-observed-multiple-families']);
+  assert.equal(findings[3].details.splitFamilyFlags, undefined);
 });
 
-test('summary emits deterministic semantic-family observation counts from canonical evidence only', () => {
+test('summary counts family roots from canonical root evidence but reserves family/subgroup counts for singular evidence', () => {
   const summary = summarizeFindings([
     {
       classification: 'canonical',
@@ -186,6 +212,18 @@ test('summary emits deterministic semantic-family observation counts from canoni
       },
     },
     {
+      classification: 'canonical',
+      code: 'NAMING_CANONICAL',
+      severity: 'info',
+      details: {
+        semanticName: 'order-payment-refund-reconcile',
+        familyRoot: 'order',
+        familySubgroup: 'payment-refund',
+        semanticFamily: 'order-payment',
+        ambiguityFlags: ['family-boundary-heuristic'],
+      },
+    },
+    {
       classification: 'invalid-ambiguous',
       code: 'NAMING_BAD_SEMANTIC_CASE',
       severity: 'warn',
@@ -200,6 +238,7 @@ test('summary emits deterministic semantic-family observation counts from canoni
 
   assert.deepEqual(summary.familyRootCounts, {
     naming: 2,
+    order: 1,
     tree: 1,
   });
   assert.deepEqual(summary.familySubgroupCounts, {

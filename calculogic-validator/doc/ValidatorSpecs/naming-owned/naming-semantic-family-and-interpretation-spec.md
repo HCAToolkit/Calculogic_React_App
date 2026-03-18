@@ -183,7 +183,7 @@ Observation/policy boundary for this tranche:
 
 - per-file derived outputs are naming-owned interpreted results,
 - aggregate count surfaces are naming-owned observed run statistics,
-- current aggregate inclusion is explicit: only findings classified as `canonical` with complete naming-derived semantic-family evidence (`semanticName`, `semanticFamily`, `familyRoot`) contribute to aggregate family counts or run-scoped peer/split observation maps,
+- current aggregate inclusion is explicit and tiered: `familyRootCounts` use canonical root evidence (`semanticName` + `familyRoot`), while `familySubgroupCounts`, `semanticFamilyCounts`, and run-scoped peer/split observation maps require singular canonical family evidence (`semanticName` + `semanticFamily` + `familyRoot` and no `family-boundary-heuristic` marker),
 - `familyRootCounts.tree = 12` means the naming run observed 12 canonical-evidence files whose derived `familyRoot` was `tree`,
 - that observation does **not** mean `tree` is now a declared registry root or registry-approved family,
 - later customization/registry work may review these observations as candidate evidence, but policy declaration remains a separate later ownership lane.
@@ -233,8 +233,8 @@ Cross-slice boundary clarification:
 - Cross-slice contracts define what results/tree may consume.
 - Cross-slice contracts do **not** re-own derivation logic.
 - `familyRoot`, `familySubgroup`, and `relatedSemanticNames` are not cross-slice owned; they are naming-owned outputs with later cross-slice utility.
-- `relatedSemanticNames` remains the current field name for bounded churn reasons and now means same-`semanticFamily` peer semantic names observed within the current run's canonical evidence set; it is intentionally not a generic semantic-relatedness claim.
-- Current runtime `ambiguityFlags` and `splitFamilyFlags` are bounded observational markers: `family-boundary-heuristic` records a deterministic but not-confidently-singular boundary choice for connector-free 4+ token semantic names, and `family-root-observed-multiple-families` records that one observed `familyRoot` mapped to multiple observed `semanticFamily` values in the run.
+- `relatedSemanticNames` remains the current field name for bounded churn reasons and now means same-`semanticFamily` peer semantic names observed within the current run's singular canonical family-evidence set; it is intentionally not a generic semantic-relatedness claim.
+- Current runtime `ambiguityFlags` and `splitFamilyFlags` are bounded observational markers: `family-boundary-heuristic` records a deterministic but not-confidently-singular boundary choice for connector-free 4+ token semantic names, and `family-root-observed-multiple-families` records that one observed `familyRoot` mapped to multiple singular observed `semanticFamily` values in the run.
 
 Classification: Normative
 
