@@ -7,8 +7,8 @@ Classification: Informative
 This transitional inventory maps the current naming-interpretation hardening tranche against three already-active contract specs:
 
 - `calculogic-validator/doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
-- `calculogic-validator/doc/ValidatorSpecs/naming-semantic-name-and-role-disambiguation-spec.md`
-- `calculogic-validator/doc/ValidatorSpecs/registry-model-and-slice-interaction-spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation-spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction-spec.md`
 
 The goal is ownership clarity and hardening ROI for the next naming-first pass, not broad redesign.
 

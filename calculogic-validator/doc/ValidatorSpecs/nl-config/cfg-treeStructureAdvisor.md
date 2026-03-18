@@ -9,7 +9,7 @@ Status labeling for this NL/config note:
 Navigation backlinks:
 
 - Tree validator spec (runtime authority): [`calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`](../tree-structure-advisor-validator-spec.md)
-- Tree documentation map (navigation metadata): [`calculogic-validator/doc/ValidatorSpecs/tree-documentation-map-and-reorg-inventory.md`](../tree-documentation-map-and-reorg-inventory.md)
+- Tree documentation map (navigation metadata): [`calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`](../tree-owned/tree-documentation-map-and-reorg-inventory.md)
 - Pointer stub at prior path: [`doc/nl-config/cfg-treeStructureAdvisor.md`](../../../../doc/nl-config/cfg-treeStructureAdvisor.md)
 
 Canonical reading order for tree implementation work:
