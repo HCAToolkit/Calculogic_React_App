@@ -276,7 +276,7 @@ npm run validate:naming -- --scope=app --config=./.calculogic/validator/config.j
 node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=docs --config=./.calculogic/validator/config.json
 ```
 
-Canonical config spec: `doc/ValidatorSpecs/validator-config-spec.md`.
+Canonical config spec: `doc/ValidatorSpecs/validator-config.spec.md`.
 
 Example:
 

@@ -7,8 +7,8 @@ Classification: Informative
 This transitional inventory maps the current naming-interpretation hardening tranche against three already-active contract specs:
 
 - `calculogic-validator/doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
-- `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation-spec.md`
-- `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction-spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation.spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction.spec.md`
 
 The goal is ownership clarity and hardening ROI for the next naming-first pass, not broad redesign.
 
@@ -25,7 +25,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Lane-aware case policy surface (shared concept) | **Partially implemented (semantic-name baseline + bounded optional registry integration implemented)** | Semantic-name case policy baseline is registry-resolved and prepared-runtime-backed today, and bounded optional registry integration is now exercised for `caseRules` on that semantic-name surface. Lane-specific policy expansion for additional interpretation lanes remains future-facing/partial. |
 | Suite-owned implementation pairing rule (shared impl must have slice consumer) | **Already implemented (architecture guardrail)** | Current naming/runtime boundaries already reflect slice-owned enforcement with suite contracts; no speculative suite-only implementation is required in this tranche. |
 
-### 2.2 `naming-semantic-name-and-role-disambiguation-spec.md` (naming specialization)
+### 2.2 `naming-semantic-name-and-role-disambiguation.spec.md` (naming specialization)
 
 | Contract area | Current status | Implementation reality (transitional) |
 | --- | --- | --- |
@@ -38,7 +38,7 @@ The goal is ownership clarity and hardening ROI for the next naming-first pass, 
 | Naming-case application points beyond current semantic case checks | **Partially implemented (semantic-name baseline + bounded optional registry integration implemented)** | Naming currently applies a prepared semantic-name case-policy baseline sourced from registry payload and runtime preparation, and bounded optional registry integration is now proven for `caseRules` on that surface. Additional lane-aware policy surfaces remain a later hardening step. |
 | Optional semantic-family-style interpretation | **Intentionally out of scope for now** | Optional by contract; no mandatory runtime addition needed in this tranche. |
 
-### 2.3 `registry-model-and-slice-interaction-spec.md` (suite-level registry ownership model)
+### 2.3 `registry-model-and-slice-interaction.spec.md` (suite-level registry ownership model)
 
 | Contract area | Current status | Implementation reality (transitional) |
 | --- | --- | --- |

@@ -5,7 +5,7 @@
 This pass canonicalizes **in-repo** usage of confirmed validator compatibility shim-debt files without deleting or moving shim files.
 
 - Date: 2026-03-07
-- Basis: `final-state-validator-shim-verification-audit.md`
+- Basis: `final-state-validator-shim-verification.audit.md`
 - Safety rule: preserve shim files as compatibility forwarders
 
 ## What changed

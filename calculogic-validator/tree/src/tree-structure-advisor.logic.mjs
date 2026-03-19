@@ -48,7 +48,7 @@ const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope) 
       classification: 'advisory-structure',
       message:
         'Top-level folder is outside the known project shape for this repository and may indicate structural drift.',
-      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
+      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
       details: {
         knownRoots: Array.from(TREE_KNOWN_ROOTS.knownTopLevelDirectories).sort((a, b) =>
           a.localeCompare(b),
@@ -69,7 +69,7 @@ const collectValidatorOwnedOutsideTreeFindings = (paths) =>
       classification: 'advisory-structure',
       message:
         'Path appears validator-owned by basename signal but is located outside calculogic-validator/**.',
-      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
+      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
       details: {
         expectedRoot: 'calculogic-validator/',
       },
@@ -123,7 +123,7 @@ const collectOwnedSliceBoundaryDriftFindings = (paths) => {
           classification: 'advisory-structure',
           message:
             'Likely validator-owned subsystem growth is accumulating under suite-core calculogic-validator/src/** rather than an owned slice root.',
-          ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
+          ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
           details: {
             suiteCoreRoot: VALIDATOR_SUITE_CORE_ROOT,
             observedSubtree: topLevelSegment,

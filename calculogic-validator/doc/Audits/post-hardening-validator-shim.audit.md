@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-> Note: `doc/Audits/current-validator-shim-audit.md` is intentionally left unchanged; this document is the post-hardening re-audit snapshot.
+> Note: `doc/Audits/current-validator-shim.audit.md` is intentionally left unchanged; this document is the post-hardening re-audit snapshot.
 
 This report re-audits the current `calculogic-validator` shim landscape against the current hardened tree-advisor behavior.
 

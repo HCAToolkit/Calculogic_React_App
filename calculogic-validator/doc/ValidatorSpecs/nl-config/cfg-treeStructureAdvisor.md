@@ -8,14 +8,14 @@ Status labeling for this NL/config note:
 
 Navigation backlinks:
 
-- Tree validator spec (runtime authority): [`calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`](../tree-structure-advisor-validator-spec.md)
+- Tree validator spec (runtime authority): [`calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md`](../tree-structure-advisor-validator.spec.md)
 - Tree documentation map (navigation metadata): [`calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`](../tree-owned/tree-documentation-map-and-reorg-inventory.md)
 - Pointer stub at prior path: [`doc/nl-config/cfg-treeStructureAdvisor.md`](../../../../doc/nl-config/cfg-treeStructureAdvisor.md)
 
 Canonical reading order for tree implementation work:
 
 1. `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
-2. `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
+2. `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md`
 3. `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
 4. `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md` (this document)
 

@@ -5,7 +5,7 @@
 This pass removes only validator shim-debt files that had no remaining internal in-repo usage at current main state verification time.
 
 - Date: 2026-03-07
-- Basis: `final-state-validator-shim-verification-audit.md` and `validator-shim-cleanup-pass-1.md`
+- Basis: `final-state-validator-shim-verification.audit.md` and `validator-shim-cleanup-pass-1.md`
 - Safety rule: preserve intentional canonical/public boundaries and preserve still-test-referenced shim-debt files for later passes
 
 ## Verification before deletion

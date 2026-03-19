@@ -30,7 +30,7 @@ Authority labels used in this index:
 
 ## 2) Canonical contract (config)
 
-- `doc/ValidatorSpecs/validator-config-spec.md`
+- `doc/ValidatorSpecs/validator-config.spec.md`
   **Authority:** canonical contract. **Intended use:** normative config semantics (report-only input, strict schema/validation, normalization + merge semantics, CLI `--config` behavior).
 
 ## 3) Canonical slice specs
@@ -41,7 +41,7 @@ Authority labels used in this index:
 - `doc/ConventionRoutines/NamingValidatorSpec.md`
   **Authority:** canonical slice spec (naming). **Intended use:** normative naming-slice behavior/spec for scope profiles, classification contract, report details, and strict-exit behavior.
 
-- `doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
+- `doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md`
   **Authority:** canonical slice spec (tree). **Intended use:** normative tree-slice runtime/spec behavior for diagnostics and snapshot-driven structure checks.
 
 ## 4) Non-canonical implementation/spec guidance
@@ -51,22 +51,22 @@ Authority labels used in this index:
 - `doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
   **Authority:** bounded normative supporting spec. **Intended use:** shared filename interpretation/case-policy contract lane for cross-slice alignment; defer primary runtime authority to suite contract + slice specs.
 
-- `doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation-spec.md`
+- `doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** naming semantic-name vs role-token disambiguation interpretation guidance; supports implementation and modeling without replacing canonical slice authority.
 
-- `doc/ValidatorSpecs/naming-owned/naming-semantic-family-and-interpretation-spec.md`
+- `doc/ValidatorSpecs/naming-owned/naming-semantic-family-and-interpretation.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** active documentation-first semantic-family modeling tranche for naming interpretation; runtime behavior remains governed by canonical authorities unless implemented.
 
-- `doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction-spec.md`
+- `doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** suite-level registry model/interaction constraints for implementation design and ownership boundaries; defer primary runtime authority to canonical contracts/slice specs.
 
-- `doc/ValidatorSpecs/tree-owned/tree-structural-vocabulary-and-root-classification-spec.md`
+- `doc/ValidatorSpecs/tree-owned/tree-structural-vocabulary-and-root-classification.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** tree-owned structural vocabulary and root-classification modeling contract; supports tree interpretation work without replacing canonical tree runtime authority.
 
-- `doc/ValidatorSpecs/tree-owned/tree-occurrence-model-and-addressing-spec.md`
+- `doc/ValidatorSpecs/tree-owned/tree-occurrence-model-and-addressing.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** tree-owned occurrence/addressing modeling contract used for deterministic path-occurrence reasoning; no runtime authority change implied.
 
-- `doc/ValidatorSpecs/tree-owned/tree-registry-definitions-and-relationships-spec.md`
+- `doc/ValidatorSpecs/tree-owned/tree-registry-definitions-and-relationships.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** tree-owned interpretive registry definitions/relationships modeling contract that supports tree design work while deferring runtime authority to the canonical tree spec.
 
 - `doc/ValidatorSpecs/tree-owned/tree-top-root-registry-transition-inventory.md`
@@ -96,7 +96,7 @@ Authority labels used in this index:
 - `doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
   **Authority:** draft. **Intended use:** structural-addressing modeling guidance while governance decisions remain in progress.
 
-- `doc/ValidatorSpecs/suite-owned/compat-shim-policy.md`
+- `doc/ValidatorSpecs/suite-owned/compat-shim.policy.md`
   **Authority:** draft. **Intended use:** draft policy for time-bounded compat shims during refactor staging; does not establish canonical runtime behavior by itself.
 
 - `doc/ValidatorSpecs/suite-owned/registry-customization-state-system-draft.md`
@@ -104,13 +104,13 @@ Authority labels used in this index:
 
 ## 7) Audits (snapshot artifacts)
 
-- `doc/Audits/current-validator-shim-audit.md`
+- `doc/Audits/current-validator-shim.audit.md`
   **Authority:** audit snapshot. **Intended use:** earlier shim audit context for pre/post-hardening transition.
 
-- `doc/Audits/post-hardening-validator-shim-audit.md`
+- `doc/Audits/post-hardening-validator-shim.audit.md`
   **Authority:** audit snapshot. **Intended use:** post-hardening shim re-audit vs `validate:tree -- --scope=validator`.
 
-- `doc/Audits/final-state-validator-shim-verification-audit.md`
+- `doc/Audits/final-state-validator-shim-verification.audit.md`
   **Authority:** audit snapshot. **Intended use:** final-state verification audit after detector-noise cleanup.
 
 ## 8) Maintenance note

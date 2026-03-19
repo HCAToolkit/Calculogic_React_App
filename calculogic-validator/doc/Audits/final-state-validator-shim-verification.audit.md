@@ -6,8 +6,8 @@ This is a **new final-state verification audit** created after detector-noise cl
 
 Historical audit snapshots intentionally left in place:
 
-- `calculogic-validator/doc/Audits/current-validator-shim-audit.md`
-- `calculogic-validator/doc/Audits/post-hardening-validator-shim-audit.md`
+- `calculogic-validator/doc/Audits/current-validator-shim.audit.md`
+- `calculogic-validator/doc/Audits/post-hardening-validator-shim.audit.md`
 
 Scope of this audit:
 
@@ -125,9 +125,9 @@ Given this final-state verification, likely next work should now shift from shim
 
 Audit artifact path:
 
-- `calculogic-validator/doc/Audits/final-state-validator-shim-verification-audit.md`
+- `calculogic-validator/doc/Audits/final-state-validator-shim-verification.audit.md`
 
 Historical snapshot docs left unchanged:
 
-- `calculogic-validator/doc/Audits/current-validator-shim-audit.md`
-- `calculogic-validator/doc/Audits/post-hardening-validator-shim-audit.md`
+- `calculogic-validator/doc/Audits/current-validator-shim.audit.md`
+- `calculogic-validator/doc/Audits/post-hardening-validator-shim.audit.md`

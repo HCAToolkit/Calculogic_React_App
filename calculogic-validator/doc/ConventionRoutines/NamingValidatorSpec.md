@@ -203,7 +203,7 @@ Guardrail:
 
 ## Validator Config Input (Report-only, V0.1.7)
 
-Config reference: [`validator-config-spec.md`](../ValidatorSpecs/validator-config-spec.md).
+Config reference: [`validator-config.spec.md`](../ValidatorSpecs/validator-config.spec.md).
 
 Current naming behavior remains report-first in implementation. Passing `--config=<path>` does **not** enable fix execution or broader enforcement modes, but config may enable strict-exit semantics via `strictExit`.
 
