@@ -49,7 +49,7 @@ Updated canonical tree path references to align docs with the new ownership boun
 
 - `calculogic-validator/README.md` projected layout and compatibility note
 - `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
-- `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md`
 - shim cleanup planning/audit docs that referenced tree canonical ownership under `src/tree/**`
 
 ## 6. Deferred shim-removal decisions (intentional)

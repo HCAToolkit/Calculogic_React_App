@@ -7,7 +7,7 @@ Status/Authority:
 - **Does not control:** Tree runtime behavior, suite report/exit semantics, or naming/runtime contract definitions.
 - **Defer to (if conflict):**
   - `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` (suite canonical contract)
-  - `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md` (tree canonical slice spec)
+  - `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md` (tree canonical slice spec)
   - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md` (naming canonical slice spec when naming boundaries are implicated)
 
 ## Purpose
@@ -27,7 +27,7 @@ Guardrail for this stabilization pass: preserve the current physical layout, fix
 
 Tree documentation discovery now follows a stable ownership split:
 
-- `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md` stays at the `ValidatorSpecs` root as the canonical tree slice entrypoint,
+- `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md` stays at the `ValidatorSpecs` root as the canonical tree slice entrypoint,
 - tree-specific supporting specs and routing metadata live under `calculogic-validator/doc/ValidatorSpecs/tree-owned/`,
 - the validator-owned tree NL/config note remains under `calculogic-validator/doc/ValidatorSpecs/nl-config/`.
 
@@ -38,7 +38,7 @@ Read the root-level canonical tree spec first, then use the `tree-owned/` lane f
 Use this sequence for tree implementation tasks (runtime, wiring, contracts, or bounded architecture guidance):
 
 1. `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
-2. `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md`
+2. `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md`
 3. `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
 4. `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
 5. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md` (this doc; navigation/index metadata under `tree-owned/`)
@@ -55,7 +55,7 @@ Interpretation note:
 | Document | Document role | Status classification | Audience / usage | Path decision | Action recommendation |
 |---|---|---|---|---|---|
 | `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` | Suite contract (shared validator vocabulary/modes/scope boundary) | **Canonical contract** | Runtime implementation, architecture/modeling, Codex task context | **Stay put** at current path | **Keep** |
-| `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md` | Tree slice runtime/spec authority with bounded modeling notes | **Canonical slice spec** | Runtime implementation, architecture/modeling, Codex task context | **Stay put** at current path (already under `ValidatorSpecs`, implementation-facing) | **Keep** |
+| `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md` | Tree slice runtime/spec authority with bounded modeling notes | **Canonical slice spec** | Runtime implementation, architecture/modeling, Codex task context | **Stay put** at current path (already under `ValidatorSpecs`, implementation-facing) | **Keep** |
 | `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md` | Naming slice runtime/spec authority consumed by tree for naming-signal boundary interpretation | **Canonical slice spec** (cross-slice supporting authority for tree tasks) | Runtime implementation, architecture/modeling, Codex task context, supporting context only for tree | **Stay put** at current path | **Reference only** for tree tasks |
 | `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md` | Tree NL/config implementation note | **Supporting implementation guidance** | Runtime implementation, Codex task context, historical/reference context for implementation sequencing | **Now colocated** under `ValidatorSpecs/nl-config` with pointer stub retained at the prior repo-root NL path | **Keep** (validator-owned supporting implementation guidance) |
 | `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` | Naming grammar/taxonomy authority consumed by tree for filename/role vocabulary boundaries | **Canonical contract** (cross-slice naming authority) | Architecture/modeling, Codex task context, supporting context only for tree | **Stay put** at current path | **Reference only** for tree tasks |
@@ -76,17 +76,17 @@ Interpretation note:
    - **Authority posture:** remains supporting implementation guidance; canonical runtime authority stays with suite contract + tree validator spec.
 2. Tree-owned supporting specs and inventories now live under `calculogic-validator/doc/ValidatorSpecs/tree-owned/`:
    - `tree-documentation-map-and-reorg-inventory.md`
-   - `tree-occurrence-model-and-addressing-spec.md`
-   - `tree-registry-definitions-and-relationships-spec.md`
-   - `tree-structural-vocabulary-and-root-classification-spec.md`
+   - `tree-occurrence-model-and-addressing.spec.md`
+   - `tree-registry-definitions-and-relationships.spec.md`
+   - `tree-structural-vocabulary-and-root-classification.spec.md`
    - `tree-top-root-registry-transition-inventory.md`
    - **Outcome:** tree-specific supporting material is easier to scan without moving the canonical tree slice spec or the path-sensitive NL/config note.
 
 ### Split-later / merge-later posture
 
-- No mandatory split now for `tree-structure-advisor-validator-spec.md`; keep as single canonical spec while status labels remain clear and sectioned.
+- No mandatory split now for `tree-structure-advisor-validator.spec.md`; keep as single canonical spec while status labels remain clear and sectioned.
 - Potential **split-later** if document growth materially harms scanability:
-  - runtime contract section remains in `tree-structure-advisor-validator-spec.md`,
+  - runtime contract section remains in `tree-structure-advisor-validator.spec.md`,
   - bounded modeling appendices (for example deeper registry modeling) move to a dedicated supporting note under `ValidatorSpecs`.
 - No merge recommended between suite contract and tree spec; ownership boundaries are intentionally separate.
 

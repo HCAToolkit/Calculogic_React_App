@@ -113,4 +113,4 @@ When documenting or implementing validator slices, treat this contract as the ca
 Related references:
 
 - `doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
-- `doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction-spec.md`
+- `doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction.spec.md`

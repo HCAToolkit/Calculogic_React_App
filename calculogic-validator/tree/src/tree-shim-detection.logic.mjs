@@ -293,7 +293,7 @@ export const collectShimCompatFindings = (paths, getFileContent) => {
       message: evidence.thinReexportShim
         ? 'Thin re-export shim signal detected; maintain a discoverable and deterministic compatibility surface while cleanup is pending.'
         : 'Shim/compat naming/path signals are present with no thin re-export evidence; treat this as low-confidence observability, not immediate shim debt.',
-      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
+      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
       details: {
         artifactSurface: evidence.surface,
         matchedShimSignals,
@@ -314,7 +314,7 @@ export const collectShimCompatFindings = (paths, getFileContent) => {
       classification: 'advisory-structure',
       message:
         'Shim-like path is outside a discoverable compat/shims surface; consider consolidating compat entries to support later cleanup work.',
-      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator-spec.md',
+      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
       details: {
         artifactSurface: evidence.surface,
         matchedShimSignals,

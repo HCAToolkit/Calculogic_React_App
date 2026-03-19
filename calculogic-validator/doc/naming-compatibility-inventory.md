@@ -9,7 +9,7 @@ Status/Authority:
   - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md` (canonical naming slice spec)
   - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` (canonical naming grammar/taxonomy authority)
   - `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` (suite contract authority)
-  - `calculogic-validator/doc/ValidatorSpecs/validator-config-spec.md` (config contract authority)
+  - `calculogic-validator/doc/ValidatorSpecs/validator-config.spec.md` (config contract authority)
 
 This note is a lightweight transitional map for later hardening/removal follow-up.
 

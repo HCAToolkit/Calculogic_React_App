@@ -478,7 +478,7 @@ Each finding uses the same stable envelope shape used by existing validators:
 - `path` (normalized relative path; when folder-scoped, path is the folder root)
 - `classification` (enum)
 - `message` (short human-readable summary)
-- `ruleRef` (spec reference pointer, e.g. `tree-structure-advisor-validator-spec.md#...`)
+- `ruleRef` (spec reference pointer, e.g. `tree-structure-advisor-validator.spec.md#...`)
 - `suggestedFix` (optional, advisory-only; e.g., proposed move set)
 - `details` (object, deterministic)
 

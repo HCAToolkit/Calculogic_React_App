@@ -291,11 +291,11 @@ Boundary note: these are naming-owned derived outputs from semantic-name interpr
 
 Classification: Normative
 
-### 9.1 Validator-doc-realistic example (`tree-occurrence-model-and-addressing-spec.md`)
+### 9.1 Validator-doc-realistic example (`tree-occurrence-model-and-addressing.spec.md`)
 
-Example filename (validator-doc-realistic): `tree-occurrence-model-and-addressing-spec.md`
+Example filename (validator-doc-realistic): `tree-occurrence-model-and-addressing.spec.md`
 
-- Observed filename form: `tree-occurrence-model-and-addressing-spec.md`
+- Observed filename form: `tree-occurrence-model-and-addressing.spec.md`
 - Likely canonicalized interpretation candidate:
   - semantic-name candidate: `tree-occurrence-model-and-addressing`
   - role candidate: `spec`
@@ -359,8 +359,8 @@ Classification: Normative
 This spec extends (and does not replace):
 
 - `calculogic-validator/doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
-- `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation-spec.md`
-- `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction-spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-semantic-name-and-role-disambiguation.spec.md`
+- `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction.spec.md`
 
 Classification: Normative
 
