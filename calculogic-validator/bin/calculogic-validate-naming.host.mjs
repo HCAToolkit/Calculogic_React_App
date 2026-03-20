@@ -7,7 +7,7 @@ import { runNamingCli } from '../naming/src/cli/naming-cli-runner.logic.mjs';
 const repositoryRoot = resolveRepositoryRoot();
 const usageLines = buildNamingCliUsageLines({
   commandPrefix: 'calculogic-validate-naming',
-  strictExampleCommand: 'node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=repo --strict',
+  strictExampleCommand: 'node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=repo --strict',
 });
 
 const result = runNamingCli({

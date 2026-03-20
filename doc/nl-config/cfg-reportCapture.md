@@ -38,11 +38,11 @@ Root package scripts provide deterministic capture presets for naming, validate-
 
 ### 2.5 Verifier workflow contract
 
-A repo-local verifier script (`calculogic-validator/scripts/report-capture-verify.mjs`) runs naming validation through report-capture for one or more scopes, parses the metadata JSON line, and asserts the generated report file exists in the configured reports directory and contains a full JSON naming report.
+A repo-local verifier script (`calculogic-validator/scripts/report-capture-verify.host.mjs`) runs naming validation through report-capture for one or more scopes, parses the metadata JSON line, and asserts the generated report file exists in the configured reports directory and contains a full JSON naming report.
 
 ### 2.6 Post-capture summarizer contract
 
-A repo-local summarizer script (`calculogic-validator/scripts/report-capture-summarize.mjs`) reads the latest captured JSON report per prefix from `./.reports` (or `--dir`) and prints compact per-scope summaries suitable for Codex/PR notes.
+A repo-local summarizer script (`calculogic-validator/scripts/report-capture-summarize.host.mjs`) reads the latest captured JSON report per prefix from `./.reports` (or `--dir`) and prints compact per-scope summaries suitable for Codex/PR notes.
 
 ## 3.0 Build Concern
 

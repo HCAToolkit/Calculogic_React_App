@@ -364,7 +364,7 @@ test('invalid CLI scope returns deterministic usage error and non-zero exit', ()
     process.execPath,
     [
       '--experimental-strip-types',
-      'calculogic-validator/scripts/validate-naming.mjs',
+      'calculogic-validator/scripts/validate-naming.host.mjs',
       '--scope=invalid-scope',
     ],
     { cwd: process.cwd(), encoding: 'utf8' },

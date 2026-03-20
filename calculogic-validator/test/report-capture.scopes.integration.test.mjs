@@ -54,7 +54,7 @@ test('report-capture host emits naming reports for repo/app/docs/validator/syste
 
       const exitCode = await runReportCapture(
         prefix,
-        'calculogic-validator/scripts/validate-naming.mjs',
+        'calculogic-validator/scripts/validate-naming.host.mjs',
         scope,
         tempDir,
       );
@@ -85,7 +85,7 @@ test('report-capture host emits validate-all reports for repo/app/docs/validator
 
       const exitCode = await runReportCapture(
         prefix,
-        'calculogic-validator/scripts/validate-all.mjs',
+        'calculogic-validator/scripts/validate-all.host.mjs',
         scope,
         tempDir,
       );
@@ -117,7 +117,7 @@ test('report-capture host emits validate-tree reports for repo/app/docs/validato
 
       const exitCode = await runReportCapture(
         prefix,
-        'calculogic-validator/scripts/validate-tree.mjs',
+        'calculogic-validator/scripts/validate-tree.host.mjs',
         scope,
         tempDir,
       );

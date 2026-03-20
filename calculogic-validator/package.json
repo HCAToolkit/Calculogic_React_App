@@ -25,8 +25,8 @@
     "./tree": "./tree/src/tree-structure-advisor.host.mjs"
   },
   "bin": {
-    "calculogic-validate": "./bin/calculogic-validate.mjs",
-    "calculogic-validate-naming": "./bin/calculogic-validate-naming.mjs",
-    "calculogic-validator-health": "./bin/calculogic-validator-health.mjs"
+    "calculogic-validate": "./bin/calculogic-validate.host.mjs",
+    "calculogic-validate-naming": "./bin/calculogic-validate-naming.host.mjs",
+    "calculogic-validator-health": "./bin/calculogic-validator-health.host.mjs"
   }
 }

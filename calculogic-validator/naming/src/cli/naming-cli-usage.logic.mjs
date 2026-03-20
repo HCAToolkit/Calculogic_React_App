@@ -22,8 +22,8 @@ export const buildNamingCliUsageLines = ({ commandPrefix, strictExampleCommand }
     '  ✅ npm run validate:naming -- --scope=app --target src/buildsurface',
     '  ✅ npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared',
     '  ✅ npm run validate:all -- --validators=naming --scope=docs',
-    '  ✅ node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app',
-    '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=docs',
+    '  ✅ node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=app',
+    '  ✅ node calculogic-validator/bin/calculogic-validate.host.mjs --scope=docs',
     `  ✅ ${strictExampleCommand}`,
   ];
 };

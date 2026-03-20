@@ -230,7 +230,7 @@ Config does not change detection mode/scope semantics and does not introduce enf
 - `npm run validate:naming -- --scope=app --target src/buildsurface`
 - `npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared`
 - `npm run validate:naming -- --scope=app --config=./path/to/validator-config.json`
-- `node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app --config=./path/to/validator-config.json`
+- `node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=app --config=./path/to/validator-config.json`
 
 npm argument forwarding note:
 

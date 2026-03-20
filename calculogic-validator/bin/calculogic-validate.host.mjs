@@ -40,9 +40,9 @@ const usageLines = [
   'Examples:',
   '  ✅ npm run validate:naming -- --scope=app',
   '  ✅ npm run validate:all -- --validators=naming --scope=docs',
-  '  ✅ node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app',
-  '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=docs',
-  '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=repo --strict',
+  '  ✅ node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=app',
+  '  ✅ node calculogic-validator/bin/calculogic-validate.host.mjs --scope=docs',
+  '  ✅ node calculogic-validator/bin/calculogic-validate.host.mjs --scope=repo --strict',
 ];
 
 const parseCliArgs = (argv) => {

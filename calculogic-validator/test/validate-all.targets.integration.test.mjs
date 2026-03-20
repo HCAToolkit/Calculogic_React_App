@@ -8,7 +8,7 @@ import { test } from 'node:test';
 const repositoryRoot = process.cwd();
 const validateAllScriptPath = path.resolve(
   repositoryRoot,
-  'calculogic-validator/scripts/validate-all.mjs',
+  'calculogic-validator/scripts/validate-all.host.mjs',
 );
 
 const runValidateAll = (fixtureDir, args) =>

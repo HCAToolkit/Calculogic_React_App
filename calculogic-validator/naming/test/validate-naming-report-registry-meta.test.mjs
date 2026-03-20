@@ -16,7 +16,7 @@ test('validate-naming script report includes registry metadata fields', () => {
     process.execPath,
     [
       '--experimental-strip-types',
-      'calculogic-validator/scripts/validate-naming.mjs',
+      'calculogic-validator/scripts/validate-naming.host.mjs',
       '--scope=system',
     ],
     { cwd: process.cwd(), encoding: 'utf8' },
@@ -35,7 +35,7 @@ test('validate-naming script report includes registry metadata fields', () => {
 test('validate-naming bin report aligns envelope and includes registry metadata fields', () => {
   const result = spawnSync(
     process.execPath,
-    ['calculogic-validator/bin/calculogic-validate-naming.mjs', '--scope=system'],
+    ['calculogic-validator/bin/calculogic-validate-naming.host.mjs', '--scope=system'],
     { cwd: process.cwd(), encoding: 'utf8' },
   );
 
@@ -60,7 +60,7 @@ test('validate-naming with config includes configDigest and config-backed regist
     process.execPath,
     [
       '--experimental-strip-types',
-      'calculogic-validator/scripts/validate-naming.mjs',
+      'calculogic-validator/scripts/validate-naming.host.mjs',
       '--scope=system',
       '--config=calculogic-validator/test/fixtures/validator-config.roles.contracts.json',
     ],

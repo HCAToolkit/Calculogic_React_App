@@ -11,7 +11,7 @@ import {
 const runValidatorCli = (args) =>
   spawnSync(
     process.execPath,
-    ['--experimental-strip-types', 'calculogic-validator/scripts/validate-naming.mjs', ...args],
+    ['--experimental-strip-types', 'calculogic-validator/scripts/validate-naming.host.mjs', ...args],
     {
       cwd: process.cwd(),
       encoding: 'utf8',
@@ -88,7 +88,7 @@ test('--scope=app includes src/test and excludes docs, validator, and root tooli
 
 test('--scope=validator includes calculogic-validator only and excludes app/docs/system files', () => {
   const validatorPaths = collectRepositoryPaths(process.cwd(), { scope: 'validator' });
-  assert.ok(validatorPaths.includes('calculogic-validator/scripts/validate-naming.mjs'));
+  assert.ok(validatorPaths.includes('calculogic-validator/scripts/validate-naming.host.mjs'));
   assert.ok(validatorPaths.some((pathname) => pathname.startsWith('calculogic-validator/src/')));
   assert.ok(validatorPaths.some((pathname) => pathname.startsWith('calculogic-validator/test/')));
   assert.equal(

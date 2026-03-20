@@ -9,7 +9,7 @@ const runBin = (args) =>
   });
 
 test('calculogic-validate bin prints help', () => {
-  const result = runBin(['calculogic-validator/bin/calculogic-validate.mjs', '--help']);
+  const result = runBin(['calculogic-validator/bin/calculogic-validate.host.mjs', '--help']);
 
   assert.equal(result.status, 0);
   assert.match(result.stdout, /Usage: calculogic-validate/);
@@ -17,7 +17,7 @@ test('calculogic-validate bin prints help', () => {
 
 test('calculogic-validate bin runs naming validator and returns JSON', () => {
   const result = runBin([
-    'calculogic-validator/bin/calculogic-validate.mjs',
+    'calculogic-validator/bin/calculogic-validate.host.mjs',
     '--scope=app',
     '--validators=naming',
   ]);
@@ -28,7 +28,7 @@ test('calculogic-validate bin runs naming validator and returns JSON', () => {
 });
 
 test('calculogic-validate-naming bin returns naming report JSON', () => {
-  const result = runBin(['calculogic-validator/bin/calculogic-validate-naming.mjs', '--scope=app']);
+  const result = runBin(['calculogic-validator/bin/calculogic-validate-naming.host.mjs', '--scope=app']);
 
   assert.ok([0, 1, 2].includes(result.status), result.stderr);
   const report = JSON.parse(result.stdout);
@@ -39,7 +39,7 @@ test('calculogic-validate-naming bin returns naming report JSON', () => {
 test('calculogic-validate-naming bin prints usage on runtime target resolution errors', () => {
   const result = runBin([
     '--experimental-strip-types',
-    'calculogic-validator/bin/calculogic-validate-naming.mjs',
+    'calculogic-validator/bin/calculogic-validate-naming.host.mjs',
     '--scope=app',
     '--target=does-not-exist',
   ]);
@@ -51,7 +51,7 @@ test('calculogic-validate-naming bin prints usage on runtime target resolution e
 
 test('calculogic-validate bin accepts --config path', () => {
   const result = runBin([
-    'calculogic-validator/bin/calculogic-validate.mjs',
+    'calculogic-validator/bin/calculogic-validate.host.mjs',
     '--scope=app',
     '--validators=naming',
     '--config=calculogic-validator/test/fixtures/validator-config.extensions.contracts.json',
@@ -64,7 +64,7 @@ test('calculogic-validate bin accepts --config path', () => {
 
 test('calculogic-validate-naming bin fails deterministically on invalid config', () => {
   const result = runBin([
-    'calculogic-validator/bin/calculogic-validate-naming.mjs',
+    'calculogic-validator/bin/calculogic-validate-naming.host.mjs',
     '--scope=app',
     '--config=calculogic-validator/test/fixtures/not-found.json',
   ]);

@@ -96,8 +96,8 @@ Validator implementation assets live under top-level `calculogic-validator/`:
 - suite-core CLI semantic area: `calculogic-validator/src/core/cli/` (`validator-cli-output.logic.mjs`, `validator-cli-usage.logic.mjs`, `validator-cli-targets.logic.mjs`)
 - package export barrel: `calculogic-validator/src/index.mjs`
 - stable repository-root resolver shared by CLIs: `calculogic-validator/src/core/repository-root.logic.mjs`
-- repo-local script entrypoints remain supported: `calculogic-validator/scripts/{validate-naming.mjs,validate-tree.mjs,validate-all.mjs,validator-health-check.host.mjs}`
-- stable installable bin entrypoints: `calculogic-validator/bin/{calculogic-validate.mjs,calculogic-validate-naming.mjs,calculogic-validator-health.mjs}`
+- repo-local script entrypoints remain supported: `calculogic-validator/scripts/{validate-naming.host.mjs,validate-tree.host.mjs,validate-all.host.mjs,validator-health-check.host.mjs}`
+- stable installable bin entrypoints: `calculogic-validator/bin/{calculogic-validate.host.mjs,calculogic-validate-naming.host.mjs,calculogic-validator-health.host.mjs}`
 - validator tests: `calculogic-validator/test/*.test.mjs`
 
 Root `package.json` scripts remain the canonical invocation interface (`npm run validate:naming`, `npm run validate:all`, `npm run health:validator`, `npm test`) while local package bins are testable via `npm exec` through the file dependency `@calculogic/validator`.
@@ -109,7 +109,7 @@ Ownership boundary rule: suite-wide cross-slice concerns belong in semantic suit
 Thin-wrapper contract for naming entrypoints: repo-local scripts and installable bins are orchestration shells only; they parse/forward CLI inputs and delegate behavior to naming-owned semantic areas (`calculogic-validator/naming/src/cli/` and `calculogic-validator/naming/src/health/`) plus suite-core CLI helpers where applicable.
 
 Health-check entrypoint lives at `calculogic-validator/scripts/validator-health-check.host.mjs` and is exposed via root script `npm run health:validator`.
-Stable installable health bin entrypoint lives at `calculogic-validator/bin/calculogic-validator-health.mjs`.
+Stable installable health bin entrypoint lives at `calculogic-validator/bin/calculogic-validator-health.host.mjs`.
 Canonical naming-owned health implementation is split by concern: pure assertions live at `calculogic-validator/naming/src/health/naming-health-check.logic.mjs`, while process entrypoint behavior lives at `calculogic-validator/naming/src/health/naming-health-check.host.mjs`; repo-local script/bin entrypoints remain thin wrappers that delegate to the naming-owned host wrapper.
 
 The health-check performs deterministic, CI-friendly assertions for scope profiles `repo`, `app`, `docs`, `validator`, and `system`:

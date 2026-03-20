@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
-const verifierScriptPath = path.resolve('calculogic-validator/scripts/report-capture-verify.mjs');
+const verifierScriptPath = path.resolve('calculogic-validator/scripts/report-capture-verify.host.mjs');
 
 const runVerifier = ({ reportsDir, scopes }) =>
   new Promise((resolve, reject) => {

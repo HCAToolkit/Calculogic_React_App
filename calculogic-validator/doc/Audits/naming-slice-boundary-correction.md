@@ -30,10 +30,10 @@ Updated runtime import targets to the new canonical naming slice path:
 
 - `calculogic-validator/src/index.mjs`
 - `calculogic-validator/src/core/validator-registry.knowledge.mjs`
-- `calculogic-validator/scripts/validate-naming.mjs`
+- `calculogic-validator/scripts/validate-naming.host.mjs`
 - `calculogic-validator/scripts/validator-health-check.host.mjs`
-- `calculogic-validator/bin/calculogic-validate-naming.mjs`
-- `calculogic-validator/bin/calculogic-validator-health.mjs`
+- `calculogic-validator/bin/calculogic-validate-naming.host.mjs`
+- `calculogic-validator/bin/calculogic-validator-health.host.mjs`
 
 ## 4. Package boundary and script updates
 
