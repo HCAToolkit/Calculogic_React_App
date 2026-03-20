@@ -113,6 +113,9 @@ Authority labels used in this index:
 - `doc/Audits/final-state-validator-shim-verification.audit.md`
   **Authority:** audit snapshot. **Intended use:** final-state verification audit after detector-noise cleanup.
 
+- `doc/Audits/validator-missing-role-decision-lanes.audit.md`
+  **Authority:** audit snapshot. **Intended use:** bounded ownership-first inventory for remaining validator-scope missing-role findings before the next rename tranche.
+
 ## 8) Maintenance note
 
 - When adding a new validator doc, classify it in this index using one of the authority labels above.
