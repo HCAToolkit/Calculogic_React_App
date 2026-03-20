@@ -8,7 +8,7 @@ import { test } from 'node:test';
 const repositoryRoot = process.cwd();
 const validateTreeScriptPath = path.resolve(
   repositoryRoot,
-  'calculogic-validator/scripts/validate-tree.mjs',
+  'calculogic-validator/scripts/validate-tree.host.mjs',
 );
 
 const runValidateTree = (cwd, args, extraEnv = {}) =>

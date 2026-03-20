@@ -33,7 +33,7 @@ test('validate-naming report includes stable configDigest when config is supplie
       process.execPath,
       [
         '--experimental-strip-types',
-        'calculogic-validator/scripts/validate-naming.mjs',
+        'calculogic-validator/scripts/validate-naming.host.mjs',
         '--scope=docs',
         '--config=calculogic-validator/test/fixtures/validator-config.extensions.contracts.json',
       ],

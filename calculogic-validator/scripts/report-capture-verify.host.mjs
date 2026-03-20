@@ -176,7 +176,7 @@ const run = async () => {
   );
   const namingValidatorPath = path.resolve(
     repositoryRoot,
-    'calculogic-validator/scripts/validate-naming.mjs',
+    'calculogic-validator/scripts/validate-naming.host.mjs',
   );
   const scopes = parseScopes(process.argv.slice(2));
 

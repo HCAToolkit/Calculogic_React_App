@@ -43,7 +43,7 @@ test('runner report includes naming validator in deterministic order', () => {
 test('validate-all CLI runs and returns naming validator report', () => {
   const result = spawnSync(
     process.execPath,
-    ['--experimental-strip-types', 'calculogic-validator/scripts/validate-all.mjs', '--scope=docs'],
+    ['--experimental-strip-types', 'calculogic-validator/scripts/validate-all.host.mjs', '--scope=docs'],
     { cwd: process.cwd(), encoding: 'utf8' },
   );
 

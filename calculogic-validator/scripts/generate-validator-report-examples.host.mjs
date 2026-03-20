@@ -74,11 +74,11 @@ const parseArgs = (argv) => {
 };
 
 export const generateValidatorReportExamples = ({ repositoryRoot, outputDirectory }) => {
-  const namingReport = runValidatorScript(repositoryRoot, 'calculogic-validator/scripts/validate-naming.mjs', [
+  const namingReport = runValidatorScript(repositoryRoot, 'calculogic-validator/scripts/validate-naming.host.mjs', [
     '--scope=system',
   ]);
 
-  const runnerReport = runValidatorScript(repositoryRoot, 'calculogic-validator/scripts/validate-all.mjs', [
+  const runnerReport = runValidatorScript(repositoryRoot, 'calculogic-validator/scripts/validate-all.host.mjs', [
     '--scope=system',
     '--validators=naming',
   ]);

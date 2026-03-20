@@ -41,7 +41,7 @@ Updated public-entrypoint pass-through detection to accept canonical tree barrel
 
 - Updated `package.json` export target for `./tree` from `./src/tree/tree-structure-advisor.host.mjs` to `./tree/src/tree-structure-advisor.host.mjs`.
 - Updated `package.json` `files` to include `tree/**` for packaging.
-- Updated tree validation script examples in `calculogic-validator/scripts/validate-tree.mjs` to point at `calculogic-validator/tree/src` target examples.
+- Updated tree validation script examples in `calculogic-validator/scripts/validate-tree.host.mjs` to point at `calculogic-validator/tree/src` target examples.
 
 ## 5. Docs/spec/NL updates
 

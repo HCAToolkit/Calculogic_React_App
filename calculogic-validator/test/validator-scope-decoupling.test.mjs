@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
-const validateAllScriptPath = 'calculogic-validator/scripts/validate-all.mjs';
-const calculateValidateBinPath = 'calculogic-validator/bin/calculogic-validate.mjs';
+const validateAllScriptPath = 'calculogic-validator/scripts/validate-all.host.mjs';
+const calculateValidateBinPath = 'calculogic-validator/bin/calculogic-validate.host.mjs';
 
 const assertDecoupledFromNamingScopeHelpers = (filePath) => {
   const fileContents = fs.readFileSync(filePath, 'utf8');

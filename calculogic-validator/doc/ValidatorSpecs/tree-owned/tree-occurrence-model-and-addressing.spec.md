@@ -143,15 +143,15 @@ A├─ doc/
 │ B├─ ValidatorSpecs/
 │ C└─ Indexes/
 B├─ bin/
-│ 1├─ calculogic-validate.mjs
-│ 2├─ calculogic-validate-naming.mjs
-│ 3└─ calculogic-validator-health.mjs
+│ 1├─ calculogic-validate.host.mjs
+│ 2├─ calculogic-validate-naming.host.mjs
+│ 3└─ calculogic-validator-health.host.mjs
 C├─ scripts/
-│ 1├─ validate-all.mjs
-│ 2├─ validate-naming.mjs
+│ 1├─ validate-all.host.mjs
+│ 2├─ validate-naming.host.mjs
 │ 3├─ validator-health-check.host.mjs
-│ 4├─ report-capture-verify.mjs
-│ 5└─ report-capture-summarize.mjs
+│ 4├─ report-capture-verify.host.mjs
+│ 5└─ report-capture-summarize.host.mjs
 D├─ src/
 │ 1├─ index.mjs
 │ 2├─ validator-config.schema.json

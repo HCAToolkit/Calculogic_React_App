@@ -14,7 +14,7 @@ const assertIsoString = (value) => {
 };
 
 test('validate-naming emits current slice report envelope and finding identifier contract', () => {
-  const result = runScript('calculogic-validator/scripts/validate-naming.mjs', ['--scope=system']);
+  const result = runScript('calculogic-validator/scripts/validate-naming.host.mjs', ['--scope=system']);
 
   assert.ok([0, 1, 2].includes(result.status));
   const report = JSON.parse(result.stdout);
@@ -44,7 +44,7 @@ test('validate-naming emits current slice report envelope and finding identifier
 });
 
 test('validate-all emits current runner report envelope and forwards configDigest', () => {
-  const result = runScript('calculogic-validator/scripts/validate-all.mjs', [
+  const result = runScript('calculogic-validator/scripts/validate-all.host.mjs', [
     '--scope=system',
     '--validators=naming',
     '--config=calculogic-validator/test/fixtures/validator-config.roles.contracts.json',

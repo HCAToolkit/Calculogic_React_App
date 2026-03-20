@@ -10,7 +10,7 @@ const runExampleGenerator = (outDir) =>
     process.execPath,
     [
       '--experimental-strip-types',
-      'calculogic-validator/scripts/generate-validator-report-examples.mjs',
+      'calculogic-validator/scripts/generate-validator-report-examples.host.mjs',
       `--out-dir=${outDir}`,
     ],
     {

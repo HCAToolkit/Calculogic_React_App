@@ -19,8 +19,8 @@ Add read-path registry-state metadata from naming validator results into script/
 
 ### 3.1 Containers
 
-- Script report builder in `scripts/validate-naming.mjs`.
-- Bin report builder in `bin/calculogic-validate-naming.mjs`.
+- Script report builder in `scripts/validate-naming.host.mjs`.
+- Bin report builder in `bin/calculogic-validate-naming.host.mjs`.
 - Runner hook metadata assembler in `src/core/validator-registry.knowledge.mjs`.
 
 ### 3.2 Subcontainers

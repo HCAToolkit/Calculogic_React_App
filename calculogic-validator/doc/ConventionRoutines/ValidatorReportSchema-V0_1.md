@@ -152,7 +152,7 @@ Current-runtime report examples are generated from live validator entrypoints an
 Refresh workflow:
 
 ```bash
-node --experimental-strip-types calculogic-validator/scripts/generate-validator-report-examples.mjs
+node --experimental-strip-types calculogic-validator/scripts/generate-validator-report-examples.host.mjs
 ```
 
 Normalization policy for these examples is intentionally bounded for deterministic repo artifacts:

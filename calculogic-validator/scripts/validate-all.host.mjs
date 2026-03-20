@@ -28,8 +28,8 @@ const usageLines = [
   '  ✅ npm run validate:all -- --validators=naming --scope=docs',
   '  ✅ npm run validate:all -- --validators=naming --scope=app --target src/buildsurface',
   '  ✅ npm run validate:all -- --target src --target test',
-  '  ✅ node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=app',
-  '  ✅ node calculogic-validator/bin/calculogic-validate.mjs --scope=docs',
+  '  ✅ node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=app',
+  '  ✅ node calculogic-validator/bin/calculogic-validate.host.mjs --scope=docs',
   '  ✅ npm run validate:all -- --scope=repo --strict',
 ];
 

@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 test('validate runner includes naming meta.registry with digest metadata', () => {
   const result = spawnSync(
     process.execPath,
-    ['calculogic-validator/bin/calculogic-validate.mjs', '--scope=system', '--validators=naming'],
+    ['calculogic-validator/bin/calculogic-validate.host.mjs', '--scope=system', '--validators=naming'],
     { cwd: process.cwd(), encoding: 'utf8' },
   );
 

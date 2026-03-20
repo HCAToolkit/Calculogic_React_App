@@ -30,15 +30,15 @@ These files have a clear current responsibility and an existing active role alre
 
 | Candidate file | Actual ownership / responsibility | Recommended role | Why this fits now |
 |---|---|---|---|
-| `calculogic-validator/bin/calculogic-validate-naming.mjs` | Public naming CLI entry surface that resolves repo root, builds usage text, and delegates to naming CLI runtime | `host` | Thin executable surface / public entry boundary; the owned logic already lives elsewhere. |
-| `calculogic-validator/bin/calculogic-validate.mjs` | Public suite runner CLI entry surface for registered validators | `host` | Entry-surface composition is clear and stable. |
-| `calculogic-validator/bin/calculogic-validator-health.mjs` | Public health-check entrypoint that hands off to the health host | `host` | It is a host surface, not the health logic itself. |
-| `calculogic-validator/scripts/generate-validator-report-examples.mjs` | Script host that orchestrates validator report example generation | `host` | Executable orchestration surface rather than reusable inner logic. |
-| `calculogic-validator/scripts/report-capture-summarize.mjs` | Standalone report-capture summarizer CLI surface | `host` | Public tool entry surface is the dominant responsibility. |
-| `calculogic-validator/scripts/report-capture-verify.mjs` | Standalone report-capture verification CLI surface | `host` | Same host-surface reasoning as the other script entrypoints. |
-| `calculogic-validator/scripts/validate-all.mjs` | npm-facing suite validator entry surface | `host` | Clear public runner surface. |
-| `calculogic-validator/scripts/validate-naming.mjs` | npm-facing naming validator entry surface | `host` | Clear public runner surface. |
-| `calculogic-validator/scripts/validate-tree.mjs` | npm-facing tree validator entry surface | `host` | Clear public runner surface. |
+| `calculogic-validator/bin/calculogic-validate-naming.host.mjs` | Public naming CLI entry surface that resolves repo root, builds usage text, and delegates to naming CLI runtime | `host` | Thin executable surface / public entry boundary; the owned logic already lives elsewhere. |
+| `calculogic-validator/bin/calculogic-validate.host.mjs` | Public suite runner CLI entry surface for registered validators | `host` | Entry-surface composition is clear and stable. |
+| `calculogic-validator/bin/calculogic-validator-health.host.mjs` | Public health-check entrypoint that hands off to the health host | `host` | It is a host surface, not the health logic itself. |
+| `calculogic-validator/scripts/generate-validator-report-examples.host.mjs` | Script host that orchestrates validator report example generation | `host` | Executable orchestration surface rather than reusable inner logic. |
+| `calculogic-validator/scripts/report-capture-summarize.host.mjs` | Standalone report-capture summarizer CLI surface | `host` | Public tool entry surface is the dominant responsibility. |
+| `calculogic-validator/scripts/report-capture-verify.host.mjs` | Standalone report-capture verification CLI surface | `host` | Same host-surface reasoning as the other script entrypoints. |
+| `calculogic-validator/scripts/validate-all.host.mjs` | npm-facing suite validator entry surface | `host` | Clear public runner surface. |
+| `calculogic-validator/scripts/validate-naming.host.mjs` | npm-facing naming validator entry surface | `host` | Clear public runner surface. |
+| `calculogic-validator/scripts/validate-tree.host.mjs` | npm-facing tree validator entry surface | `host` | Clear public runner surface. |
 | `calculogic-validator/doc/Audits/naming-slice-boundary-correction.md` | Point-in-time reconciliation record of the naming slice ownership move | `audit` | Snapshot verification / correction record. |
 | `calculogic-validator/doc/Audits/tree-slice-boundary-correction.md` | Point-in-time reconciliation record of the tree slice ownership move | `audit` | Snapshot verification / correction record. |
 | `calculogic-validator/doc/Audits/validator-shim-cleanup-pass-1.md` | Completed pass record for shim cleanup pass 1 | `audit` | Completed-state cleanup record, not future planning. |
@@ -89,9 +89,9 @@ These files have clear current responsibility, but the current active role vocab
 
 This pass reviewed every current validator-scope `NAMING_MISSING_ROLE` finding from the 2026-03-20 report run:
 
-1. `calculogic-validator/bin/calculogic-validate-naming.mjs`
-2. `calculogic-validator/bin/calculogic-validate.mjs`
-3. `calculogic-validator/bin/calculogic-validator-health.mjs`
+1. `calculogic-validator/bin/calculogic-validate-naming.host.mjs`
+2. `calculogic-validator/bin/calculogic-validate.host.mjs`
+3. `calculogic-validator/bin/calculogic-validator-health.host.mjs`
 4. `calculogic-validator/doc/Audits/naming-slice-boundary-correction.md`
 5. `calculogic-validator/doc/Audits/tree-slice-boundary-correction.md`
 6. `calculogic-validator/doc/Audits/validator-shim-cleanup-design-checkpoint.md`
@@ -122,12 +122,12 @@ This pass reviewed every current validator-scope `NAMING_MISSING_ROLE` finding f
 31. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`
 32. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-top-root-registry-transition-inventory.md`
 33. `calculogic-validator/naming/src/registries/registry-state.json`
-34. `calculogic-validator/scripts/generate-validator-report-examples.mjs`
-35. `calculogic-validator/scripts/report-capture-summarize.mjs`
-36. `calculogic-validator/scripts/report-capture-verify.mjs`
-37. `calculogic-validator/scripts/validate-all.mjs`
-38. `calculogic-validator/scripts/validate-naming.mjs`
-39. `calculogic-validator/scripts/validate-tree.mjs`
+34. `calculogic-validator/scripts/generate-validator-report-examples.host.mjs`
+35. `calculogic-validator/scripts/report-capture-summarize.host.mjs`
+36. `calculogic-validator/scripts/report-capture-verify.host.mjs`
+37. `calculogic-validator/scripts/validate-all.host.mjs`
+38. `calculogic-validator/scripts/validate-naming.host.mjs`
+39. `calculogic-validator/scripts/validate-tree.host.mjs`
 40. `calculogic-validator/src/index.mjs`
 
 ## 7. Highest-ROI subset for the next rename tranche

@@ -25,15 +25,15 @@ calculogic-validator/
 │  ├─ ValidatorSpecs/                 # specs that are package-owned (runner/tree advisor/etc.)
 │  └─ Indexes/                        # optional: “where to find things” maps
 ├─ bin/                               # suite-level CLIs (entrypoints)
-│  ├─ calculogic-validate.mjs
-│  ├─ calculogic-validate-naming.mjs
-│  └─ calculogic-validator-health.mjs
+│  ├─ calculogic-validate.host.mjs
+│  ├─ calculogic-validate-naming.host.mjs
+│  └─ calculogic-validator-health.host.mjs
 ├─ scripts/                           # suite-level workflows (thin orchestration)
-│  ├─ validate-all.mjs
-│  ├─ validate-naming.mjs
+│  ├─ validate-all.host.mjs
+│  ├─ validate-naming.host.mjs
 │  ├─ validator-health-check.host.mjs
-│  ├─ report-capture-verify.mjs
-│  └─ report-capture-summarize.mjs
+│  ├─ report-capture-verify.host.mjs
+│  └─ report-capture-summarize.host.mjs
 ├─ src/                               # suite-core only (suite-level infra + compat boundary)
 │  ├─ index.mjs
 │  ├─ validator-config.schema.json      # canonical validator config schema authority
@@ -79,7 +79,7 @@ calculogic-validator/
 ├─ naming/                            # naming validator scope root (mini-scope)
 │  ├─ README.md                       # optional (what lives here)
 │  ├─ scripts/                        # optional (suite scripts can delegate here)
-│  │  └─ validate-naming.mjs
+│  │  └─ validate-naming.host.mjs
 │  ├─ src/
 │  │  ├─ naming-validator.host.mjs
 │  │  ├─ naming-validator.wiring.mjs
@@ -221,18 +221,18 @@ npm run report:summarize
 This section includes package-defined validator entrypoints plus direct script invocation where useful, all executable from repo root.
 
 ```bash
-node calculogic-validator/bin/calculogic-validate.mjs
-node calculogic-validator/bin/calculogic-validate-naming.mjs
-node calculogic-validator/bin/calculogic-validator-health.mjs
-node calculogic-validator/scripts/validate-tree.mjs --scope=repo
+node calculogic-validator/bin/calculogic-validate.host.mjs
+node calculogic-validator/bin/calculogic-validate-naming.host.mjs
+node calculogic-validator/bin/calculogic-validator-health.host.mjs
+node calculogic-validator/scripts/validate-tree.host.mjs --scope=repo
 ```
 
 What each entrypoint does:
 
-- `calculogic-validate.mjs`: full validator entrypoint.
-- `calculogic-validate-naming.mjs`: naming-only validator entrypoint.
-- `calculogic-validator-health.mjs`: validator health/diagnostic entrypoint.
-- `scripts/validate-tree.mjs`: tree validator script (`--scope`, repeatable `--target`, `--config`, `--help`).
+- `calculogic-validate.host.mjs`: full validator entrypoint.
+- `calculogic-validate-naming.host.mjs`: naming-only validator entrypoint.
+- `calculogic-validator-health.host.mjs`: validator health/diagnostic entrypoint.
+- `scripts/validate-tree.host.mjs`: tree validator script (`--scope`, repeatable `--target`, `--config`, `--help`).
 
 ## 6) Scopes and targets
 
@@ -273,7 +273,7 @@ Use `--config=<path>` to pass a config file explicitly:
 
 ```bash
 npm run validate:naming -- --scope=app --config=./.calculogic/validator/config.json
-node calculogic-validator/bin/calculogic-validate-naming.mjs --scope=docs --config=./.calculogic/validator/config.json
+node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=docs --config=./.calculogic/validator/config.json
 ```
 
 Canonical config spec: `doc/ValidatorSpecs/validator-config.spec.md`.
