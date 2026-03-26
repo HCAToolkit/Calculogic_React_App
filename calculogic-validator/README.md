@@ -216,6 +216,21 @@ npm run report:summarize
 - `report:verify`: checks report-capture wiring/outputs.
 - `report:summarize`: summarizes captured reports.
 
+### Validator-internal naming/report presets (bounded convenience wrappers)
+
+These presets are convenience wrappers for validator-internal workflows. They **do not** add new built-in scopes; each command remains `--scope=validator` with explicit `--target` narrowing.
+
+```bash
+npm run validate:naming:validator:entry
+npm run validate:naming:validator:naming
+npm run validate:naming:validator:tree
+npm run validate:naming:validator:doc
+npm run report:naming:validator:entry
+npm run report:naming:validator:naming
+npm run report:naming:validator:tree
+npm run report:naming:validator:doc
+```
+
 ## 5) Validator entrypoints and direct invocation
 
 This section includes package-defined validator entrypoints plus direct script invocation where useful, all executable from repo root.
@@ -258,6 +273,19 @@ npm run validate:tree -- --scope=repo --target calculogic-validator
 ```
 
 Use scope-specific `report:*` commands when you want one-command capture per target/scope combination.
+
+Raw target-filter pattern (adaptable to your own validator-focused areas/files):
+
+```bash
+npm run validate:naming -- --scope=validator --target calculogic-validator/doc
+npm run validate:naming -- --scope=validator --target calculogic-validator/naming
+npm run validate:naming -- --scope=validator --target calculogic-validator/tree
+npm run validate:naming -- --scope=validator --target calculogic-validator/bin --target calculogic-validator/scripts
+npm run validate:naming -- --scope=validator --target calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md
+calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-validator-doc -- node --experimental-strip-types calculogic-validator/scripts/validate-naming.host.mjs --scope=validator --target calculogic-validator/doc
+```
+
+Scope boundary note: validator-internal presets do not create new built-in scope profiles. `validator` remains the actual scope, and `--target` is the narrowing layer inside that scope.
 
 ## 7) Strict config and schema
 
