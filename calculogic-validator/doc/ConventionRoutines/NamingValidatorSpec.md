@@ -219,7 +219,7 @@ In current behavior, these config effects are limited to classification/runtime 
 
 Config does not change detection mode/scope semantics and does not introduce enforcement/fix execution. Current exit policy remains policy-driven as documented in this spec.
 
-## CLI Usage (V0.1.7)
+## CLI Usage (V0.1.8)
 
 - `npm run validate:naming` (defaults to `--scope=repo`)
 - `npm run validate:naming -- --scope=repo`
@@ -230,6 +230,10 @@ Config does not change detection mode/scope semantics and does not introduce enf
 - `npm run validate:naming -- --scope=app --target src/buildsurface`
 - `npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared`
 - `npm run validate:naming -- --scope=app --config=./path/to/validator-config.json`
+- `npm run validate:naming:validator:entry`
+- `npm run validate:naming:validator:naming`
+- `npm run validate:naming:validator:tree`
+- `npm run validate:naming:validator:doc`
 - `node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=app --config=./path/to/validator-config.json`
 
 npm argument forwarding note:
@@ -238,6 +242,12 @@ npm argument forwarding note:
 - Wrong (now deterministic usage error): `npm run validate:naming --scope=app`, `npm run validate:all --scope=app`
 - Right: `npm run validate:naming -- --scope=app`, `npm run validate:all -- --scope=app`
 - The validator scripts fail fast with guidance when supported flags are detected in npm invocation metadata but not forwarded to script argv.
+
+Validator-internal preset boundary (V0.1.8):
+
+- validator-internal convenience scripts use `--scope=validator` plus explicit repeatable `--target` filters.
+- these presets improve validator-internal workflow granularity without introducing additional built-in scope taxonomy.
+- built-in scope vocabulary remains suite-owned and unchanged: `repo`, `app`, `docs`, `validator`, `system`.
 
 ## Targeted runs (developer convenience, V0.1.6)
 
