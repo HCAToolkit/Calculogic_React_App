@@ -2,7 +2,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.1** (add tree-validator report-capture presets alongside naming and validate-all).
+Current implementation target: **V0.1.2** (add validator-internal naming report-capture presets that use `--scope=validator` + stable target unions).
 
 ## 1.0 Purpose
 
@@ -35,6 +35,15 @@ Report filenames are deterministic and filesystem-safe:
 ### 2.4 Scope capture presets
 
 Root package scripts provide deterministic capture presets for naming, validate-all, and validate-tree across `repo`, `app`, `docs`, `validator`, and `system` scopes, writing files to repo-local `./.reports/` for safe exclusion from validator walking behavior.
+
+Report-capture also provides validator-internal naming presets that preserve scope taxonomy while adding practical granularity:
+
+- `report:naming:validator:entry` → `--scope=validator --target calculogic-validator/bin --target calculogic-validator/scripts`
+- `report:naming:validator:naming` → `--scope=validator --target calculogic-validator/naming`
+- `report:naming:validator:tree` → `--scope=validator --target calculogic-validator/tree`
+- `report:naming:validator:doc` → `--scope=validator --target calculogic-validator/doc`
+
+These are convenience scripts only; no additional built-in scope profiles are introduced.
 
 ### 2.5 Verifier workflow contract
 

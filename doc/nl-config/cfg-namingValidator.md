@@ -24,9 +24,9 @@ Summary only: naming rules are consumed from canonical docs. For normative role/
 
 ### 2.2 Scope mode (V0.1.11)
 
-### 2.2.1 Target filter mode (V0.1.15)
+### 2.2.1 Target filter mode (V0.1.16)
 
-V0.1.15 adds optional repeatable `--target` inputs for developer-convenience focused runs while preserving canonical scope semantics:
+V0.1.16 adds optional repeatable `--target` inputs for developer-convenience focused runs while preserving canonical scope semantics:
 
 - `--target <path>` and `--target=<path>` are both accepted and can be repeated
 - target may resolve to a file (exact-match) or directory (recursive prefix-match)
@@ -42,6 +42,16 @@ Deterministic validation and safety requirements:
   - `filters.isFiltered = true`
   - `filters.targets = [sorted repo-relative targets]`
 - when target filtering is inactive, metadata includes `filters.isFiltered = false` and omits `filters.targets`
+
+Validator-internal preset clarification (V0.1.16):
+
+- root scripts may define validator-internal convenience presets that combine `--scope=validator` with stable target unions.
+- these presets do not add built-in scope profiles; they only narrow selection inside the existing `validator` scope boundary.
+- current validator-internal naming presets use deterministic ownership slices:
+  - entry surfaces: `calculogic-validator/bin` + `calculogic-validator/scripts`
+  - naming slice: `calculogic-validator/naming`
+  - tree slice: `calculogic-validator/tree`
+  - docs slice: `calculogic-validator/doc`
 
 V0.1.11 supports deterministic scope profiles selected via CLI and applied before filename classification using explicit scope path predicates:
 
@@ -100,7 +110,7 @@ Validator implementation assets live under top-level `calculogic-validator/`:
 - stable installable bin entrypoints: `calculogic-validator/bin/{calculogic-validate.host.mjs,calculogic-validate-naming.host.mjs,calculogic-validator-health.host.mjs}`
 - validator tests: `calculogic-validator/test/*.test.mjs`
 
-Root `package.json` scripts remain the canonical invocation interface (`npm run validate:naming`, `npm run validate:all`, `npm run health:validator`, `npm test`) while local package bins are testable via `npm exec` through the file dependency `@calculogic/validator`.
+Root `package.json` scripts remain the canonical invocation interface (`npm run validate:naming`, `npm run validate:naming:validator:*`, `npm run validate:all`, `npm run health:validator`, `npm test`) while local package bins are testable via `npm exec` through the file dependency `@calculogic/validator`.
 
 Ownership boundary rule: suite-wide cross-slice concerns belong in semantic suite-core areas under `calculogic-validator/src/core/<area>/`; naming-owned shared concerns belong in semantic naming areas under `calculogic-validator/naming/src/<area>/`. Prefer these semantic owner areas over generic catch-all helper folders when ownership is clear.
 
