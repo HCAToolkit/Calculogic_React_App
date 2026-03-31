@@ -231,6 +231,12 @@ npm run report:naming:validator:tree
 npm run report:naming:validator:doc
 ```
 
+Preset target mapping:
+- `entry` → `calculogic-validator/bin` + `calculogic-validator/scripts`
+- `naming` → `calculogic-validator/naming`
+- `tree` → `calculogic-validator/tree`
+- `doc` → `calculogic-validator/doc`
+
 ## 5) Validator entrypoints and direct invocation
 
 This section includes package-defined validator entrypoints plus direct script invocation where useful, all executable from repo root.
