@@ -1,6 +1,6 @@
 import path from 'node:path';
-import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots.registry.logic.mjs';
-import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy.registry.logic.mjs';
+import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
+import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy-registry.logic.mjs';
 import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.logic.mjs';
 
 const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();

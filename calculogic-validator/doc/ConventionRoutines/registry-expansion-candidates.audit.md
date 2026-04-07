@@ -1,4 +1,4 @@
-# Registry-Expansion-Candidates.audit
+# registry-expansion-candidates.audit
 
 ## Purpose
 
@@ -19,18 +19,18 @@ These areas are already registry-backed and should not be redundantly re-extract
 - Builtin roles registry (`roles.registry.json`) via `registry-state.logic.mjs`.
 - Reportable extensions registry (`reportable-extensions.registry.json`) via `registry-state.logic.mjs`.
 - Reportable root-file adjunct registry (`reportable-root-files.registry.json`) via `registry-state.logic.mjs`.
-- Missing-role patterns registry (`missing-role-patterns.registry.json`) via `registry-state.logic.mjs` + `naming-missing-role-patterns.registry.logic.mjs`.
-- Finding policy registry (`finding-policy.registry.json`) via `registry-state.logic.mjs` + `naming-finding-policy.registry.logic.mjs` + `naming-validator.logic.mjs`.
-- Summary buckets registry (`summary-buckets.registry.json`) via `registry-state.logic.mjs` + `naming-summary-buckets.registry.logic.mjs` + `naming-validator.logic.mjs`.
+- Missing-role patterns registry (`missing-role-patterns.registry.json`) via `registry-state.logic.mjs` + `naming-missing-role-patterns-registry.logic.mjs`.
+- Finding policy registry (`finding-policy.registry.json`) via `registry-state.logic.mjs` + `naming-finding-policy-registry.logic.mjs` + `naming-validator.logic.mjs`.
+- Summary buckets registry (`summary-buckets.registry.json`) via `registry-state.logic.mjs` + `naming-summary-buckets-registry.logic.mjs` + `naming-validator.logic.mjs`.
 - Overlay capabilities registry (`overlay-capabilities.registry.json`) via `registry-state.logic.mjs`.
 - Scope profiles registry (`scope-profiles.registry.json`) via `validator-scopes.runtime.mjs`.
 - Default validator scope policy via `DEFAULT_VALIDATOR_SCOPE` in `validator-scopes.runtime.mjs` (canonical suite-owned default consumed by runtime + naming CLI/wiring).
-- Special cases registry (`special-cases.registry.json`) via `naming-special-case-rules.registry.logic.mjs`.
+- Special cases registry (`special-cases.registry.json`) via `naming-special-case-rules-registry.logic.mjs`.
 - Exit policy registry (`exit-policy.registry.json`) via `validator-exit-policy.registry.runtime.mjs` + `validator-exit-code.logic.mjs`.
-- Tree known-roots registry (`tree-known-roots.registry.json`) via `tree-known-roots.registry.logic.mjs`.
-- Tree validator-owned signal registry (`validator-owned-signals.registry.json`) via `tree-signal-policy.registry.logic.mjs` + `tree-structure-advisor.logic.mjs`.
-- Tree shim detection vocabularies registry (`shim-detection-signals.registry.json`) via `tree-signal-policy.registry.logic.mjs` + `tree-shim-detection.logic.mjs`.
-- Walk exclusions registry (`walk-exclusions.registry.json`) via `naming-walk-exclusions.registry.logic.mjs`.
+- Tree known-roots registry (`tree-known-roots.registry.json`) via `tree-known-roots-registry.logic.mjs`.
+- Tree validator-owned signal registry (`validator-owned-signals.registry.json`) via `tree-signal-policy-registry.logic.mjs` + `tree-structure-advisor.logic.mjs`.
+- Tree shim detection vocabularies registry (`shim-detection-signals.registry.json`) via `tree-signal-policy-registry.logic.mjs` + `tree-shim-detection.logic.mjs`.
+- Walk exclusions registry (`walk-exclusions.registry.json`) via `naming-walk-exclusions-registry.logic.mjs`.
 
 ## Hardcoded-policy inventory
 
@@ -45,8 +45,8 @@ These areas are already registry-backed and should not be redundantly re-extract
 | Config overlay limits | `naming/src/registries/registry-state.logic.mjs` + `naming/src/registries/_builtin/overlay-capabilities.registry.json` | Runtime now resolves bounded overlay support from registry-declared capabilities and preserves add-only handling for `naming.reportableExtensions.add` and `naming.roles.add`. | Overlay capability is a policy contract surface; contract declaration is now registry-owned while merge mechanics remain engine-owned. | `overlay-capabilities.registry.json` (declared add-only fields and merge mode). | `completed` | Keep overlay schema bounded to current naming surfaces and preserve unsupported-path behavior. | Extraction completed as bounded contract-first slice without broadening overlay semantics. |
 | Exit behavior mapping | `src/registries/_builtin/exit-policy.registry.json` + `src/registries/validator-exit-policy.registry.runtime.mjs` + `src/core/validator-exit-code.logic.mjs` | Runtime now resolves ordered exit-policy predicates from bounded builtin registry and evaluates those predicates deterministically in code. | Severity/classification + strict-mode to exit-code mapping is policy contract, while semantic evaluation remains engine-owned. | `exit-policy.registry.json` (ordered predicates). | `completed` | Keep schema bounded to current semantics and preserve deterministic first-match ordering. | Extraction completed in Slice A without exit-semantic changes. |
 | Tree top-level shape vocabulary | `tree/src/registries/_builtin/tree-known-roots.registry.json` + `tree/src/tree-structure-advisor.logic.mjs` | Runtime now consumes `knownTopLevelDirectories` from bounded tree registry payload. | Allowed root directories are repository policy, not algorithmic necessity. | `tree-known-roots.registry.json`. | `completed` | Keep payload bounded to current top-level vocabulary and preserve deterministic ordering in findings details. | Extraction completed without decision-flow changes. |
-| Tree validator-owned basename signals | `tree/src/registries/_builtin/validator-owned-signals.registry.json` + `tree/src/registries/tree-signal-policy.registry.logic.mjs` + `tree/src/tree-structure-advisor.logic.mjs` | Runtime now consumes normalized validator-owned basename signal entries from bounded builtin registry payload and compiles deterministic matcher order in loader. | File ownership signal vocabulary is policy-shaped and now registry-owned with code-owned evaluation mechanics. | `validator-owned-signals.registry.json`. | `completed` | Keep bounded taxonomy (`validator-module-surface`, `validator-cli-entrypoint`, `validator-quality-surface`) and preserve deterministic matcher precedence. | Extraction completed without changing advisor finding semantics. |
-| Shim detection token vocabularies | `tree/src/registries/_builtin/shim-detection-signals.registry.json` + `tree/src/registries/tree-signal-policy.registry.logic.mjs` + `tree/src/tree-shim-detection.logic.mjs` | Runtime now consumes normalized shim taxonomy sections (signals, suppressions, extension allowlist) from bounded registry payload. | Heuristic vocabulary is registry-owned while shim evidence parsing/suppression precedence remains code-owned. | `shim-detection-signals.registry.json`. | `completed` | Keep schema bounded and preserve deterministic matching/suppression behavior. | Extraction completed with no behavior drift in tree shim findings. |
+| Tree validator-owned basename signals | `tree/src/registries/_builtin/validator-owned-signals.registry.json` + `tree/src/registries/tree-signal-policy-registry.logic.mjs` + `tree/src/tree-structure-advisor.logic.mjs` | Runtime now consumes normalized validator-owned basename signal entries from bounded builtin registry payload and compiles deterministic matcher order in loader. | File ownership signal vocabulary is policy-shaped and now registry-owned with code-owned evaluation mechanics. | `validator-owned-signals.registry.json`. | `completed` | Keep bounded taxonomy (`validator-module-surface`, `validator-cli-entrypoint`, `validator-quality-surface`) and preserve deterministic matcher precedence. | Extraction completed without changing advisor finding semantics. |
+| Shim detection token vocabularies | `tree/src/registries/_builtin/shim-detection-signals.registry.json` + `tree/src/registries/tree-signal-policy-registry.logic.mjs` + `tree/src/tree-shim-detection.logic.mjs` | Runtime now consumes normalized shim taxonomy sections (signals, suppressions, extension allowlist) from bounded registry payload. | Heuristic vocabulary is registry-owned while shim evidence parsing/suppression precedence remains code-owned. | `shim-detection-signals.registry.json`. | `completed` | Keep schema bounded and preserve deterministic matching/suppression behavior. | Extraction completed with no behavior drift in tree shim findings. |
 | System-scope compatibility expansions | `src/core/validator-scopes.runtime.mjs` | Hardcoded expansion for `eslint.config.*`, `vite.config.*`, `tsconfig*.json`. | Pattern expansion vocabulary is scope policy adjunct. | Scope-profile adjunct registry for compatibility pattern expansions. | `keep-hardcoded-for-now` | Keep local until root-file discovery contracts stabilize. | Tight coupling with `ROOT_APP_FILES` may not justify extraction yet. |
 
 ## Candidate classification

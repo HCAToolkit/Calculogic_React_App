@@ -558,7 +558,7 @@ Deferred candidates above are a documentation menu only. They are not current ru
 ### Composition ownership
 
 - Tree wiring prepares tree-core inputs and calls tree contributor assembly for default contributors.
-- Default contributor selection is owned by `tree-structure-advisor-contributors.assembly.wiring.mjs`, not by tree core.
+- Default contributor selection is owned by `tree-structure-advisor-contributors-assembly.wiring.mjs`, not by tree core.
 - Shim diagnostics are attached as a contributor (`tree-shim-diagnostics`) during normal tree runs.
 - Shim/content reads are owned by the shim contributor attachment boundary and are guarded to selected paths.
 

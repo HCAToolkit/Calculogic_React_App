@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { loadFindingPolicyFromFile } from '../src/registries/naming-finding-policy.registry.logic.mjs';
+import { loadFindingPolicyFromFile } from '../src/registries/naming-finding-policy-registry.logic.mjs';
 import { resolveNamingRegistryInputs } from '../src/registries/registry-state.logic.mjs';
 import {
   toNamingRolesRuntime,

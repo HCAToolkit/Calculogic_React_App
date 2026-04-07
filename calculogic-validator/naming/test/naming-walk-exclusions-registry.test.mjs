@@ -7,7 +7,7 @@ import { collectRepositoryPaths } from '../src/naming-validator.host.mjs';
 import {
   BUILTIN_WALK_EXCLUSIONS_REGISTRY_PATH,
   getBuiltinWalkExclusions,
-} from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
+} from '../src/registries/naming-walk-exclusions-registry.logic.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
   const absolutePath = path.join(rootDirectory, relativePath);

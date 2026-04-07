@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { classifyTreeOccurrenceRecords } from '../src/tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from '../src/tree-occurrence-snapshot.logic.mjs';
-import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots.registry.logic.mjs';
+import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 
 const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
 
