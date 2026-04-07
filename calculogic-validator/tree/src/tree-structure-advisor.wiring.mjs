@@ -32,7 +32,10 @@ const collectTopLevelDirectoryNames = (repositoryRoot) =>
     .filter((directoryName) => !directoryName.startsWith('.'))
     .sort((left, right) => left.localeCompare(right));
 
-export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targets } = {}) => {
+export const prepareTreeStructureAdvisorInputs = (
+  repositoryRoot,
+  { scope, targets, namingSemanticFamilyBridge } = {},
+) => {
   const scopedSnapshotInputs = collectSuiteScopedSnapshotInputs(repositoryRoot, {
     scope,
     targets,
@@ -54,12 +57,17 @@ export const prepareTreeStructureAdvisorInputs = (repositoryRoot, { scope, targe
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
       selectedPaths,
+      namingSemanticFamilyBridge,
     }),
   };
 };
 
-export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets } = {}) => {
-  const preparedInputs = prepareTreeStructureAdvisorInputs(repositoryRoot, { scope, targets });
+export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets, namingSemanticFamilyBridge } = {}) => {
+  const preparedInputs = prepareTreeStructureAdvisorInputs(repositoryRoot, {
+    scope,
+    targets,
+    namingSemanticFamilyBridge,
+  });
   return runTreeStructureAdvisorRuntime(preparedInputs);
 };
 

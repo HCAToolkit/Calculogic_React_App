@@ -93,11 +93,13 @@ Tree advisor consumes naming-shaped metadata only across an explicit slice bound
 
 **Current shipped runtime posture:**
 
-- current tree findings do **not** yet ingest parsed naming-validator outputs or semantic-family clustering data
-- current shipped tree findings are driven by deterministic path, basename, scope, target, shim-evidence, and occurrence-derived structural signals
-- the naming boundary still matters now because any later tree heuristic that needs semantic-family or role information must consume naming-derived signals rather than re-implement naming interpretation locally
+- tree runtime now supports a bounded naming→tree prepared-input bridge for contributor-backed semantic-family advisory consumption
+- consumed bridge payload is naming-owned evidence projection only (not raw naming runtime internals)
+- shipped semantic-family tree advisories remain report-first and deterministic
+- tree findings continue to be driven by deterministic path/basename/scope/target/shim/occurrence signals plus optional naming bridge evidence when provided
+- tree heuristics that need semantic-family or role information must consume naming-derived signals rather than re-implement naming interpretation locally
 
-When naming-derived signal input is explicitly wired in later, intended consumable surfaces include:
+Bounded consumable naming bridge surfaces include:
 
 - `semanticName`
 - semantic family/group outputs derived by naming from `semanticName`
@@ -115,6 +117,19 @@ Examples of naming validity judgments that tree advisor must not duplicate:
 - hyphen-role ambiguity
 
 When usable naming-shaped metadata is unavailable, incomplete, or not yet wired into tree runtime, tree advisor should reduce confidence and/or recommend running naming validation rather than inventing naming-invalid findings inside tree output. Naming-owned aggregate observations are downstream evidence only and do not let tree declare registry truth on its own.
+
+Bridge shape (prepared-input contract):
+
+- `namingSemanticFamilyBridge.observations[]`
+  - `path`
+  - `semanticName`
+  - `familyRoot`
+  - `semanticFamily`
+  - optional `familySubgroup`
+  - optional `ambiguityFlags[]`
+  - optional `splitFamilyFlags[]`
+
+Tree consumes this normalized bridge payload only. Tree runtime must not parse filenames to recreate these fields.
 
 Boundary note (canonical_target for this slice): tree validator ownership is under `calculogic-validator/tree/src/**`. Legacy flat suite-core paths such as `calculogic-validator/src/tree-structure-advisor.*.mjs` are compatibility wrappers only, not canonical ownership.
 
@@ -521,8 +536,8 @@ Each finding uses the same stable envelope shape used by existing validators:
 
 ### Deferred/planning code candidates (future advisory direction)
 
-- `TREE_OBSERVED_FAMILY_CLUSTER`
-- `TREE_FAMILY_SCATTERED`
+- `TREE_OBSERVED_FAMILY_CLUSTER` (`info`) — implemented via naming bridge contributor (bounded thresholded cluster observability)
+- `TREE_FAMILY_SCATTERED` (`info`) — implemented via naming bridge contributor (bounded family scatter advisory)
 - `TREE_LANE_MIX_HIGH_ENTROPY`
 - `TREE_MISSING_NAMESPACE_ROOT`
 - `TREE_SUBSYSTEM_SCAFFOLD_ASYMMETRY`
@@ -553,7 +568,7 @@ Deferred candidates above are a documentation menu only. They are not current ru
   - `findingContributors` (array of contributor callbacks)
 - Tree core does **not** require `getFileContent(relativePath)`.
 - Current tree runtime does **not** consume tree-specific config surfaces. The dedicated CLI may accept `--config=<path>` through shared suite runner plumbing, but current tree behavior only validates/normalizes the shared config shape and exposes `configDigest` at the runner envelope when config is supplied.
-- Current tree runtime does **not** emit tree addresses, move proposals, semantic-family clustering payloads, or naming-derived parsed metadata in findings/report payloads.
+- Current tree runtime does **not** emit tree addresses or move proposals. Naming bridge payload is consumed as contributor input and is not re-emitted as a raw payload surface.
 
 ### Composition ownership
 
@@ -574,6 +589,11 @@ Attached shim contributor currently ships during normal tree runs:
 
 - `TREE_SHIM_SURFACE_PRESENT`
 - `TREE_SHIM_OUTSIDE_COMPAT`
+
+Attached naming bridge contributor (when bridge payload is provided) currently ships:
+
+- `TREE_OBSERVED_FAMILY_CLUSTER`
+- `TREE_FAMILY_SCATTERED`
 
 ### Current report payload from tree runtime
 

@@ -358,8 +358,30 @@ Boundary clarifications:
 - these are naming-owned observed report surfaces, not shared registry declarations
 - aggregate counts represent what a naming run observed after canonical-evidence inclusion; they are not policy truth by themselves
 - current runtime only emits these derived details when the semantic-name shape supports bounded deterministic interpretation; it does not force every filename to have family outputs
-- tree may later consume naming-owned emitted surfaces rather than deriving semantic-family independently
+- tree may consume these naming-owned emitted surfaces through a bounded prepared-input bridge and must not re-derive semantic-family semantics from filenames locally
 - later custom-registry work may review recurring observations as candidate evidence for additions, overlays, or pinning, but registry truth must still be declared through a separate policy/customization lane
+
+### Naming→Tree semantic-family bridge contract (bounded cross-slice consumption)
+
+Naming remains the sole owner of semantic-family derivation and validity interpretation. Tree may consume naming-emitted semantic-family evidence only through a bounded prepared-input projection, not by reading arbitrary naming runtime internals.
+
+Canonical ownership split:
+
+- naming owns semantic interpretation (`semanticName`, `familyRoot`, `semanticFamily`, optional `familySubgroup`, optional ambiguity/split markers) and naming-validity judgments
+- tree owns structural advisories and recommendations derived from prepared structural + naming-owned evidence
+- tree must not re-parse semantic names, infer family roots, or reproduce naming validity checks (`missing role`, `bad semantic case`, `deprecated role`, `role-hyphen ambiguity`)
+
+Prepared bridge projection (small explicit surface):
+
+- `path` (normalized repo-relative path)
+- `semanticName`
+- `familyRoot`
+- `semanticFamily`
+- optional `familySubgroup`
+- optional `ambiguityFlags`
+- optional `splitFamilyFlags`
+
+This bridge is an intentionally narrow projection for advisory consumption. It is not a generic "pass the full naming report to tree" contract.
 
 ### Special-case subtype metadata
 
