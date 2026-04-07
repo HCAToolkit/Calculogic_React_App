@@ -60,7 +60,7 @@ V0.1.x uses deterministic path-based and occurrence-backed signals only:
 - filename basename patterns that strongly indicate validator ownership
 - occurrence-derived structural records when `occurrenceSnapshot.occurrenceRecords` is available
 
-Current boundary note: shipped tree heuristics do **not** yet ingest naming-derived semantic-family/role outputs. That consumption path remains deferred and, when added later, must consume naming-owned signals rather than derive naming semantics independently.
+Current boundary note: shipped tree heuristics may ingest naming-derived semantic-family evidence only through a bounded prepared-input bridge projection. Tree must consume naming-owned signals and must not derive semantic-family semantics independently.
 
 ### 2.3 Initial advisory heuristics (narrow slice)
 
@@ -92,6 +92,7 @@ V0.1.7 introduces a suite-core scoped snapshot/input helper boundary and migrate
 - suite-core helper owns scope profile read, includeRoots walk, includeRootFiles inclusion, normalized path collection, target filtering, and deterministic sort/dedupe
 - tree wiring consumes the shared scoped snapshot input and still prepares tree-local top-level directory inventory
 - tree runtime remains slice-owned for tree-core findings using prepared tree-core inputs only (`selectedPaths`, `topLevelDirectoryNames`, `targets`) and consumes occurrence-derived file-path reasoning input when `occurrenceSnapshot.occurrenceRecords` is available (bounded fallback to `selectedPaths` when occurrence snapshot is absent/malformed)
+- tree contributor attachment now supports bounded naming-owned semantic-family bridge payloads (`namingSemanticFamilyBridge.observations[]`) for structural advisories while preserving naming ownership of semantic derivation and validity interpretation
 - occurrence-driven file reasoning now carries bounded structural class metadata on occurrence records (`structuralClass`, `structuralKind`, repo-top known-root flags, scoped-root flag, subtree-partition candidate flag) for near-term tree-local interpretation
 - tree-run default contributor selection is owned by a dedicated assembly/wiring module so tree wiring only prepares tree-core inputs
 - shim/content-backed diagnostics are attached from a shim-owned contributor helper that prepares lazy content access (cache + selected-path guard) so tree-core runtime does not require file-content access
@@ -154,7 +155,6 @@ Each finding follows existing report conventions:
 
 Deferred to later slices:
 
-- naming-derived semantic-family/lane heuristics and clustering
 - docs/runtime/test co-location drift heuristics
 - mixed concern folder smell heuristics
 - structural recommendation planning and move proposals
