@@ -1,5 +1,5 @@
 import { resolveNamingRegistryInputs } from './registries/registry-state.logic.mjs';
-import { getBuiltinWalkExclusions } from './registries/naming-walk-exclusions.registry.logic.mjs';
+import { getBuiltinWalkExclusions } from './registries/naming-walk-exclusions-registry.logic.mjs';
 import {
   toNamingRolesRuntime,
   toReportableExtensionsSet,

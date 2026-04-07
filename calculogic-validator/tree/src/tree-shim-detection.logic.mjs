@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy.registry.logic.mjs';
+import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy-registry.logic.mjs';
 
 const TREE_SIGNAL_POLICY = getBuiltinTreeSignalPolicy();
 

@@ -13,7 +13,7 @@ import {
   toCaseRulesRuntime,
 } from '../src/naming-runtime-converters.logic.mjs';
 import { runNamingValidator as runNamingValidatorRuntime } from '../src/naming-validator.logic.mjs';
-import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
+import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions-registry.logic.mjs';
 import { runNamingValidator as runNamingValidatorWiring } from '../src/naming-validator.wiring.mjs';
 import { collectRepositoryPaths } from '../src/naming-validator.wiring.mjs';
 

@@ -78,8 +78,8 @@ Suite core composes slice runners and shared runtime contracts; it does not repl
 ### 6.3 Tree slice
 
 - Loader-style policy loading appears in tree registry logic modules:
-  - `tree/src/registries/tree-known-roots.registry.logic.mjs`
-  - `tree/src/registries/tree-signal-policy.registry.logic.mjs`
+  - `tree/src/registries/tree-known-roots-registry.logic.mjs`
+  - `tree/src/registries/tree-signal-policy-registry.logic.mjs`
 - Runtime/wiring/logic ownership appears in:
   - `tree/src/tree-structure-advisor.wiring.mjs`
   - `tree/src/tree-structure-advisor.logic.mjs`

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { loadOverlayCapabilitiesFromFile } from '../src/registries/naming-overlay-capabilities.registry.logic.mjs';
+import { loadOverlayCapabilitiesFromFile } from '../src/registries/naming-overlay-capabilities-registry.logic.mjs';
 
 const writeJson = (filePath, value) => {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });

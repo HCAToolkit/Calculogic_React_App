@@ -29,7 +29,7 @@ test('tree occurrence snapshot disambiguates repeated names by lineage', () => {
 
 test('tree occurrence snapshot preserves deterministic lineage and depth', () => {
   const snapshot = prepareTreeOccurrenceSnapshot({
-    selectedPaths: ['calculogic-validator/tree/src/registries/tree-known-roots.registry.logic.mjs'],
+    selectedPaths: ['calculogic-validator/tree/src/registries/tree-known-roots-registry.logic.mjs'],
     targets: [],
     includeRoots: ['calculogic-validator'],
   });
@@ -43,7 +43,7 @@ test('tree occurrence snapshot preserves deterministic lineage and depth', () =>
   ]);
   assert.equal(recordsByPath['calculogic-validator/tree/src'].depth, 2);
   assert.equal(
-    recordsByPath['calculogic-validator/tree/src/registries/tree-known-roots.registry.logic.mjs'].parentResolvedPath,
+    recordsByPath['calculogic-validator/tree/src/registries/tree-known-roots-registry.logic.mjs'].parentResolvedPath,
     'calculogic-validator/tree/src/registries',
   );
 });

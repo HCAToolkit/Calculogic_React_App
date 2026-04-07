@@ -18,7 +18,7 @@ import {
   toFindingPolicyRuntime,
   toCaseRulesRuntime,
 } from '../src/naming-runtime-converters.logic.mjs';
-import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions.registry.logic.mjs';
+import { getBuiltinWalkExclusions } from '../src/registries/naming-walk-exclusions-registry.logic.mjs';
 
 const writeFile = (rootDirectory, relativePath) => {
   const absolutePath = path.join(rootDirectory, relativePath);

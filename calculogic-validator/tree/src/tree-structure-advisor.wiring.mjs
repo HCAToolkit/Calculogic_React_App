@@ -5,7 +5,7 @@ import {
 } from './tree-structure-advisor.logic.mjs';
 import {
   collectDefaultTreeStructureAdvisorContributors,
-} from './tree-structure-advisor-contributors.assembly.wiring.mjs';
+} from './tree-structure-advisor-contributors-assembly.wiring.mjs';
 import {
   collectSuiteScopedSnapshotInputs,
 } from '../../src/core/suite-scoped-snapshot-input.logic.mjs';

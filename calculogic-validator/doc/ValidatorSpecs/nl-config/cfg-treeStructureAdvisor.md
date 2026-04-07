@@ -139,7 +139,7 @@ Each finding follows existing report conventions:
 - Canonical tree slice boundary lives at:
   - `calculogic-validator/tree/src/tree-structure-advisor.host.mjs`
   - `calculogic-validator/tree/src/tree-structure-advisor.wiring.mjs`
-  - `calculogic-validator/tree/src/tree-structure-advisor-contributors.assembly.wiring.mjs`
+  - `calculogic-validator/tree/src/tree-structure-advisor-contributors-assembly.wiring.mjs`
   - `calculogic-validator/tree/src/tree-structure-advisor.logic.mjs`
   - shim evidence/runtime helpers: `calculogic-validator/tree/src/tree-shim-detection.logic.mjs`
   - optional contracts surface: `calculogic-validator/tree/src/tree-structure-advisor.contracts.mjs`

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { normalizeTreeKnownRootsRegistryPayload } from '../src/registries/tree-known-roots.registry.logic.mjs';
+import { normalizeTreeKnownRootsRegistryPayload } from '../src/registries/tree-known-roots-registry.logic.mjs';
 
 const EXPECTED_KNOWN_ROOTS = [
   'bin',

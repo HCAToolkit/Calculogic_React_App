@@ -1,4 +1,4 @@
-# Post-Registry-Reassessment.audit
+# post-registry-reassessment.audit
 
 ## Purpose
 
@@ -14,7 +14,7 @@ Primary inspection scope:
 
 Reference baseline:
 
-- `calculogic-validator/doc/ConventionRoutines/Registry-Expansion-Candidates.audit.md`
+- `calculogic-validator/doc/ConventionRoutines/registry-expansion-candidates.audit.md`
 
 ---
 

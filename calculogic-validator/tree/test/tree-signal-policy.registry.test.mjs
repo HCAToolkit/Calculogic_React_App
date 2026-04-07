@@ -7,7 +7,7 @@ import {
   BUILTIN_SHIM_DETECTION_SIGNALS_REGISTRY_PATH,
   BUILTIN_VALIDATOR_OWNED_SIGNALS_REGISTRY_PATH,
   loadBuiltinTreeSignalPolicy,
-} from '../src/registries/tree-signal-policy.registry.logic.mjs';
+} from '../src/registries/tree-signal-policy-registry.logic.mjs';
 
 test('tree signal policy loader compiles validator-owned basename matchers deterministically', () => {
   const policy = loadBuiltinTreeSignalPolicy();
