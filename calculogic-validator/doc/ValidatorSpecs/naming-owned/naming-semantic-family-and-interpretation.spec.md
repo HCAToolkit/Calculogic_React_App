@@ -2,7 +2,7 @@
 
 - **Classification:** Normative
 - **Applies to:** Naming-slice semantic-name interpretation extensions.
-- **Status:** Active for bounded naming-owned runtime/report behavior in the current tranche; semantic-family derivation is implemented as report-first observation, while tree consumption remains deferred.
+- **Status:** Active for bounded naming-owned runtime/report behavior in the current tranche; semantic-family derivation is implemented as report-first observation and is now consumable by tree through the runner-staged bounded naming→tree bridge.
 - **Authority posture note:** Bounded normative supporting spec for naming interpretation modeling; does not supersede primary canonical naming authorities.
 
 ## 1) Purpose
@@ -244,15 +244,15 @@ Current maturity boundary remains unchanged:
 
 - warn/error/strict/plan/fix behavior for semantic-family is not implemented in the current runtime tranche yet,
 - semantic-family interpretation remains structurally important and report-first in this phase,
-- results/reporting is the first intended consumer,
-- tree runtime consumption is not activated in this tranche yet and remains deferred until naming-owned implementation maturity justifies it.
+- results/reporting remains a first consumer,
+- tree runtime now consumes naming-owned semantic-family evidence through a bounded runner-staged bridge payload.
 
-Results-first, tree-later handoff clarification:
+Results + tree handoff clarification:
 
 - Results/reporting consumes naming-owned semantic-family outputs first.
-- Tree consumption is later and explicitly deferred in this tranche; that timing deferment does not make semantic-family derivation conceptually optional.
-- Tree may later consume `semanticFamily`/`familyRoot`/`familySubgroup`/`relatedSemanticNames` for semantic-folder expectations or grouping reasoning once naming emits those outputs.
-- Tree may later consume naming-owned aggregate observations such as `familyRootCounts`/`familySubgroupCounts`/`semanticFamilyCounts` only as report context, not as tree-owned policy declaration.
+- Tree consumes a bounded naming bridge payload projected by naming and staged by the shared runner (`namingSemanticFamilyBridge.observations[]`), rather than raw naming runtime internals.
+- Tree consumption remains constrained to naming-owned interpreted outputs (for example `semanticFamily`/`familyRoot`/`familySubgroup` and bounded ambiguity/split markers) and does not re-own derivation.
+- Tree may consume naming-owned aggregate observations such as `familyRootCounts`/`familySubgroupCounts`/`semanticFamilyCounts` as report context, not as tree-owned policy declaration.
 - Tree must not derive semantic-family independently as a competing source.
 
 Classification: Normative

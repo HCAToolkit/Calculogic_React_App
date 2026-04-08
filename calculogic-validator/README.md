@@ -167,9 +167,16 @@ npm run health:validator
 ```
 
 - `npm run validate:naming`: naming-only validation using repo defaults.
-- `npm run validate:all`: full validator pass (all configured validators).
-- `npm run validate:tree`: tree-structure-advisor validation using repo defaults.
+- `npm run validate:all`: shared-runner validation that stages naming before tree and reports all configured validators.
+- `npm run validate:tree`: tree-structure-advisor validation through the shared runner path (tree only in report output).
 - `npm run health:validator`: validator environment/health diagnostics.
+
+Bridge behavior note (normal runs):
+
+- `validate:naming` remains naming-only.
+- `validate:tree` executes tree through the shared runner path; when tree is selected, the runner stages naming-owned semantic-family evidence first and passes only the bounded naming bridge payload into tree.
+- `validate:all` stages naming before tree in deterministic registry order; tree consumes the same bounded naming bridge payload rather than raw naming internals.
+- Ownership boundary stays explicit: naming interprets and projects semantic-family evidence, runner orchestrates staged execution, and tree consumes that bounded bridge to emit structural `TREE_*` advisories.
 
 ### Reports by scope and target
 
@@ -349,7 +356,7 @@ Canonical report contracts:
 There are two report envelopes:
 
 - slice output (single-slice CLI, for example `validate:naming`)
-- runner output (multi-slice CLI, for example `validate:all`)
+- runner output (runner-style CLIs, including `validate:all` and `validate:tree`)
 
 Validator reports include stable metadata fields for report envelope identity and reproducibility:
 
