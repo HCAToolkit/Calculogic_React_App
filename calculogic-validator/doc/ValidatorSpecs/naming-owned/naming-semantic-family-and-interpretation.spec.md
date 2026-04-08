@@ -369,7 +369,7 @@ Classification: Normative
 - No runtime behavior changes.
 - No custom-registry implementation changes.
 - No warn/error/strict/fix/plan policy changes.
-- No tree runtime integration changes.
+- No additional tree runtime integration changes beyond the bounded runner-staged naming→tree bridge already shipped.
 - No registry payload mutation requirements.
 
 Classification: Normative
