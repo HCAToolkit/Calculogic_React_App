@@ -96,16 +96,18 @@ Tree advisor consumes naming-shaped metadata only across an explicit slice bound
 - tree runtime now supports a bounded naming→tree prepared-input bridge for contributor-backed semantic-family advisory consumption
 - consumed bridge payload is naming-owned evidence projection only (not raw naming runtime internals)
 - shipped semantic-family tree advisories remain report-first and deterministic
-- tree findings continue to be driven by deterministic path/basename/scope/target/shim/occurrence signals plus optional naming bridge evidence when provided
+- tree findings continue to be driven by deterministic path/basename/scope/target/shim/occurrence signals plus naming bridge evidence staged by the shared runner when tree executes through normal runner paths
 - tree heuristics that need semantic-family or role information must consume naming-derived signals rather than re-implement naming interpretation locally
 
 Bounded consumable naming bridge surfaces include:
 
+- `path`
 - `semanticName`
-- semantic family/group outputs derived by naming from `semanticName`
-- naming-owned aggregate observations such as `familyRootCounts`, `familySubgroupCounts`, and `semanticFamilyCounts` when/if naming later emits them
-- `role`
-- role category/status metadata
+- `familyRoot`
+- `semanticFamily`
+- optional `familySubgroup`
+- optional `ambiguityFlags[]`
+- optional `splitFamilyFlags[]`
 
 Tree advisor does **not** re-own naming validity judgments. Naming validity remains owned by naming conventions/specs and the naming validator slice.
 
@@ -116,7 +118,7 @@ Examples of naming validity judgments that tree advisor must not duplicate:
 - deprecated role
 - hyphen-role ambiguity
 
-When usable naming-shaped metadata is unavailable, incomplete, or not yet wired into tree runtime, tree advisor should reduce confidence and/or recommend running naming validation rather than inventing naming-invalid findings inside tree output. Naming-owned aggregate observations are downstream evidence only and do not let tree declare registry truth on its own.
+When usable naming-shaped metadata is unavailable, incomplete, or not yet wired into tree runtime in a bounded context, tree advisor should reduce confidence and/or recommend running naming validation rather than inventing naming-invalid findings inside tree output.
 
 Bridge shape (prepared-input contract):
 
@@ -590,7 +592,7 @@ Attached shim contributor currently ships during normal tree runs:
 - `TREE_SHIM_SURFACE_PRESENT`
 - `TREE_SHIM_OUTSIDE_COMPAT`
 
-Attached naming bridge contributor (when bridge payload is provided) currently ships:
+Attached naming bridge contributor (with runner-staged bridge payload during normal runner execution) currently ships:
 
 - `TREE_OBSERVED_FAMILY_CLUSTER`
 - `TREE_FAMILY_SCATTERED`

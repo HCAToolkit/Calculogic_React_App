@@ -1,6 +1,7 @@
 import { CALCULOGIC_VALIDATOR_REPORT_VERSION } from './validator-report.contracts.mjs';
 import { VALIDATOR_REGISTRY, getValidatorById } from './validator-registry.knowledge.mjs';
 import { getSourceSnapshot } from './source-snapshot.logic.mjs';
+import { projectNamingSemanticFamilyBridge } from '../../naming/src/naming-validator.host.mjs';
 
 const toValidatorReportEntry = (registryEntry, validatorResult) => {
   const summary = validatorResult.summary ?? null;
@@ -44,8 +45,32 @@ export const runValidatorRunner = (repositoryRoot, options = {}) => {
   const config = options.config;
   const targets = options.targets;
 
+  const shouldRunTreeStructureAdvisor = validatorsToRun.some(
+    (registryEntry) => registryEntry.id === 'tree-structure-advisor',
+  );
+  const shouldIncludeNamingReport = validatorsToRun.some((registryEntry) => registryEntry.id === 'naming');
+  const namingRegistryEntry = getValidatorById('naming');
+
+  let stagedNamingResult = null;
+  let stagedNamingSemanticFamilyBridge = undefined;
+  if (shouldRunTreeStructureAdvisor && namingRegistryEntry) {
+    stagedNamingResult = namingRegistryEntry.run(repositoryRoot, { scope, config, targets });
+    stagedNamingSemanticFamilyBridge = projectNamingSemanticFamilyBridge(stagedNamingResult);
+  }
+
   const validators = validatorsToRun.map((registryEntry) => {
-    const result = registryEntry.run(repositoryRoot, { scope, config, targets });
+    if (registryEntry.id === 'naming' && shouldIncludeNamingReport && stagedNamingResult) {
+      return toValidatorReportEntry(registryEntry, stagedNamingResult);
+    }
+
+    const result = registryEntry.run(repositoryRoot, {
+      scope,
+      config,
+      targets,
+      ...(registryEntry.id === 'tree-structure-advisor' && stagedNamingSemanticFamilyBridge
+        ? { namingSemanticFamilyBridge: stagedNamingSemanticFamilyBridge }
+        : {}),
+    });
     return toValidatorReportEntry(registryEntry, result);
   });
 

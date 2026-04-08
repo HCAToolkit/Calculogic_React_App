@@ -36,10 +36,12 @@ const runTreeStructureAdvisorHook = (repositoryRoot, options = {}) => {
   const scope = options.scope;
   const config = options.config;
   const targets = options.targets;
+  const namingSemanticFamilyBridge = options.namingSemanticFamilyBridge;
   const treeStructureAdvisorResult = runTreeStructureAdvisor(repositoryRoot, {
     scope,
     config,
     targets,
+    namingSemanticFamilyBridge,
   });
   const summary = summarizeTreeStructureAdvisorFindings(treeStructureAdvisorResult.findings);
   const meta = {};

@@ -20,6 +20,7 @@ import {
   getScopeProfile,
   summarizeFindings as summarizeFindingsRuntime,
 } from './naming-validator.logic.mjs';
+import { projectNamingSemanticFamilyBridge } from './naming-semantic-family-bridge-projection.logic.mjs';
 import {
   normalizePath,
   resolveScopedTargets,
@@ -115,4 +116,5 @@ export {
   normalizePath,
   listNamingValidatorScopes,
   getScopeProfile,
+  projectNamingSemanticFamilyBridge,
 };

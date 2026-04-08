@@ -383,6 +383,14 @@ Prepared bridge projection (small explicit surface):
 
 This bridge is an intentionally narrow projection for advisory consumption. It is not a generic "pass the full naming report to tree" contract.
 
+Current runner production path (shipped behavior):
+
+- the shared suite runner stages naming before tree whenever tree is selected in the run
+- naming-owned projection is prepared from naming findings through a dedicated naming-owned bridge projection helper
+- tree receives only `namingSemanticFamilyBridge.observations[]` through tree wiring; tree never receives raw naming runtime internals from runner staging
+- `validate:naming` remains naming-only output
+- `validate:tree` and `validate:all` now automatically include naming-produced bridge evidence for tree advisories through the shared runner path
+
 ### Special-case subtype metadata
 
 V0.1.2 keeps top-level classification `allowed-special-case` and includes deterministic subtype metadata in `details.specialCaseType`:
