@@ -3,6 +3,11 @@ import path from 'node:path';
 const FAMILY_SCATTER_MIN_STRUCTURAL_HOMES = 2;
 const FAMILY_SCATTER_MIN_FILES = 3;
 const FAMILY_CLUSTER_INFO_MIN_FILES = 4;
+const SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS = ['src/shared'];
+const SHARED_ROOT_LANE_FIRST_PARTITIONS = ['build', 'build-style', 'logic', 'knowledge', 'results', 'results-style', 'tests', 'docs'];
+const SHARED_ROOT_LANE_FIRST_PARTITION_SET = new Set(SHARED_ROOT_LANE_FIRST_PARTITIONS);
+const SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS = 2;
+const SHARED_ROOT_MIN_FAMILY_FILES = 3;
 
 const toSortedUnique = (values) => Array.from(new Set(values)).sort((left, right) => left.localeCompare(right));
 
@@ -72,6 +77,30 @@ export const prepareNamingSemanticFamilyBridge = (bridgePayload) => {
 };
 
 const isSingularFamilyEvidence = (observation) => (observation.ambiguityFlags ?? []).length === 0;
+
+const toSharedRootLaneObservation = (observation) => {
+  for (const sharedRoot of SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS) {
+    const sharedRootPrefix = `${sharedRoot}/`;
+    if (!observation.path.startsWith(sharedRootPrefix)) {
+      continue;
+    }
+
+    const remainder = observation.path.slice(sharedRootPrefix.length);
+    const [lanePartition] = remainder.split('/').filter(Boolean);
+    if (!lanePartition || !SHARED_ROOT_LANE_FIRST_PARTITION_SET.has(lanePartition)) {
+      return null;
+    }
+
+    return {
+      sharedRoot,
+      lanePartition,
+      path: observation.path,
+      semanticFamily: observation.semanticFamily,
+    };
+  }
+
+  return null;
+};
 
 const collectFamilyScatterFindings = (observations) => {
   const observationsBySemanticFamily = new Map();
@@ -160,6 +189,70 @@ const collectFamilyClusterFindings = (observations) => {
     }));
 };
 
+const collectSharedRootFamilyScatterAcrossLanesFindings = (observations) => {
+  const observationsBySharedRootAndFamily = new Map();
+
+  for (const observation of observations) {
+    if (!isSingularFamilyEvidence(observation)) {
+      continue;
+    }
+
+    const sharedRootLaneObservation = toSharedRootLaneObservation(observation);
+    if (!sharedRootLaneObservation) {
+      continue;
+    }
+
+    const mapKey = `${sharedRootLaneObservation.sharedRoot}::${sharedRootLaneObservation.semanticFamily}`;
+    if (!observationsBySharedRootAndFamily.has(mapKey)) {
+      observationsBySharedRootAndFamily.set(mapKey, []);
+    }
+
+    observationsBySharedRootAndFamily.get(mapKey).push(sharedRootLaneObservation);
+  }
+
+  return Array.from(observationsBySharedRootAndFamily.entries())
+    .sort(([leftMapKey], [rightMapKey]) => leftMapKey.localeCompare(rightMapKey))
+    .flatMap(([, sharedFamilyObservations]) => {
+      const sortedPaths = sharedFamilyObservations.map(({ path: normalizedPath }) => normalizedPath).sort((a, b) => a.localeCompare(b));
+      const observedLanePartitions = toSortedUnique(
+        sharedFamilyObservations.map(({ lanePartition }) => lanePartition),
+      );
+
+      if (
+        observedLanePartitions.length < SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS ||
+        sortedPaths.length < SHARED_ROOT_MIN_FAMILY_FILES
+      ) {
+        return [];
+      }
+
+      const { sharedRoot, semanticFamily } = sharedFamilyObservations[0];
+      return [
+        {
+          code: 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES',
+          severity: 'info',
+          path: sortedPaths[0],
+          classification: 'advisory-structure',
+          message:
+            'Naming-owned semantic-family evidence is spread across lane-first partitions under a shared root and may benefit from semantic-first grouping.',
+          ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
+          details: {
+            sharedRootPath: sharedRoot,
+            semanticFamily,
+            observedLanePartitions,
+            observedPaths: sortedPaths,
+            thresholds: {
+              supportedSharedRoots: SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS,
+              allowedLaneFirstPartitions: SHARED_ROOT_LANE_FIRST_PARTITIONS,
+              minDistinctLanePartitions: SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS,
+              minFamilyFiles: SHARED_ROOT_MIN_FAMILY_FILES,
+            },
+            suggestedSemanticTargetRoot: `${sharedRoot}/${semanticFamily}`,
+          },
+        },
+      ];
+    });
+};
+
 export const collectNamingSemanticFamilyBridgeFindings = (bridgePayload) => {
   const namingSemanticFamilyBridge = prepareNamingSemanticFamilyBridge(bridgePayload);
   const observations = namingSemanticFamilyBridge.observations;
@@ -171,5 +264,6 @@ export const collectNamingSemanticFamilyBridgeFindings = (bridgePayload) => {
   return [
     ...collectFamilyScatterFindings(observations),
     ...collectFamilyClusterFindings(observations),
+    ...collectSharedRootFamilyScatterAcrossLanesFindings(observations),
   ];
 };

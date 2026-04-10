@@ -304,7 +304,7 @@ Runtime collection must ignore missing declared root files, normalize collected 
 
 ## Analysis Heuristics (Deterministic, Status: Future advisory direction)
 
-This section is a deferred heuristic menu, not a statement of currently emitted tree behavior. Current runtime only ships the bounded findings listed later under **Current Runtime Boundary and Shipped Findings**. In particular, semantic-family/lane heuristics below remain future-facing until explicit runtime + conformance coverage lands.
+This section is a deferred heuristic menu, not a statement of currently emitted tree behavior, except where explicitly noted as shipped below. Current runtime only ships the bounded findings listed later under **Current Runtime Boundary and Shipped Findings**.
 
 ### 1) Semantic family cohesion
 
@@ -378,7 +378,7 @@ Naming metadata reuse note:
 
 - Treat parsed naming metadata (`<semantic-name>.<role>.<ext>`) as a primary lane signal.
 
-### 3) Shared-root semantic-first grouping (advisory-only)
+### 3) Shared-root semantic-first grouping (advisory-only; partially shipped)
 
 Intent:
 
@@ -392,7 +392,7 @@ Detect (deterministic):
 - The shared root contains lane-first partitions as immediate child folders (examples):
   - `logic`, `knowledge`, `results`, `build`, `build-style`, `results-style`, `tests`, `docs`
 - A semantic family output supplied by naming (derived from parsed `<semantic-name>`) appears under >= 2 distinct lane-first partitions within that shared root.
-- Guardrail: only recommend when the family has >= 2 files (reduces churn/noise).
+- Guardrail: only recommend when the family has >= configured minimum files (reduces churn/noise).
 
 Recommend (advisory):
 
@@ -546,7 +546,6 @@ Each finding uses the same stable envelope shape used by existing validators:
 - `TREE_TOOL_SURFACE_MIX`
 - `TREE_SHIM_SCATTERED` (`warn`/`info`)
 - `TREE_SHARED_LANE_FIRST_PARTITION_PRESENT` (`info`)
-- `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (`warn`/`info`)
 - `TREE_SHARED_SEMANTIC_ROOT_RECOMMENDED` (`warn`/`info`)
 - `TREE_OWNED_SLICE_EXTRACTION_RECOMMENDED` (`warn`/`info`)
 
@@ -592,10 +591,11 @@ Attached shim contributor currently ships during normal tree runs:
 - `TREE_SHIM_SURFACE_PRESENT`
 - `TREE_SHIM_OUTSIDE_COMPAT`
 
-Attached naming bridge contributor (with runner-staged bridge payload during normal runner execution) currently ships:
+Attached naming-bridge contributor currently ships during normal tree runs:
 
-- `TREE_OBSERVED_FAMILY_CLUSTER`
 - `TREE_FAMILY_SCATTERED`
+- `TREE_OBSERVED_FAMILY_CLUSTER`
+- `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (bounded shared-root lane-first partitions under supported shared roots, using naming-owned bridge observations only)
 
 ### Current report payload from tree runtime
 

@@ -160,3 +160,103 @@ test('tree naming bridge contributor excludes ambiguity-flagged observations fro
 
   assert.deepEqual(findings, []);
 });
+
+test('tree naming bridge contributor emits bounded shared-root lane scatter advisory only in supported shared root context', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'src/shared/logic/shared-family.logic.ts',
+        semanticName: 'shared-family',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-family',
+      },
+      {
+        path: 'src/shared/knowledge/shared-family.knowledge.ts',
+        semanticName: 'shared-family',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-family',
+      },
+      {
+        path: 'src/shared/results/shared-family.results.ts',
+        semanticName: 'shared-family',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-family',
+      },
+      {
+        path: 'src/features/logic/shared-family.logic.ts',
+        semanticName: 'shared-family',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-family',
+      },
+    ],
+  });
+
+  const sharedRootFindingCodes = findings
+    .filter((finding) => finding.code === 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES')
+    .map((finding) => finding.code);
+
+  assert.deepEqual(sharedRootFindingCodes, ['TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES']);
+});
+
+test('tree naming bridge contributor does not emit shared-root lane scatter advisory when family evidence is outside supported shared root', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'src/features/logic/feature-family.logic.ts',
+        semanticName: 'feature-family',
+        familyRoot: 'feature',
+        semanticFamily: 'feature-family',
+      },
+      {
+        path: 'src/features/knowledge/feature-family.knowledge.ts',
+        semanticName: 'feature-family',
+        familyRoot: 'feature',
+        semanticFamily: 'feature-family',
+      },
+      {
+        path: 'src/features/results/feature-family.results.ts',
+        semanticName: 'feature-family',
+        familyRoot: 'feature',
+        semanticFamily: 'feature-family',
+      },
+    ],
+  });
+
+  assert.equal(
+    findings.some((finding) => finding.code === 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES'),
+    false,
+  );
+});
+
+test('tree naming bridge contributor keeps shared-root advisory deterministic for ordering and counts', () => {
+  const payload = {
+    observations: [
+      {
+        path: 'src/shared/results/alpha-family.results.ts',
+        semanticName: 'alpha-family',
+        familyRoot: 'alpha',
+        semanticFamily: 'alpha-family',
+      },
+      {
+        path: 'src/shared/logic/alpha-family.logic.ts',
+        semanticName: 'alpha-family',
+        familyRoot: 'alpha',
+        semanticFamily: 'alpha-family',
+      },
+      {
+        path: 'src/shared/knowledge/alpha-family.knowledge.ts',
+        semanticName: 'alpha-family',
+        familyRoot: 'alpha',
+        semanticFamily: 'alpha-family',
+      },
+    ],
+  };
+
+  const first = collectNamingSemanticFamilyBridgeFindings(payload);
+  const second = collectNamingSemanticFamilyBridgeFindings(payload);
+  const firstSharedRootFindings = first.filter((finding) => finding.code === 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES');
+  const secondSharedRootFindings = second.filter((finding) => finding.code === 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES');
+
+  assert.deepEqual(firstSharedRootFindings, secondSharedRootFindings);
+  assert.equal(firstSharedRootFindings.length, 1);
+});
