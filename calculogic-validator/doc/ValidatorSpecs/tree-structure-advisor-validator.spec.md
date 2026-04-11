@@ -133,6 +133,21 @@ Bridge shape (prepared-input contract):
 
 Tree consumes this normalized bridge payload only. Tree runtime must not parse filenames to recreate these fields.
 
+### Family-scatter structural gating (Status: Current runtime behavior, bounded)
+
+`TREE_FAMILY_SCATTERED` now applies a bounded tree-owned structural interpretation layer before emitting broader scatter:
+
+- tree classifies each family observation by structural root/surface and naming-aligned semantic-container placement,
+- semantic-container recognition is based on path alignment with naming-owned bridge evidence (`familyRoot`, `semanticFamily`, optional `familySubgroup`), not a hardcoded semantic-folder allowlist,
+- family presence confined to one valid naming-aligned semantic container is treated as expected/container-local density first (not immediate broad scatter),
+- bounded allowed cross-container pairings are exempt from broad scatter by default (for example canonical docs authority lane with aligned owned runtime container pairing),
+- broad scatter remains for family spread across unrelated structural homes/containers when no allowed pairing covers the spread.
+
+Ownership boundary remains unchanged:
+
+- naming owns semantic-family derivation and validity semantics,
+- tree owns structural interpretation/gating decisions that consume naming bridge evidence.
+
 Boundary note (canonical_target for this slice): tree validator ownership is under `calculogic-validator/tree/src/**`. Legacy flat suite-core paths such as `calculogic-validator/src/tree-structure-advisor.*.mjs` are compatibility wrappers only, not canonical ownership.
 
 ## Top-Root Registry Classes and Ownership Boundary (Status: Bounded modeling note)

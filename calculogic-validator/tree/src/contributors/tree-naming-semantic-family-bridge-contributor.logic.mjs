@@ -3,6 +3,17 @@ import path from 'node:path';
 const FAMILY_SCATTER_MIN_STRUCTURAL_HOMES = 2;
 const FAMILY_SCATTER_MIN_FILES = 3;
 const FAMILY_CLUSTER_INFO_MIN_FILES = 4;
+const TREE_STRUCTURAL_ROOT_SURFACES = ['src', 'test', 'doc', 'docs', 'scripts', 'tools', 'bin', 'public', 'calculogic-validator'];
+const TREE_STRUCTURAL_ROOT_SURFACE_SET = new Set(TREE_STRUCTURAL_ROOT_SURFACES);
+const ALLOWED_STRUCTURAL_ROOT_PAIRINGS = [
+  ['src', 'test'],
+  ['doc', 'docs'],
+];
+const ALLOWED_STRUCTURAL_ROOT_PAIRING_SET = new Set(
+  ALLOWED_STRUCTURAL_ROOT_PAIRINGS.map((pair) => pair.slice().sort((left, right) => left.localeCompare(right)).join('::')),
+);
+const CANONICAL_DOC_AUTHORITY_ROOT_PREFIX = 'calculogic-validator/doc/';
+const CANONICAL_VALIDATOR_ROOT_PREFIX = 'calculogic-validator/';
 const SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS = ['src/shared'];
 const SHARED_ROOT_LANE_FIRST_PARTITIONS = ['build', 'build-style', 'logic', 'knowledge', 'results', 'results-style', 'tests', 'docs'];
 const SHARED_ROOT_LANE_FIRST_PARTITION_SET = new Set(SHARED_ROOT_LANE_FIRST_PARTITIONS);
@@ -26,6 +37,102 @@ const toNormalizedStructuralHome = (normalizedPath) => {
   }
 
   return segments.slice(0, 2).join('/');
+};
+
+const toSemanticIdentityTokens = (observation) =>
+  toSortedUnique(
+    [observation.familyRoot, observation.semanticFamily, observation.familySubgroup]
+      .filter((value) => typeof value === 'string' && value.length > 0)
+      .flatMap((value) => value.split('-').filter(Boolean).concat(value)),
+  );
+
+const toSemanticAlignmentHits = ({ path: normalizedPath }, semanticIdentityTokens) => {
+  const pathSegments = normalizedPath.split('/').filter(Boolean);
+  const semanticIdentityTokenSet = new Set(semanticIdentityTokens);
+
+  return pathSegments.flatMap((segment, index) => {
+    if (
+      semanticIdentityTokenSet.has(segment) ||
+      semanticIdentityTokens.some((token) => segment.startsWith(`${token}-`))
+    ) {
+      return [{ segment, index }];
+    }
+
+    return [];
+  });
+};
+
+const classifyScatterPlacement = (observation) => {
+  const pathSegments = observation.path.split('/').filter(Boolean);
+  const structuralRoot = pathSegments[0] ?? '.';
+  const structuralSurface = pathSegments.slice(0, 2).join('/') || structuralRoot;
+  const semanticIdentityTokens = toSemanticIdentityTokens(observation);
+  const semanticAlignmentHits = toSemanticAlignmentHits(observation, semanticIdentityTokens);
+  const firstSemanticAlignmentHit = semanticAlignmentHits[0] ?? null;
+  const semanticContainerIdentity = firstSemanticAlignmentHit
+    ? pathSegments.slice(0, firstSemanticAlignmentHit.index + 1).join('/')
+    : null;
+
+  return {
+    path: observation.path,
+    structuralRoot,
+    structuralHome: toNormalizedStructuralHome(observation.path),
+    structuralSurface,
+    structuralRootKind: TREE_STRUCTURAL_ROOT_SURFACE_SET.has(structuralRoot) ? 'structural-surface' : 'non-structural-surface',
+    semanticContainerRole: semanticContainerIdentity ? 'naming-aligned-semantic-container' : 'none',
+    semanticContainerIdentity,
+    semanticIdentityTokens,
+    semanticAlignmentHits,
+  };
+};
+
+const isAllowedStructuralRootPairing = (leftPlacement, rightPlacement) => {
+  const key = [leftPlacement.structuralRoot, rightPlacement.structuralRoot]
+    .sort((left, right) => left.localeCompare(right))
+    .join('::');
+  return ALLOWED_STRUCTURAL_ROOT_PAIRING_SET.has(key);
+};
+
+const isAllowedCanonicalDocAuthorityRuntimePairing = (leftPlacement, rightPlacement) => {
+  const placementPair = [leftPlacement, rightPlacement];
+  const docPlacement = placementPair.find((placement) => placement.path.startsWith(CANONICAL_DOC_AUTHORITY_ROOT_PREFIX));
+  const runtimePlacement = placementPair.find(
+    (placement) =>
+      placement.path.startsWith(CANONICAL_VALIDATOR_ROOT_PREFIX) &&
+      !placement.path.startsWith(CANONICAL_DOC_AUTHORITY_ROOT_PREFIX),
+  );
+  if (!docPlacement || !runtimePlacement) {
+    return false;
+  }
+
+  if (runtimePlacement.semanticContainerRole !== 'naming-aligned-semantic-container') {
+    return false;
+  }
+
+  const runtimeContainerSegment = runtimePlacement.semanticContainerIdentity?.split('/')[1];
+  if (!runtimeContainerSegment) {
+    return false;
+  }
+
+  return docPlacement.semanticAlignmentHits.some(
+    (hit) => hit.segment === runtimeContainerSegment || hit.segment.startsWith(`${runtimeContainerSegment}-`),
+  );
+};
+
+const isAllowedCrossContainerPlacementPair = (leftPlacement, rightPlacement) => {
+  if (
+    leftPlacement.semanticContainerRole === 'naming-aligned-semantic-container' &&
+    rightPlacement.semanticContainerRole === 'naming-aligned-semantic-container' &&
+    leftPlacement.semanticContainerIdentity === rightPlacement.semanticContainerIdentity
+  ) {
+    return true;
+  }
+
+  if (isAllowedStructuralRootPairing(leftPlacement, rightPlacement)) {
+    return true;
+  }
+
+  return isAllowedCanonicalDocAuthorityRuntimePairing(leftPlacement, rightPlacement);
 };
 
 const toNormalizedBridgeObservation = (observation) => {
@@ -121,13 +228,28 @@ const collectFamilyScatterFindings = (observations) => {
     .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
     .flatMap(([semanticFamily, familyObservations]) => {
       const sortedPaths = familyObservations.map(({ path: normalizedPath }) => normalizedPath).sort((a, b) => a.localeCompare(b));
-      const structuralHomes = toSortedUnique(
-        familyObservations.map(({ path: normalizedPath }) => toNormalizedStructuralHome(normalizedPath)),
+      const placements = familyObservations.map(classifyScatterPlacement);
+      const structuralHomes = toSortedUnique(placements.map((placement) => placement.structuralHome));
+      const semanticContainerIdentities = toSortedUnique(
+        placements
+          .filter((placement) => placement.semanticContainerRole === 'naming-aligned-semantic-container')
+          .map((placement) => placement.semanticContainerIdentity),
+      );
+      const allPlacementsInOneSemanticContainer =
+        semanticContainerIdentities.length === 1 &&
+        placements.every((placement) => placement.semanticContainerRole === 'naming-aligned-semantic-container');
+
+      const allCrossContainerPlacementsCoveredByAllowedRules = placements.every((leftPlacement, leftIndex) =>
+        placements
+          .slice(leftIndex + 1)
+          .every((rightPlacement) => isAllowedCrossContainerPlacementPair(leftPlacement, rightPlacement)),
       );
 
       if (
         sortedPaths.length < FAMILY_SCATTER_MIN_FILES ||
-        structuralHomes.length < FAMILY_SCATTER_MIN_STRUCTURAL_HOMES
+        structuralHomes.length < FAMILY_SCATTER_MIN_STRUCTURAL_HOMES ||
+        allPlacementsInOneSemanticContainer ||
+        allCrossContainerPlacementsCoveredByAllowedRules
       ) {
         return [];
       }
@@ -145,6 +267,13 @@ const collectFamilyScatterFindings = (observations) => {
             semanticFamily,
             observedPaths: sortedPaths,
             observedStructuralHomes: structuralHomes,
+            observedStructuralRoots: toSortedUnique(placements.map((placement) => placement.structuralRoot)),
+            observedContainerIdentities: semanticContainerIdentities,
+            observedStructuralRootKinds: toSortedUnique(placements.map((placement) => placement.structuralRootKind)),
+            allowedCrossContainerPatterns: {
+              structuralRootPairings: ALLOWED_STRUCTURAL_ROOT_PAIRINGS,
+              canonicalDocAuthorityRuntimePairing: 'calculogic-validator/doc/** <-> calculogic-validator/<semantic-container>/**',
+            },
             thresholds: {
               minFamilyFiles: FAMILY_SCATTER_MIN_FILES,
               minStructuralHomes: FAMILY_SCATTER_MIN_STRUCTURAL_HOMES,
