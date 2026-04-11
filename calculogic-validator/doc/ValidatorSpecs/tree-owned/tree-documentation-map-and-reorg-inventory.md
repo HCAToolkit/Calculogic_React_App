@@ -58,6 +58,7 @@ Interpretation note:
 | `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md` | Tree slice runtime/spec authority with bounded modeling notes | **Canonical slice spec** | Runtime implementation, architecture/modeling, Codex task context | **Stay put** at current path (already under `ValidatorSpecs`, implementation-facing) | **Keep** |
 | `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md` | Naming slice runtime/spec authority consumed by tree for naming-signal boundary interpretation | **Canonical slice spec** (cross-slice supporting authority for tree tasks) | Runtime implementation, architecture/modeling, Codex task context, supporting context only for tree | **Stay put** at current path | **Reference only** for tree tasks |
 | `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md` | Tree NL/config implementation note | **Supporting implementation guidance** | Runtime implementation, Codex task context, historical/reference context for implementation sequencing | **Now colocated** under `ValidatorSpecs/nl-config` with pointer stub retained at the prior repo-root NL path | **Keep** (validator-owned supporting implementation guidance) |
+| `calculogic-validator/doc/ValidatorSpecs/tree-owned/validator-tree-structural-reality.audit.md` | Tree structural-reality audit baseline for advisor-signal hardening | **Audit** | Architecture/modeling, advisory-noise hardening calibration, Codex task setup context | **Now colocated** under `ValidatorSpecs/tree-owned` for tree-owned discoverability | **Keep** |
 | `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` | Naming grammar/taxonomy authority consumed by tree for filename/role vocabulary boundaries | **Canonical contract** (cross-slice naming authority) | Architecture/modeling, Codex task context, supporting context only for tree | **Stay put** at current path | **Reference only** for tree tasks |
 | `calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md` | Bounded draft reference for report-only tree-address grammar alignment | **Draft** (bounded modeling guidance) | Architecture/modeling, supporting context only, historical/deferred decision reference | **Stay put** at current path | **Reference only** |
 
@@ -80,6 +81,7 @@ Interpretation note:
    - `tree-registry-definitions-and-relationships.spec.md`
    - `tree-structural-vocabulary-and-root-classification.spec.md`
    - `tree-top-root-registry-transition-inventory.md`
+   - `validator-tree-structural-reality.audit.md`
    - **Outcome:** tree-specific supporting material is easier to scan without moving the canonical tree slice spec or the path-sensitive NL/config note.
 
 ### Split-later / merge-later posture
