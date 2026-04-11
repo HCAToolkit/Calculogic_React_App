@@ -2,14 +2,19 @@
 
 ## Purpose
 
-This audit compares a **fresh validator-scope tree report** against the structural-reality baseline using the **structural-root vs semantic-container** model as the primary interpretation lens.
+This audit re-evaluates validator-scope tree advisory noise after the recently shipped hardening slices and rewrites prior conclusions against **fresh runtime evidence**.
 
-This pass is intentionally bounded to documentation and planning:
+Shipped behavior now in scope for this audit:
+
+- `TREE_FAMILY_SCATTERED` structural-root + semantic-container gating,
+- `TREE_OBSERVED_FAMILY_CLUSTER` family-level / family-in-container aggregation,
+- `TREE_FAMILY_SUBGROUP_OPPORTUNITY` bounded container-local subgroup opportunity signaling.
+
+This pass remains docs/planning only:
 
 - no runtime logic changes,
-- no tree heuristic changes,
-- no suppression implementation,
-- no ownership-model changes.
+- no heuristic changes,
+- no ownership-boundary changes.
 
 Classification: Audit
 
@@ -19,9 +24,9 @@ Classification: Audit
 npm run report:tree:validator
 ```
 
-Report artifact produced in this pass:
+Fresh report artifact produced in this rewrite pass:
 
-- `.reports/validate-tree-validator-2026-04-11_18-13-30.txt`
+- `.reports/validate-tree-validator-2026-04-11_21-39-01.txt`
 
 Classification: Audit
 
@@ -30,154 +35,124 @@ Classification: Audit
 Validator entry summary (`tree-structure-advisor`, scope `validator`):
 
 - `totalFilesScanned`: `200`
-- total findings: `19`
+- total findings: `11`
 - code counts:
-  - `TREE_OBSERVED_FAMILY_CLUSTER`: `10`
-  - `TREE_FAMILY_SCATTERED`: `5`
+  - `TREE_FAMILY_SCATTERED`: `3`
+  - `TREE_OBSERVED_FAMILY_CLUSTER`: `4`
   - `TREE_SHIM_SURFACE_PRESENT`: `4`
+  - `TREE_FAMILY_SUBGROUP_OPPORTUNITY`: `0`
 
-Primary recurring families/patterns in this run:
+Major recurring families/patterns in this run:
 
-- semantic-family activity concentrated in `validator`, `tree`, `naming`, `report`, and `registry`
-- repeated top-level semantic-container pairings (`doc` + owned runtime container such as `naming` or `tree`)
-- lower-level family density inside semantic containers (`naming/src/**`, `tree/src/**`, `tools/report-capture/src/**`)
-- bridge/shim token observability with no thin re-export evidence
+- `TREE_FAMILY_SCATTERED` is now limited to broader cross-container spreads: `registry`, `validator`, `report`.
+- `TREE_OBSERVED_FAMILY_CLUSTER` appears as container-local telemetry in expected homes (`naming`, `tree`, `validator-cli`, `report-capture`).
+- `TREE_SHIM_SURFACE_PRESENT` remains token/path-only low-confidence observability (`bridge`/`shim`) with no thin re-export evidence.
+- No `TREE_FAMILY_SUBGROUP_OPPORTUNITY` findings fired in this run.
 
 Classification: Audit
 
-## Comparison lens: structural roots vs semantic containers
+## Re-evaluation against shipped behavior
 
-Primary interpretation model used in this rewrite:
+### 1) `TREE_FAMILY_SCATTERED` now reads mostly high-value
 
-1. **Structural roots/folders are tree-owned** and remain the first-class structural topology surface.
-2. **Top-level semantic-family containers** (for this repo shape: `tree/`, `naming/`, and docs ownership lanes under `doc/ValidatorSpecs/*-owned/`) are valid semantic homes, not immediate scatter evidence.
-3. **Lower-level family distribution inside a semantic container** is judged first as:
-   - expected family presence / healthy density,
-   - family subgrouping opportunity,
-   - and only secondarily as broader scatter.
-4. **Cross-container presence** is meaningful scatter only when no allowed structural/cross-concern rule explains placement.
+The current `3` scatter findings are no longer broad blanket noise. They map to families that still span multiple structural homes/containers in ways that can warrant targeted review:
 
-Ownership boundary preserved:
+- `registry`: docs + runtime registry implementation surfaces,
+- `validator`: doc/scripts/suite-core/tree registry surfaces,
+- `report`: scripts wrappers + report-capture tool runtime.
 
-- naming owns semantic-family derivation (`semanticFamily`, `familyRoot`, `familySubgroup`),
-- tree owns structural folder/node interpretation and evidence gating,
-- tree may align against naming-derived family signals,
-- tree does not re-own naming derivation/validity semantics.
+Given the shipped structural-root and semantic-container gating, remaining scatter appears significantly precision-improved and mostly actionable as a planning trigger.
+
+### 2) `TREE_OBSERVED_FAMILY_CLUSTER` reads as useful telemetry, not primary noise
+
+Cluster findings are now concise and container-scoped:
+
+- `naming` cluster under `calculogic-validator/naming`,
+- `tree` cluster under `calculogic-validator/tree`,
+- `validator` cluster in `src/core/cli`,
+- `report` cluster in `tools/report-capture`.
+
+This is now good observability signal for family density and potential local grouping review, not debt by default.
+
+### 3) `TREE_FAMILY_SUBGROUP_OPPORTUNITY` appears well-bounded (non-eager in this run)
+
+No subgroup findings fired. With current density and singular-evidence prerequisites, that suggests the detector is not over-triggering under current validator scope data.
+
+This should be treated as a positive boundedness signal, not as a missing-feature defect by itself.
+
+### 4) `TREE_SHIM_SURFACE_PRESENT` is now the primary remaining noisy area
+
+All four shim-surface findings are token/path-only observability with no thin re-export evidence, and all remain `info` level.
+
+Relative to the now-cleaner scatter/cluster outputs, this code family is currently the largest residual low-confidence noise pocket.
+
+### 5) Broad families still needing special handling
+
+- `validator` remains naturally broad across suite-core/docs/scripts/registries and should keep bounded, architecture-aware interpretation.
+- `registry` remains ambiguous: some spread is healthy canonical-doc + runtime pairing, while some may indicate over-dispersion.
+
+These should continue to be treated as review-required families rather than auto-suppress or auto-escalate categories.
 
 Classification: Audit
 
 ## True positives worth preserving
 
-### 1) Cross-container scatter that remains structurally meaningful
-
-`report` family presence across:
-
-- `calculogic-validator/scripts/report-capture-*.host.mjs`
-- `calculogic-validator/tools/report-capture/src/report-capture.*.mjs`
-
-This is still a valid structural opportunity because these are distinct structural roots (`scripts` vs `tools`) with family coupling that may benefit from clearer grouping policy.
-
-### 2) Family cluster observability remains useful planning telemetry
-
-High family density remains useful as context:
-
-- `validator=17`, `naming=13`, `tree=11`, `report=6`
-
-This should stay visible, but interpreted as family-density telemetry first (especially inside semantic containers) rather than direct debt.
-
-### 3) `registry` spread is a legitimate review trigger
-
-`registry` appears across docs and runtime registry implementation surfaces. This can be healthy cross-concern/spec-runtime pairing, but can also expose true cross-container over-dispersion in specific cases. Keep as review-required signal.
+1. **Cross-container scatter for `report`** across scripts wrappers and tool runtime remains a meaningful structural coupling signal.
+2. **Broad-family scatter for `validator`** remains useful as a bounded architecture review trigger.
+3. **`registry` scatter** remains a valid ambiguity detector where spec/runtime layering and potential over-spread can coexist.
+4. **Container-local cluster telemetry** for `naming`, `tree`, `validator-cli`, and `report-capture` remains useful planning context.
 
 Classification: Audit
 
-## Noisy / low-value findings under the updated model
+## Noisy / low-value findings (current state)
 
-### 1) Semantic-container-local density misread as scatter
-
-Findings where family presence spans:
-
-- docs semantic container (`calculogic-validator/doc/**`), and
-- matching runtime semantic container (`calculogic-validator/naming/**` or `calculogic-validator/tree/**`)
-
-are often expected canonical spec + owned runtime layering, not default scatter debt.
-
-### 2) Repeated per-file cluster emissions for same family
-
-`TREE_OBSERVED_FAMILY_CLUSTER` repeatedly emitting on multiple files for one family inflates noise. Family-level aggregate context is higher value than file-level repetition.
-
-### 3) Token-only shim/bridge observability remains low-confidence telemetry
-
-`TREE_SHIM_SURFACE_PRESENT` from token signals (`bridge`, `shim`) without thin re-export evidence is still low-confidence observability and should not be interpreted as primary structural debt.
+1. **`TREE_SHIM_SURFACE_PRESENT` token-only signals** (`bridge`, `shim`) without thin re-export evidence remain low-confidence and often non-actionable by themselves.
+2. **Some broad-family spread cases** (especially `validator`/`registry`) can still read noisy when architecture layering is intentional and already explainable.
 
 Classification: Audit
 
-## Ambiguous cases (bounded, case-specific handling)
+## Ambiguous cases
 
-### 1) `registry` family across docs + runtime containers
-
-Could be healthy spec/runtime split across semantic containers, or could indicate additional lower-level subgroup opportunities. Requires explicit per-surface structural explanation before suppression/escalation.
-
-### 2) Broad `validator` family footprint
-
-Can reflect healthy suite identity and layered cross-surface architecture. But at high breadth it may hide finer subgroup opportunities (`validator-cli-*`, `validator-config-*`, report-meta/helpers). Needs subgroup-aware analysis before changing scatter behavior.
+1. **`registry` family**: healthy docs/runtime layering vs excess dispersion is still case-dependent.
+2. **`validator` family**: expected suite-wide identity vs overly broad footprint remains a bounded interpretive judgment.
+3. **No subgroup signals this run**: could mean true absence of dense lower-level subgroup opportunities, or thresholds that are conservatively high for current data shape.
 
 Classification: Audit
 
-## Revised hardening targets (bounded next implementation slice)
+## Revised bounded hardening plan
 
-This plan replaces a docs/runtime-pairing suppression framing with structural-root vs semantic-container-aware gating.
+### What noise is actually left after recent slices
 
-### A) Recognize top-level semantic containers explicitly
+- Primary residual noise: `TREE_SHIM_SURFACE_PRESENT` token/path-only observability.
+- Secondary residual ambiguity: broad-family interpretation (`validator`, `registry`) in intentionally layered architecture.
 
-Future tree hardening should:
+### What now looks good enough (do not revisit immediately)
 
-1. classify observed homes by structural-root class and semantic-container role,
-2. treat known semantic containers as valid first-pass family homes,
-3. avoid immediate scatter escalation when placements are explainable by canonical authority layering.
+- `TREE_FAMILY_SCATTERED` baseline precision after structural-root + semantic-container gating.
+- `TREE_OBSERVED_FAMILY_CLUSTER` as concise container-scoped telemetry.
+- `TREE_FAMILY_SUBGROUP_OPPORTUNITY` bounded trigger posture (non-eager in this run).
 
-### B) Evaluate lower-level family containment before scatter escalation
+### Next highest-ROI implementation slice
 
-Future tree hardening should:
+1. **Precision cleanup pass for shim-surface observability**, not a broad new heuristic expansion.
+2. Add bounded suppression/reduction for recurring low-confidence token-only shim findings when no stronger shim evidence is present across repeated patterns.
+3. Preserve deterministic payload detail so operators can still inspect why a shim-surface advisory appeared.
 
-1. compute container-local family density first,
-2. detect lower-level subgroup opportunity inside the same semantic container,
-3. escalate to broader scatter only when family presence extends across unrelated containers without allowed structural/cross-concern rationale.
+### Out of scope for now
 
-### C) Tighten true cross-container scatter identification
-
-Future tree hardening should:
-
-1. define allowed cross-concern/cross-surface patterns (for example canonical spec + owned runtime pairing),
-2. treat scatter as meaningful when observed homes are not covered by those allowed patterns,
-3. keep deterministic detail payloads so decisions are inspectable.
-
-### D) Clarify likely modeling split (without changing ownership)
-
-Future implementation should likely use:
-
-- tree structural-root registry modeling for folder/node class interpretation,
-- naming semantic-family alignment as bounded consumed evidence,
-- no transfer of semantic derivation ownership from naming to tree.
-
-### E) Preserve healthy layered spread
-
-Hardening should continue to preserve:
-
-- canonical tree/naming docs paired with owned runtime containers,
-- suite-core helper layers paired with scripts/bin/operator surfaces,
-- report-capture runtime implementation paired with host wrappers,
-- other explicit cross-surface layering that is structurally intentional.
+- Reworking semantic-family derivation ownership (remains naming-owned).
+- Large architecture rewrites for broad-family spread.
+- Aggressive subgroup-threshold retuning without additional multi-scope evidence.
 
 Classification: Audit
 
-## Implementation-ready next-slice checklist
+## Ownership boundary confirmation
 
-1. Add structural-root + semantic-container classification to scatter eligibility gating.
-2. Add container-local density/subgroup-first evaluation before cross-container scatter decisions.
-3. Keep high-ROI scatter emissions where unrelated structural roots are coupled without allowed rule coverage.
-4. Reduce `TREE_OBSERVED_FAMILY_CLUSTER` cardinality to family-level summary-oriented observability.
-5. Keep token-only shim/bridge signals as low-confidence telemetry unless higher-confidence shim evidence is present.
-6. Keep ownership contract intact: naming derives; tree interprets structure and consumes aligned evidence.
+This rewrite remains aligned with the current ownership contract:
+
+- naming owns semantic-family derivation and naming validity,
+- tree owns structural interpretation and advisory gating,
+- tree consumes naming bridge evidence only,
+- tree does not re-own naming derivation or naming validity semantics.
 
 Classification: Audit
