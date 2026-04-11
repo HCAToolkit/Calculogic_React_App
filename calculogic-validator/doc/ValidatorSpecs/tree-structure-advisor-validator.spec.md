@@ -172,6 +172,28 @@ Future tree root registries may require metadata richer than a flat string list,
 
 This is a modeling direction note only, not an implementation claim for this version.
 
+### 5) Structural-root vs semantic-container modeling clarification (bounded; non-runtime)
+
+Classification: Informative
+
+This bounded modeling note preserves ownership and interpretation direction for future tree hardening without claiming shipped behavior changes.
+
+- **Structural folders/nodes** are tree-owned structural surfaces and are the most direct candidates for eventual registry-backed tree-node modeling.
+- **Semantic folders** should generally be interpreted through alignment with naming-owned semantic-family signals (for example `semanticFamily`, `familyRoot`, optional `familySubgroup`) rather than as an independent flat truth source owned by tree.
+- **Top-level semantic folders** (repo-shape dependent examples can include `tree/` and `naming/`) may function as semantic-family containers, not only as generic folder roots.
+- Inside one such top-level semantic container, lower-level family distribution should be evaluated first as:
+  1. expected family presence / healthy family density,
+  2. lower-level family subfolder opportunity,
+  3. and only secondarily as broader scatter.
+- **Cross-container family presence** should count as meaningful scatter only when no allowed structural or cross-concern rule explains that placement.
+- Tree organization and tree addressing stay distinct from file-level structural addressing concerns; tree addressing remains tree-owned report/organization metadata and does not re-own naming derivation.
+
+Ownership boundary restatement:
+
+- naming slice owns semantic-family derivation (`semanticFamily`, `familyRoot`, `familySubgroup`)
+- tree slice owns folder/node interpretation and may consume naming-owned derivation as bounded evidence
+- tree must not re-derive or re-own naming validity semantics
+
 ---
 
 ## Tree Addressing (Report-Only, Status: Future advisory direction)
