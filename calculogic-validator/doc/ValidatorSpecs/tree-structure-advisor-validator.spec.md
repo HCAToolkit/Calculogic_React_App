@@ -575,7 +575,7 @@ Each finding uses the same stable envelope shape used by existing validators:
 
 ### Deferred/planning code candidates (future advisory direction)
 
-- `TREE_OBSERVED_FAMILY_CLUSTER` (`info`) — implemented via naming bridge contributor (bounded thresholded cluster observability)
+- `TREE_OBSERVED_FAMILY_CLUSTER` (`info`) — implemented via naming bridge contributor (bounded thresholded cluster observability, aggregated deterministically at semanticFamily level or semanticFamily-in-container when all family observations are naming-aligned to semantic containers)
 - `TREE_FAMILY_SCATTERED` (`info`) — implemented via naming bridge contributor (bounded family scatter advisory)
 - `TREE_LANE_MIX_HIGH_ENTROPY`
 - `TREE_MISSING_NAMESPACE_ROOT`
