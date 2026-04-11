@@ -324,6 +324,7 @@ test('tree naming bridge contributor evaluates lower-level density in one semant
 
   assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
   assert.equal(findings.some((finding) => finding.code === 'TREE_OBSERVED_FAMILY_CLUSTER'), true);
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY'), true);
 });
 
 test('tree naming bridge contributor suppresses broad scatter for bounded allowed cross-container pairing', () => {
@@ -516,6 +517,193 @@ test('tree naming bridge contributor can emit distinct cluster observations acro
     clusterFindings.map((finding) => finding.details.semanticContainerIdentity),
     ['calculogic-validator/naming/tree-multi-container', 'calculogic-validator/tree'],
   );
+});
+
+test('tree naming bridge contributor emits subgroup opportunity for dense lower-level family inside one semantic container', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/tree/src/tree-occurrence/tree-occurrence-observed.logic.mjs',
+        semanticName: 'tree-occurrence-observed',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+      },
+      {
+        path: 'calculogic-validator/tree/src/tree-shim/tree-occurrence-observed.wiring.mjs',
+        semanticName: 'tree-occurrence-observed',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+      },
+      {
+        path: 'calculogic-validator/tree/test/tree-occurrence/tree-occurrence-observed.test.mjs',
+        semanticName: 'tree-occurrence-observed',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+      },
+      {
+        path: 'calculogic-validator/tree/validator-cli/tree-occurrence-observed.host.mjs',
+        semanticName: 'tree-occurrence-observed',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+      },
+    ],
+  });
+
+  const subgroupFindings = findings.filter((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY');
+  assert.equal(subgroupFindings.length, 1);
+  assert.equal(subgroupFindings[0].details.semanticContainerIdentity, 'calculogic-validator/tree');
+  assert.deepEqual(subgroupFindings[0].details.observedContainerLocalHomes, ['src', 'test', 'validator-cli']);
+});
+
+test('tree naming bridge contributor does not emit subgroup opportunity for ordinary family presence below subgroup threshold', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/tree/src/tree-occurrence/tree-occurrence-lower.logic.mjs',
+        semanticName: 'tree-occurrence-lower',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+      },
+      {
+        path: 'calculogic-validator/tree/test/tree-occurrence/tree-occurrence-lower.test.mjs',
+        semanticName: 'tree-occurrence-lower',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+      },
+      {
+        path: 'calculogic-validator/tree/validator-cli/tree-occurrence-lower.host.mjs',
+        semanticName: 'tree-occurrence-lower',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY'), false);
+});
+
+test('tree naming bridge contributor keeps broad cross-container spread as TREE_FAMILY_SCATTERED instead of subgroup opportunity', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/tree/src/tree-shim/tree-shim-family.logic.mjs',
+        semanticName: 'tree-shim-family',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-shim',
+        familySubgroup: 'shim',
+      },
+      {
+        path: 'calculogic-validator/naming/src/naming-lane/tree-shim-family.wiring.mjs',
+        semanticName: 'tree-shim-family',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-shim',
+        familySubgroup: 'shim',
+      },
+      {
+        path: 'tools/tree/tree-shim-family.host.mjs',
+        semanticName: 'tree-shim-family',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-shim',
+        familySubgroup: 'shim',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), true);
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY'), false);
+});
+
+test('tree naming bridge contributor does not emit subgroup opportunity from ambiguity-flagged observations', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/tree/src/tree-occurrence/tree-occurrence-ambiguous.logic.mjs',
+        semanticName: 'tree-occurrence-ambiguous',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+        ambiguityFlags: ['family-boundary-heuristic'],
+      },
+      {
+        path: 'calculogic-validator/tree/src/tree-shim/tree-occurrence-ambiguous.wiring.mjs',
+        semanticName: 'tree-occurrence-ambiguous',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+        ambiguityFlags: ['family-boundary-heuristic'],
+      },
+      {
+        path: 'calculogic-validator/tree/test/tree-occurrence/tree-occurrence-ambiguous.test.mjs',
+        semanticName: 'tree-occurrence-ambiguous',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+        ambiguityFlags: ['family-boundary-heuristic'],
+      },
+      {
+        path: 'calculogic-validator/tree/validator-cli/tree-occurrence-ambiguous.host.mjs',
+        semanticName: 'tree-occurrence-ambiguous',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+        familySubgroup: 'occurrence',
+        ambiguityFlags: ['family-boundary-heuristic'],
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY'), false);
+});
+
+test('tree naming bridge contributor emits deterministic subgroup opportunity finding count and ordering for identical inputs', () => {
+  const payload = {
+    observations: [
+      {
+        path: 'calculogic-validator/tree/validator-cli/tree-subgroup-deterministic.host.mjs',
+        semanticName: 'tree-subgroup-deterministic',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-subgroup',
+        familySubgroup: 'subgroup',
+      },
+      {
+        path: 'calculogic-validator/tree/test/tree-subgroup/tree-subgroup-deterministic.test.mjs',
+        semanticName: 'tree-subgroup-deterministic',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-subgroup',
+        familySubgroup: 'subgroup',
+      },
+      {
+        path: 'calculogic-validator/tree/src/tree-shim/tree-subgroup-deterministic.wiring.mjs',
+        semanticName: 'tree-subgroup-deterministic',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-subgroup',
+        familySubgroup: 'subgroup',
+      },
+      {
+        path: 'calculogic-validator/tree/src/tree-occurrence/tree-subgroup-deterministic.logic.mjs',
+        semanticName: 'tree-subgroup-deterministic',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-subgroup',
+        familySubgroup: 'subgroup',
+      },
+    ],
+  };
+
+  const first = collectNamingSemanticFamilyBridgeFindings(payload)
+    .filter((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY')
+    .map((finding) => finding.path);
+  const second = collectNamingSemanticFamilyBridgeFindings(payload)
+    .filter((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY')
+    .map((finding) => finding.path);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.length, 1);
 });
 
 test('tree naming bridge contributor keeps ambiguity-only dense families as non-cluster observability', () => {

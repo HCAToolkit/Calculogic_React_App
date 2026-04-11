@@ -143,6 +143,24 @@ Tree consumes this normalized bridge payload only. Tree runtime must not parse f
 - bounded allowed cross-container pairings are exempt from broad scatter by default (for example canonical docs authority lane with aligned owned runtime container pairing),
 - broad scatter remains for family spread across unrelated structural homes/containers when no allowed pairing covers the spread.
 
+### Family subgroup opportunity inside one semantic container (Status: Current runtime behavior, bounded)
+
+`TREE_FAMILY_SUBGROUP_OPPORTUNITY` is a bounded, info-level, advisory-only signal for lower-level family grouping opportunity *inside one naming-aligned semantic container*.
+
+Current runtime trigger posture:
+
+- observations must be singular naming evidence (`ambiguityFlags[]` absent),
+- observations for the family must all classify to one valid naming-aligned semantic container identity,
+- density must meet explicit thresholds (`minFilesInContainer`, `minDistinctContainerLocalHomes`),
+- lower-level grouping signal must be present (currently from naming-owned `familySubgroup` or `semanticFamily` alignment with `familyRoot`),
+- this signal is container-local guidance and does not replace broad cross-container scatter behavior.
+
+Boundary note:
+
+- broad cross-container spread remains represented by `TREE_FAMILY_SCATTERED`,
+- container-local high-count observability remains represented by `TREE_OBSERVED_FAMILY_CLUSTER`,
+- subgroup opportunity is the bounded “between” signal for dense/cohesive lower-level grouping in one semantic container.
+
 Ownership boundary remains unchanged:
 
 - naming owns semantic-family derivation and validity semantics,
