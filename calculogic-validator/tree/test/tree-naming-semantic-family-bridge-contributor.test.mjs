@@ -260,3 +260,122 @@ test('tree naming bridge contributor keeps shared-root advisory deterministic fo
   assert.deepEqual(firstSharedRootFindings, secondSharedRootFindings);
   assert.equal(firstSharedRootFindings.length, 1);
 });
+
+test('tree naming bridge contributor treats one naming-aligned semantic container as expected presence, not broad scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/tree/src/contributors/tree-family.logic.mjs',
+        semanticName: 'tree-family',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-family',
+      },
+      {
+        path: 'calculogic-validator/tree/src/tree-family.results.mjs',
+        semanticName: 'tree-family',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-family',
+      },
+      {
+        path: 'calculogic-validator/tree/test/tree-family.test.mjs',
+        semanticName: 'tree-family',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-family',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+});
+
+test('tree naming bridge contributor evaluates lower-level density in one semantic container before broad scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/naming/src/lanes/naming-lane.logic.mjs',
+        semanticName: 'naming-lane',
+        familyRoot: 'naming',
+        semanticFamily: 'naming-lane',
+        familySubgroup: 'lane',
+      },
+      {
+        path: 'calculogic-validator/naming/src/families/naming-lane.results.mjs',
+        semanticName: 'naming-lane',
+        familyRoot: 'naming',
+        semanticFamily: 'naming-lane',
+        familySubgroup: 'lane',
+      },
+      {
+        path: 'calculogic-validator/naming/test/naming-lane.test.mjs',
+        semanticName: 'naming-lane',
+        familyRoot: 'naming',
+        semanticFamily: 'naming-lane',
+        familySubgroup: 'lane',
+      },
+      {
+        path: 'calculogic-validator/naming/src/naming-lane.knowledge.mjs',
+        semanticName: 'naming-lane',
+        familyRoot: 'naming',
+        semanticFamily: 'naming-lane',
+        familySubgroup: 'lane',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+  assert.equal(findings.some((finding) => finding.code === 'TREE_OBSERVED_FAMILY_CLUSTER'), true);
+});
+
+test('tree naming bridge contributor suppresses broad scatter for bounded allowed cross-container pairing', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-model.spec.md',
+        semanticName: 'tree-model',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-model',
+      },
+      {
+        path: 'calculogic-validator/tree/src/tree-model.logic.mjs',
+        semanticName: 'tree-model',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-model',
+      },
+      {
+        path: 'calculogic-validator/tree/test/tree-model.test.mjs',
+        semanticName: 'tree-model',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-model',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+});
+
+test('tree naming bridge contributor still emits broad scatter for unrelated cross-container spread', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'src/features/validator/validator-summary.logic.ts',
+        semanticName: 'validator-summary',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-summary',
+      },
+      {
+        path: 'tools/validator/validator-summary.wiring.mjs',
+        semanticName: 'validator-summary',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-summary',
+      },
+      {
+        path: 'doc/validator/validator-summary.spec.md',
+        semanticName: 'validator-summary',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-summary',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), true);
+});
