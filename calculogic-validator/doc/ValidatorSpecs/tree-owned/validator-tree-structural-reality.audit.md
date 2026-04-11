@@ -115,4 +115,10 @@ A better tree-advisor signal should:
 - **Avoid noise** on healthy cross-surface pairings that represent explicit ownership boundaries rather than accidental scatter.
 - **Treat ambiguous IA choices cautiously** unless extractability, ownership clarity, or deterministic navigation measurably improves.
 
+Short modeling-preservation note for later hardening:
+
+- account for top-level semantic-family containers (for example `tree/`, `naming/` in repo shapes where they exist),
+- evaluate lower-level family grouping opportunities within each container before escalating to repo-wide scatter,
+- and distinguish healthy container-local family density from true cross-container semantic scatter.
+
 Classification: Audit
