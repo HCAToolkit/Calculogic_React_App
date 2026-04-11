@@ -285,37 +285,76 @@ const collectFamilyScatterFindings = (observations) => {
 };
 
 const collectFamilyClusterFindings = (observations) => {
-  const familyCounts = new Map();
+  const singularObservations = observations
+    .filter((observation) => isSingularFamilyEvidence(observation))
+    .map((observation) => ({
+      observation,
+      placement: classifyScatterPlacement(observation),
+    }));
 
-  for (const observation of observations) {
-    if (!isSingularFamilyEvidence(observation)) {
-      continue;
+  const observationsBySemanticFamily = new Map();
+  for (const entry of singularObservations) {
+    if (!observationsBySemanticFamily.has(entry.observation.semanticFamily)) {
+      observationsBySemanticFamily.set(entry.observation.semanticFamily, []);
     }
 
-    familyCounts.set(observation.semanticFamily, (familyCounts.get(observation.semanticFamily) ?? 0) + 1);
+    observationsBySemanticFamily.get(entry.observation.semanticFamily).push(entry);
   }
 
-  return observations
-    .filter((observation) => isSingularFamilyEvidence(observation))
-    .filter((observation) => (familyCounts.get(observation.semanticFamily) ?? 0) >= FAMILY_CLUSTER_INFO_MIN_FILES)
-    .sort((left, right) => left.path.localeCompare(right.path))
-    .filter((observation, index, sorted) => index === 0 || sorted[index - 1].semanticFamily !== observation.semanticFamily)
-    .map((observation) => ({
-      code: 'TREE_OBSERVED_FAMILY_CLUSTER',
-      severity: 'info',
-      path: observation.path,
-      classification: 'advisory-structure',
-      message:
-        'Naming-owned semantic-family cluster size is high enough to consider a clearer structural grouping surface.',
-      ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
-      details: {
-        semanticFamily: observation.semanticFamily,
-        observedCount: familyCounts.get(observation.semanticFamily),
-        threshold: {
-          minFamilyFilesForClusterObservation: FAMILY_CLUSTER_INFO_MIN_FILES,
-        },
-      },
-    }));
+  return Array.from(observationsBySemanticFamily.entries())
+    .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
+    .flatMap(([semanticFamily, familyEntries]) => {
+      const allEntriesHaveSemanticContainer = familyEntries.every(
+        ({ placement }) => placement.semanticContainerRole === 'naming-aligned-semantic-container',
+      );
+
+      const aggregationBuckets = new Map();
+      for (const familyEntry of familyEntries) {
+        const bucketKey = allEntriesHaveSemanticContainer
+          ? `container::${familyEntry.placement.semanticContainerIdentity}`
+          : `family::${semanticFamily}`;
+        if (!aggregationBuckets.has(bucketKey)) {
+          aggregationBuckets.set(bucketKey, []);
+        }
+
+        aggregationBuckets.get(bucketKey).push(familyEntry);
+      }
+
+      return Array.from(aggregationBuckets.entries())
+        .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+        .flatMap(([, bucketEntries]) => {
+          if (bucketEntries.length < FAMILY_CLUSTER_INFO_MIN_FILES) {
+            return [];
+          }
+
+          const sortedPaths = bucketEntries
+            .map(({ observation }) => observation.path)
+            .sort((left, right) => left.localeCompare(right));
+          const semanticContainerIdentity = bucketEntries[0].placement.semanticContainerIdentity ?? null;
+
+          return [
+            {
+              code: 'TREE_OBSERVED_FAMILY_CLUSTER',
+              severity: 'info',
+              path: sortedPaths[0],
+              classification: 'advisory-structure',
+              message:
+                'Naming-owned semantic-family cluster size is high enough to consider a clearer structural grouping surface.',
+              ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
+              details: {
+                semanticFamily,
+                semanticContainerIdentity,
+                aggregationUnit: semanticContainerIdentity ? 'semanticFamily-in-container' : 'semanticFamily',
+                observedCount: bucketEntries.length,
+                observedPaths: sortedPaths,
+                threshold: {
+                  minFamilyFilesForClusterObservation: FAMILY_CLUSTER_INFO_MIN_FILES,
+                },
+              },
+            },
+          ];
+        });
+    });
 };
 
 const collectSharedRootFamilyScatterAcrossLanesFindings = (observations) => {
