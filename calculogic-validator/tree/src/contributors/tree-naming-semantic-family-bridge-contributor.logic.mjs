@@ -3,6 +3,9 @@ import path from 'node:path';
 const FAMILY_SCATTER_MIN_STRUCTURAL_HOMES = 2;
 const FAMILY_SCATTER_MIN_FILES = 3;
 const FAMILY_CLUSTER_INFO_MIN_FILES = 4;
+const FAMILY_SUBGROUP_OPPORTUNITY_MIN_FILES_IN_CONTAINER = 4;
+const FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES = 2;
+const FAMILY_SUBGROUP_OPPORTUNITY_REQUIRES_LOWER_LEVEL_GROUPING_SIGNAL = true;
 const TREE_STRUCTURAL_ROOT_SURFACES = ['src', 'test', 'doc', 'docs', 'scripts', 'tools', 'bin', 'public', 'calculogic-validator'];
 const TREE_STRUCTURAL_ROOT_SURFACE_SET = new Set(TREE_STRUCTURAL_ROOT_SURFACES);
 const ALLOWED_STRUCTURAL_ROOT_PAIRINGS = [
@@ -185,6 +188,31 @@ export const prepareNamingSemanticFamilyBridge = (bridgePayload) => {
 
 const isSingularFamilyEvidence = (observation) => (observation.ambiguityFlags ?? []).length === 0;
 
+const toContainerLocalHome = (placement) => {
+  if (placement.semanticContainerRole !== 'naming-aligned-semantic-container' || !placement.semanticContainerIdentity) {
+    return placement.structuralHome;
+  }
+
+  const containerPrefix = `${placement.semanticContainerIdentity}/`;
+  if (!placement.path.startsWith(containerPrefix)) {
+    return placement.structuralHome;
+  }
+
+  const containerRelativePath = placement.path.slice(containerPrefix.length);
+  const containerRelativeSegments = path.posix.dirname(containerRelativePath).split('/').filter(Boolean);
+  const [firstLocalHome] = containerRelativeSegments;
+
+  return firstLocalHome ?? '.';
+};
+
+const hasLowerLevelGroupingSignal = (observation) => {
+  if (typeof observation.familySubgroup === 'string' && observation.familySubgroup.length > 0) {
+    return true;
+  }
+
+  return observation.semanticFamily.startsWith(`${observation.familyRoot}-`);
+};
+
 const toSharedRootLaneObservation = (observation) => {
   for (const sharedRoot of SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS) {
     const sharedRootPrefix = `${sharedRoot}/`;
@@ -357,6 +385,86 @@ const collectFamilyClusterFindings = (observations) => {
     });
 };
 
+const collectFamilySubgroupOpportunityFindings = (observations) => {
+  const singularObservations = observations
+    .filter((observation) => isSingularFamilyEvidence(observation))
+    .map((observation) => ({
+      observation,
+      placement: classifyScatterPlacement(observation),
+    }));
+
+  const observationsBySemanticFamily = new Map();
+  for (const entry of singularObservations) {
+    if (!observationsBySemanticFamily.has(entry.observation.semanticFamily)) {
+      observationsBySemanticFamily.set(entry.observation.semanticFamily, []);
+    }
+
+    observationsBySemanticFamily.get(entry.observation.semanticFamily).push(entry);
+  }
+
+  return Array.from(observationsBySemanticFamily.entries())
+    .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
+    .flatMap(([semanticFamily, familyEntries]) => {
+      const semanticContainerIdentities = toSortedUnique(
+        familyEntries
+          .filter(({ placement }) => placement.semanticContainerRole === 'naming-aligned-semantic-container')
+          .map(({ placement }) => placement.semanticContainerIdentity),
+      );
+      const allEntriesInsideOneSemanticContainer =
+        semanticContainerIdentities.length === 1 &&
+        familyEntries.every(({ placement }) => placement.semanticContainerRole === 'naming-aligned-semantic-container');
+
+      if (!allEntriesInsideOneSemanticContainer) {
+        return [];
+      }
+
+      const sortedPaths = familyEntries
+        .map(({ observation }) => observation.path)
+        .sort((left, right) => left.localeCompare(right));
+      const observedContainerLocalHomes = toSortedUnique(
+        familyEntries.map(({ placement }) => toContainerLocalHome(placement)),
+      );
+      const lowerLevelGroupingSignalPresent = familyEntries.some(({ observation }) => hasLowerLevelGroupingSignal(observation));
+      const groupingSignalRequiredAndMissing =
+        FAMILY_SUBGROUP_OPPORTUNITY_REQUIRES_LOWER_LEVEL_GROUPING_SIGNAL && !lowerLevelGroupingSignalPresent;
+
+      if (
+        sortedPaths.length < FAMILY_SUBGROUP_OPPORTUNITY_MIN_FILES_IN_CONTAINER ||
+        observedContainerLocalHomes.length < FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES ||
+        groupingSignalRequiredAndMissing
+      ) {
+        return [];
+      }
+
+      const semanticContainerIdentity = semanticContainerIdentities[0];
+      return [
+        {
+          code: 'TREE_FAMILY_SUBGROUP_OPPORTUNITY',
+          severity: 'info',
+          path: sortedPaths[0],
+          classification: 'advisory-structure',
+          message:
+            'Naming-owned semantic-family evidence is dense inside one naming-aligned semantic container and may benefit from a lower-level subgroup folder.',
+          ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
+          details: {
+            semanticFamily,
+            semanticContainerIdentity,
+            observedCount: sortedPaths.length,
+            observedPaths: sortedPaths,
+            observedContainerLocalHomes,
+            lowerLevelGroupingSignalPresent,
+            thresholds: {
+              minFilesInContainer: FAMILY_SUBGROUP_OPPORTUNITY_MIN_FILES_IN_CONTAINER,
+              minDistinctContainerLocalHomes: FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES,
+              requireLowerLevelGroupingSignal: FAMILY_SUBGROUP_OPPORTUNITY_REQUIRES_LOWER_LEVEL_GROUPING_SIGNAL,
+            },
+            scopeBoundary: 'container-local subgroup opportunity; broad cross-container spread remains TREE_FAMILY_SCATTERED',
+          },
+        },
+      ];
+    });
+};
+
 const collectSharedRootFamilyScatterAcrossLanesFindings = (observations) => {
   const observationsBySharedRootAndFamily = new Map();
 
@@ -431,6 +539,7 @@ export const collectNamingSemanticFamilyBridgeFindings = (bridgePayload) => {
 
   return [
     ...collectFamilyScatterFindings(observations),
+    ...collectFamilySubgroupOpportunityFindings(observations),
     ...collectFamilyClusterFindings(observations),
     ...collectSharedRootFamilyScatterAcrossLanesFindings(observations),
   ];
