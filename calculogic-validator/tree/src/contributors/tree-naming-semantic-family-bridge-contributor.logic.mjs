@@ -8,6 +8,8 @@ const FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES = 2;
 const FAMILY_SUBGROUP_OPPORTUNITY_REQUIRES_LOWER_LEVEL_GROUPING_SIGNAL = true;
 const TREE_STRUCTURAL_ROOT_SURFACES = ['src', 'test', 'doc', 'docs', 'scripts', 'tools', 'bin', 'public', 'calculogic-validator'];
 const TREE_STRUCTURAL_ROOT_SURFACE_SET = new Set(TREE_STRUCTURAL_ROOT_SURFACES);
+const TREE_SEMANTIC_ROOT_FOLDERS = ['tree', 'naming'];
+const TREE_SEMANTIC_ROOT_FOLDER_SET = new Set(TREE_SEMANTIC_ROOT_FOLDERS);
 const ALLOWED_STRUCTURAL_ROOT_PAIRINGS = [
   ['src', 'test'],
   ['doc', 'docs'],
@@ -47,27 +49,6 @@ const toSortedUnique = (values) => Array.from(new Set(values)).sort((left, right
 const toSortedUniqueStringFlags = (flags) =>
   toSortedUnique(flags.filter((flag) => typeof flag === 'string' && flag.length > 0));
 
-const toNormalizedStructuralHome = (normalizedPath) => {
-  const parentDirectory = path.posix.dirname(normalizedPath);
-  if (parentDirectory === '.') {
-    return '.';
-  }
-
-  const segments = parentDirectory.split('/').filter(Boolean);
-  if (segments.length < 2) {
-    return parentDirectory;
-  }
-
-  return segments.slice(0, 2).join('/');
-};
-
-const toLocalStructuralHome = (normalizedPath, structuralHome) => {
-  const parentSegments = path.posix.dirname(normalizedPath).split('/').filter(Boolean);
-  const structuralHomeSegments = structuralHome.split('/').filter(Boolean);
-  const [firstLocalSegment] = parentSegments.slice(structuralHomeSegments.length);
-  return firstLocalSegment ?? '.';
-};
-
 const toSemanticIdentityTokens = (observation) =>
   toSortedUnique(
     [observation.familyRoot, observation.semanticFamily, observation.familySubgroup]
@@ -96,6 +77,19 @@ const toSignalAlignment = (pathSegments, semanticSignal) => {
     return null;
   }
 
+  const exactSignalHit = pathSegments.findIndex(
+    (segment) => segment === semanticSignal || segment.startsWith(`${semanticSignal}-`),
+  );
+  if (exactSignalHit >= 0) {
+    return {
+      signal: semanticSignal,
+      tokenSet: [semanticSignal],
+      segment: pathSegments[exactSignalHit],
+      segmentIndex: exactSignalHit,
+      pathPrefix: pathSegments.slice(0, exactSignalHit + 1).join('/'),
+    };
+  }
+
   const signalTokens = toSortedUnique(semanticSignal.split('-').filter(Boolean).concat(semanticSignal));
   const hit = pathSegments.findIndex(
     (segment) => signalTokens.includes(segment) || signalTokens.some((token) => segment.startsWith(`${token}-`)),
@@ -110,6 +104,48 @@ const toSignalAlignment = (pathSegments, semanticSignal) => {
     segment: pathSegments[hit],
     segmentIndex: hit,
     pathPrefix: pathSegments.slice(0, hit + 1).join('/'),
+  };
+};
+
+export const classifyNamingBridgeFolderKinds = (observation) => {
+  const directorySegments = path.posix.dirname(observation.path).split('/').filter(Boolean);
+  const alignments = {
+    familyRoot: toSignalAlignment(directorySegments, observation.familyRoot),
+    semanticFamily: toSignalAlignment(directorySegments, observation.semanticFamily),
+    familySubgroup: toSignalAlignment(directorySegments, observation.familySubgroup),
+  };
+  const namingAlignedSemanticSegmentIndexes = new Set(
+    [alignments.familyRoot, alignments.semanticFamily, alignments.familySubgroup]
+      .filter(Boolean)
+      .map((alignment) => alignment.segmentIndex),
+  );
+
+  const folderKinds = directorySegments.map((segment, index) => {
+    if (TREE_SEMANTIC_ROOT_FOLDER_SET.has(segment)) {
+      return { segment, index, folderKind: 'semantic-folder', reason: 'semantic-root-folder' };
+    }
+
+    if (namingAlignedSemanticSegmentIndexes.has(index)) {
+      return { segment, index, folderKind: 'semantic-folder', reason: 'naming-signal-aligned-folder' };
+    }
+
+    if (TREE_STRUCTURAL_ROOT_SURFACE_SET.has(segment)) {
+      return { segment, index, folderKind: 'structural-folder', reason: 'structural-surface-folder' };
+    }
+
+    return { segment, index, folderKind: 'unspecified-folder', reason: 'no-bounded-folder-kind-match' };
+  });
+
+  const structuralFolderSegments = folderKinds.filter((entry) => entry.folderKind === 'structural-folder');
+  const semanticFolderSegments = folderKinds.filter((entry) => entry.folderKind === 'semantic-folder');
+  const unspecifiedFolderSegments = folderKinds.filter((entry) => entry.folderKind === 'unspecified-folder');
+
+  return {
+    folderKinds,
+    structuralFolderSegments,
+    semanticFolderSegments,
+    unspecifiedFolderSegments,
+    namingAlignments: alignments,
   };
 };
 
@@ -211,21 +247,31 @@ const classifyLocalPlacementCoherence = ({
 
 export const toNamingBridgePlacementRecord = (observation) => {
   const pathSegments = observation.path.split('/').filter(Boolean);
-  const directorySegments = path.posix.dirname(observation.path).split('/').filter(Boolean);
+  const folderKindInterpretation = classifyNamingBridgeFolderKinds(observation);
+  const directorySegments = folderKindInterpretation.folderKinds.map((entry) => entry.segment);
   const structuralRoot = pathSegments[0] ?? '.';
-  const structuralSurface = pathSegments.slice(0, 2).join('/') || structuralRoot;
-  const structuralHome = toNormalizedStructuralHome(observation.path);
-  const localStructuralHome = toLocalStructuralHome(observation.path, structuralHome);
+  const nonSemanticFolderSegments = folderKindInterpretation.folderKinds.filter((entry) => entry.folderKind !== 'semantic-folder');
+  const structuralSurfaceChain = folderKindInterpretation.structuralFolderSegments.map((entry) => entry.segment);
+  const structuralSegmentChain = nonSemanticFolderSegments.map((entry) => entry.segment);
+  const structuralHomeSegments = structuralSegmentChain.slice(0, 2);
+  const structuralHome = structuralHomeSegments.length > 0 ? structuralHomeSegments.join('/') : '.';
+  const structuralSurface = structuralHome;
+  const structuralHomeLastSegmentIndex = nonSemanticFolderSegments[Math.max(0, structuralHomeSegments.length - 1)]?.index;
+  const localStructuralHome =
+    structuralHomeLastSegmentIndex === undefined
+      ? '.'
+      : directorySegments[structuralHomeLastSegmentIndex + 1] ?? '.';
   const semanticIdentityTokens = toSemanticIdentityTokens(observation);
   const semanticAlignmentHits = toSemanticAlignmentHits(observation, semanticIdentityTokens);
-  const familyRootDirectoryAlignment = toSignalAlignment(directorySegments, observation.familyRoot);
-  const semanticFamilyDirectoryAlignment = toSignalAlignment(directorySegments, observation.semanticFamily);
-  const familySubgroupDirectoryAlignment = toSignalAlignment(directorySegments, observation.familySubgroup);
+  const familyRootDirectoryAlignment = folderKindInterpretation.namingAlignments.familyRoot;
+  const semanticFamilyDirectoryAlignment = folderKindInterpretation.namingAlignments.semanticFamily;
+  const familySubgroupDirectoryAlignment = folderKindInterpretation.namingAlignments.familySubgroup;
   const familyRootAlignment = toSignalAlignment(pathSegments, observation.familyRoot);
   const semanticFamilyAlignment = toSignalAlignment(pathSegments, observation.semanticFamily);
   const familySubgroupAlignment = toSignalAlignment(pathSegments, observation.familySubgroup);
   const semanticContainerIdentity = familyRootDirectoryAlignment?.pathPrefix ?? null;
   const semanticHome = semanticFamilyDirectoryAlignment?.pathPrefix ?? semanticContainerIdentity;
+  const semanticRoot = semanticContainerIdentity;
   const semanticSubhome =
     familySubgroupDirectoryAlignment &&
     semanticHome &&
@@ -246,9 +292,14 @@ export const toNamingBridgePlacementRecord = (observation) => {
     structuralRoot,
     structuralSurface,
     structuralHome,
+    structuralSurfaceChain,
+    structuralSegmentChain,
     localStructuralHome,
     structuralRootKind: TREE_STRUCTURAL_ROOT_SURFACE_SET.has(structuralRoot) ? 'structural-surface' : 'non-structural-surface',
+    folderKindBreakdown: folderKindInterpretation.folderKinds,
+    unresolvedFolderContext: folderKindInterpretation.unspecifiedFolderSegments.map((entry) => entry.segment),
     semanticContainerRole: semanticContainerIdentity ? 'naming-aligned-semantic-container' : 'none',
+    semanticRoot,
     semanticContainerIdentity,
     semanticHome,
     semanticSubhome,

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  classifyNamingBridgeFolderKinds,
   collectNamingSemanticFamilyBridgeFindings,
   toNamingBridgePlacementRecord,
 } from '../src/contributors/tree-naming-semantic-family-bridge-contributor.logic.mjs';
@@ -71,11 +72,13 @@ test('tree naming bridge placement model resolves structural home and semantic c
     semanticFamily: 'tree-occurrence',
   });
 
-  assert.equal(placement.structuralHome, 'calculogic-validator/tree');
+  assert.equal(placement.structuralHome, 'calculogic-validator/src');
+  assert.deepEqual(placement.structuralSurfaceChain, ['calculogic-validator', 'src']);
   assert.equal(placement.semanticContainerIdentity, 'calculogic-validator/tree');
   assert.equal(placement.semanticHome, 'calculogic-validator/tree');
-  assert.equal(placement.localStructuralHome, 'src');
-  assert.equal(placement.localPlacementCoherence, 'aligned-local-home');
+  assert.equal(placement.localStructuralHome, 'contributors');
+  assert.equal(placement.localPlacementCoherence, 'divergent-local-placement');
+  assert.equal(placement.localPlacementCoherenceDetails.reason, 'semantic-home-diverges-from-structural-home');
 });
 
 test('tree naming bridge placement model derives semantic placement from naming-owned signals and path alignment', () => {
@@ -118,11 +121,12 @@ test('tree naming bridge placement model can represent semantic subhome from fam
   });
 
   assert.equal(placement.semanticContainerIdentity, 'calculogic-validator/naming');
+  assert.equal(placement.semanticRoot, 'calculogic-validator/naming');
   assert.equal(placement.semanticSubhome, 'calculogic-validator/naming/src/lane');
   assert.equal(placement.localPlacementCoherence, 'divergent-local-placement');
   assert.equal(
     placement.localPlacementCoherenceDetails.reason,
-    'semantic-subhome-signals-lower-local-placement',
+    'semantic-home-diverges-from-structural-home',
   );
 });
 
@@ -189,6 +193,75 @@ test('tree naming bridge placement model stays deterministic for identical input
   const first = toNamingBridgePlacementRecord(observation);
   const second = toNamingBridgePlacementRecord(observation);
   assert.deepEqual(first, second);
+});
+
+test('tree naming bridge folder-kind interpretation classifies structural semantic and unspecified folders deterministically', () => {
+  const observation = {
+    path: 'calculogic-validator/tree/src/contributors/registry/tree-structure-advisor.logic.mjs',
+    semanticName: 'tree-structure-advisor',
+    familyRoot: 'tree',
+    semanticFamily: 'tree-structure-advisor',
+    familySubgroup: 'registry',
+  };
+
+  const first = classifyNamingBridgeFolderKinds(observation);
+  const second = classifyNamingBridgeFolderKinds(observation);
+  assert.deepEqual(first, second);
+  assert.deepEqual(
+    first.folderKinds.map(({ segment, folderKind }) => ({ segment, folderKind })),
+    [
+      { segment: 'calculogic-validator', folderKind: 'structural-folder' },
+      { segment: 'tree', folderKind: 'semantic-folder' },
+      { segment: 'src', folderKind: 'structural-folder' },
+      { segment: 'contributors', folderKind: 'unspecified-folder' },
+      { segment: 'registry', folderKind: 'semantic-folder' },
+    ],
+  );
+});
+
+test('tree naming bridge placement model keeps semantic roots out of structural-home derivation by position', () => {
+  const placement = toNamingBridgePlacementRecord({
+    path: 'calculogic-validator/naming/src/registry/naming-registry.logic.mjs',
+    semanticName: 'naming-registry',
+    familyRoot: 'naming',
+    semanticFamily: 'naming-registry',
+    familySubgroup: 'registry',
+  });
+
+  assert.equal(placement.structuralHome, 'calculogic-validator/src');
+  assert.equal(placement.semanticRoot, 'calculogic-validator/naming');
+  assert.equal(placement.semanticHome, 'calculogic-validator/naming');
+  assert.equal(placement.semanticSubhome, 'calculogic-validator/naming/src/registry');
+});
+
+test('tree naming bridge placement model represents family-root and semantic-family as root plus lower semantic grouping', () => {
+  const placement = toNamingBridgePlacementRecord({
+    path: 'calculogic-validator/tree/src/tree-structure-advisor/report-capture.logic.mjs',
+    semanticName: 'report-capture',
+    familyRoot: 'tree',
+    semanticFamily: 'tree-structure-advisor',
+  });
+
+  assert.equal(placement.semanticRoot, 'calculogic-validator/tree');
+  assert.equal(placement.semanticHome, 'calculogic-validator/tree/src/tree-structure-advisor');
+  assert.equal(placement.semanticContainerIdentity, 'calculogic-validator/tree');
+  assert.equal(placement.semanticHome === placement.semanticRoot, false);
+});
+
+test('tree naming bridge placement model keeps unresolved segments visible in placement record', () => {
+  const placement = toNamingBridgePlacementRecord({
+    path: 'tools/validator-config/runtime/registry/validator-config.logic.mjs',
+    semanticName: 'validator-config',
+    familyRoot: 'validator',
+    semanticFamily: 'validator-config',
+    familySubgroup: 'registry',
+  });
+
+  assert.deepEqual(placement.unresolvedFolderContext, ['runtime']);
+  assert.equal(
+    placement.folderKindBreakdown.some((entry) => entry.folderKind === 'unspecified-folder' && entry.segment === 'runtime'),
+    true,
+  );
 });
 
 test('tree naming bridge contributor does not emit naming validity judgments', () => {
