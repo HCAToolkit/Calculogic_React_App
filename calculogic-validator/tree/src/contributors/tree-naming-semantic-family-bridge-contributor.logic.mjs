@@ -22,6 +22,13 @@ const SHARED_ROOT_LANE_FIRST_PARTITIONS = ['build', 'build-style', 'logic', 'kno
 const SHARED_ROOT_LANE_FIRST_PARTITION_SET = new Set(SHARED_ROOT_LANE_FIRST_PARTITIONS);
 const SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS = 2;
 const SHARED_ROOT_MIN_FAMILY_FILES = 3;
+const LOCAL_FIRST_FAMILY_INTERPRETATION = Object.freeze({
+  EXPECTED_LOCAL_PRESENCE: 'expected-local-presence',
+  LOCAL_DENSITY_FIRST: 'local-density-first',
+  LOCAL_SUBGROUP_FIRST: 'local-subgroup-first',
+  LOCAL_DIVERGENCE_NEEDS_BROADER_REVIEW: 'local-divergence-needs-broader-review',
+  NO_LOCAL_SEMANTIC_EXPLANATION: 'no-local-semantic-explanation',
+});
 
 const toSortedUnique = (values) => Array.from(new Set(values)).sort((left, right) => left.localeCompare(right));
 
@@ -384,6 +391,109 @@ const hasLowerLevelGroupingSignal = (observation) => {
   return observation.semanticFamily.startsWith(`${observation.familyRoot}-`);
 };
 
+const interpretFamilyLocalFirst = (familyEntries) => {
+  const sortedPaths = familyEntries
+    .map(({ observation }) => observation.path)
+    .sort((left, right) => left.localeCompare(right));
+  const localPlacementCoherenceClasses = toSortedUnique(
+    familyEntries.map(({ placement }) => placement.localPlacementCoherence),
+  );
+  const semanticContainerIdentities = toSortedUnique(
+    familyEntries
+      .filter(({ placement }) => placement.semanticContainerRole === 'naming-aligned-semantic-container')
+      .map(({ placement }) => placement.semanticContainerIdentity),
+  );
+  const allEntriesInsideOneSemanticContainer =
+    semanticContainerIdentities.length === 1 &&
+    familyEntries.every(({ placement }) => placement.semanticContainerRole === 'naming-aligned-semantic-container');
+  const observedContainerLocalHomes = allEntriesInsideOneSemanticContainer
+    ? toSortedUnique(familyEntries.map(({ placement }) => toContainerLocalHome(placement)))
+    : [];
+  const lowerLevelGroupingSignalPresent = familyEntries.some(({ observation }) => hasLowerLevelGroupingSignal(observation));
+  const localDivergencePresent = familyEntries.some(
+    ({ placement }) =>
+      placement.localPlacementCoherence === 'divergent-local-placement' ||
+      placement.localPlacementCoherence === 'semantic-home-only',
+  );
+  const localSemanticExplanationAbsent = familyEntries.every(
+    ({ placement }) =>
+      placement.localPlacementCoherence === 'structural-home-only' ||
+      placement.localPlacementCoherence === 'no-semantic-home',
+  );
+
+  if (allEntriesInsideOneSemanticContainer) {
+    const hasContainerLocalDensity =
+      sortedPaths.length >= FAMILY_CLUSTER_INFO_MIN_FILES ||
+      observedContainerLocalHomes.length >= FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES;
+    const hasContainerLocalSubgroupOpportunity =
+      sortedPaths.length >= FAMILY_SUBGROUP_OPPORTUNITY_MIN_FILES_IN_CONTAINER &&
+      observedContainerLocalHomes.length >= FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES &&
+      lowerLevelGroupingSignalPresent;
+
+    if (hasContainerLocalSubgroupOpportunity) {
+      return {
+        classification: LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_SUBGROUP_FIRST,
+        details: {
+          semanticContainerIdentity: semanticContainerIdentities[0],
+          observedContainerLocalHomes,
+          lowerLevelGroupingSignalPresent,
+          localPlacementCoherence: localPlacementCoherenceClasses,
+        },
+      };
+    }
+
+    if (hasContainerLocalDensity) {
+      return {
+        classification: LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DENSITY_FIRST,
+        details: {
+          semanticContainerIdentity: semanticContainerIdentities[0],
+          observedContainerLocalHomes,
+          lowerLevelGroupingSignalPresent,
+          localPlacementCoherence: localPlacementCoherenceClasses,
+        },
+      };
+    }
+
+    return {
+      classification: LOCAL_FIRST_FAMILY_INTERPRETATION.EXPECTED_LOCAL_PRESENCE,
+      details: {
+        semanticContainerIdentity: semanticContainerIdentities[0],
+        observedContainerLocalHomes,
+        localPlacementCoherence: localPlacementCoherenceClasses,
+      },
+    };
+  }
+
+  if (localDivergencePresent) {
+    return {
+      classification: LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DIVERGENCE_NEEDS_BROADER_REVIEW,
+      details: {
+        semanticContainerIdentities,
+        localPlacementCoherence: localPlacementCoherenceClasses,
+      },
+    };
+  }
+
+  if (localSemanticExplanationAbsent) {
+    return {
+      classification: LOCAL_FIRST_FAMILY_INTERPRETATION.NO_LOCAL_SEMANTIC_EXPLANATION,
+      details: {
+        semanticContainerIdentities,
+        localPlacementCoherence: localPlacementCoherenceClasses,
+      },
+    };
+  }
+
+  return {
+    classification: LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DIVERGENCE_NEEDS_BROADER_REVIEW,
+    details: {
+      semanticContainerIdentities,
+      localPlacementCoherence: localPlacementCoherenceClasses,
+      reason: 'mixed-local-placement-coherence-outside-one-semantic-container',
+    },
+  };
+};
+
 const toSharedRootLaneObservation = (observation) => {
   for (const sharedRoot of SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS) {
     const sharedRootPrefix = `${sharedRoot}/`;
@@ -427,13 +537,18 @@ const collectFamilyScatterFindings = (observations) => {
     .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
     .flatMap(([semanticFamily, familyObservations]) => {
       const sortedPaths = familyObservations.map(({ path: normalizedPath }) => normalizedPath).sort((a, b) => a.localeCompare(b));
-      const placements = familyObservations.map(classifyScatterPlacement);
+      const familyEntries = familyObservations.map((observation) => ({
+        observation,
+        placement: classifyScatterPlacement(observation),
+      }));
+      const placements = familyEntries.map(({ placement }) => placement);
       const structuralHomes = toSortedUnique(placements.map((placement) => placement.structuralHome));
       const semanticContainerIdentities = toSortedUnique(
         placements
           .filter((placement) => placement.semanticContainerRole === 'naming-aligned-semantic-container')
           .map((placement) => placement.semanticContainerIdentity),
       );
+      const localFirstInterpretation = interpretFamilyLocalFirst(familyEntries);
       const allPlacementsInOneSemanticContainer =
         semanticContainerIdentities.length === 1 &&
         placements.every((placement) => placement.semanticContainerRole === 'naming-aligned-semantic-container');
@@ -447,6 +562,9 @@ const collectFamilyScatterFindings = (observations) => {
       if (
         sortedPaths.length < FAMILY_SCATTER_MIN_FILES ||
         structuralHomes.length < FAMILY_SCATTER_MIN_STRUCTURAL_HOMES ||
+        localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.EXPECTED_LOCAL_PRESENCE ||
+        localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DENSITY_FIRST ||
+        localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_SUBGROUP_FIRST ||
         allPlacementsInOneSemanticContainer ||
         allCrossContainerPlacementsCoveredByAllowedRules
       ) {
@@ -469,6 +587,7 @@ const collectFamilyScatterFindings = (observations) => {
             observedStructuralRoots: toSortedUnique(placements.map((placement) => placement.structuralRoot)),
             observedContainerIdentities: semanticContainerIdentities,
             observedStructuralRootKinds: toSortedUnique(placements.map((placement) => placement.structuralRootKind)),
+            localFirstInterpretation,
             allowedCrossContainerPatterns: {
               structuralRootPairings: ALLOWED_STRUCTURAL_ROOT_PAIRINGS,
               canonicalDocAuthorityRuntimePairing: 'calculogic-validator/doc/** <-> calculogic-validator/<semantic-container>/**',

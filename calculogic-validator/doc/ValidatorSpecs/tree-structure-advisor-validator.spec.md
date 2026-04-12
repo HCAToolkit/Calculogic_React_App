@@ -177,9 +177,28 @@ Tree consumes this normalized bridge payload only. Tree runtime must not parse f
 
 - tree classifies each family observation by structural root/surface and naming-aligned semantic-container placement,
 - semantic-container recognition is based on path alignment with naming-owned bridge evidence (`familyRoot`, `semanticFamily`, optional `familySubgroup`), not a hardcoded semantic-folder allowlist,
-- family presence confined to one valid naming-aligned semantic container is treated as expected/container-local density first (not immediate broad scatter),
+- tree evaluates family interpretation in explicit local-first order:
+  1. structural placement,
+  2. semantic placement,
+  3. local placement coherence,
+  4. local-first family interpretation lane selection,
+  5. broad scatter eligibility only when local interpretation does not sufficiently explain observed placement,
+- family presence confined to one valid naming-aligned semantic container is treated as expected/container-local density/subgroup opportunity first (not immediate broad scatter),
 - bounded allowed cross-container pairings are exempt from broad scatter by default (for example canonical docs authority lane with aligned owned runtime container pairing),
 - broad scatter remains for family spread across unrelated structural homes/containers when no allowed pairing covers the spread.
+
+Current bounded local-first family interpretation outcomes used for this gate:
+
+- `expected-local-presence`
+- `local-density-first`
+- `local-subgroup-first`
+- `local-divergence-needs-broader-review`
+- `no-local-semantic-explanation`
+
+Behavior boundary for this slice:
+
+- no new findings/codes are introduced,
+- this slice only refines when existing broad-scatter eligibility (`TREE_FAMILY_SCATTERED`) is allowed after local-first interpretation.
 
 ### Family subgroup opportunity inside one semantic container (Status: Current runtime behavior, bounded)
 
