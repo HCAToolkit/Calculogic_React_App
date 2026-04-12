@@ -35,6 +35,12 @@ const BROADER_SPREAD_INTERPRETATION = Object.freeze({
   CROSS_CONCERN_BUT_EXPLAINABLE: 'cross-concern-but-explainable',
   UNRESOLVED_BROADER_SPREAD: 'unresolved-broader-spread',
 });
+const SHARED_ROOT_LANE_INTERPRETATION = Object.freeze({
+  SELECT_SHARED_ROOT_LANE_SPREAD: 'select-shared-root-lane-spread',
+  BELOW_SHARED_ROOT_LANE_THRESHOLD: 'below-shared-root-lane-threshold',
+  LOCAL_FIRST_SUPPRESSED: 'local-first-suppressed',
+  BROADER_SPREAD_SUPPRESSED: 'broader-spread-suppressed',
+});
 
 const toSortedUnique = (values) => Array.from(new Set(values)).sort((left, right) => left.localeCompare(right));
 
@@ -672,6 +678,72 @@ const toSharedRootLaneObservation = (observation) => {
   return null;
 };
 
+const toSharedRootLaneInterpretation = ({
+  sharedRootObservations,
+  localFirstInterpretation,
+  broaderSpreadInterpretation,
+}) => {
+  const sortedPaths = sharedRootObservations
+    .map(({ path: normalizedPath }) => normalizedPath)
+    .sort((left, right) => left.localeCompare(right));
+  const observedLanePartitions = toSortedUnique(sharedRootObservations.map(({ lanePartition }) => lanePartition));
+  const thresholdQualified =
+    observedLanePartitions.length >= SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS &&
+    sortedPaths.length >= SHARED_ROOT_MIN_FAMILY_FILES;
+
+  if (!thresholdQualified) {
+    return {
+      classification: SHARED_ROOT_LANE_INTERPRETATION.BELOW_SHARED_ROOT_LANE_THRESHOLD,
+      shouldEmit: false,
+      details: {
+        thresholdQualified,
+        localFirstClassification: localFirstInterpretation.classification,
+        broaderSpreadClassification: broaderSpreadInterpretation?.classification ?? null,
+      },
+    };
+  }
+
+  const localFirstAllowsSharedRootLaneSpread =
+    localFirstInterpretation.classification ===
+      LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DIVERGENCE_NEEDS_BROADER_REVIEW ||
+    localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.NO_LOCAL_SEMANTIC_EXPLANATION;
+  if (!localFirstAllowsSharedRootLaneSpread) {
+    return {
+      classification: SHARED_ROOT_LANE_INTERPRETATION.LOCAL_FIRST_SUPPRESSED,
+      shouldEmit: false,
+      details: {
+        thresholdQualified,
+        localFirstClassification: localFirstInterpretation.classification,
+        broaderSpreadClassification: broaderSpreadInterpretation?.classification ?? null,
+      },
+    };
+  }
+
+  const broaderSpreadAllowsSharedRootLaneSpread =
+    broaderSpreadInterpretation?.classification === BROADER_SPREAD_INTERPRETATION.UNRESOLVED_BROADER_SPREAD;
+  if (!broaderSpreadAllowsSharedRootLaneSpread) {
+    return {
+      classification: SHARED_ROOT_LANE_INTERPRETATION.BROADER_SPREAD_SUPPRESSED,
+      shouldEmit: false,
+      details: {
+        thresholdQualified,
+        localFirstClassification: localFirstInterpretation.classification,
+        broaderSpreadClassification: broaderSpreadInterpretation?.classification ?? null,
+      },
+    };
+  }
+
+  return {
+    classification: SHARED_ROOT_LANE_INTERPRETATION.SELECT_SHARED_ROOT_LANE_SPREAD,
+    shouldEmit: true,
+    details: {
+      thresholdQualified,
+      localFirstClassification: localFirstInterpretation.classification,
+      broaderSpreadClassification: broaderSpreadInterpretation.classification,
+    },
+  };
+};
+
 const collectFamilyScatterFindings = (familySharedSpineAnalysisEntries) =>
   familySharedSpineAnalysisEntries.flatMap(({ familyAnalysis, broaderSpreadInterpretation }) => {
       const semanticFamily = familyAnalysis.semanticFamily;
@@ -820,11 +892,13 @@ const collectSharedRootFamilyScatterAcrossLanesFindings = (familySharedSpineAnal
         const observedLanePartitions = toSortedUnique(
           sharedRootObservations.map(({ lanePartition }) => lanePartition),
         );
-        const hasSupportedSharedRootLaneSpread =
-          observedLanePartitions.length >= SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS &&
-          sortedPaths.length >= SHARED_ROOT_MIN_FAMILY_FILES;
+        const sharedRootLaneInterpretation = toSharedRootLaneInterpretation({
+          sharedRootObservations,
+          localFirstInterpretation,
+          broaderSpreadInterpretation,
+        });
 
-        if (!hasSupportedSharedRootLaneSpread) {
+        if (!sharedRootLaneInterpretation.shouldEmit) {
           return [];
         }
 
@@ -844,9 +918,10 @@ const collectSharedRootFamilyScatterAcrossLanesFindings = (familySharedSpineAnal
               observedPaths: sortedPaths,
               localFirstInterpretation,
               broaderSpreadInterpretation,
+              sharedRootLaneInterpretation,
               familySharedSpineRouting: {
                 model: 'shared-local-first-family-interpretation',
-                sharedRootOutcome: 'bounded-shared-root-lane-spread',
+                sharedRootOutcome: sharedRootLaneInterpretation.classification,
               },
               thresholds: {
                 supportedSharedRoots: SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS,

@@ -263,20 +263,21 @@ Boundary notes for this consolidation slice:
 
 Classification: Normative
 
-`TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` remains an existing bounded code, but its eligibility now routes through the same shared family interpretation spine used by other family outcomes.
+`TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` remains an existing bounded code, and its emission is now decision-routed by the same shared family interpretation spine used by other family outcomes.
 
 Routing and meaning in this slice:
 
 - shared-root lane spread is no longer treated as a separate family-reasoning island,
 - eligibility is evaluated from shared family analysis grouped by naming-owned `semanticFamily`,
-- the same local-first interpretation result used by cluster/subgroup/scatter outcomes is attached to this shared-root outcome,
-- broader-spread interpretation context is reused where relevant rather than bypassed,
+- shared-root lane counts/partitions remain bounded decision inputs, but they are no longer a standalone threshold collector that emits first and only carries shared-spine context afterward,
+- local-first and broader-spread outcomes from the shared spine now gate whether shared-root lane spread is the selected outcome,
+- emission occurs only when bounded shared-spine interpretation resolves to shared-root lane spread (rather than from lane thresholds alone),
 - this consolidation adds no new finding family and does not alter naming ownership boundaries.
 
 Bounded intent:
 
 - preserve the existing finding code (`TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES`),
-- keep shared-root lane spread as a bounded outcome within the existing local-first → broader-spread family reasoning flow,
+- keep shared-root lane spread as a bounded, explicit, deterministic, inspectable outcome within the existing local-first → broader-spread family reasoning flow,
 - avoid introducing new policy surfaces beyond this routing consolidation slice.
 
 ### Family subgroup opportunity inside one semantic container (Status: Current runtime behavior, bounded)

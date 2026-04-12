@@ -326,6 +326,11 @@ test('tree naming bridge contributor emits bounded shared-root lane scatter advi
   assert.equal(sharedRootFindings[0].details.localFirstInterpretation.classification, 'local-divergence-needs-broader-review');
   assert.equal(sharedRootFindings[0].details.broaderSpreadInterpretation.classification, 'unresolved-broader-spread');
   assert.equal(sharedRootFindings[0].details.familySharedSpineRouting.model, 'shared-local-first-family-interpretation');
+  assert.equal(
+    sharedRootFindings[0].details.sharedRootLaneInterpretation.classification,
+    'select-shared-root-lane-spread',
+  );
+  assert.equal(sharedRootFindings[0].details.sharedRootLaneInterpretation.details.thresholdQualified, true);
 });
 
 test('tree naming bridge contributor does not emit shared-root lane scatter advisory when family evidence is outside supported shared root', () => {
@@ -389,7 +394,10 @@ test('tree naming bridge contributor keeps shared-root advisory deterministic fo
 
   assert.deepEqual(firstSharedRootFindings, secondSharedRootFindings);
   assert.equal(firstSharedRootFindings.length, 1);
-  assert.equal(firstSharedRootFindings[0].details.familySharedSpineRouting.sharedRootOutcome, 'bounded-shared-root-lane-spread');
+  assert.equal(
+    firstSharedRootFindings[0].details.familySharedSpineRouting.sharedRootOutcome,
+    'select-shared-root-lane-spread',
+  );
 });
 
 test('tree naming bridge contributor keeps non-shared families on shared family spine without emitting shared-root lane spread', () => {
@@ -418,6 +426,33 @@ test('tree naming bridge contributor keeps non-shared families on shared family 
 
   assert.equal(findings.some((finding) => finding.code === 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES'), false);
   assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+});
+
+test('tree naming bridge contributor does not emit shared-root lane spread when thresholds match but shared spine resolves local expected presence', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'src/shared/logic/shared-local.logic.ts',
+        semanticName: 'shared-local',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-local',
+      },
+      {
+        path: 'src/shared/knowledge/shared-local.knowledge.ts',
+        semanticName: 'shared-local',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-local',
+      },
+      {
+        path: 'src/shared/results/shared-local.results.ts',
+        semanticName: 'shared-local',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-local',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES'), false);
 });
 
 test('tree naming bridge contributor treats one naming-aligned semantic container as expected presence, not broad scatter', () => {
