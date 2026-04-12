@@ -96,20 +96,26 @@ const toSignalAlignment = (pathSegments, semanticSignal) => {
 
 export const toNamingBridgePlacementRecord = (observation) => {
   const pathSegments = observation.path.split('/').filter(Boolean);
+  const directorySegments = path.posix.dirname(observation.path).split('/').filter(Boolean);
   const structuralRoot = pathSegments[0] ?? '.';
   const structuralSurface = pathSegments.slice(0, 2).join('/') || structuralRoot;
   const structuralHome = toNormalizedStructuralHome(observation.path);
   const localStructuralHome = toLocalStructuralHome(observation.path, structuralHome);
   const semanticIdentityTokens = toSemanticIdentityTokens(observation);
   const semanticAlignmentHits = toSemanticAlignmentHits(observation, semanticIdentityTokens);
+  const familyRootDirectoryAlignment = toSignalAlignment(directorySegments, observation.familyRoot);
+  const semanticFamilyDirectoryAlignment = toSignalAlignment(directorySegments, observation.semanticFamily);
+  const familySubgroupDirectoryAlignment = toSignalAlignment(directorySegments, observation.familySubgroup);
   const familyRootAlignment = toSignalAlignment(pathSegments, observation.familyRoot);
   const semanticFamilyAlignment = toSignalAlignment(pathSegments, observation.semanticFamily);
   const familySubgroupAlignment = toSignalAlignment(pathSegments, observation.familySubgroup);
-  const semanticContainerIdentity = familyRootAlignment?.pathPrefix ?? null;
-  const semanticHome = semanticFamilyAlignment?.pathPrefix ?? semanticContainerIdentity;
+  const semanticContainerIdentity = familyRootDirectoryAlignment?.pathPrefix ?? null;
+  const semanticHome = semanticFamilyDirectoryAlignment?.pathPrefix ?? semanticContainerIdentity;
   const semanticSubhome =
-    familySubgroupAlignment && semanticHome && familySubgroupAlignment.pathPrefix !== semanticHome
-      ? familySubgroupAlignment.pathPrefix
+    familySubgroupDirectoryAlignment &&
+    semanticHome &&
+    familySubgroupDirectoryAlignment.pathPrefix !== semanticHome
+      ? familySubgroupDirectoryAlignment.pathPrefix
       : null;
 
   return {
@@ -135,6 +141,11 @@ export const toNamingBridgePlacementRecord = (observation) => {
         familyRoot: familyRootAlignment,
         semanticFamily: semanticFamilyAlignment,
         familySubgroup: familySubgroupAlignment,
+      },
+      folderDerivedAlignments: {
+        familyRoot: familyRootDirectoryAlignment,
+        semanticFamily: semanticFamilyDirectoryAlignment,
+        familySubgroup: familySubgroupDirectoryAlignment,
       },
       inferredFromPathStructure: true,
     },
