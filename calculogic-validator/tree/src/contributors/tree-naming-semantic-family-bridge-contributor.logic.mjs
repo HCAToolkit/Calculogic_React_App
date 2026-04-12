@@ -572,6 +572,22 @@ const toFamilyLocalFirstAnalysis = (semanticFamily, familyEntries) => {
   };
 };
 
+const toFamilySharedSpineAnalysisEntries = (observations) => {
+  const observationsBySemanticFamily = toSingularFamilyEntriesBySemanticFamily(observations);
+
+  return Array.from(observationsBySemanticFamily.entries())
+    .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
+    .map(([semanticFamily, familyEntries]) => {
+      const familyAnalysis = toFamilyLocalFirstAnalysis(semanticFamily, familyEntries);
+      const broaderSpreadInterpretation = toFamilyBroaderSpreadInterpretation(familyAnalysis);
+
+      return {
+        familyAnalysis,
+        broaderSpreadInterpretation,
+      };
+    });
+};
+
 const toFamilyBroaderSpreadInterpretation = (familyAnalysis) => {
   const requiresBroaderSpreadReview =
     familyAnalysis.localFirstInterpretation.classification ===
@@ -656,14 +672,9 @@ const toSharedRootLaneObservation = (observation) => {
   return null;
 };
 
-const collectFamilyScatterFindings = (observations) => {
-  const observationsBySemanticFamily = toSingularFamilyEntriesBySemanticFamily(observations);
-
-  return Array.from(observationsBySemanticFamily.entries())
-    .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
-    .flatMap(([semanticFamily, familyEntries]) => {
-      const familyAnalysis = toFamilyLocalFirstAnalysis(semanticFamily, familyEntries);
-      const broaderSpreadInterpretation = toFamilyBroaderSpreadInterpretation(familyAnalysis);
+const collectFamilyScatterFindings = (familySharedSpineAnalysisEntries) =>
+  familySharedSpineAnalysisEntries.flatMap(({ familyAnalysis, broaderSpreadInterpretation }) => {
+      const semanticFamily = familyAnalysis.semanticFamily;
       const broaderSpreadResolved =
         broaderSpreadInterpretation &&
         broaderSpreadInterpretation.classification !== BROADER_SPREAD_INTERPRETATION.UNRESOLVED_BROADER_SPREAD;
@@ -716,15 +727,10 @@ const collectFamilyScatterFindings = (observations) => {
         },
       ];
     });
-};
 
-const collectFamilyClusterFindings = (observations) => {
-  const observationsBySemanticFamily = toSingularFamilyEntriesBySemanticFamily(observations);
-
-  return Array.from(observationsBySemanticFamily.entries())
-    .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
-    .flatMap(([semanticFamily, familyEntries]) => {
-      const familyAnalysis = toFamilyLocalFirstAnalysis(semanticFamily, familyEntries);
+const collectFamilyClusterFindings = (familySharedSpineAnalysisEntries) =>
+  familySharedSpineAnalysisEntries.flatMap(({ familyAnalysis }) => {
+      const semanticFamily = familyAnalysis.semanticFamily;
       if (familyAnalysis.localFirstInterpretation.classification !== LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DENSITY_FIRST) {
         return [];
       }
@@ -752,15 +758,10 @@ const collectFamilyClusterFindings = (observations) => {
         },
       ];
     });
-};
 
-const collectFamilySubgroupOpportunityFindings = (observations) => {
-  const observationsBySemanticFamily = toSingularFamilyEntriesBySemanticFamily(observations);
-
-  return Array.from(observationsBySemanticFamily.entries())
-    .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
-    .flatMap(([semanticFamily, familyEntries]) => {
-      const familyAnalysis = toFamilyLocalFirstAnalysis(semanticFamily, familyEntries);
+const collectFamilySubgroupOpportunityFindings = (familySharedSpineAnalysisEntries) =>
+  familySharedSpineAnalysisEntries.flatMap(({ familyAnalysis }) => {
+      const semanticFamily = familyAnalysis.semanticFamily;
       if (familyAnalysis.localFirstInterpretation.classification !== LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_SUBGROUP_FIRST) {
         return [];
       }
@@ -792,71 +793,73 @@ const collectFamilySubgroupOpportunityFindings = (observations) => {
         },
       ];
     });
-};
 
-const collectSharedRootFamilyScatterAcrossLanesFindings = (observations) => {
-  const observationsBySharedRootAndFamily = new Map();
+const collectSharedRootFamilyScatterAcrossLanesFindings = (familySharedSpineAnalysisEntries) =>
+  familySharedSpineAnalysisEntries.flatMap(({ familyAnalysis, broaderSpreadInterpretation }) => {
+    const sharedFamilyObservations = familyAnalysis.familyEntries
+      .map(({ observation }) => toSharedRootLaneObservation(observation))
+      .filter(Boolean);
+    const observationsBySharedRoot = new Map();
 
-  for (const observation of observations) {
-    if (!isSingularFamilyEvidence(observation)) {
-      continue;
-    }
-
-    const sharedRootLaneObservation = toSharedRootLaneObservation(observation);
-    if (!sharedRootLaneObservation) {
-      continue;
-    }
-
-    const mapKey = `${sharedRootLaneObservation.sharedRoot}::${sharedRootLaneObservation.semanticFamily}`;
-    if (!observationsBySharedRootAndFamily.has(mapKey)) {
-      observationsBySharedRootAndFamily.set(mapKey, []);
-    }
-
-    observationsBySharedRootAndFamily.get(mapKey).push(sharedRootLaneObservation);
-  }
-
-  return Array.from(observationsBySharedRootAndFamily.entries())
-    .sort(([leftMapKey], [rightMapKey]) => leftMapKey.localeCompare(rightMapKey))
-    .flatMap(([, sharedFamilyObservations]) => {
-      const sortedPaths = sharedFamilyObservations.map(({ path: normalizedPath }) => normalizedPath).sort((a, b) => a.localeCompare(b));
-      const observedLanePartitions = toSortedUnique(
-        sharedFamilyObservations.map(({ lanePartition }) => lanePartition),
-      );
-
-      if (
-        observedLanePartitions.length < SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS ||
-        sortedPaths.length < SHARED_ROOT_MIN_FAMILY_FILES
-      ) {
-        return [];
+    for (const sharedFamilyObservation of sharedFamilyObservations) {
+      if (!observationsBySharedRoot.has(sharedFamilyObservation.sharedRoot)) {
+        observationsBySharedRoot.set(sharedFamilyObservation.sharedRoot, []);
       }
 
-      const { sharedRoot, semanticFamily } = sharedFamilyObservations[0];
-      return [
-        {
-          code: 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES',
-          severity: 'info',
-          path: sortedPaths[0],
-          classification: 'advisory-structure',
-          message:
-            'Naming-owned semantic-family evidence is spread across lane-first partitions under a shared root and may benefit from semantic-first grouping.',
-          ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
-          details: {
-            sharedRootPath: sharedRoot,
-            semanticFamily,
-            observedLanePartitions,
-            observedPaths: sortedPaths,
-            thresholds: {
-              supportedSharedRoots: SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS,
-              allowedLaneFirstPartitions: SHARED_ROOT_LANE_FIRST_PARTITIONS,
-              minDistinctLanePartitions: SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS,
-              minFamilyFiles: SHARED_ROOT_MIN_FAMILY_FILES,
+      observationsBySharedRoot.get(sharedFamilyObservation.sharedRoot).push(sharedFamilyObservation);
+    }
+
+    return Array.from(observationsBySharedRoot.entries())
+      .sort(([leftSharedRoot], [rightSharedRoot]) => leftSharedRoot.localeCompare(rightSharedRoot))
+      .flatMap(([sharedRoot, sharedRootObservations]) => {
+        const semanticFamily = familyAnalysis.semanticFamily;
+        const localFirstInterpretation = familyAnalysis.localFirstInterpretation;
+        const sortedPaths = sharedRootObservations
+          .map(({ path: normalizedPath }) => normalizedPath)
+          .sort((left, right) => left.localeCompare(right));
+        const observedLanePartitions = toSortedUnique(
+          sharedRootObservations.map(({ lanePartition }) => lanePartition),
+        );
+        const hasSupportedSharedRootLaneSpread =
+          observedLanePartitions.length >= SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS &&
+          sortedPaths.length >= SHARED_ROOT_MIN_FAMILY_FILES;
+
+        if (!hasSupportedSharedRootLaneSpread) {
+          return [];
+        }
+
+        return [
+          {
+            code: 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES',
+            severity: 'info',
+            path: sortedPaths[0],
+            classification: 'advisory-structure',
+            message:
+              'Naming-owned semantic-family evidence is spread across lane-first partitions under a shared root and may benefit from semantic-first grouping.',
+            ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
+            details: {
+              sharedRootPath: sharedRoot,
+              semanticFamily,
+              observedLanePartitions,
+              observedPaths: sortedPaths,
+              localFirstInterpretation,
+              broaderSpreadInterpretation,
+              familySharedSpineRouting: {
+                model: 'shared-local-first-family-interpretation',
+                sharedRootOutcome: 'bounded-shared-root-lane-spread',
+              },
+              thresholds: {
+                supportedSharedRoots: SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS,
+                allowedLaneFirstPartitions: SHARED_ROOT_LANE_FIRST_PARTITIONS,
+                minDistinctLanePartitions: SHARED_ROOT_MIN_DISTINCT_LANE_PARTITIONS,
+                minFamilyFiles: SHARED_ROOT_MIN_FAMILY_FILES,
+              },
+              suggestedSemanticTargetRoot: `${sharedRoot}/${semanticFamily}`,
             },
-            suggestedSemanticTargetRoot: `${sharedRoot}/${semanticFamily}`,
           },
-        },
-      ];
-    });
-};
+        ];
+      });
+  });
 
 export const collectNamingSemanticFamilyBridgeFindings = (bridgePayload) => {
   const namingSemanticFamilyBridge = prepareNamingSemanticFamilyBridge(bridgePayload);
@@ -866,10 +869,12 @@ export const collectNamingSemanticFamilyBridgeFindings = (bridgePayload) => {
     return [];
   }
 
+  const familySharedSpineAnalysisEntries = toFamilySharedSpineAnalysisEntries(observations);
+
   return [
-    ...collectFamilyScatterFindings(observations),
-    ...collectFamilySubgroupOpportunityFindings(observations),
-    ...collectFamilyClusterFindings(observations),
-    ...collectSharedRootFamilyScatterAcrossLanesFindings(observations),
+    ...collectFamilyScatterFindings(familySharedSpineAnalysisEntries),
+    ...collectFamilySubgroupOpportunityFindings(familySharedSpineAnalysisEntries),
+    ...collectFamilyClusterFindings(familySharedSpineAnalysisEntries),
+    ...collectSharedRootFamilyScatterAcrossLanesFindings(familySharedSpineAnalysisEntries),
   ];
 };

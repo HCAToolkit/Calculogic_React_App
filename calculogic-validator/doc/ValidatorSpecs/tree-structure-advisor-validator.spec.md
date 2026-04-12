@@ -259,6 +259,26 @@ Boundary notes for this consolidation slice:
 - routing is consolidated so existing family findings derive from one bounded local-first interpretation model,
 - naming ownership remains unchanged (`familyRoot`, `semanticFamily`, optional `familySubgroup` stay naming-owned).
 
+### Shared-root lane spread routing inside the shared family interpretation spine (Status: Current runtime behavior, bounded)
+
+Classification: Normative
+
+`TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` remains an existing bounded code, but its eligibility now routes through the same shared family interpretation spine used by other family outcomes.
+
+Routing and meaning in this slice:
+
+- shared-root lane spread is no longer treated as a separate family-reasoning island,
+- eligibility is evaluated from shared family analysis grouped by naming-owned `semanticFamily`,
+- the same local-first interpretation result used by cluster/subgroup/scatter outcomes is attached to this shared-root outcome,
+- broader-spread interpretation context is reused where relevant rather than bypassed,
+- this consolidation adds no new finding family and does not alter naming ownership boundaries.
+
+Bounded intent:
+
+- preserve the existing finding code (`TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES`),
+- keep shared-root lane spread as a bounded outcome within the existing local-first → broader-spread family reasoning flow,
+- avoid introducing new policy surfaces beyond this routing consolidation slice.
+
 ### Family subgroup opportunity inside one semantic container (Status: Current runtime behavior, bounded)
 
 `TREE_FAMILY_SUBGROUP_OPPORTUNITY` is a bounded, info-level, advisory-only signal for lower-level family grouping opportunity *inside one naming-aligned semantic container*.
@@ -766,7 +786,7 @@ Attached naming-bridge contributor currently ships during normal tree runs:
 
 - `TREE_FAMILY_SCATTERED`
 - `TREE_OBSERVED_FAMILY_CLUSTER`
-- `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (bounded shared-root lane-first partitions under supported shared roots, using naming-owned bridge observations only)
+- `TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES` (bounded shared-root lane-first spread outcome emitted from the shared family interpretation spine under supported shared roots, using naming-owned bridge observations only)
 
 ### Current report payload from tree runtime
 
