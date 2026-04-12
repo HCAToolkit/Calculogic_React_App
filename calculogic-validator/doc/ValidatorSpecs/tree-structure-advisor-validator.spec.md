@@ -111,21 +111,47 @@ Bounded consumable naming bridge surfaces include:
 
 Tree advisor does **not** re-own naming validity judgments. Naming validity remains owned by naming conventions/specs and the naming validator slice.
 
-### Naming-bridge placement model (Status: Bounded modeling note)
+### Naming-bridge folder-kind interpretation + placement model (Status: Bounded modeling note)
 
 Classification: Informative
 
-Tree now carries a bounded, explicit placement model when consuming naming-bridge observations so structural and semantic placement can be interpreted side-by-side without collapsing them into one field.
+Tree now carries a bounded, explicit folder-kind interpretation layer before placement derivation when consuming naming-bridge observations.
+
+Folder-kind interpretation (bounded in this slice):
+
+- `structural-folder`
+  - structural surfaces and structural utility partitions (for example `src`, `test`, `doc`, `docs`, `scripts`, `tools`)
+- `semantic-folder`
+  - meaning-bearing folder segments interpreted as semantic roots or semantic subhomes
+- `unspecified-folder`
+  - segments currently unresolved by this bounded interpretation layer
+
+Interpretation order in this slice:
+
+1. classify folder segments by folder-kind
+2. derive structural interpretation from structural folders
+3. derive semantic interpretation from semantic folders + naming-owned bridge signals
+
+This bounded tranche is intentionally limited to modeling and home-derivation refinement first. It does not intentionally broaden finding families/codes or redesign thresholds.
+
+Tree consumes naming-owned signals and does not re-own naming semantics:
+
+- naming remains source-of-truth for `familyRoot`, `semanticFamily`, and optional `familySubgroup`
+- tree uses those naming-owned signals plus folder-kind interpretation to derive semantic placement
 
 At minimum, the placement model distinguishes:
 
+- folder-kind breakdown (structural/semantic/unspecified)
+- structural segment chain/surface chain
 - `structuralRoot`
 - `structuralSurface`
 - `structuralHome`
 - `localStructuralHome`
+- `semanticRoot`
 - `semanticContainerIdentity`
 - `semanticHome`
 - `semanticSubhome`
+- unresolved/unspecified segment context
 
 On top of those placement fields, tree also records a bounded local placement-coherence classification so the local relationship between structural and semantic placement is explicit and inspectable.
 
@@ -140,8 +166,8 @@ Bounded local placement-coherence values in this tranche:
 Ownership and interpretation guardrails for this tranche:
 
 - naming still owns `familyRoot`, `semanticFamily`, and optional `familySubgroup`
-- tree consumes those naming-owned signals plus path structure to interpret semantic placement
-- this tranche adds bounded placement modeling plus local structural-vs-semantic coherence classification only
+- tree consumes those naming-owned signals plus folder-kind/path interpretation to interpret semantic placement
+- this tranche adds bounded folder-kind interpretation and placement modeling plus local structural-vs-semantic coherence classification only
 - this tranche does not broaden finding behavior (no new finding families/codes and no intentional threshold/count/severity broadening)
 - semantic placement values in this tranche are folder/subfolder-derived interpretations
   - `semanticContainerIdentity` resolves to a folder/subfolder home, not a filename path
