@@ -133,6 +133,11 @@ Ownership and interpretation guardrails for this tranche:
 - tree consumes those naming-owned signals plus path structure to interpret semantic placement
 - this tranche adds bounded placement modeling only
 - this tranche does not broaden finding behavior (no new finding families/codes and no intentional threshold/count/severity broadening)
+- semantic placement values in this tranche are folder/subfolder-derived interpretations
+  - `semanticContainerIdentity` resolves to a folder/subfolder home, not a filename path
+  - `semanticHome` resolves to a folder/subfolder home, not a filename path
+  - `semanticSubhome`, when present, resolves to a folder/subfolder home, not a filename path
+  - filename-level semantic token hits may remain visible in alignment/explanation details, but do not become semantic home/container values
 
 Examples of naming validity judgments that tree advisor must not duplicate:
 

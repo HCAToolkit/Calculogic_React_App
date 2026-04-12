@@ -86,8 +86,10 @@ test('tree naming bridge placement model derives semantic placement from naming-
   });
 
   assert.equal(placement.semanticContainerIdentity, 'tools/report-capture');
+  assert.equal(placement.semanticHome, 'tools/report-capture');
   assert.equal(placement.semanticAlignmentDetails.alignments.familyRoot.signal, 'report');
   assert.equal(placement.semanticAlignmentDetails.alignments.semanticFamily.signal, 'report-capture');
+  assert.equal(placement.semanticAlignmentDetails.folderDerivedAlignments.familyRoot.pathPrefix, 'tools/report-capture');
   assert.equal(placement.semanticAlignmentDetails.inferredFromPathStructure, true);
 });
 
@@ -114,8 +116,25 @@ test('tree naming bridge placement model keeps structural and semantic placement
   });
 
   assert.equal(placement.structuralHome, 'src/features');
-  assert.equal(placement.semanticContainerIdentity, 'src/features/tree/validator-cli.logic.ts');
+  assert.equal(placement.semanticContainerIdentity, null);
   assert.equal(placement.structuralHome === placement.semanticContainerIdentity, false);
+  assert.equal(placement.semanticAlignmentDetails.alignments.semanticFamily.segment, 'validator-cli.logic.ts');
+  assert.equal(placement.semanticAlignmentDetails.folderDerivedAlignments.semanticFamily, null);
+});
+
+test('tree naming bridge placement model does not elevate filename-only semantic hits into semantic container/home', () => {
+  const placement = toNamingBridgePlacementRecord({
+    path: 'src/features/tree/validator-cli.logic.ts',
+    semanticName: 'validator-cli',
+    familyRoot: 'validator',
+    semanticFamily: 'validator-cli',
+  });
+
+  assert.equal(placement.semanticContainerIdentity, null);
+  assert.equal(placement.semanticHome, null);
+  assert.equal(placement.semanticAlignmentDetails.alignments.familyRoot.segment, 'validator-cli.logic.ts');
+  assert.equal(placement.semanticAlignmentDetails.alignments.semanticFamily.segment, 'validator-cli.logic.ts');
+  assert.equal(placement.semanticAlignmentHits.some((hit) => hit.segment === 'validator-cli.logic.ts'), true);
 });
 
 test('tree naming bridge placement model stays deterministic for identical inputs', () => {
