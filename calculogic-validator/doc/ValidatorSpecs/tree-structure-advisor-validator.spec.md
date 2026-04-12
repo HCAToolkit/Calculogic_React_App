@@ -127,11 +127,21 @@ At minimum, the placement model distinguishes:
 - `semanticHome`
 - `semanticSubhome`
 
+On top of those placement fields, tree also records a bounded local placement-coherence classification so the local relationship between structural and semantic placement is explicit and inspectable.
+
+Bounded local placement-coherence values in this tranche:
+
+- `aligned-local-home`
+- `structural-home-only`
+- `semantic-home-only`
+- `divergent-local-placement`
+- `no-semantic-home`
+
 Ownership and interpretation guardrails for this tranche:
 
 - naming still owns `familyRoot`, `semanticFamily`, and optional `familySubgroup`
 - tree consumes those naming-owned signals plus path structure to interpret semantic placement
-- this tranche adds bounded placement modeling only
+- this tranche adds bounded placement modeling plus local structural-vs-semantic coherence classification only
 - this tranche does not broaden finding behavior (no new finding families/codes and no intentional threshold/count/severity broadening)
 - semantic placement values in this tranche are folder/subfolder-derived interpretations
   - `semanticContainerIdentity` resolves to a folder/subfolder home, not a filename path

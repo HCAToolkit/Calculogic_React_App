@@ -94,6 +94,102 @@ const toSignalAlignment = (pathSegments, semanticSignal) => {
   };
 };
 
+const toFirstSegmentAfterPrefix = (fullPath, prefixPath) => {
+  if (typeof fullPath !== 'string' || fullPath.length === 0) {
+    return null;
+  }
+
+  if (typeof prefixPath !== 'string' || prefixPath.length === 0) {
+    return null;
+  }
+
+  if (fullPath === prefixPath) {
+    return '.';
+  }
+
+  const prefix = `${prefixPath}/`;
+  if (!fullPath.startsWith(prefix)) {
+    return null;
+  }
+
+  const [firstSegment] = fullPath.slice(prefix.length).split('/').filter(Boolean);
+  return firstSegment ?? '.';
+};
+
+const classifyLocalPlacementCoherence = ({
+  structuralHome,
+  localStructuralHome,
+  semanticContainerIdentity,
+  semanticHome,
+  semanticSubhome,
+  semanticAlignmentHits,
+}) => {
+  if (!semanticHome) {
+    return {
+      classification: semanticAlignmentHits.length > 0 ? 'structural-home-only' : 'no-semantic-home',
+      details: {
+        reason: semanticAlignmentHits.length > 0 ? 'semantic-hits-without-folder-derived-semantic-home' : 'no-folder-derived-semantic-home',
+        semanticAlignmentHitCount: semanticAlignmentHits.length,
+      },
+    };
+  }
+
+  if (!structuralHome) {
+    return {
+      classification: 'semantic-home-only',
+      details: {
+        reason: 'semantic-home-present-while-structural-home-missing',
+      },
+    };
+  }
+
+  const semanticLocalHome =
+    toFirstSegmentAfterPrefix(semanticSubhome, semanticHome) ??
+    toFirstSegmentAfterPrefix(semanticHome, semanticContainerIdentity) ??
+    '.';
+  const semanticSubhomeDepthFromSemanticHome =
+    typeof semanticSubhome === 'string' && semanticSubhome.startsWith(`${semanticHome}/`)
+      ? semanticSubhome
+          .slice(`${semanticHome}/`.length)
+          .split('/')
+          .filter(Boolean).length
+      : 0;
+  const homesAligned = structuralHome === semanticHome;
+  const localHomesAligned = semanticLocalHome === '.' || semanticLocalHome === localStructuralHome;
+
+  if (homesAligned && semanticSubhomeDepthFromSemanticHome > 1) {
+    return {
+      classification: 'divergent-local-placement',
+      details: {
+        reason: 'semantic-subhome-signals-lower-local-placement',
+        semanticLocalHome,
+        semanticSubhomeDepthFromSemanticHome,
+      },
+    };
+  }
+
+  if (homesAligned && localHomesAligned) {
+    return {
+      classification: 'aligned-local-home',
+      details: {
+        reason: 'structural-home-and-semantic-home-align-locally',
+        semanticLocalHome,
+      },
+    };
+  }
+
+  return {
+    classification: 'divergent-local-placement',
+    details: {
+      reason: homesAligned ? 'semantic-local-home-diverges-from-structural-local-home' : 'semantic-home-diverges-from-structural-home',
+      semanticLocalHome,
+      localStructuralHome,
+      structuralHome,
+      semanticHome,
+    },
+  };
+};
+
 export const toNamingBridgePlacementRecord = (observation) => {
   const pathSegments = observation.path.split('/').filter(Boolean);
   const directorySegments = path.posix.dirname(observation.path).split('/').filter(Boolean);
@@ -117,6 +213,14 @@ export const toNamingBridgePlacementRecord = (observation) => {
     familySubgroupDirectoryAlignment.pathPrefix !== semanticHome
       ? familySubgroupDirectoryAlignment.pathPrefix
       : null;
+  const localPlacementCoherence = classifyLocalPlacementCoherence({
+    structuralHome,
+    localStructuralHome,
+    semanticContainerIdentity,
+    semanticHome,
+    semanticSubhome,
+    semanticAlignmentHits,
+  });
 
   return {
     path: observation.path,
@@ -129,6 +233,8 @@ export const toNamingBridgePlacementRecord = (observation) => {
     semanticContainerIdentity,
     semanticHome,
     semanticSubhome,
+    localPlacementCoherence: localPlacementCoherence.classification,
+    localPlacementCoherenceDetails: localPlacementCoherence.details,
     semanticIdentityTokens,
     semanticAlignmentHits,
     semanticAlignmentDetails: {
