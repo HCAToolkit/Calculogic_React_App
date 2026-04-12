@@ -29,6 +29,12 @@ const LOCAL_FIRST_FAMILY_INTERPRETATION = Object.freeze({
   LOCAL_DIVERGENCE_NEEDS_BROADER_REVIEW: 'local-divergence-needs-broader-review',
   NO_LOCAL_SEMANTIC_EXPLANATION: 'no-local-semantic-explanation',
 });
+const BROADER_SPREAD_INTERPRETATION = Object.freeze({
+  ALLOWED_BROADER_SPREAD: 'allowed-broader-spread',
+  DOCS_RUNTIME_PAIRED_SPREAD: 'docs-runtime-paired-spread',
+  CROSS_CONCERN_BUT_EXPLAINABLE: 'cross-concern-but-explainable',
+  UNRESOLVED_BROADER_SPREAD: 'unresolved-broader-spread',
+});
 
 const toSortedUnique = (values) => Array.from(new Set(values)).sort((left, right) => left.localeCompare(right));
 
@@ -316,6 +322,26 @@ const isAllowedCrossContainerPlacementPair = (leftPlacement, rightPlacement) => 
   return isAllowedCanonicalDocAuthorityRuntimePairing(leftPlacement, rightPlacement);
 };
 
+const toBroaderSpreadPairInterpretation = (leftPlacement, rightPlacement) => {
+  if (
+    leftPlacement.semanticContainerRole === 'naming-aligned-semantic-container' &&
+    rightPlacement.semanticContainerRole === 'naming-aligned-semantic-container' &&
+    leftPlacement.semanticContainerIdentity === rightPlacement.semanticContainerIdentity
+  ) {
+    return 'same-semantic-container';
+  }
+
+  if (isAllowedStructuralRootPairing(leftPlacement, rightPlacement)) {
+    return 'allowed-structural-root-pairing';
+  }
+
+  if (isAllowedCanonicalDocAuthorityRuntimePairing(leftPlacement, rightPlacement)) {
+    return 'canonical-docs-runtime-pairing';
+  }
+
+  return 'unresolved-pair';
+};
+
 const toNormalizedBridgeObservation = (observation) => {
   if (!observation || typeof observation !== 'object' || Array.isArray(observation)) {
     return null;
@@ -546,6 +572,66 @@ const toFamilyLocalFirstAnalysis = (semanticFamily, familyEntries) => {
   };
 };
 
+const toFamilyBroaderSpreadInterpretation = (familyAnalysis) => {
+  const requiresBroaderSpreadReview =
+    familyAnalysis.localFirstInterpretation.classification ===
+      LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DIVERGENCE_NEEDS_BROADER_REVIEW ||
+    familyAnalysis.localFirstInterpretation.classification ===
+      LOCAL_FIRST_FAMILY_INTERPRETATION.NO_LOCAL_SEMANTIC_EXPLANATION;
+  if (!requiresBroaderSpreadReview) {
+    return null;
+  }
+
+  const pairInterpretations = familyAnalysis.placements.flatMap((leftPlacement, leftIndex) =>
+    familyAnalysis.placements.slice(leftIndex + 1).map((rightPlacement) => ({
+      pair: [leftPlacement.path, rightPlacement.path].sort((left, right) => left.localeCompare(right)),
+      interpretation: toBroaderSpreadPairInterpretation(leftPlacement, rightPlacement),
+    })),
+  );
+  const pairInterpretationSummary = toSortedUnique(pairInterpretations.map(({ interpretation }) => interpretation));
+  const hasUnresolvedPairs = pairInterpretationSummary.includes('unresolved-pair');
+  const hasCanonicalDocsRuntimePairing = pairInterpretationSummary.includes('canonical-docs-runtime-pairing');
+  const hasAllowedStructuralRootPairing = pairInterpretationSummary.includes('allowed-structural-root-pairing');
+
+  if (hasUnresolvedPairs) {
+    return {
+      classification: BROADER_SPREAD_INTERPRETATION.UNRESOLVED_BROADER_SPREAD,
+      details: {
+        pairInterpretationSummary,
+        pairInterpretations,
+      },
+    };
+  }
+
+  if (hasCanonicalDocsRuntimePairing) {
+    return {
+      classification: BROADER_SPREAD_INTERPRETATION.DOCS_RUNTIME_PAIRED_SPREAD,
+      details: {
+        pairInterpretationSummary,
+        pairInterpretations,
+      },
+    };
+  }
+
+  if (hasAllowedStructuralRootPairing) {
+    return {
+      classification: BROADER_SPREAD_INTERPRETATION.ALLOWED_BROADER_SPREAD,
+      details: {
+        pairInterpretationSummary,
+        pairInterpretations,
+      },
+    };
+  }
+
+  return {
+    classification: BROADER_SPREAD_INTERPRETATION.CROSS_CONCERN_BUT_EXPLAINABLE,
+    details: {
+      pairInterpretationSummary,
+      pairInterpretations,
+    },
+  };
+};
+
 const toSharedRootLaneObservation = (observation) => {
   for (const sharedRoot of SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS) {
     const sharedRootPrefix = `${sharedRoot}/`;
@@ -577,7 +663,10 @@ const collectFamilyScatterFindings = (observations) => {
     .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
     .flatMap(([semanticFamily, familyEntries]) => {
       const familyAnalysis = toFamilyLocalFirstAnalysis(semanticFamily, familyEntries);
-
+      const broaderSpreadInterpretation = toFamilyBroaderSpreadInterpretation(familyAnalysis);
+      const broaderSpreadResolved =
+        broaderSpreadInterpretation &&
+        broaderSpreadInterpretation.classification !== BROADER_SPREAD_INTERPRETATION.UNRESOLVED_BROADER_SPREAD;
       const allCrossContainerPlacementsCoveredByAllowedRules = familyAnalysis.placements.every((leftPlacement, leftIndex) =>
         familyAnalysis.placements
           .slice(leftIndex + 1)
@@ -591,6 +680,7 @@ const collectFamilyScatterFindings = (observations) => {
         familyAnalysis.localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DENSITY_FIRST ||
         familyAnalysis.localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_SUBGROUP_FIRST ||
         familyAnalysis.allEntriesInsideOneSemanticContainer ||
+        broaderSpreadResolved ||
         allCrossContainerPlacementsCoveredByAllowedRules
       ) {
         return [];
@@ -613,6 +703,7 @@ const collectFamilyScatterFindings = (observations) => {
             observedContainerIdentities: familyAnalysis.semanticContainerIdentities,
             observedStructuralRootKinds: toSortedUnique(familyAnalysis.placements.map((placement) => placement.structuralRootKind)),
             localFirstInterpretation: familyAnalysis.localFirstInterpretation,
+            broaderSpreadInterpretation,
             allowedCrossContainerPatterns: {
               structuralRootPairings: ALLOWED_STRUCTURAL_ROOT_PAIRINGS,
               canonicalDocAuthorityRuntimePairing: 'calculogic-validator/doc/** <-> calculogic-validator/<semantic-container>/**',

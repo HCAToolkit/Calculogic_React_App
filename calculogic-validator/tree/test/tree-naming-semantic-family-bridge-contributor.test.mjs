@@ -485,6 +485,87 @@ test('tree naming bridge contributor suppresses broad scatter for bounded allowe
   assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
 });
 
+test('tree naming bridge contributor applies broader-spread review and keeps explainable src/test spread out of final scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'src/validator-cli/core/validator-cli.logic.ts',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+      {
+        path: 'src/validator-cli/runtime/validator-cli.results.ts',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+      {
+        path: 'test/validator-cli/validator-cli.test.ts',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+});
+
+test('tree naming bridge contributor treats canonical docs/runtime pairings as broader explainable spread before scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-router.spec.md',
+        semanticName: 'tree-router',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-router',
+      },
+      {
+        path: 'calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-router.audit.md',
+        semanticName: 'tree-router',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-router',
+      },
+      {
+        path: 'calculogic-validator/tree/src/tree-router.logic.mjs',
+        semanticName: 'tree-router',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-router',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+});
+
+test('tree naming bridge contributor keeps cross-concern but explainable spread out of final scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/tree/src/tree-occurrence/tree-occurrence.logic.mjs',
+        semanticName: 'tree-occurrence',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+      },
+      {
+        path: 'calculogic-validator/tree/test/tree-occurrence/tree-occurrence.test.mjs',
+        semanticName: 'tree-occurrence',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+      },
+      {
+        path: 'calculogic-validator/tree/validator-cli/tree-occurrence.host.mjs',
+        semanticName: 'tree-occurrence',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-occurrence',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+});
+
 test('tree naming bridge contributor still emits broad scatter for unrelated cross-container spread', () => {
   const findings = collectNamingSemanticFamilyBridgeFindings({
     observations: [
@@ -510,6 +591,8 @@ test('tree naming bridge contributor still emits broad scatter for unrelated cro
   });
 
   assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), true);
+  const scatterFinding = findings.find((finding) => finding.code === 'TREE_FAMILY_SCATTERED');
+  assert.equal(scatterFinding.details.broaderSpreadInterpretation.classification, 'unresolved-broader-spread');
 });
 
 test('tree naming bridge contributor keeps locally aligned family observations in local-first lanes before broad scatter', () => {
@@ -674,6 +757,41 @@ test('tree naming bridge contributor keeps no-local-semantic-explanation familie
   assert.equal(
     scatterFinding.details.localFirstInterpretation.classification,
     'no-local-semantic-explanation',
+  );
+  assert.equal(scatterFinding.details.broaderSpreadInterpretation.classification, 'unresolved-broader-spread');
+});
+
+test('tree naming bridge contributor keeps broader-spread interpretation deterministic for identical unresolved inputs', () => {
+  const payload = {
+    observations: [
+      {
+        path: 'src/alpha/unrelated.logic.ts',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+      {
+        path: 'tools/beta/unrelated.results.mjs',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+      {
+        path: 'doc/gamma/unrelated.spec.md',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+    ],
+  };
+  const first = collectNamingSemanticFamilyBridgeFindings(payload);
+  const second = collectNamingSemanticFamilyBridgeFindings(payload);
+  const firstScatter = first.find((finding) => finding.code === 'TREE_FAMILY_SCATTERED');
+  const secondScatter = second.find((finding) => finding.code === 'TREE_FAMILY_SCATTERED');
+
+  assert.deepEqual(
+    firstScatter.details.broaderSpreadInterpretation,
+    secondScatter.details.broaderSpreadInterpretation,
   );
 });
 
