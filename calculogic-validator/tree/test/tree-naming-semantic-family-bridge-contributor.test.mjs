@@ -406,7 +406,7 @@ test('tree naming bridge contributor treats one naming-aligned semantic containe
         semanticFamily: 'tree-family',
       },
       {
-        path: 'calculogic-validator/tree/test/tree-family.test.mjs',
+        path: 'calculogic-validator/tree/src/tests/tree-family.test.mjs',
         semanticName: 'tree-family',
         familyRoot: 'tree',
         semanticFamily: 'tree-family',
@@ -415,9 +415,11 @@ test('tree naming bridge contributor treats one naming-aligned semantic containe
   });
 
   assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+  assert.equal(findings.some((finding) => finding.code === 'TREE_OBSERVED_FAMILY_CLUSTER'), false);
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY'), false);
 });
 
-test('tree naming bridge contributor evaluates lower-level density in one semantic container before broad scatter', () => {
+test('tree naming bridge contributor treats local-subgroup-first as the primary local signal before broad scatter', () => {
   const findings = collectNamingSemanticFamilyBridgeFindings({
     observations: [
       {
@@ -452,7 +454,7 @@ test('tree naming bridge contributor evaluates lower-level density in one semant
   });
 
   assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
-  assert.equal(findings.some((finding) => finding.code === 'TREE_OBSERVED_FAMILY_CLUSTER'), true);
+  assert.equal(findings.some((finding) => finding.code === 'TREE_OBSERVED_FAMILY_CLUSTER'), false);
   assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY'), true);
 });
 
@@ -541,28 +543,28 @@ test('tree naming bridge contributor keeps local-density-first families out of b
   const payload = {
     observations: [
       {
-        path: 'calculogic-validator/tree/src/local-density/tree-density.logic.mjs',
-        semanticName: 'tree-density',
+        path: 'calculogic-validator/tree/src/local-density/density-pack.logic.mjs',
+        semanticName: 'density-pack',
         familyRoot: 'tree',
-        semanticFamily: 'tree-density',
+        semanticFamily: 'density-pack',
       },
       {
-        path: 'calculogic-validator/tree/src/local-density/tree-density.results.mjs',
-        semanticName: 'tree-density',
+        path: 'calculogic-validator/tree/src/local-density/density-pack.results.mjs',
+        semanticName: 'density-pack',
         familyRoot: 'tree',
-        semanticFamily: 'tree-density',
+        semanticFamily: 'density-pack',
       },
       {
-        path: 'calculogic-validator/tree/test/local-density/tree-density.test.mjs',
-        semanticName: 'tree-density',
+        path: 'calculogic-validator/tree/test/local-density/density-pack.test.mjs',
+        semanticName: 'density-pack',
         familyRoot: 'tree',
-        semanticFamily: 'tree-density',
+        semanticFamily: 'density-pack',
       },
       {
-        path: 'calculogic-validator/tree/src/local-density/tree-density.knowledge.mjs',
-        semanticName: 'tree-density',
+        path: 'calculogic-validator/tree/src/local-density/density-pack.knowledge.mjs',
+        semanticName: 'density-pack',
         familyRoot: 'tree',
-        semanticFamily: 'tree-density',
+        semanticFamily: 'density-pack',
       },
     ],
   };
@@ -572,6 +574,7 @@ test('tree naming bridge contributor keeps local-density-first families out of b
   assert.deepEqual(first, second);
   assert.equal(first.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
   assert.equal(first.some((finding) => finding.code === 'TREE_OBSERVED_FAMILY_CLUSTER'), true);
+  assert.equal(first.some((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY'), false);
 });
 
 test('tree naming bridge contributor keeps local-subgroup-first families out of broad scatter', () => {
@@ -675,32 +678,32 @@ test('tree naming bridge contributor keeps no-local-semantic-explanation familie
 });
 
 
-test('tree naming bridge contributor emits one cluster finding for dense family in one semantic container', () => {
+test('tree naming bridge contributor emits one cluster finding for local-density-first family in one semantic container', () => {
   const findings = collectNamingSemanticFamilyBridgeFindings({
     observations: [
       {
-        path: 'calculogic-validator/tree/src/cluster/tree-observed-family.logic.mjs',
-        semanticName: 'tree-observed-family',
+        path: 'calculogic-validator/tree/src/cluster/observed-family.logic.mjs',
+        semanticName: 'observed-family',
         familyRoot: 'tree',
-        semanticFamily: 'tree-observed-family',
+        semanticFamily: 'observed-family',
       },
       {
-        path: 'calculogic-validator/tree/src/cluster/tree-observed-family.results.mjs',
-        semanticName: 'tree-observed-family',
+        path: 'calculogic-validator/tree/src/cluster/observed-family.results.mjs',
+        semanticName: 'observed-family',
         familyRoot: 'tree',
-        semanticFamily: 'tree-observed-family',
+        semanticFamily: 'observed-family',
       },
       {
-        path: 'calculogic-validator/tree/src/cluster/tree-observed-family.knowledge.mjs',
-        semanticName: 'tree-observed-family',
+        path: 'calculogic-validator/tree/src/cluster/observed-family.knowledge.mjs',
+        semanticName: 'observed-family',
         familyRoot: 'tree',
-        semanticFamily: 'tree-observed-family',
+        semanticFamily: 'observed-family',
       },
       {
-        path: 'calculogic-validator/tree/test/tree-observed-family.test.mjs',
-        semanticName: 'tree-observed-family',
+        path: 'calculogic-validator/tree/test/observed-family.test.mjs',
+        semanticName: 'observed-family',
         familyRoot: 'tree',
-        semanticFamily: 'tree-observed-family',
+        semanticFamily: 'observed-family',
       },
     ],
   });
@@ -805,11 +808,8 @@ test('tree naming bridge contributor can emit distinct cluster observations acro
   });
 
   const clusterFindings = findings.filter((finding) => finding.code === 'TREE_OBSERVED_FAMILY_CLUSTER');
-  assert.equal(clusterFindings.length, 2);
-  assert.deepEqual(
-    clusterFindings.map((finding) => finding.details.semanticContainerIdentity),
-    ['calculogic-validator/naming/tree-multi-container', 'calculogic-validator/tree'],
-  );
+  assert.equal(clusterFindings.length, 0);
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), true);
 });
 
 test('tree naming bridge contributor emits subgroup opportunity for dense lower-level family inside one semantic container', () => {
@@ -1037,7 +1037,7 @@ test('tree naming bridge contributor keeps ambiguity-only dense families as non-
   assert.equal(findings.some((finding) => finding.severity === 'warn'), false);
 });
 
-test('tree naming bridge contributor emits deterministic cluster count and ordering for same input', () => {
+test('tree naming bridge contributor keeps local-first routing deterministic when dense evidence spans multiple semantic containers', () => {
   const payload = {
     observations: [
       {
@@ -1099,6 +1099,13 @@ test('tree naming bridge contributor emits deterministic cluster count and order
     .map((finding) => ({ path: finding.path, container: finding.details.semanticContainerIdentity }));
 
   assert.deepEqual(first, second);
-  assert.equal(first.length, 2);
-  assert.deepEqual(first.map((entry) => entry.container), ['calculogic-validator/naming/tree-ordering-family', 'calculogic-validator/tree']);
+  assert.equal(first.length, 0);
+  const firstScatter = collectNamingSemanticFamilyBridgeFindings(payload)
+    .filter((finding) => finding.code === 'TREE_FAMILY_SCATTERED')
+    .map((finding) => finding.path);
+  const secondScatter = collectNamingSemanticFamilyBridgeFindings(payload)
+    .filter((finding) => finding.code === 'TREE_FAMILY_SCATTERED')
+    .map((finding) => finding.path);
+  assert.deepEqual(firstScatter, secondScatter);
+  assert.equal(firstScatter.length, 1);
 });

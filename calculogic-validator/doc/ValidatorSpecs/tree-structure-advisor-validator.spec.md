@@ -200,6 +200,35 @@ Behavior boundary for this slice:
 - no new findings/codes are introduced,
 - this slice only refines when existing broad-scatter eligibility (`TREE_FAMILY_SCATTERED`) is allowed after local-first interpretation.
 
+### Shared local-first family interpretation spine for family outcomes (Status: Current runtime behavior, bounded)
+
+Classification: Normative
+
+Current family-level tree outcomes now share one bounded local-first interpretation authority (`interpretFamilyLocalFirst`) before emitting family findings.
+
+The shared local-first interpretation spine routes existing family findings as follows:
+
+- `expected-local-presence`
+  - suppresses broad scatter (`TREE_FAMILY_SCATTERED`)
+  - does not force local debt-style cluster/subgroup signaling
+- `local-density-first`
+  - enables cluster-first local signaling (`TREE_OBSERVED_FAMILY_CLUSTER`) using existing bounded thresholds/details
+  - suppresses broad scatter-first routing
+- `local-subgroup-first`
+  - enables subgroup-opportunity-first local signaling (`TREE_FAMILY_SUBGROUP_OPPORTUNITY`) using existing bounded thresholds/details
+  - suppresses broad scatter-first routing
+- `local-divergence-needs-broader-review`
+  - keeps broad scatter (`TREE_FAMILY_SCATTERED`) eligible under existing bounded scatter thresholds/rules
+- `no-local-semantic-explanation`
+  - keeps broad scatter (`TREE_FAMILY_SCATTERED`) eligible under existing bounded scatter thresholds/rules
+
+Boundary notes for this consolidation slice:
+
+- no new finding codes are introduced,
+- no new family/advisory families are introduced,
+- routing is consolidated so existing family findings derive from one bounded local-first interpretation model,
+- naming ownership remains unchanged (`familyRoot`, `semanticFamily`, optional `familySubgroup` stay naming-owned).
+
 ### Family subgroup opportunity inside one semantic container (Status: Current runtime behavior, bounded)
 
 `TREE_FAMILY_SUBGROUP_OPPORTUNITY` is a bounded, info-level, advisory-only signal for lower-level family grouping opportunity *inside one naming-aligned semantic container*.

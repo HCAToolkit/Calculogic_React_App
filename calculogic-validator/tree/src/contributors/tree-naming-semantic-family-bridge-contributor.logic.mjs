@@ -494,6 +494,58 @@ const interpretFamilyLocalFirst = (familyEntries) => {
   };
 };
 
+const toSingularFamilyEntriesBySemanticFamily = (observations) => {
+  const singularObservations = observations
+    .filter((observation) => isSingularFamilyEvidence(observation))
+    .map((observation) => ({
+      observation,
+      placement: classifyScatterPlacement(observation),
+    }));
+
+  const observationsBySemanticFamily = new Map();
+  for (const entry of singularObservations) {
+    if (!observationsBySemanticFamily.has(entry.observation.semanticFamily)) {
+      observationsBySemanticFamily.set(entry.observation.semanticFamily, []);
+    }
+
+    observationsBySemanticFamily.get(entry.observation.semanticFamily).push(entry);
+  }
+
+  return observationsBySemanticFamily;
+};
+
+const toFamilyLocalFirstAnalysis = (semanticFamily, familyEntries) => {
+  const sortedPaths = familyEntries.map(({ observation }) => observation.path).sort((left, right) => left.localeCompare(right));
+  const placements = familyEntries.map(({ placement }) => placement);
+  const structuralHomes = toSortedUnique(placements.map((placement) => placement.structuralHome));
+  const semanticContainerIdentities = toSortedUnique(
+    placements
+      .filter((placement) => placement.semanticContainerRole === 'naming-aligned-semantic-container')
+      .map((placement) => placement.semanticContainerIdentity),
+  );
+  const allEntriesInsideOneSemanticContainer =
+    semanticContainerIdentities.length === 1 &&
+    placements.every((placement) => placement.semanticContainerRole === 'naming-aligned-semantic-container');
+  const observedContainerLocalHomes = allEntriesInsideOneSemanticContainer
+    ? toSortedUnique(familyEntries.map(({ placement }) => toContainerLocalHome(placement)))
+    : [];
+  const lowerLevelGroupingSignalPresent = familyEntries.some(({ observation }) => hasLowerLevelGroupingSignal(observation));
+  const localFirstInterpretation = interpretFamilyLocalFirst(familyEntries);
+
+  return {
+    semanticFamily,
+    familyEntries,
+    sortedPaths,
+    placements,
+    structuralHomes,
+    semanticContainerIdentities,
+    allEntriesInsideOneSemanticContainer,
+    observedContainerLocalHomes,
+    lowerLevelGroupingSignalPresent,
+    localFirstInterpretation,
+  };
+};
+
 const toSharedRootLaneObservation = (observation) => {
   for (const sharedRoot of SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS) {
     const sharedRootPrefix = `${sharedRoot}/`;
@@ -519,53 +571,26 @@ const toSharedRootLaneObservation = (observation) => {
 };
 
 const collectFamilyScatterFindings = (observations) => {
-  const observationsBySemanticFamily = new Map();
-
-  for (const observation of observations) {
-    if (!isSingularFamilyEvidence(observation)) {
-      continue;
-    }
-
-    if (!observationsBySemanticFamily.has(observation.semanticFamily)) {
-      observationsBySemanticFamily.set(observation.semanticFamily, []);
-    }
-
-    observationsBySemanticFamily.get(observation.semanticFamily).push(observation);
-  }
+  const observationsBySemanticFamily = toSingularFamilyEntriesBySemanticFamily(observations);
 
   return Array.from(observationsBySemanticFamily.entries())
     .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
-    .flatMap(([semanticFamily, familyObservations]) => {
-      const sortedPaths = familyObservations.map(({ path: normalizedPath }) => normalizedPath).sort((a, b) => a.localeCompare(b));
-      const familyEntries = familyObservations.map((observation) => ({
-        observation,
-        placement: classifyScatterPlacement(observation),
-      }));
-      const placements = familyEntries.map(({ placement }) => placement);
-      const structuralHomes = toSortedUnique(placements.map((placement) => placement.structuralHome));
-      const semanticContainerIdentities = toSortedUnique(
-        placements
-          .filter((placement) => placement.semanticContainerRole === 'naming-aligned-semantic-container')
-          .map((placement) => placement.semanticContainerIdentity),
-      );
-      const localFirstInterpretation = interpretFamilyLocalFirst(familyEntries);
-      const allPlacementsInOneSemanticContainer =
-        semanticContainerIdentities.length === 1 &&
-        placements.every((placement) => placement.semanticContainerRole === 'naming-aligned-semantic-container');
+    .flatMap(([semanticFamily, familyEntries]) => {
+      const familyAnalysis = toFamilyLocalFirstAnalysis(semanticFamily, familyEntries);
 
-      const allCrossContainerPlacementsCoveredByAllowedRules = placements.every((leftPlacement, leftIndex) =>
-        placements
+      const allCrossContainerPlacementsCoveredByAllowedRules = familyAnalysis.placements.every((leftPlacement, leftIndex) =>
+        familyAnalysis.placements
           .slice(leftIndex + 1)
           .every((rightPlacement) => isAllowedCrossContainerPlacementPair(leftPlacement, rightPlacement)),
       );
 
       if (
-        sortedPaths.length < FAMILY_SCATTER_MIN_FILES ||
-        structuralHomes.length < FAMILY_SCATTER_MIN_STRUCTURAL_HOMES ||
-        localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.EXPECTED_LOCAL_PRESENCE ||
-        localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DENSITY_FIRST ||
-        localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_SUBGROUP_FIRST ||
-        allPlacementsInOneSemanticContainer ||
+        familyAnalysis.sortedPaths.length < FAMILY_SCATTER_MIN_FILES ||
+        familyAnalysis.structuralHomes.length < FAMILY_SCATTER_MIN_STRUCTURAL_HOMES ||
+        familyAnalysis.localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.EXPECTED_LOCAL_PRESENCE ||
+        familyAnalysis.localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DENSITY_FIRST ||
+        familyAnalysis.localFirstInterpretation.classification === LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_SUBGROUP_FIRST ||
+        familyAnalysis.allEntriesInsideOneSemanticContainer ||
         allCrossContainerPlacementsCoveredByAllowedRules
       ) {
         return [];
@@ -575,19 +600,19 @@ const collectFamilyScatterFindings = (observations) => {
         {
           code: 'TREE_FAMILY_SCATTERED',
           severity: 'info',
-          path: sortedPaths[0],
+          path: familyAnalysis.sortedPaths[0],
           classification: 'advisory-structure',
           message:
             'Naming-owned semantic-family evidence is spread across multiple structural homes and may benefit from clearer semantic-first grouping.',
           ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
           details: {
             semanticFamily,
-            observedPaths: sortedPaths,
-            observedStructuralHomes: structuralHomes,
-            observedStructuralRoots: toSortedUnique(placements.map((placement) => placement.structuralRoot)),
-            observedContainerIdentities: semanticContainerIdentities,
-            observedStructuralRootKinds: toSortedUnique(placements.map((placement) => placement.structuralRootKind)),
-            localFirstInterpretation,
+            observedPaths: familyAnalysis.sortedPaths,
+            observedStructuralHomes: familyAnalysis.structuralHomes,
+            observedStructuralRoots: toSortedUnique(familyAnalysis.placements.map((placement) => placement.structuralRoot)),
+            observedContainerIdentities: familyAnalysis.semanticContainerIdentities,
+            observedStructuralRootKinds: toSortedUnique(familyAnalysis.placements.map((placement) => placement.structuralRootKind)),
+            localFirstInterpretation: familyAnalysis.localFirstInterpretation,
             allowedCrossContainerPatterns: {
               structuralRootPairings: ALLOWED_STRUCTURAL_ROOT_PAIRINGS,
               canonicalDocAuthorityRuntimePairing: 'calculogic-validator/doc/** <-> calculogic-validator/<semantic-container>/**',
@@ -603,146 +628,69 @@ const collectFamilyScatterFindings = (observations) => {
 };
 
 const collectFamilyClusterFindings = (observations) => {
-  const singularObservations = observations
-    .filter((observation) => isSingularFamilyEvidence(observation))
-    .map((observation) => ({
-      observation,
-      placement: classifyScatterPlacement(observation),
-    }));
-
-  const observationsBySemanticFamily = new Map();
-  for (const entry of singularObservations) {
-    if (!observationsBySemanticFamily.has(entry.observation.semanticFamily)) {
-      observationsBySemanticFamily.set(entry.observation.semanticFamily, []);
-    }
-
-    observationsBySemanticFamily.get(entry.observation.semanticFamily).push(entry);
-  }
+  const observationsBySemanticFamily = toSingularFamilyEntriesBySemanticFamily(observations);
 
   return Array.from(observationsBySemanticFamily.entries())
     .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
     .flatMap(([semanticFamily, familyEntries]) => {
-      const allEntriesHaveSemanticContainer = familyEntries.every(
-        ({ placement }) => placement.semanticContainerRole === 'naming-aligned-semantic-container',
-      );
-
-      const aggregationBuckets = new Map();
-      for (const familyEntry of familyEntries) {
-        const bucketKey = allEntriesHaveSemanticContainer
-          ? `container::${familyEntry.placement.semanticContainerIdentity}`
-          : `family::${semanticFamily}`;
-        if (!aggregationBuckets.has(bucketKey)) {
-          aggregationBuckets.set(bucketKey, []);
-        }
-
-        aggregationBuckets.get(bucketKey).push(familyEntry);
+      const familyAnalysis = toFamilyLocalFirstAnalysis(semanticFamily, familyEntries);
+      if (familyAnalysis.localFirstInterpretation.classification !== LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_DENSITY_FIRST) {
+        return [];
       }
 
-      return Array.from(aggregationBuckets.entries())
-        .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
-        .flatMap(([, bucketEntries]) => {
-          if (bucketEntries.length < FAMILY_CLUSTER_INFO_MIN_FILES) {
-            return [];
-          }
-
-          const sortedPaths = bucketEntries
-            .map(({ observation }) => observation.path)
-            .sort((left, right) => left.localeCompare(right));
-          const semanticContainerIdentity = bucketEntries[0].placement.semanticContainerIdentity ?? null;
-
-          return [
-            {
-              code: 'TREE_OBSERVED_FAMILY_CLUSTER',
-              severity: 'info',
-              path: sortedPaths[0],
-              classification: 'advisory-structure',
-              message:
-                'Naming-owned semantic-family cluster size is high enough to consider a clearer structural grouping surface.',
-              ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
-              details: {
-                semanticFamily,
-                semanticContainerIdentity,
-                aggregationUnit: semanticContainerIdentity ? 'semanticFamily-in-container' : 'semanticFamily',
-                observedCount: bucketEntries.length,
-                observedPaths: sortedPaths,
-                threshold: {
-                  minFamilyFilesForClusterObservation: FAMILY_CLUSTER_INFO_MIN_FILES,
-                },
-              },
+      return [
+        {
+          code: 'TREE_OBSERVED_FAMILY_CLUSTER',
+          severity: 'info',
+          path: familyAnalysis.sortedPaths[0],
+          classification: 'advisory-structure',
+          message:
+            'Naming-owned semantic-family cluster size is high enough to consider a clearer structural grouping surface.',
+          ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
+          details: {
+            semanticFamily,
+            semanticContainerIdentity: familyAnalysis.semanticContainerIdentities[0] ?? null,
+            aggregationUnit: familyAnalysis.semanticContainerIdentities.length === 1 ? 'semanticFamily-in-container' : 'semanticFamily',
+            observedCount: familyAnalysis.sortedPaths.length,
+            observedPaths: familyAnalysis.sortedPaths,
+            localFirstInterpretation: familyAnalysis.localFirstInterpretation,
+            threshold: {
+              minFamilyFilesForClusterObservation: FAMILY_CLUSTER_INFO_MIN_FILES,
             },
-          ];
-        });
+          },
+        },
+      ];
     });
 };
 
 const collectFamilySubgroupOpportunityFindings = (observations) => {
-  const singularObservations = observations
-    .filter((observation) => isSingularFamilyEvidence(observation))
-    .map((observation) => ({
-      observation,
-      placement: classifyScatterPlacement(observation),
-    }));
-
-  const observationsBySemanticFamily = new Map();
-  for (const entry of singularObservations) {
-    if (!observationsBySemanticFamily.has(entry.observation.semanticFamily)) {
-      observationsBySemanticFamily.set(entry.observation.semanticFamily, []);
-    }
-
-    observationsBySemanticFamily.get(entry.observation.semanticFamily).push(entry);
-  }
+  const observationsBySemanticFamily = toSingularFamilyEntriesBySemanticFamily(observations);
 
   return Array.from(observationsBySemanticFamily.entries())
     .sort(([leftFamily], [rightFamily]) => leftFamily.localeCompare(rightFamily))
     .flatMap(([semanticFamily, familyEntries]) => {
-      const semanticContainerIdentities = toSortedUnique(
-        familyEntries
-          .filter(({ placement }) => placement.semanticContainerRole === 'naming-aligned-semantic-container')
-          .map(({ placement }) => placement.semanticContainerIdentity),
-      );
-      const allEntriesInsideOneSemanticContainer =
-        semanticContainerIdentities.length === 1 &&
-        familyEntries.every(({ placement }) => placement.semanticContainerRole === 'naming-aligned-semantic-container');
-
-      if (!allEntriesInsideOneSemanticContainer) {
+      const familyAnalysis = toFamilyLocalFirstAnalysis(semanticFamily, familyEntries);
+      if (familyAnalysis.localFirstInterpretation.classification !== LOCAL_FIRST_FAMILY_INTERPRETATION.LOCAL_SUBGROUP_FIRST) {
         return [];
       }
 
-      const sortedPaths = familyEntries
-        .map(({ observation }) => observation.path)
-        .sort((left, right) => left.localeCompare(right));
-      const observedContainerLocalHomes = toSortedUnique(
-        familyEntries.map(({ placement }) => toContainerLocalHome(placement)),
-      );
-      const lowerLevelGroupingSignalPresent = familyEntries.some(({ observation }) => hasLowerLevelGroupingSignal(observation));
-      const groupingSignalRequiredAndMissing =
-        FAMILY_SUBGROUP_OPPORTUNITY_REQUIRES_LOWER_LEVEL_GROUPING_SIGNAL && !lowerLevelGroupingSignalPresent;
-
-      if (
-        sortedPaths.length < FAMILY_SUBGROUP_OPPORTUNITY_MIN_FILES_IN_CONTAINER ||
-        observedContainerLocalHomes.length < FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES ||
-        groupingSignalRequiredAndMissing
-      ) {
-        return [];
-      }
-
-      const semanticContainerIdentity = semanticContainerIdentities[0];
       return [
         {
           code: 'TREE_FAMILY_SUBGROUP_OPPORTUNITY',
           severity: 'info',
-          path: sortedPaths[0],
+          path: familyAnalysis.sortedPaths[0],
           classification: 'advisory-structure',
           message:
             'Naming-owned semantic-family evidence is dense inside one naming-aligned semantic container and may benefit from a lower-level subgroup folder.',
           ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
           details: {
             semanticFamily,
-            semanticContainerIdentity,
-            observedCount: sortedPaths.length,
-            observedPaths: sortedPaths,
-            observedContainerLocalHomes,
-            lowerLevelGroupingSignalPresent,
+            semanticContainerIdentity: familyAnalysis.semanticContainerIdentities[0],
+            observedCount: familyAnalysis.sortedPaths.length,
+            observedPaths: familyAnalysis.sortedPaths,
+            observedContainerLocalHomes: familyAnalysis.observedContainerLocalHomes,
+            lowerLevelGroupingSignalPresent: familyAnalysis.lowerLevelGroupingSignalPresent,
+            localFirstInterpretation: familyAnalysis.localFirstInterpretation,
             thresholds: {
               minFilesInContainer: FAMILY_SUBGROUP_OPPORTUNITY_MIN_FILES_IN_CONTAINER,
               minDistinctContainerLocalHomes: FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES,
