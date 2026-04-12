@@ -42,6 +42,13 @@ const toNormalizedStructuralHome = (normalizedPath) => {
   return segments.slice(0, 2).join('/');
 };
 
+const toLocalStructuralHome = (normalizedPath, structuralHome) => {
+  const parentSegments = path.posix.dirname(normalizedPath).split('/').filter(Boolean);
+  const structuralHomeSegments = structuralHome.split('/').filter(Boolean);
+  const [firstLocalSegment] = parentSegments.slice(structuralHomeSegments.length);
+  return firstLocalSegment ?? '.';
+};
+
 const toSemanticIdentityTokens = (observation) =>
   toSortedUnique(
     [observation.familyRoot, observation.semanticFamily, observation.familySubgroup]
@@ -65,29 +72,76 @@ const toSemanticAlignmentHits = ({ path: normalizedPath }, semanticIdentityToken
   });
 };
 
-const classifyScatterPlacement = (observation) => {
+const toSignalAlignment = (pathSegments, semanticSignal) => {
+  if (typeof semanticSignal !== 'string' || semanticSignal.length === 0) {
+    return null;
+  }
+
+  const signalTokens = toSortedUnique(semanticSignal.split('-').filter(Boolean).concat(semanticSignal));
+  const hit = pathSegments.findIndex(
+    (segment) => signalTokens.includes(segment) || signalTokens.some((token) => segment.startsWith(`${token}-`)),
+  );
+  if (hit < 0) {
+    return null;
+  }
+
+  return {
+    signal: semanticSignal,
+    tokenSet: signalTokens,
+    segment: pathSegments[hit],
+    segmentIndex: hit,
+    pathPrefix: pathSegments.slice(0, hit + 1).join('/'),
+  };
+};
+
+export const toNamingBridgePlacementRecord = (observation) => {
   const pathSegments = observation.path.split('/').filter(Boolean);
   const structuralRoot = pathSegments[0] ?? '.';
   const structuralSurface = pathSegments.slice(0, 2).join('/') || structuralRoot;
+  const structuralHome = toNormalizedStructuralHome(observation.path);
+  const localStructuralHome = toLocalStructuralHome(observation.path, structuralHome);
   const semanticIdentityTokens = toSemanticIdentityTokens(observation);
   const semanticAlignmentHits = toSemanticAlignmentHits(observation, semanticIdentityTokens);
-  const firstSemanticAlignmentHit = semanticAlignmentHits[0] ?? null;
-  const semanticContainerIdentity = firstSemanticAlignmentHit
-    ? pathSegments.slice(0, firstSemanticAlignmentHit.index + 1).join('/')
-    : null;
+  const familyRootAlignment = toSignalAlignment(pathSegments, observation.familyRoot);
+  const semanticFamilyAlignment = toSignalAlignment(pathSegments, observation.semanticFamily);
+  const familySubgroupAlignment = toSignalAlignment(pathSegments, observation.familySubgroup);
+  const semanticContainerIdentity = familyRootAlignment?.pathPrefix ?? null;
+  const semanticHome = semanticFamilyAlignment?.pathPrefix ?? semanticContainerIdentity;
+  const semanticSubhome =
+    familySubgroupAlignment && semanticHome && familySubgroupAlignment.pathPrefix !== semanticHome
+      ? familySubgroupAlignment.pathPrefix
+      : null;
 
   return {
     path: observation.path,
     structuralRoot,
-    structuralHome: toNormalizedStructuralHome(observation.path),
     structuralSurface,
+    structuralHome,
+    localStructuralHome,
     structuralRootKind: TREE_STRUCTURAL_ROOT_SURFACE_SET.has(structuralRoot) ? 'structural-surface' : 'non-structural-surface',
     semanticContainerRole: semanticContainerIdentity ? 'naming-aligned-semantic-container' : 'none',
     semanticContainerIdentity,
+    semanticHome,
+    semanticSubhome,
     semanticIdentityTokens,
     semanticAlignmentHits,
+    semanticAlignmentDetails: {
+      consumedSignals: {
+        familyRoot: observation.familyRoot,
+        semanticFamily: observation.semanticFamily,
+        familySubgroup: observation.familySubgroup ?? null,
+      },
+      alignments: {
+        familyRoot: familyRootAlignment,
+        semanticFamily: semanticFamilyAlignment,
+        familySubgroup: familySubgroupAlignment,
+      },
+      inferredFromPathStructure: true,
+    },
   };
 };
+
+const classifyScatterPlacement = (observation) => toNamingBridgePlacementRecord(observation);
 
 const isAllowedStructuralRootPairing = (leftPlacement, rightPlacement) => {
   const key = [leftPlacement.structuralRoot, rightPlacement.structuralRoot]
