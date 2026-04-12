@@ -111,6 +111,29 @@ Bounded consumable naming bridge surfaces include:
 
 Tree advisor does **not** re-own naming validity judgments. Naming validity remains owned by naming conventions/specs and the naming validator slice.
 
+### Naming-bridge placement model (Status: Bounded modeling note)
+
+Classification: Informative
+
+Tree now carries a bounded, explicit placement model when consuming naming-bridge observations so structural and semantic placement can be interpreted side-by-side without collapsing them into one field.
+
+At minimum, the placement model distinguishes:
+
+- `structuralRoot`
+- `structuralSurface`
+- `structuralHome`
+- `localStructuralHome`
+- `semanticContainerIdentity`
+- `semanticHome`
+- `semanticSubhome`
+
+Ownership and interpretation guardrails for this tranche:
+
+- naming still owns `familyRoot`, `semanticFamily`, and optional `familySubgroup`
+- tree consumes those naming-owned signals plus path structure to interpret semantic placement
+- this tranche adds bounded placement modeling only
+- this tranche does not broaden finding behavior (no new finding families/codes and no intentional threshold/count/severity broadening)
+
 Examples of naming validity judgments that tree advisor must not duplicate:
 
 - bad semantic case
