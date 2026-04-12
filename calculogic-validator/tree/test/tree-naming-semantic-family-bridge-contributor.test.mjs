@@ -75,6 +75,7 @@ test('tree naming bridge placement model resolves structural home and semantic c
   assert.equal(placement.semanticContainerIdentity, 'calculogic-validator/tree');
   assert.equal(placement.semanticHome, 'calculogic-validator/tree');
   assert.equal(placement.localStructuralHome, 'src');
+  assert.equal(placement.localPlacementCoherence, 'aligned-local-home');
 });
 
 test('tree naming bridge placement model derives semantic placement from naming-owned signals and path alignment', () => {
@@ -93,6 +94,20 @@ test('tree naming bridge placement model derives semantic placement from naming-
   assert.equal(placement.semanticAlignmentDetails.inferredFromPathStructure, true);
 });
 
+test('tree naming bridge placement model classifies divergent local placement when semantic home differs from structural home', () => {
+  const placement = toNamingBridgePlacementRecord({
+    path: 'src/features/report-capture/runtime/report-capture.logic.ts',
+    semanticName: 'report-capture',
+    familyRoot: 'report',
+    semanticFamily: 'report-capture',
+  });
+
+  assert.equal(placement.structuralHome, 'src/features');
+  assert.equal(placement.semanticHome, 'src/features/report-capture');
+  assert.equal(placement.localPlacementCoherence, 'divergent-local-placement');
+  assert.equal(placement.localPlacementCoherenceDetails.reason, 'semantic-home-diverges-from-structural-home');
+});
+
 test('tree naming bridge placement model can represent semantic subhome from family subgroup signals', () => {
   const placement = toNamingBridgePlacementRecord({
     path: 'calculogic-validator/naming/src/lane/naming-lane.logic.mjs',
@@ -104,6 +119,11 @@ test('tree naming bridge placement model can represent semantic subhome from fam
 
   assert.equal(placement.semanticContainerIdentity, 'calculogic-validator/naming');
   assert.equal(placement.semanticSubhome, 'calculogic-validator/naming/src/lane');
+  assert.equal(placement.localPlacementCoherence, 'divergent-local-placement');
+  assert.equal(
+    placement.localPlacementCoherenceDetails.reason,
+    'semantic-subhome-signals-lower-local-placement',
+  );
 });
 
 test('tree naming bridge placement model keeps structural and semantic placement distinct when they differ', () => {
@@ -118,6 +138,7 @@ test('tree naming bridge placement model keeps structural and semantic placement
   assert.equal(placement.structuralHome, 'src/features');
   assert.equal(placement.semanticContainerIdentity, null);
   assert.equal(placement.structuralHome === placement.semanticContainerIdentity, false);
+  assert.equal(placement.localPlacementCoherence, 'structural-home-only');
   assert.equal(placement.semanticAlignmentDetails.alignments.semanticFamily.segment, 'validator-cli.logic.ts');
   assert.equal(placement.semanticAlignmentDetails.folderDerivedAlignments.semanticFamily, null);
 });
@@ -132,9 +153,28 @@ test('tree naming bridge placement model does not elevate filename-only semantic
 
   assert.equal(placement.semanticContainerIdentity, null);
   assert.equal(placement.semanticHome, null);
+  assert.equal(placement.localPlacementCoherence, 'structural-home-only');
+  assert.equal(
+    placement.localPlacementCoherenceDetails.reason,
+    'semantic-hits-without-folder-derived-semantic-home',
+  );
   assert.equal(placement.semanticAlignmentDetails.alignments.familyRoot.segment, 'validator-cli.logic.ts');
   assert.equal(placement.semanticAlignmentDetails.alignments.semanticFamily.segment, 'validator-cli.logic.ts');
   assert.equal(placement.semanticAlignmentHits.some((hit) => hit.segment === 'validator-cli.logic.ts'), true);
+});
+
+test('tree naming bridge placement model classifies no semantic home when no semantic token alignment is present', () => {
+  const placement = toNamingBridgePlacementRecord({
+    path: 'src/features/tree/unrelated.logic.ts',
+    semanticName: 'validator-cli',
+    familyRoot: 'validator',
+    semanticFamily: 'validator-cli',
+  });
+
+  assert.equal(placement.semanticContainerIdentity, null);
+  assert.equal(placement.semanticHome, null);
+  assert.equal(placement.semanticAlignmentHits.length, 0);
+  assert.equal(placement.localPlacementCoherence, 'no-semantic-home');
 });
 
 test('tree naming bridge placement model stays deterministic for identical inputs', () => {
