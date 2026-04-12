@@ -182,7 +182,8 @@ Tree consumes this normalized bridge payload only. Tree runtime must not parse f
   2. semantic placement,
   3. local placement coherence,
   4. local-first family interpretation lane selection,
-  5. broad scatter eligibility only when local interpretation does not sufficiently explain observed placement,
+  5. bounded broader-spread interpretation for families that survive local-first review,
+  6. broad scatter eligibility only when both local and broader interpretation remain unresolved,
 - family presence confined to one valid naming-aligned semantic container is treated as expected/container-local density/subgroup opportunity first (not immediate broad scatter),
 - bounded allowed cross-container pairings are exempt from broad scatter by default (for example canonical docs authority lane with aligned owned runtime container pairing),
 - broad scatter remains for family spread across unrelated structural homes/containers when no allowed pairing covers the spread.
@@ -199,6 +200,33 @@ Behavior boundary for this slice:
 
 - no new findings/codes are introduced,
 - this slice only refines when existing broad-scatter eligibility (`TREE_FAMILY_SCATTERED`) is allowed after local-first interpretation.
+
+### Bounded broader-spread interpretation layer (Status: Current runtime behavior, bounded)
+
+Classification: Normative
+
+After local-first interpretation, tree now applies a bounded broader-spread interpretation layer before final `TREE_FAMILY_SCATTERED` escalation.
+
+Bounded scope for this layer:
+
+- runs only when local-first interpretation is one of:
+  - `local-divergence-needs-broader-review`
+  - `no-local-semantic-explanation`
+- reuses already-shipped bounded explainable spread rules (for example: same semantic container, allowed structural-root pairing, canonical docs authority/runtime pairing)
+- remains deterministic and inspectable; no fuzzy or open-ended policy expansion
+
+Bounded broader-spread interpretation outcomes:
+
+- `allowed-broader-spread`
+- `docs-runtime-paired-spread`
+- `cross-concern-but-explainable`
+- `unresolved-broader-spread`
+
+Escalation intent:
+
+- local-first local lanes remain the shared decision spine for local family outcomes,
+- broader-spread interpretation is only a review layer for families that survive local-first checks,
+- `TREE_FAMILY_SCATTERED` represents unresolved spread after both local and broader interpretation do not sufficiently explain placement.
 
 ### Shared local-first family interpretation spine for family outcomes (Status: Current runtime behavior, bounded)
 
@@ -218,9 +246,11 @@ The shared local-first interpretation spine routes existing family findings as f
   - enables subgroup-opportunity-first local signaling (`TREE_FAMILY_SUBGROUP_OPPORTUNITY`) using existing bounded thresholds/details
   - suppresses broad scatter-first routing
 - `local-divergence-needs-broader-review`
-  - keeps broad scatter (`TREE_FAMILY_SCATTERED`) eligible under existing bounded scatter thresholds/rules
+  - routes to bounded broader-spread interpretation review first
+  - keeps broad scatter (`TREE_FAMILY_SCATTERED`) eligible only when broader-spread interpretation remains unresolved
 - `no-local-semantic-explanation`
-  - keeps broad scatter (`TREE_FAMILY_SCATTERED`) eligible under existing bounded scatter thresholds/rules
+  - routes to bounded broader-spread interpretation review first
+  - keeps broad scatter (`TREE_FAMILY_SCATTERED`) eligible only when broader-spread interpretation remains unresolved
 
 Boundary notes for this consolidation slice:
 
