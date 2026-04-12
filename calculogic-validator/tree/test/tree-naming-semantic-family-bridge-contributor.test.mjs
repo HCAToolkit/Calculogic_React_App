@@ -510,6 +510,170 @@ test('tree naming bridge contributor still emits broad scatter for unrelated cro
   assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), true);
 });
 
+test('tree naming bridge contributor keeps locally aligned family observations in local-first lanes before broad scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/tree/src/placements/tree-placement.logic.mjs',
+        semanticName: 'tree-placement',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-placement',
+      },
+      {
+        path: 'calculogic-validator/tree/src/placements/tree-placement.results.mjs',
+        semanticName: 'tree-placement',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-placement',
+      },
+      {
+        path: 'calculogic-validator/tree/src/placements/tree-placement.knowledge.mjs',
+        semanticName: 'tree-placement',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-placement',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+});
+
+test('tree naming bridge contributor keeps local-density-first families out of broad scatter and retains deterministic finding behavior', () => {
+  const payload = {
+    observations: [
+      {
+        path: 'calculogic-validator/tree/src/local-density/tree-density.logic.mjs',
+        semanticName: 'tree-density',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-density',
+      },
+      {
+        path: 'calculogic-validator/tree/src/local-density/tree-density.results.mjs',
+        semanticName: 'tree-density',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-density',
+      },
+      {
+        path: 'calculogic-validator/tree/test/local-density/tree-density.test.mjs',
+        semanticName: 'tree-density',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-density',
+      },
+      {
+        path: 'calculogic-validator/tree/src/local-density/tree-density.knowledge.mjs',
+        semanticName: 'tree-density',
+        familyRoot: 'tree',
+        semanticFamily: 'tree-density',
+      },
+    ],
+  };
+
+  const first = collectNamingSemanticFamilyBridgeFindings(payload);
+  const second = collectNamingSemanticFamilyBridgeFindings(payload);
+  assert.deepEqual(first, second);
+  assert.equal(first.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+  assert.equal(first.some((finding) => finding.code === 'TREE_OBSERVED_FAMILY_CLUSTER'), true);
+});
+
+test('tree naming bridge contributor keeps local-subgroup-first families out of broad scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'calculogic-validator/naming/src/lane/naming-lane.logic.mjs',
+        semanticName: 'naming-lane',
+        familyRoot: 'naming',
+        semanticFamily: 'naming-lane',
+        familySubgroup: 'lane',
+      },
+      {
+        path: 'calculogic-validator/naming/src/family/naming-lane.results.mjs',
+        semanticName: 'naming-lane',
+        familyRoot: 'naming',
+        semanticFamily: 'naming-lane',
+        familySubgroup: 'lane',
+      },
+      {
+        path: 'calculogic-validator/naming/test/lane/naming-lane.test.mjs',
+        semanticName: 'naming-lane',
+        familyRoot: 'naming',
+        semanticFamily: 'naming-lane',
+        familySubgroup: 'lane',
+      },
+      {
+        path: 'calculogic-validator/naming/src/naming-lane.knowledge.mjs',
+        semanticName: 'naming-lane',
+        familyRoot: 'naming',
+        semanticFamily: 'naming-lane',
+        familySubgroup: 'lane',
+      },
+    ],
+  });
+
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SCATTERED'), false);
+  assert.equal(findings.some((finding) => finding.code === 'TREE_FAMILY_SUBGROUP_OPPORTUNITY'), true);
+});
+
+test('tree naming bridge contributor keeps divergent local placement eligible for broad scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'src/features/report-capture/runtime/report-capture.logic.ts',
+        semanticName: 'report-capture',
+        familyRoot: 'report',
+        semanticFamily: 'report-capture',
+      },
+      {
+        path: 'tools/report-capture/runtime/report-capture.results.mjs',
+        semanticName: 'report-capture',
+        familyRoot: 'report',
+        semanticFamily: 'report-capture',
+      },
+      {
+        path: 'doc/report-capture/report-capture.spec.md',
+        semanticName: 'report-capture',
+        familyRoot: 'report',
+        semanticFamily: 'report-capture',
+      },
+    ],
+  });
+  const scatterFinding = findings.find((finding) => finding.code === 'TREE_FAMILY_SCATTERED');
+  assert.equal(Boolean(scatterFinding), true);
+  assert.equal(
+    scatterFinding.details.localFirstInterpretation.classification,
+    'local-divergence-needs-broader-review',
+  );
+});
+
+test('tree naming bridge contributor keeps no-local-semantic-explanation families eligible for broad scatter', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'src/alpha/unrelated.logic.ts',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+      {
+        path: 'tools/beta/unrelated.results.mjs',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+      {
+        path: 'doc/gamma/unrelated.spec.md',
+        semanticName: 'validator-cli',
+        familyRoot: 'validator',
+        semanticFamily: 'validator-cli',
+      },
+    ],
+  });
+  const scatterFinding = findings.find((finding) => finding.code === 'TREE_FAMILY_SCATTERED');
+  assert.equal(Boolean(scatterFinding), true);
+  assert.equal(
+    scatterFinding.details.localFirstInterpretation.classification,
+    'no-local-semantic-explanation',
+  );
+});
+
 
 test('tree naming bridge contributor emits one cluster finding for dense family in one semantic container', () => {
   const findings = collectNamingSemanticFamilyBridgeFindings({
