@@ -11,6 +11,8 @@ This spec defines a suite-level model for registry ownership, registry shape, an
 
 This spec intentionally formalizes **model rules**, not runtime rewrites. Existing registries and normalization behavior remain valid unless and until changed by a future implementation task.
 
+For an explicit current-state-to-target alignment inventory, see [`registry-blueprint-implementation-map.md`](./registry-blueprint-implementation-map.md).
+
 ## Terminology
 
 - **Canonical entities**: Core nouns that represent canonical policy meaning in the model.
