@@ -91,7 +91,7 @@ The **target architecture** treats **Category**, **Role**, and **Surface** as sh
 **Current implementation reality**:
 
 - Category and Role registry payloads currently live under Naming builtin registries.
-- `rolesByCategory` is currently a Naming-owned grouped storage payload.
+- `roles.registry.json` is currently a Naming-owned grouped runtime input payload (via `rolesByCategory`).
 - Runtime role/category normalization is currently performed by Naming registry-state logic.
 - This is intentional in the current slice and is not current runtime truth for suite-shared registry ownership.
 
@@ -107,7 +107,7 @@ Shared-contract-aligned, but slice-local implementation.
 
 The following living-document blueprint concepts are valid **target architecture**, but are **not current runtime truth**:
 
-- `roles.registry.json` as the canonical Role entity registry
+- `roles.registry.json` as the suite-shared canonical Role entity registry (target architecture, not current runtime truth)
 - `category-role-perspective.registry.json`
 - `surfaces.registry.json`
 - `structural-homes.registry.json`
