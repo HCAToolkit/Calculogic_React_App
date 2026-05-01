@@ -105,18 +105,27 @@ Shared-contract-aligned, but slice-local implementation.
 
 ## 3. Target Architecture
 
-The following blueprint concepts are valid **target architecture**, but are **not current runtime truth**:
+The following living-document blueprint concepts are valid **target architecture**, but are **not current runtime truth**:
 
+- `roles.registry.json` as the canonical Role entity registry
+- `category-role-perspective.registry.json`
 - `surfaces.registry.json`
-- `definitions.registry.json`
+- `structural-homes.registry.json`
+- `agnostic-core-meanings.registry.json`
+- `category-surface-perspective.registry.json`
+- `surface-structural-home-perspective.registry.json`
+- `relationship-types.registry.json`
 - `relationships.registry.json`
-- allowed-surfaces-by-category registry or relationship view
-- agnostic-core meanings registry
-- formal Tree `folder-kinds.registry.json`
-- formal Tree `structural-homes.registry.json`
-- Tree structural-home relationship registry
-- weak structural-home signal registry
-- anti-pattern structural-home signal registry
+- Tree-owned `folder-kinds.registry.json`
+- Tree-owned `structural-home-signal-policy.registry.json`
+- Tree-owned `semantic-home-policy.registry.json`
+
+Tree-side parity explanation for this **target architecture**:
+
+- Naming-side context: Category → Role → agnostic-core meanings.
+- Tree-side context: Surface → Structural Home → agnostic-core meanings / signal strength.
+- `surface-structural-home-perspective.registry.json` provides placement evidence, not automatic placement truth.
+- Tree owns final placement confidence.
 
 Implementation rule for this group:
 
@@ -124,7 +133,16 @@ These concepts belong to the **staged implementation path** and require explicit
 
 ## 4. Staged Implementation Path
 
-The following are valid **staged implementation path** items and are **not current runtime truth**:
+Registry-model migration sequence:
+
+1. docs/spec alignment
+2. data-only registry payloads
+3. registry shape tests
+4. loader compatibility bridges
+5. runtime behavior migration
+6. extraction preparation
+
+Additional staged items (still **not current runtime truth**):
 
 - lexical coherence validator
 - catch-all detection
@@ -135,11 +153,11 @@ The following are valid **staged implementation path** items and are **not curre
 
 ## 5. Immediate Alignment Tasks
 
-1. Keep the current Naming registry-state implementation as the runtime source for categories/roles until extraction is justified.
-2. Keep the living document’s shared Category/Role/Surface model as **target architecture**.
-3. Document shared registry extraction scope before moving files.
-4. Avoid creating surfaces, definitions, relationships, or Tree structural-home registries until loader/resolver contracts and tests are scoped.
-5. Keep lexical/coherence concepts in **staged implementation path** documentation until scoped for implementation.
+1. Keep the current Naming registry-state implementation as the runtime source for Category/Role interpretation in the current slice.
+2. Keep current Category and Role implementation Naming-owned until shared consumers, loaders, and tests are scoped.
+3. Keep grouped `rolesByCategory` storage documented as **current implementation reality**, not architectural failure.
+4. Keep the living-document separation between canonical Role identity (`roles.registry.json`) and Category → Role perspective records (`category-role-perspective.registry.json`) as **target architecture**.
+5. Follow the staged sequence explicitly: docs/spec alignment → data-only registry payloads → registry shape tests → loader compatibility bridges → runtime behavior migration → extraction preparation.
 
 ## 6. Non-goals
 
