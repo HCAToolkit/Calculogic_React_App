@@ -1,20 +1,20 @@
 # Registry Blueprint Implementation Map
 
 - **Classification:** Informative
-- **Applies to:** Calculogic validator registry blueprint alignment, current implementation mapping, and future registry extraction planning.
+- **Applies to:** Calculogic validator registry blueprint alignment, current implementation mapping, and extraction planning.
 - **Status:** Active alignment map.
-- **Authority posture note:** This document maps current implementation reality to the target registry blueprint. It does not change runtime behavior, registry ownership, config contracts, or report output.
+- **Authority posture note:** This document maps **current implementation reality** to the **target architecture**. It does not change runtime behavior, registry ownership, config contracts, or report output.
 
 ## Purpose
 
-This map aligns the living registry blueprint with current repository implementation reality.
+This map aligns the living registry blueprint with **current implementation reality**.
 
 It explicitly separates:
 
-- implemented/current runtime behavior
+- **current runtime truth**
 - current-but-slice-local behavior
-- target architecture
-- deferred/future work
+- **target architecture**
+- **staged implementation path**
 
 ## How to Read This Map
 
@@ -27,7 +27,7 @@ Interpretation guardrails:
 - normalization/resolution owns deterministic runtime interpretation
 - slice-local ownership remains valid until suite-level promotion is justified
 
-## 1. Implemented / Current Runtime Truth
+## 1. Current Runtime Truth
 
 ### Naming registries
 
@@ -86,45 +86,63 @@ Current behavior:
 
 ## 2. Current but Slice-Local
 
-The target blueprint treats **Category**, **Role**, and **Surface** as shared canonical entities.
+The **target architecture** treats **Category**, **Role**, and **Surface** as shared canonical entities.
 
-Current implementation reality:
+**Current implementation reality**:
 
 - Category and Role registry payloads currently live under Naming builtin registries.
-- `rolesByCategory` is currently a Naming-owned grouped storage payload.
+- `roles.registry.json` is currently a Naming-owned grouped runtime input payload (via `rolesByCategory`).
 - Runtime role/category normalization is currently performed by Naming registry-state logic.
-- This is intentional for now and should not be treated as architectural failure.
+- This is intentional in the current slice and is not current runtime truth for suite-shared registry ownership.
 
 Current rule:
 
-Keep categories and roles in Naming until a future suite-shared extraction task has clear consumers, loader changes, and tests.
+Keep categories and roles in Naming until a suite-shared extraction task has clear consumers, loader changes, and tests.
 
 Current implementation posture:
 
-Shared-contract-aligned, but not yet suite-shared implementation.
+Shared-contract-aligned, but slice-local implementation.
 
-## 3. Target Architecture / Not Yet Implemented
+## 3. Target Architecture
 
-The following blueprint concepts are valid target architecture, but are not current runtime truth:
+The following living-document blueprint concepts are valid **target architecture**, but are **not current runtime truth**:
 
+- `roles.registry.json` as the suite-shared canonical Role entity registry (target architecture, not current runtime truth)
+- `category-role-perspective.registry.json`
 - `surfaces.registry.json`
-- `definitions.registry.json`
+- `structural-homes.registry.json`
+- `agnostic-core-meanings.registry.json`
+- `category-surface-perspective.registry.json`
+- `surface-structural-home-perspective.registry.json`
+- `relationship-types.registry.json`
 - `relationships.registry.json`
-- allowed-surfaces-by-category registry or relationship view
-- agnostic-core meanings registry
-- formal Tree `folder-kinds.registry.json`
-- formal Tree `structural-homes.registry.json`
-- Tree structural-home relationship registry
-- weak structural-home signal registry
-- anti-pattern structural-home signal registry
+- Tree-owned `folder-kinds.registry.json`
+- Tree-owned `structural-home-signal-policy.registry.json`
+- Tree-owned `semantic-home-policy.registry.json`
+
+Tree-side parity explanation for this **target architecture**:
+
+- Naming-side context: Category → Role → agnostic-core meanings.
+- Tree-side context: Surface → Structural Home → agnostic-core meanings / signal strength.
+- `surface-structural-home-perspective.registry.json` provides placement evidence, not automatic placement truth.
+- Tree owns final placement confidence.
 
 Implementation rule for this group:
 
-These may be implemented later only after ownership, loaders/resolvers, and tests are explicitly defined.
+These concepts belong to the **staged implementation path** and require explicit ownership, loader/resolver contracts, and tests before implementation work.
 
-## 4. Deferred / Future Work
+## 4. Staged Implementation Path
 
-The following are valid future directions and are not current implementation obligations:
+Registry-model migration sequence:
+
+1. docs/spec alignment
+2. data-only registry payloads
+3. registry shape tests
+4. loader compatibility bridges
+5. runtime behavior migration
+6. extraction preparation
+
+Additional staged items (still **not current runtime truth**):
 
 - lexical coherence validator
 - catch-all detection
@@ -135,11 +153,11 @@ The following are valid future directions and are not current implementation obl
 
 ## 5. Immediate Alignment Tasks
 
-1. Keep the current Naming registry-state implementation as the runtime source for categories/roles until extraction is justified.
-2. Keep the living document’s shared Category/Role/Surface model as target architecture.
-3. Document future shared registry extraction before moving files.
-4. Avoid creating surfaces, definitions, relationships, or Tree structural-home registries until loaders/resolvers/tests are scoped.
-5. Keep future lexical/coherence work as deferred draft material.
+1. Keep the current Naming registry-state implementation as the runtime source for Category/Role interpretation in the current slice.
+2. Keep current Category and Role implementation Naming-owned until shared consumers, loaders, and tests are scoped.
+3. Keep grouped `rolesByCategory` storage documented as **current implementation reality**, not architectural failure.
+4. Keep the living-document separation between canonical Role identity (`roles.registry.json`) and Category → Role perspective records (`category-role-perspective.registry.json`) as **target architecture**.
+5. Follow the staged sequence explicitly: docs/spec alignment → data-only registry payloads → registry shape tests → loader compatibility bridges → runtime behavior migration → extraction preparation.
 
 ## 6. Non-goals
 
