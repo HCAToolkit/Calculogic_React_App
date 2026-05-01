@@ -19,7 +19,7 @@ Use docs-first, deterministic, ownership-aligned changes.
 6. `README.md`
 7. `calculogic-validator/README.md`
 
-Read the narrowest relevant subset for the task. For validator, convention, architecture, naming, or NL-aligned changes, treat the list below as baseline references.
+Read the narrowest relevant subset for the task. For validator, convention, architecture, naming, or NL-aligned changes, treat the list above as baseline references.
 
 If any always-read canonical convention doc is missing, stop and report it clearly.
 
@@ -46,7 +46,8 @@ Use these exact phrases when describing state:
 - target architecture
 - not current runtime truth
 - staged implementation path
-- Avoid vague sticky wording in durable repo docs (for example: “maybe later,” “future possible,” “deferred someday,” “do not implement,” “not yet”) unless the document is explicitly a roadmap, issue-derived plan, or transitional inventory.
+
+Avoid vague sticky wording in durable repo docs, such as “maybe later,” “future possible,” “deferred someday,” “do not implement,” and “not yet,” unless the document is explicitly a roadmap, issue-derived plan, or transitional inventory.
 
 ## Workflow and Architecture Guardrails
 - Follow NL-first when task scope touches structure, behavior, contracts, validators, registries, shells, or configs.
