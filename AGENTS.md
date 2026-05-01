@@ -1,41 +1,86 @@
 # AGENTS.md
 
-## Scope
-These instructions apply to the entire repository.
+## Scope and Purpose
+Applies to the entire repository.
+Use docs-first, deterministic, ownership-aligned changes.
 
-## Purpose
-This repository uses a docs-first workflow with validator-backed conventions.
-Agents must keep changes deterministic, minimal, and ownership-aligned.
+## Issue vs PR Discipline
+- Issues hold planning context, deferred scope, roadmap notes, ADR context, and explicit “not this PR” boundaries.
+- PRs hold durable repository changes only.
+- Do not copy broad issue-planning language into repo docs unless it is stable implementation truth.
+- Use `Closes #...` only when the PR completes the whole issue; otherwise use `Refs #...` or `Implements part of #...`.
 
-## Required pre-work for each task
-Before making changes, read:
+## Required Pre-Read (All Tasks)
 1. `calculogic-validator/doc/ConventionRoutines/CCPP.md`
 2. `calculogic-validator/doc/ConventionRoutines/CCS.md`
 3. `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
 4. `doc/ConventionRoutines/General-NL-Skeletons.md`
 5. `doc/ConventionRoutines/NL-First-Workflow.md`
+6. `README.md`
+7. `calculogic-validator/README.md`
 
-If a required canonical convention document is missing, stop and report the missing file rather than inventing replacements.
+If any always-read canonical convention doc is missing, stop and report it clearly.
 
-## NL-first and concern purity
-- Follow NL-first: update the relevant NL/canonical doc first when structure, behavior, contracts, or conventions change.
-- Preserve concern purity and dependency direction per CCS.
-- Preserve comment/provenance rules per CCPP.
+## Required Task-Specific References
+- **Runtime/suite work:**
+  - `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
+  - `calculogic-validator/doc/ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md`
+- **Naming work:**
+  - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
+- **Tree work (read in order):**
+  1. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md` (navigation/ownership metadata)
+  2. `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` (runtime authority layer)
+  3. `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md` (runtime/spec authority)
+  4. `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
+  5. `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
+- **Registry model work:**
+  - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+  - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
+  - `calculogic-validator/doc/ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md`
 
-## Naming and validator authority
-- Treat `FileNamingMasterList-V1_1.md` as canonical naming authority.
-- Treat validator-owned convention docs as canonical when both validator-owned and repo-local pointer docs exist.
-- Do not assume validators enforce all taxonomy concepts unless explicitly documented in the active validator spec.
+## Precise Status Wording
+Use these exact phrases when describing state:
+- current runtime truth
+- current implementation reality
+- target architecture
+- not current runtime truth
+- staged implementation path
 
-## Task boundaries
+## Workflow and Architecture Guardrails
+- Follow NL-first when task scope touches structure, behavior, contracts, validators, registries, shells, or configs.
+- Maintain concern purity and dependency direction per CCS.
+- Maintain comment/provenance discipline per CCPP.
+- Treat validator-owned convention docs as canonical when repo-local pointer docs also exist.
+
+## Calculogic Validator ROI Priorities
+Prioritize decisions using:
+- clean ownership boundaries
+- modular decomposition
+- future extraction paths
+- deterministic organization
+- future-proof extensibility
+- fidelity to developer mental models
+- semantic modeling where it improves deterministic reasoning
+
+## Validator Ownership Rules
+- Naming owns filename / semantic-name / semantic-family interpretation.
+- Tree owns folder classification, structural-home reasoning, semantic-home reasoning, placement evidence, and whole-placement confidence.
+- Runtime loaders own normalization and deterministic runtime interpretation.
+- Generated/runtime views consume registry truth and must not become competing policy truth.
+- Do not make Surface equivalent to Structural Home.
+- Do not make Agnostic-Core Meaning replace Category, Role, Surface, or Structural Home identity.
+
+## Registry Work Order
+Follow this sequence:
+1. docs/spec alignment
+2. data-only registry payloads
+3. registry shape tests
+4. loader compatibility bridges
+5. runtime behavior migration
+6. extraction preparation
+
+## Task Boundaries and Verification
 - Keep PRs narrowly scoped to the requested issue.
-- Do not broaden into unrelated runtime refactors or convention rewrites.
-- Do not modify validator behavior, registry payloads/loaders, report output, CI workflows, templates, or specs unless explicitly requested.
-
-## Verification
-- Run the narrowest relevant checks for files touched.
-- If a requested check does not target a touched path, note the limitation and do not broaden scope.
-
-## PR requirements
-- Include concise summary and verification results.
-- Reference the issue being closed (for example: `Closes #<issue-number>`).
+- Do not modify runtime code, registry payloads, loaders, workflows, templates, or existing specs unless explicitly requested.
+- Run the narrowest relevant checks for touched files.
+- If target filtering excludes touched files, note the limitation and do not broaden scope.
