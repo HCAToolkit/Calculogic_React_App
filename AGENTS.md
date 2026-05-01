@@ -10,7 +10,7 @@ Use docs-first, deterministic, ownership-aligned changes.
 - Do not copy broad issue-planning language into repo docs unless it is stable implementation truth.
 - Use `Closes #...` only when the PR completes the whole issue; otherwise use `Refs #...` or `Implements part of #...`.
 
-## Required Pre-Read (All Tasks)
+## Baseline References
 1. `calculogic-validator/doc/ConventionRoutines/CCPP.md`
 2. `calculogic-validator/doc/ConventionRoutines/CCS.md`
 3. `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
@@ -18,6 +18,8 @@ Use docs-first, deterministic, ownership-aligned changes.
 5. `doc/ConventionRoutines/NL-First-Workflow.md`
 6. `README.md`
 7. `calculogic-validator/README.md`
+
+Read the narrowest relevant subset for the task. For validator, convention, architecture, naming, or NL-aligned changes, treat the list below as baseline references.
 
 If any always-read canonical convention doc is missing, stop and report it clearly.
 
@@ -27,16 +29,15 @@ If any always-read canonical convention doc is missing, stop and report it clear
   - `calculogic-validator/doc/ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md`
 - **Naming work:**
   - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
-- **Tree work (read in order):**
-  1. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md` (navigation/ownership metadata)
-  2. `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` (runtime authority layer)
-  3. `calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md` (runtime/spec authority)
-  4. `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
-  5. `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
+- **Tree work:**
+  - `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md` is for navigation/discovery only.
+  - For runtime/spec authority, follow the canonical reading order defined in that map.
 - **Registry model work:**
   - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
   - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
   - `calculogic-validator/doc/ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md`
+  - `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction.spec.md`
+  - `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-blueprint-implementation-map.spec.md`
 
 ## Precise Status Wording
 Use these exact phrases when describing state:
@@ -45,6 +46,7 @@ Use these exact phrases when describing state:
 - target architecture
 - not current runtime truth
 - staged implementation path
+- Avoid vague sticky wording in durable repo docs (for example: “maybe later,” “future possible,” “deferred someday,” “do not implement,” “not yet”) unless the document is explicitly a roadmap, issue-derived plan, or transitional inventory.
 
 ## Workflow and Architecture Guardrails
 - Follow NL-first when task scope touches structure, behavior, contracts, validators, registries, shells, or configs.
