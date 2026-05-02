@@ -123,7 +123,7 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
   const result = resolveNamingRegistryInputs();
 
   const builtinRolesRegistry = JSON.parse(
-    fs.readFileSync(path.join(REGISTRY_MODULE_ROOT, '_builtin', 'roles.registry.json'), 'utf8'),
+    fs.readFileSync(path.join(REGISTRY_MODULE_ROOT, '_builtin', 'category-role-perspective.registry.json'), 'utf8'),
   );
   const expectedRoles = Object.entries(builtinRolesRegistry.rolesByCategory)
     .flatMap(([category, entries]) =>
@@ -207,7 +207,7 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       categories: [{ category: 'from-temp-root' }],
     });
 
-    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+    writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
       rolesByCategory: {
         'from-temp-root': [{ role: 'temp-builtin-role', status: 'active' }],
       },
@@ -293,6 +293,114 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
 });
 
 
+
+test('registryRootDir accepts legacy grouped roles filename as builtin compatibility fallback', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
+      categories: [{ category: 'from-temp-root' }],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+      rolesByCategory: {
+        'from-temp-root': [{ role: 'temp-legacy-role', status: 'active' }],
+      },
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), {
+      reportableExtensions: ['.tmp'],
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), {
+      reportableRootFiles: ['root-a.json'],
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), {
+      classificationBuckets: ['bucket-a'],
+      secondaryBucketFamilies: ['codeCounts'],
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), {
+      missingRolePatterns: [],
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), {
+      outcomes: {
+        canonical: {
+          code: 'TEMP_CANONICAL',
+          severity: 'info',
+          classification: 'canonical',
+          message: 'Temporary canonical policy.',
+          ruleRef: 'temp-rule-ref',
+        },
+      },
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), DEFAULT_OVERLAY_CAPABILITIES_REGISTRY);
+    writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), {
+      semanticName: { style: 'kebab-case' },
+    });
+
+    const result = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
+    assert.ok(result.roles.some((entry) => entry.role === 'temp-legacy-role'));
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('registryRootDir prefers category-role-perspective over legacy grouped roles when both exist', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
+      categories: [{ category: 'from-temp-root' }],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
+      rolesByCategory: {
+        'from-temp-root': [{ role: 'temp-new-role', status: 'active' }],
+      },
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+      rolesByCategory: {
+        'from-temp-root': [{ role: 'temp-legacy-role', status: 'active' }],
+      },
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), {
+      reportableExtensions: ['.tmp'],
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), {
+      reportableRootFiles: ['root-a.json'],
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), {
+      classificationBuckets: ['bucket-a'],
+      secondaryBucketFamilies: ['codeCounts'],
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), {
+      missingRolePatterns: [],
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), {
+      outcomes: {
+        canonical: {
+          code: 'TEMP_CANONICAL',
+          severity: 'info',
+          classification: 'canonical',
+          message: 'Temporary canonical policy.',
+          ruleRef: 'temp-rule-ref',
+        },
+      },
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), DEFAULT_OVERLAY_CAPABILITIES_REGISTRY);
+    writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), {
+      semanticName: { style: 'kebab-case' },
+    });
+
+    const result = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
+    assert.ok(result.roles.some((entry) => entry.role === 'temp-new-role'));
+    assert.ok(!result.roles.some((entry) => entry.role === 'temp-legacy-role'));
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
 test('registryRootDir falls back to module _builtin when temp _builtin is incomplete', () => {
   const tempRoot = makeTempRegistryRoot();
 
@@ -301,7 +409,7 @@ test('registryRootDir falls back to module _builtin when temp _builtin is incomp
       categories: [{ category: 'from-incomplete-temp-root' }],
     });
 
-    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+    writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
       rolesByCategory: {
         'from-incomplete-temp-root': [{ role: 'incomplete-temp-role', status: 'active' }],
       },
@@ -622,7 +730,7 @@ test('throws when overlay capabilities registry is malformed', () => {
       categories: [{ category: 'architecture-support' }],
     });
 
-    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+    writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
       rolesByCategory: {
         'architecture-support': [{ role: 'host', status: 'active' }],
       },

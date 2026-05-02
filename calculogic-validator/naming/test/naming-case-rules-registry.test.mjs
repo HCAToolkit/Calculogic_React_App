@@ -63,7 +63,7 @@ const seedCaseRulesRegistryFixture = (
   writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
     categories: [{ category: 'architecture-support' }],
   });
-  writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+  writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
     rolesByCategory: {
       'architecture-support': [{ role: 'host', status: 'active' }],
     },

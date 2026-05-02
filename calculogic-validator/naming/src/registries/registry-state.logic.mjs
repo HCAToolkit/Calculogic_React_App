@@ -10,9 +10,10 @@ import { loadOverlayCapabilitiesFromFile } from './naming-overlay-capabilities-r
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const BUILTIN_REGISTRY_DIR = path.join(MODULE_DIR, '_builtin');
+const LEGACY_GROUPED_ROLES_REGISTRY_FILENAME = 'roles.registry.json';
+const CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME = 'category-role-perspective.registry.json';
 const REQUIRED_BUILTIN_REGISTRY_FILES = [
   'categories.registry.json',
-  'roles.registry.json',
   'reportable-extensions.registry.json',
   'reportable-root-files.registry.json',
   'summary-buckets.registry.json',
@@ -24,10 +25,20 @@ const REQUIRED_BUILTIN_REGISTRY_FILES = [
 
 const ALLOWED_ROLE_STATUSES = new Set(['active', 'deprecated']);
 
-const hasRequiredBuiltinRegistryFiles = ({ builtinRegistryDir }) =>
-  REQUIRED_BUILTIN_REGISTRY_FILES.every((registryFile) =>
+const hasRequiredBuiltinRegistryFiles = ({ builtinRegistryDir }) => {
+  const hasRequiredFiles = REQUIRED_BUILTIN_REGISTRY_FILES.every((registryFile) =>
     fs.existsSync(path.join(builtinRegistryDir, registryFile)),
   );
+
+  if (!hasRequiredFiles) {
+    return false;
+  }
+
+  return (
+    fs.existsSync(path.join(builtinRegistryDir, CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME)) ||
+    fs.existsSync(path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME))
+  );
+};
 
 const resolveBuiltinRegistryDir = ({ resolvedRegistryRootDir }) => {
   const candidateBuiltinRegistryDir = path.join(resolvedRegistryRootDir, '_builtin');
@@ -186,7 +197,17 @@ function loadJsonFile(filePath) {
 }
 
 const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
-  const parsed = loadJsonFile(path.join(builtinRegistryDir, 'roles.registry.json'));
+  const categoryRolePerspectivePath = path.join(
+    builtinRegistryDir,
+    CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME,
+  );
+  const legacyGroupedRolesPath = path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME);
+
+  const groupedRolesPath = fs.existsSync(categoryRolePerspectivePath)
+    ? categoryRolePerspectivePath
+    : legacyGroupedRolesPath;
+
+  const parsed = loadJsonFile(groupedRolesPath);
   const rolesByCategory = parsed?.rolesByCategory;
 
   if (!rolesByCategory || typeof rolesByCategory !== 'object' || Array.isArray(rolesByCategory)) {
