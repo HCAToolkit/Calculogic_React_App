@@ -8,7 +8,9 @@ Use docs-first, deterministic, ownership-aligned changes.
 - Issues hold planning context, deferred scope, roadmap notes, ADR context, and explicit “not this PR” boundaries.
 - PRs hold durable repository changes only.
 - Do not copy broad issue-planning language into repo docs unless it is stable implementation truth.
-- Use `Closes #...` only when the PR completes the whole issue; otherwise use `Refs #...` or `Implements part of #...`.
+- Default to `Refs #...` or `Implements part of #...` in PR bodies.
+- Do not use closing keywords such as `Closes #...`, `Fixes #...`, or `Resolves #...` unless the human owner explicitly asks for automatic issue closure.
+- Let the human owner close planning, architecture, roadmap, registry, and validator alignment issues manually after review.
 
 ## Baseline References
 1. `calculogic-validator/doc/ConventionRoutines/CCPP.md`
@@ -82,8 +84,13 @@ Follow this sequence:
 5. runtime behavior migration
 6. extraction preparation
 
+## Docs Task Fidelity
+- For docs tasks with required sections or acceptance criteria, preserve each required section unless it conflicts with current repo truth.
+- Do not satisfy a structural docs task with wording cleanup only unless the issue explicitly asks for wording cleanup only.
+
 ## Task Boundaries and Verification
 - Keep PRs narrowly scoped to the requested issue.
 - Do not modify runtime code, registry payloads, loaders, workflows, templates, or existing specs unless explicitly requested.
 - Run the narrowest relevant checks for touched files.
 - If target filtering excludes touched files, note the limitation and do not broaden scope.
+- If any verification command is run, record the exact command and outcome in the PR body or PR comment.
