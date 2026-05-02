@@ -3,7 +3,194 @@
   "roles": [
     {
       "role": "adapter",
-      "status": "active"
+      "status": "active",
+      "definition": "Integration role for adapting one interface, contract, or system shape to another."
+    },
+    {
+      "role": "anchor",
+      "status": "active",
+      "definition": "Registry indexing role for stable anchor/address tokens used for deterministic references."
+    },
+    {
+      "role": "audit",
+      "status": "active",
+      "definition": "Documentation role for point-in-time audit and reconciliation findings."
+    },
+    {
+      "role": "benchmark",
+      "status": "active",
+      "definition": "Quality-support role for benchmark artifacts used to evaluate performance characteristics."
+    },
+    {
+      "role": "build",
+      "status": "active",
+      "definition": "Concern-core role for local UI structure and content construction."
+    },
+    {
+      "role": "build-style",
+      "status": "active",
+      "definition": "Concern-style role for style/layout rules paired to build concern structure."
+    },
+    {
+      "role": "catalog",
+      "status": "active",
+      "definition": "Registry indexing role for bounded inventories/listings without runtime resolution execution."
+    },
+    {
+      "role": "cli",
+      "status": "active",
+      "definition": "Architecture-support role for command-line entrypoints and command surface orchestration."
+    },
+    {
+      "role": "client",
+      "status": "active",
+      "definition": "Integration role for outbound system clients that consume external interfaces."
+    },
+    {
+      "role": "contracts",
+      "status": "active",
+      "definition": "Architecture-support role for stable contract boundary definitions, parsing/normalization, and shape guards."
+    },
+    {
+      "role": "dto",
+      "status": "active",
+      "definition": "Data-model role for explicit data transfer object shape boundaries."
+    },
+    {
+      "role": "entry",
+      "status": "active",
+      "definition": "Surface-system role for runtime entry composition points."
+    },
+    {
+      "role": "fixture",
+      "status": "active",
+      "definition": "Quality-support role for deterministic fixture artifacts."
+    },
+    {
+      "role": "gateway",
+      "status": "active",
+      "definition": "Integration role for boundary gateways coordinating calls across external/internal systems."
+    },
+    {
+      "role": "healthcheck",
+      "status": "active",
+      "definition": "Documentation role for recurring health/status checks."
+    },
+    {
+      "role": "host",
+      "status": "active",
+      "definition": "Architecture-support role for structural host/composition and placement orchestration."
+    },
+    {
+      "role": "ids",
+      "status": "active",
+      "definition": "Registry indexing role for stable identifier constants/tokens/key sets for bounded targets."
+    },
+    {
+      "role": "index",
+      "status": "active",
+      "definition": "Registry indexing role for canonical index surfaces."
+    },
+    {
+      "role": "knowledge",
+      "status": "active",
+      "definition": "Concern-core role for static knowledge/config/schema/reference data."
+    },
+    {
+      "role": "logic",
+      "status": "active",
+      "definition": "Concern-core role for interaction/state/behavior logic."
+    },
+    {
+      "role": "manifest",
+      "status": "active",
+      "definition": "Registry indexing role for manifest/list artifacts that enumerate bounded payload membership."
+    },
+    {
+      "role": "mapper",
+      "status": "active",
+      "definition": "Integration role for deterministic mapping between source and target representations."
+    },
+    {
+      "role": "mock",
+      "status": "active",
+      "definition": "Quality-support role for mocks and stubs used in isolated testing."
+    },
+    {
+      "role": "plan",
+      "status": "active",
+      "definition": "Documentation role for forward-looking planning artifacts."
+    },
+    {
+      "role": "policy",
+      "status": "active",
+      "definition": "Documentation role for governance and rule-setting decisions."
+    },
+    {
+      "role": "registry",
+      "status": "active",
+      "definition": "Registry indexing role for canonical registry payload surfaces."
+    },
+    {
+      "role": "resolver",
+      "status": "active",
+      "definition": "Integration role for deterministic resolution across bounded candidate sets."
+    },
+    {
+      "role": "results",
+      "status": "active",
+      "definition": "Concern-core role for result-layer output shaping/mapping/preparation."
+    },
+    {
+      "role": "results-style",
+      "status": "active",
+      "definition": "Concern-style role for style/layout rules paired to results concern outputs."
+    },
+    {
+      "role": "router",
+      "status": "active",
+      "definition": "Surface-system role for runtime route and path dispatch composition."
+    },
+    {
+      "role": "schema",
+      "status": "active",
+      "definition": "Data-model role for schema authority and deterministic shape declarations."
+    },
+    {
+      "role": "spec",
+      "status": "active",
+      "definition": "Documentation role for canonical specification/contract references."
+    },
+    {
+      "role": "test",
+      "status": "active",
+      "definition": "Quality-support role for deterministic test artifacts."
+    },
+    {
+      "role": "tokens",
+      "status": "active",
+      "definition": "Registry indexing role for token vocabularies used by deterministic interpretation routines."
+    },
+    {
+      "role": "types",
+      "status": "active",
+      "definition": "Data-model role for type declarations and typed shape boundaries."
+    },
+    {
+      "role": "view",
+      "status": "deprecated",
+      "definition": "Historical pre-current concern split role retained for detection and migration guidance.",
+      "notes": "Manual migration required."
+    },
+    {
+      "role": "wiring",
+      "status": "active",
+      "definition": "Architecture-support role for integration glue connecting modules/contracts/adapters."
+    },
+    {
+      "role": "workflow",
+      "status": "active",
+      "definition": "Documentation role for repeatable procedural routines and sequences."
     }
   ]
 }
