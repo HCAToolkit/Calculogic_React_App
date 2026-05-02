@@ -1,0 +1,311 @@
+{
+  "version": "1",
+  "roles": [
+    {
+      "role": "adapter",
+      "status": "active",
+      "definition": "Integration role for adapting one interface, contract, or system shape to another."
+    },
+    {
+      "role": "anchor",
+      "status": "active",
+      "definition": "Reference role for stable addressing, linking, or anchoring within a registry or index."
+    },
+    {
+      "role": "audit",
+      "status": "active",
+      "definition": "Documentation role for review, inspection, or evaluation records."
+    },
+    {
+      "role": "auth",
+      "status": "active",
+      "definition": "Security role for authentication, authorization, session identity, or access-control responsibility."
+    },
+    {
+      "role": "benchmark",
+      "status": "active",
+      "definition": "Quality role for performance or comparison measurement artifacts."
+    },
+    {
+      "role": "boundary",
+      "status": "active",
+      "definition": "Architecture-support role for defining or protecting responsibility, module, or integration boundaries."
+    },
+    {
+      "role": "build",
+      "status": "active",
+      "definition": "Role for structure and assembly of user-visible artifacts or interface units."
+    },
+    {
+      "role": "build-style",
+      "status": "active",
+      "definition": "Style role for presentation-layer mutations of composed user-visible structure."
+    },
+    {
+      "role": "buildsys",
+      "status": "active",
+      "definition": "Build-system role for build pipeline, compilation, bundling, or build-tool automation responsibility."
+    },
+    {
+      "role": "cache",
+      "status": "active",
+      "definition": "Persistence role for cache behavior, retained computed state, or temporary storage policy."
+    },
+    {
+      "role": "catalog",
+      "status": "active",
+      "definition": "Indexing-registry role for organized reference listings or discoverable item collections."
+    },
+    {
+      "role": "cli",
+      "status": "active",
+      "definition": "Architecture-support role for command-line entrypoints or command orchestration."
+    },
+    {
+      "role": "client",
+      "status": "active",
+      "definition": "Integration role for consuming or calling an external or internal service boundary."
+    },
+    {
+      "role": "config",
+      "status": "active",
+      "definition": "Configuration role for structured options, setup policy, or configurable runtime/tooling values."
+    },
+    {
+      "role": "contracts",
+      "status": "active",
+      "definition": "Architecture-support role for shared contracts, interfaces, schemas, or behavioral agreements."
+    },
+    {
+      "role": "crypto",
+      "status": "active",
+      "definition": "Security role for cryptographic behavior, key handling, hashing, signing, or encryption responsibility."
+    },
+    {
+      "role": "deploy",
+      "status": "active",
+      "definition": "Operations-support role for deployment behavior, release movement, or environment rollout responsibility."
+    },
+    {
+      "role": "dto",
+      "status": "active",
+      "definition": "Data-model role for transfer-shaped output or structured exchange payloads."
+    },
+    {
+      "role": "entry",
+      "status": "active",
+      "definition": "Surface-system role for entrypoints into a runtime, UI, app, or execution surface."
+    },
+    {
+      "role": "env",
+      "status": "active",
+      "definition": "Configuration role for environment variables, environment-specific setup, or runtime environment contracts."
+    },
+    {
+      "role": "fixture",
+      "status": "active",
+      "definition": "Quality-support role for stable test or validation data."
+    },
+    {
+      "role": "gateway",
+      "status": "active",
+      "definition": "Integration role for mediating access to a system, service, or boundary."
+    },
+    {
+      "role": "healthcheck",
+      "status": "active",
+      "definition": "Documentation role for status, health, or readiness review artifacts."
+    },
+    {
+      "role": "host",
+      "status": "active",
+      "definition": "Surface-system role for hosting, mounting, or containing a runtime/UI/system surface."
+    },
+    {
+      "role": "i18n",
+      "status": "active",
+      "definition": "Localization role for internationalization structures, translation wiring, or language-aware runtime support."
+    },
+    {
+      "role": "ids",
+      "status": "active",
+      "definition": "Indexing-registry role for stable identifiers."
+    },
+    {
+      "role": "index",
+      "status": "active",
+      "definition": "Indexing-registry role for lookup or discovery structures."
+    },
+    {
+      "role": "infra",
+      "status": "active",
+      "definition": "Operations-support role for infrastructure shape, infrastructure policy, or environment resource structure."
+    },
+    {
+      "role": "knowledge",
+      "status": "active",
+      "definition": "Role for static reference meaning, domain reference content, or declarative support data."
+    },
+    {
+      "role": "locale",
+      "status": "active",
+      "definition": "Localization role for locale-specific messages, formatting, translation payloads, or audience-localized data."
+    },
+    {
+      "role": "logic",
+      "status": "active",
+      "definition": "Role for behavior, state, decisions, and response."
+    },
+    {
+      "role": "logging",
+      "status": "active",
+      "definition": "Observability role for emitted logs, logging behavior, or diagnostic event output."
+    },
+    {
+      "role": "manifest",
+      "status": "active",
+      "definition": "Indexing-registry role for declared inventory, package, or structural listing metadata."
+    },
+    {
+      "role": "mapper",
+      "status": "active",
+      "definition": "Integration role for transforming one data, domain, or interface shape into another."
+    },
+    {
+      "role": "migration",
+      "status": "active",
+      "definition": "Migration role for transition, conversion, version-shift, or one-time state/schema movement work."
+    },
+    {
+      "role": "mock",
+      "status": "active",
+      "definition": "Quality-support role for simulated behavior or replacement test doubles."
+    },
+    {
+      "role": "monitoring",
+      "status": "active",
+      "definition": "Operations or observability role for monitoring signals, health visibility, or operational watch behavior."
+    },
+    {
+      "role": "packaging",
+      "status": "active",
+      "definition": "Build-system role for package assembly, distribution shape, bundling output, or publishable artifact structure."
+    },
+    {
+      "role": "perf",
+      "status": "active",
+      "definition": "Performance role for performance-sensitive behavior, measurement output, or optimization evidence."
+    },
+    {
+      "role": "plan",
+      "status": "active",
+      "definition": "Documentation role for intended work, sequencing, or implementation direction."
+    },
+    {
+      "role": "policy",
+      "status": "active",
+      "definition": "Documentation role for governing rules, constraints, or decision policy."
+    },
+    {
+      "role": "provider",
+      "status": "active",
+      "definition": "Integration role for supplying a bounded capability, dependency, service, or value source to a consumer context."
+    },
+    {
+      "role": "registry",
+      "status": "active",
+      "definition": "Indexing-registry role for canonical registered data."
+    },
+    {
+      "role": "resolver",
+      "status": "active",
+      "definition": "Integration role for resolving references, lookups, routing decisions, or context mappings."
+    },
+    {
+      "role": "results",
+      "status": "active",
+      "definition": "Role for output shaping and consumer-ready result modeling."
+    },
+    {
+      "role": "results-style",
+      "status": "active",
+      "definition": "Style role for presentation-layer mutations of user-visible result output."
+    },
+    {
+      "role": "router",
+      "status": "active",
+      "definition": "Surface-system role for route, path, or dispatch behavior."
+    },
+    {
+      "role": "schema",
+      "status": "active",
+      "definition": "Data-model role for structural validation, shape definition, or data contract modeling."
+    },
+    {
+      "role": "secrets",
+      "status": "active",
+      "definition": "Security role for secret references, secret access policy, credential handling, or protected configuration."
+    },
+    {
+      "role": "settings",
+      "status": "active",
+      "definition": "Configuration role for user, system, runtime, or tool settings that tune behavior without owning behavior itself."
+    },
+    {
+      "role": "spec",
+      "status": "active",
+      "definition": "Documentation role for formal specification."
+    },
+    {
+      "role": "storage",
+      "status": "active",
+      "definition": "Persistence role for stored state, storage access, persistence contracts, or retained data behavior."
+    },
+    {
+      "role": "telemetry",
+      "status": "active",
+      "definition": "Observability role for emitted measurements, traces, metrics, or runtime visibility payloads."
+    },
+    {
+      "role": "test",
+      "status": "active",
+      "definition": "Quality-support role for executable or documented verification."
+    },
+    {
+      "role": "tokens",
+      "status": "active",
+      "definition": "Indexing-registry role for reusable lexical, design, semantic, or symbolic tokens."
+    },
+    {
+      "role": "transport",
+      "status": "active",
+      "definition": "Networking role for transport behavior, protocol exchange, message movement, or communication boundary mechanics."
+    },
+    {
+      "role": "types",
+      "status": "active",
+      "definition": "Data-model role for type definitions."
+    },
+    {
+      "role": "view",
+      "status": "deprecated",
+      "definition": "Historical role from pre-current concern split.",
+      "notes": "Manual migration required."
+    },
+    {
+      "role": "wiring",
+      "status": "active",
+      "definition": "Architecture-support role for connecting modules, dependencies, or system parts."
+    },
+    {
+      "role": "worker",
+      "status": "active",
+      "definition": "Concurrency role for asynchronous, parallel, queued, or background execution behavior."
+    },
+    {
+      "role": "workflow",
+      "status": "active",
+      "definition": "Documentation role for process, sequence, or operating procedure."
+    }
+  ]
+}
