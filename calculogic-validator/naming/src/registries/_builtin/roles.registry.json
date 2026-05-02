@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "roles": [
+    {
+      "role": "adapter",
+      "status": "active"
+    }
+  ]
+}
