@@ -123,7 +123,7 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
   const result = resolveNamingRegistryInputs();
 
   const builtinRolesRegistry = JSON.parse(
-    fs.readFileSync(path.join(REGISTRY_MODULE_ROOT, '_builtin', 'roles.registry.json'), 'utf8'),
+    fs.readFileSync(path.join(REGISTRY_MODULE_ROOT, '_builtin', 'category-role-perspective.registry.json'), 'utf8'),
   );
   const expectedRoles = Object.entries(builtinRolesRegistry.rolesByCategory)
     .flatMap(([category, entries]) =>
@@ -207,7 +207,7 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       categories: [{ category: 'from-temp-root' }],
     });
 
-    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+    writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
       rolesByCategory: {
         'from-temp-root': [{ role: 'temp-builtin-role', status: 'active' }],
       },
@@ -274,7 +274,7 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       schemaVersion: '1',
       activeRegistry: 'custom',
     });
-    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
       { role: 'temp-custom-role', category: 'from-temp-root', status: 'active' },
     ]);
     writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.tmp']);
@@ -301,7 +301,7 @@ test('registryRootDir falls back to module _builtin when temp _builtin is incomp
       categories: [{ category: 'from-incomplete-temp-root' }],
     });
 
-    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+    writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
       rolesByCategory: {
         'from-incomplete-temp-root': [{ role: 'incomplete-temp-role', status: 'active' }],
       },
@@ -343,7 +343,7 @@ test('custom state selects custom and digests diverge from builtin when payload 
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
       { role: 'host', category: 'architecture-support', status: 'active' },
       { role: 'custom-role', category: 'architecture-support', status: 'active' },
     ]);
@@ -378,7 +378,7 @@ test('custom state preserves builtin summary buckets for summary runtime prepara
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
       { role: 'host', category: 'architecture-support', status: 'active' },
       { role: 'custom-role', category: 'architecture-support', status: 'active' },
     ]);
@@ -426,7 +426,7 @@ test('throws when custom is active and custom files are missing', () => {
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
       { role: 'host', category: 'architecture-support', status: 'active' },
     ]);
 
@@ -448,7 +448,7 @@ test('accepts custom role category values that exist in _builtin/categories.regi
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
       { role: 'perf-role', category: 'performance', status: 'active' },
     ]);
 
@@ -472,7 +472,7 @@ test('throws when custom roles include invalid category', () => {
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
       { role: 'x', category: 'nope', status: 'active' },
     ]);
 
@@ -498,7 +498,7 @@ test('throws when custom roles include invalid status', () => {
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
       { role: 'x', category: 'architecture-support', status: 'provisional' },
     ]);
 
@@ -524,7 +524,7 @@ test('throws when custom reportable extension omits leading dot', () => {
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
       { role: 'host', category: 'architecture-support', status: 'active' },
     ]);
 
@@ -622,7 +622,7 @@ test('throws when overlay capabilities registry is malformed', () => {
       categories: [{ category: 'architecture-support' }],
     });
 
-    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+    writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
       rolesByCategory: {
         'architecture-support': [{ role: 'host', status: 'active' }],
       },

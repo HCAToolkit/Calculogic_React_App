@@ -63,7 +63,7 @@ const seedCaseRulesRegistryFixture = (
   writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
     categories: [{ category: 'architecture-support' }],
   });
-  writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+  writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
     rolesByCategory: {
       'architecture-support': [{ role: 'host', status: 'active' }],
     },
@@ -126,7 +126,7 @@ const seedCaseRulesRegistryFixture = (
     semanticName: { style: 'kebab-case' },
   });
 
-  writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
+  writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
     { role: 'host', category: 'architecture-support', status: 'active' },
   ]);
   writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.ts']);
