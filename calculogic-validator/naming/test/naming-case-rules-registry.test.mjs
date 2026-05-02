@@ -126,7 +126,7 @@ const seedCaseRulesRegistryFixture = (
     semanticName: { style: 'kebab-case' },
   });
 
-  writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+  writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
     { role: 'host', category: 'architecture-support', status: 'active' },
   ]);
   writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.ts']);

@@ -300,7 +300,7 @@ const loadRegistryState = (registryRootDir) => {
 };
 
 const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
-  const customRolesPath = path.join(registryRootDir, '_custom', 'roles.registry.custom.json');
+  const customRolesPath = path.join(registryRootDir, '_custom', 'roles.overlay.custom.json');
   const customExtensionsPath = path.join(
     registryRootDir,
     '_custom',
@@ -313,7 +313,7 @@ const loadCustomPayload = ({ registryRootDir, builtinRegistryDir }) => {
   );
 
   if (!fs.existsSync(customRolesPath)) {
-    throw new Error('Custom registry file missing: _custom/roles.registry.custom.json.');
+    throw new Error('Custom registry file missing: _custom/roles.overlay.custom.json.');
   }
 
   if (!fs.existsSync(customExtensionsPath)) {
@@ -460,7 +460,7 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
   const customRolesPath = path.join(
     resolvedRegistryRootDir,
     '_custom',
-    'roles.registry.custom.json',
+    'roles.overlay.custom.json',
   );
   const customExtensionsPath = path.join(
     resolvedRegistryRootDir,
@@ -477,7 +477,7 @@ export const resolveNamingRegistryInputs = ({ config, registryRootDir } = {}) =>
 
   if (registryState === 'custom' && !hasCustomFiles) {
     if (!fs.existsSync(customRolesPath)) {
-      throw new Error('Custom registry file missing: _custom/roles.registry.custom.json.');
+      throw new Error('Custom registry file missing: _custom/roles.overlay.custom.json.');
     }
 
     throw new Error(

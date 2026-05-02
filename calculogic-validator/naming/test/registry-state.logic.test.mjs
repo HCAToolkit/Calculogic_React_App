@@ -274,7 +274,7 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
       schemaVersion: '1',
       activeRegistry: 'custom',
     });
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
       { role: 'temp-custom-role', category: 'from-temp-root', status: 'active' },
     ]);
     writeJson(path.join(tempRoot, '_custom', 'reportable-extensions.registry.custom.json'), ['.tmp']);
@@ -343,7 +343,7 @@ test('custom state selects custom and digests diverge from builtin when payload 
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
       { role: 'host', category: 'architecture-support', status: 'active' },
       { role: 'custom-role', category: 'architecture-support', status: 'active' },
     ]);
@@ -378,7 +378,7 @@ test('custom state preserves builtin summary buckets for summary runtime prepara
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
       { role: 'host', category: 'architecture-support', status: 'active' },
       { role: 'custom-role', category: 'architecture-support', status: 'active' },
     ]);
@@ -426,7 +426,7 @@ test('throws when custom is active and custom files are missing', () => {
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
       { role: 'host', category: 'architecture-support', status: 'active' },
     ]);
 
@@ -448,7 +448,7 @@ test('accepts custom role category values that exist in _builtin/categories.regi
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
       { role: 'perf-role', category: 'performance', status: 'active' },
     ]);
 
@@ -472,7 +472,7 @@ test('throws when custom roles include invalid category', () => {
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
       { role: 'x', category: 'nope', status: 'active' },
     ]);
 
@@ -498,7 +498,7 @@ test('throws when custom roles include invalid status', () => {
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
       { role: 'x', category: 'architecture-support', status: 'provisional' },
     ]);
 
@@ -524,7 +524,7 @@ test('throws when custom reportable extension omits leading dot', () => {
       activeRegistry: 'custom',
     });
 
-    writeJson(path.join(tempRoot, '_custom', 'roles.registry.custom.json'), [
+    writeJson(path.join(tempRoot, '_custom', 'roles.overlay.custom.json'), [
       { role: 'host', category: 'architecture-support', status: 'active' },
     ]);
 
