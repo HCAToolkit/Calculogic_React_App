@@ -9,6 +9,7 @@ Use docs-first, deterministic, ownership-aligned changes.
 - PRs hold durable repository changes only.
 - Do not copy broad issue-planning language into repo docs unless it is stable implementation truth.
 - Use `Closes #...` only when the PR completes the whole issue; otherwise use `Refs #...` or `Implements part of #...`.
+- For partial-scope delivery or manual-close workflows, prefer `Refs #...` in the PR body.
 
 ## Baseline References
 1. `calculogic-validator/doc/ConventionRoutines/CCPP.md`
@@ -87,3 +88,4 @@ Follow this sequence:
 - Do not modify runtime code, registry payloads, loaders, workflows, templates, or existing specs unless explicitly requested.
 - Run the narrowest relevant checks for touched files.
 - If target filtering excludes touched files, note the limitation and do not broaden scope.
+- If any verification command is run, record the exact command and outcome in the PR body or PR comment.
