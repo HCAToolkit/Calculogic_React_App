@@ -3,139 +3,297 @@
   "rolesByCategory": {
     "architecture-support": [
       {
-        "role": "boundary"
+        "role": "boundary",
+        "agnosticCoreMeanings": [
+          "structure"
+        ]
       },
       {
-        "role": "cli"
+        "role": "cli",
+        "agnosticCoreMeanings": [
+          "behavior",
+          "presentation"
+        ]
       },
       {
-        "role": "contracts"
+        "role": "contracts",
+        "agnosticCoreMeanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "wiring"
+        "role": "wiring",
+        "agnosticCoreMeanings": [
+          "structure"
+        ]
       }
     ],
     "concern-core": [
       {
-        "role": "build"
+        "role": "build",
+        "agnosticCoreMeanings": [
+          "structure"
+        ]
       },
       {
-        "role": "knowledge"
+        "role": "knowledge",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       },
       {
-        "role": "logic"
+        "role": "logic",
+        "agnosticCoreMeanings": [
+          "behavior"
+        ]
       },
       {
-        "role": "results"
+        "role": "results",
+        "agnosticCoreMeanings": [
+          "output"
+        ]
       }
     ],
     "concern-style": [
       {
-        "role": "build-style"
+        "role": "build-style",
+        "inheritsFrom": {
+          "category": "concern-core",
+          "role": "build"
+        },
+        "baseMeanings": [
+          "structure"
+        ],
+        "overlayMeanings": [
+          "presentation"
+        ],
+        "agnosticCoreMeanings": [
+          "structure",
+          "presentation"
+        ]
       },
       {
-        "role": "results-style"
+        "role": "results-style",
+        "inheritsFrom": {
+          "category": "concern-core",
+          "role": "results"
+        },
+        "baseMeanings": [
+          "output"
+        ],
+        "overlayMeanings": [
+          "presentation"
+        ],
+        "agnosticCoreMeanings": [
+          "output",
+          "presentation"
+        ]
       }
     ],
     "data-model": [
       {
-        "role": "dto"
+        "role": "dto",
+        "agnosticCoreMeanings": [
+          "output",
+          "structure"
+        ]
       },
       {
-        "role": "schema"
+        "role": "schema",
+        "agnosticCoreMeanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "types"
+        "role": "types",
+        "agnosticCoreMeanings": [
+          "reference",
+          "structure"
+        ]
       }
     ],
     "deprecated": [
       {
-        "role": "view"
+        "role": "view",
+        "agnosticCoreMeanings": [
+          "presentation"
+        ]
       }
     ],
     "documentation": [
       {
-        "role": "audit"
+        "role": "audit",
+        "agnosticCoreMeanings": [
+          "reference",
+          "output"
+        ]
       },
       {
-        "role": "healthcheck"
+        "role": "healthcheck",
+        "agnosticCoreMeanings": [
+          "reference",
+          "output"
+        ]
       },
       {
-        "role": "plan"
+        "role": "plan",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       },
       {
-        "role": "policy"
+        "role": "policy",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       },
       {
-        "role": "spec"
+        "role": "spec",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       },
       {
-        "role": "workflow"
+        "role": "workflow",
+        "agnosticCoreMeanings": [
+          "reference",
+          "behavior"
+        ]
       }
     ],
     "indexing-registry": [
       {
-        "role": "anchor"
+        "role": "anchor",
+        "agnosticCoreMeanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "catalog"
+        "role": "catalog",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       },
       {
-        "role": "ids"
+        "role": "ids",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       },
       {
-        "role": "index"
+        "role": "index",
+        "agnosticCoreMeanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "manifest"
+        "role": "manifest",
+        "agnosticCoreMeanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "registry"
+        "role": "registry",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       },
       {
-        "role": "tokens"
+        "role": "tokens",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       }
     ],
     "integration-adapter": [
       {
-        "role": "adapter"
+        "role": "adapter",
+        "agnosticCoreMeanings": [
+          "behavior",
+          "structure"
+        ]
       },
       {
-        "role": "client"
+        "role": "client",
+        "agnosticCoreMeanings": [
+          "behavior"
+        ]
       },
       {
-        "role": "gateway"
+        "role": "gateway",
+        "agnosticCoreMeanings": [
+          "behavior",
+          "structure"
+        ]
       },
       {
-        "role": "mapper"
+        "role": "mapper",
+        "agnosticCoreMeanings": [
+          "behavior",
+          "output"
+        ]
       },
       {
-        "role": "resolver"
+        "role": "resolver",
+        "agnosticCoreMeanings": [
+          "behavior",
+          "reference"
+        ]
       }
     ],
     "quality-support": [
       {
-        "role": "benchmark"
+        "role": "benchmark",
+        "agnosticCoreMeanings": [
+          "reference",
+          "output"
+        ]
       },
       {
-        "role": "fixture"
+        "role": "fixture",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
       },
       {
-        "role": "mock"
+        "role": "mock",
+        "agnosticCoreMeanings": [
+          "behavior"
+        ]
       },
       {
-        "role": "test"
+        "role": "test",
+        "agnosticCoreMeanings": [
+          "behavior",
+          "output"
+        ]
       }
     ],
     "surface-system": [
       {
-        "role": "entry"
+        "role": "entry",
+        "agnosticCoreMeanings": [
+          "structure",
+          "behavior"
+        ]
       },
       {
-        "role": "host"
+        "role": "host",
+        "agnosticCoreMeanings": [
+          "structure"
+        ]
       },
       {
-        "role": "router"
+        "role": "router",
+        "agnosticCoreMeanings": [
+          "behavior",
+          "structure"
+        ]
       }
     ]
   }
