@@ -1,31 +1,135 @@
 {
   "version": "1",
   "categories": [
-    { "category": "architecture-support", "status": "active" },
-    { "category": "build-system", "status": "active" },
-    { "category": "concern-core", "status": "active" },
-    { "category": "concern-style", "status": "active" },
-    { "category": "concurrency", "status": "active" },
-    { "category": "configuration", "status": "active" },
-    { "category": "data-model", "status": "active" },
-    { "category": "deprecated", "status": "active" },
-    { "category": "documentation", "status": "active" },
-    { "category": "examples", "status": "active" },
-    { "category": "experimental", "status": "active" },
-    { "category": "generated", "status": "active" },
-    { "category": "indexing-registry", "status": "active" },
-    { "category": "integration-adapter", "status": "active" },
-    { "category": "localization", "status": "active" },
-    { "category": "migration", "status": "active" },
-    { "category": "networking", "status": "active" },
-    { "category": "observability", "status": "active" },
-    { "category": "operations-support", "status": "active" },
-    { "category": "performance", "status": "active" },
-    { "category": "persistence", "status": "active" },
-    { "category": "quality-support", "status": "active" },
-    { "category": "security", "status": "active" },
-    { "category": "surface-system", "status": "active" },
-    { "category": "tooling", "status": "active" },
-    { "category": "vendor", "status": "active" }
+    {
+      "category": "architecture-support",
+      "status": "active",
+      "definition": "Bounded grouping for architecture-support roles that define boundaries, wiring, contracts, command surfaces, and responsibility connection points."
+    },
+    {
+      "category": "build-system",
+      "status": "active",
+      "definition": "Bounded grouping for roles that support build pipelines, packaging, compilation, bundling, and build-oriented automation."
+    },
+    {
+      "category": "concern-core",
+      "status": "active",
+      "definition": "Bounded grouping for core concern-owned responsibility lanes such as structure, behavior, reference, and output."
+    },
+    {
+      "category": "concern-style",
+      "status": "active",
+      "definition": "Bounded grouping for style-overlay roles that mutate presentation-linked structure or output without taking over the corresponding core concern lane."
+    },
+    {
+      "category": "concurrency",
+      "status": "active",
+      "definition": "Bounded grouping for roles that coordinate asynchronous, parallel, worker, or concurrent execution responsibility."
+    },
+    {
+      "category": "configuration",
+      "status": "active",
+      "definition": "Bounded grouping for roles that define configurable settings, environment values, runtime options, or setup policy."
+    },
+    {
+      "category": "data-model",
+      "status": "active",
+      "definition": "Bounded grouping for roles that define data shapes, schemas, transfer objects, and typed structural contracts."
+    },
+    {
+      "category": "deprecated",
+      "status": "active",
+      "definition": "Bounded grouping for legacy roles retained for detection, migration guidance, compatibility checks, or historical interpretation."
+    },
+    {
+      "category": "documentation",
+      "status": "active",
+      "definition": "Bounded grouping for roles that produce human-facing specifications, policies, workflows, plans, audits, and healthcheck documentation."
+    },
+    {
+      "category": "examples",
+      "status": "active",
+      "definition": "Bounded grouping for demonstrative, tutorial, sample, or reference-example artifacts."
+    },
+    {
+      "category": "experimental",
+      "status": "active",
+      "definition": "Bounded grouping for prototypes, spikes, playground work, and exploratory artifacts with intentionally relaxed stability expectations."
+    },
+    {
+      "category": "generated",
+      "status": "active",
+      "definition": "Bounded grouping for machine-generated artifacts where generated status affects ownership, validation, or editing expectations."
+    },
+    {
+      "category": "indexing-registry",
+      "status": "active",
+      "definition": "Bounded grouping for roles that define registries, indexes, identifiers, catalogs, anchors, manifests, and reusable token references."
+    },
+    {
+      "category": "integration-adapter",
+      "status": "active",
+      "definition": "Bounded grouping for roles that adapt, map, resolve, mediate, call, or gateway across system, service, or interface boundaries."
+    },
+    {
+      "category": "localization",
+      "status": "active",
+      "definition": "Bounded grouping for roles that define locale, language, translation, internationalization, or audience-localized artifacts."
+    },
+    {
+      "category": "migration",
+      "status": "active",
+      "definition": "Bounded grouping for roles that represent migration, transition, conversion, or version-shift work."
+    },
+    {
+      "category": "networking",
+      "status": "active",
+      "definition": "Bounded grouping for roles that define transport, network exchange, communication, or protocol-facing responsibility."
+    },
+    {
+      "category": "observability",
+      "status": "active",
+      "definition": "Bounded grouping for roles that produce logging, telemetry, monitoring, measurement, or runtime visibility signals."
+    },
+    {
+      "category": "operations-support",
+      "status": "active",
+      "definition": "Bounded grouping for operational roles such as deployment, infrastructure, environment support, release movement, and repository operations."
+    },
+    {
+      "category": "performance",
+      "status": "active",
+      "definition": "Bounded grouping for roles that express performance-sensitive behavior, measurement, optimization, or runtime efficiency concerns."
+    },
+    {
+      "category": "persistence",
+      "status": "active",
+      "definition": "Bounded grouping for roles that manage storage, caching, persistence, retrieval, or retained state."
+    },
+    {
+      "category": "quality-support",
+      "status": "active",
+      "definition": "Bounded grouping for roles that support validation, tests, fixtures, mocks, benchmarks, and quality evidence."
+    },
+    {
+      "category": "security",
+      "status": "active",
+      "definition": "Bounded grouping for roles that define authentication, authorization, cryptography, secrets, or protection-oriented responsibility."
+    },
+    {
+      "category": "surface-system",
+      "status": "active",
+      "definition": "Bounded grouping for roles that establish entry, host, route, or surface-level system structure."
+    },
+    {
+      "category": "tooling",
+      "status": "active",
+      "definition": "Bounded grouping for developer-facing automation, scripts, generators, CLIs, validators, and repository tooling artifacts."
+    },
+    {
+      "category": "vendor",
+      "status": "active",
+      "definition": "Bounded grouping for vendored, third-party, externally maintained, or externally sourced artifacts."
+    }
   ]
 }
