@@ -4,132 +4,132 @@
     {
       "category": "architecture-support",
       "status": "active",
-      "definition": "Category for files that define, protect, or connect architectural boundaries, contracts, commands, and wiring."
+      "definition": "Bounded grouping for architecture-support roles that define boundaries, wiring, contracts, command surfaces, and responsibility connection points."
     },
     {
       "category": "build-system",
       "status": "active",
-      "definition": "Category for files that define build pipelines, compile orchestration, packaging flows, and build-time system integration behavior."
+      "definition": "Bounded grouping for roles that support build pipelines, packaging, compilation, bundling, and build-oriented automation."
     },
     {
       "category": "concern-core",
       "status": "active",
-      "definition": "Category for core concern roles that express primary structure, behavior, reference knowledge, and output shaping."
+      "definition": "Bounded grouping for core concern-owned responsibility lanes such as structure, behavior, reference, and output."
     },
     {
       "category": "concern-style",
       "status": "active",
-      "definition": "Category for presentation-layer style roles that mutate or refine user-visible structure or results."
+      "definition": "Bounded grouping for style-overlay roles that mutate presentation-linked structure or output without taking over the corresponding core concern lane."
     },
     {
       "category": "concurrency",
       "status": "active",
-      "definition": "Category for files that coordinate scheduling, parallel work, race-safety boundaries, and deterministic concurrent execution behavior."
+      "definition": "Bounded grouping for roles that coordinate asynchronous, parallel, worker, or concurrent execution responsibility."
     },
     {
       "category": "configuration",
       "status": "active",
-      "definition": "Category for files that declare configurable options, policy values, mode controls, and bounded parameter contracts."
+      "definition": "Bounded grouping for roles that define configurable settings, environment values, runtime options, or setup policy."
     },
     {
       "category": "data-model",
       "status": "active",
-      "definition": "Category for files that define data shapes, transfer objects, schemas, and type contracts."
+      "definition": "Bounded grouping for roles that define data shapes, schemas, transfer objects, and typed structural contracts."
     },
     {
       "category": "deprecated",
       "status": "active",
-      "definition": "Category for roles retained only for compatibility, migration, or historical interpretation."
+      "definition": "Bounded grouping for legacy roles retained for detection, migration guidance, compatibility checks, or historical interpretation."
     },
     {
       "category": "documentation",
       "status": "active",
-      "definition": "Category for written specifications, plans, policies, audits, workflows, and other documentation artifacts."
+      "definition": "Bounded grouping for roles that produce human-facing specifications, policies, workflows, plans, audits, and healthcheck documentation."
     },
     {
       "category": "examples",
       "status": "active",
-      "definition": "Category for illustrative files that demonstrate usage patterns, reference scenarios, or instructional implementation examples."
+      "definition": "Bounded grouping for demonstrative, tutorial, sample, or reference-example artifacts."
     },
     {
       "category": "experimental",
       "status": "active",
-      "definition": "Category for files that isolate exploratory implementations, bounded trials, and non-stable experiment slices."
+      "definition": "Bounded grouping for prototypes, spikes, playground work, and exploratory artifacts with intentionally relaxed stability expectations."
     },
     {
       "category": "generated",
       "status": "active",
-      "definition": "Category for files produced by generators or automation pipelines rather than maintained as primary authored sources."
+      "definition": "Bounded grouping for machine-generated artifacts where generated status affects ownership, validation, or editing expectations."
     },
     {
       "category": "indexing-registry",
       "status": "active",
-      "definition": "Category for files that provide canonical registries, indexes, identifiers, catalogs, manifests, anchors, or reusable tokens."
+      "definition": "Bounded grouping for roles that define registries, indexes, identifiers, catalogs, anchors, manifests, and reusable token references."
     },
     {
       "category": "integration-adapter",
       "status": "active",
-      "definition": "Category for files that connect, adapt, map, resolve, or mediate between systems, services, boundaries, or data shapes."
+      "definition": "Bounded grouping for roles that adapt, map, resolve, mediate, call, or gateway across system, service, or interface boundaries."
     },
     {
       "category": "localization",
       "status": "active",
-      "definition": "Category for files that define language resources, locale mappings, translation assets, and regional presentation variants."
+      "definition": "Bounded grouping for roles that define locale, language, translation, internationalization, or audience-localized artifacts."
     },
     {
       "category": "migration",
       "status": "active",
-      "definition": "Category for files that define staged implementation path transitions, compatibility bridges, and bounded migration procedures."
+      "definition": "Bounded grouping for roles that represent migration, transition, conversion, or version-shift work."
     },
     {
       "category": "networking",
       "status": "active",
-      "definition": "Category for files that define transport interactions, request/response handling, protocol boundaries, and connection-layer integration behavior."
+      "definition": "Bounded grouping for roles that define transport, network exchange, communication, or protocol-facing responsibility."
     },
     {
       "category": "observability",
       "status": "active",
-      "definition": "Category for files that define logging, tracing, metrics, diagnostics, and visibility support for runtime behavior inspection."
+      "definition": "Bounded grouping for roles that produce logging, telemetry, monitoring, measurement, or runtime visibility signals."
     },
     {
       "category": "operations-support",
       "status": "active",
-      "definition": "Category for files that support deployment, environment operations, runtime administration, and operational maintenance workflows."
+      "definition": "Bounded grouping for operational roles such as deployment, infrastructure, environment support, release movement, and repository operations."
     },
     {
       "category": "performance",
       "status": "active",
-      "definition": "Category for files that define performance constraints, optimization strategies, profiling support, and efficiency-focused execution boundaries."
+      "definition": "Bounded grouping for roles that express performance-sensitive behavior, measurement, optimization, or runtime efficiency concerns."
     },
     {
       "category": "persistence",
       "status": "active",
-      "definition": "Category for files that define storage interaction patterns, data retention boundaries, serialization formats, and persistence-layer contracts."
+      "definition": "Bounded grouping for roles that manage storage, caching, persistence, retrieval, or retained state."
     },
     {
       "category": "quality-support",
       "status": "active",
-      "definition": "Category for tests, fixtures, mocks, benchmarks, and other verification-support artifacts."
+      "definition": "Bounded grouping for roles that support validation, tests, fixtures, mocks, benchmarks, and quality evidence."
     },
     {
       "category": "security",
       "status": "active",
-      "definition": "Category for files that define authentication, authorization, secrecy, integrity controls, and security-policy enforcement boundaries."
+      "definition": "Bounded grouping for roles that define authentication, authorization, cryptography, secrets, or protection-oriented responsibility."
     },
     {
       "category": "surface-system",
       "status": "active",
-      "definition": "Category for files that define entrypoints, hosts, routers, or other surface-level system access points."
+      "definition": "Bounded grouping for roles that establish entry, host, route, or surface-level system structure."
     },
     {
       "category": "tooling",
       "status": "active",
-      "definition": "Category for files that define developer tools, automation utilities, workflow helpers, and instrumentation used to operate repository processes."
+      "definition": "Bounded grouping for developer-facing automation, scripts, generators, CLIs, validators, and repository tooling artifacts."
     },
     {
       "category": "vendor",
       "status": "active",
-      "definition": "Category for third-party or externally sourced integration files preserved for deterministic consumption within repository workflows."
+      "definition": "Bounded grouping for vendored, third-party, externally maintained, or externally sourced artifacts."
     }
   ]
 }
