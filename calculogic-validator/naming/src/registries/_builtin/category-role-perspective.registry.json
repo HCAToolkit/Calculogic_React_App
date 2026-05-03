@@ -3,139 +3,277 @@
   "rolesByCategory": {
     "architecture-support": [
       {
-        "role": "boundary"
+        "role": "boundary",
+        "meanings": [
+          "structure"
+        ]
       },
       {
-        "role": "cli"
+        "role": "cli",
+        "meanings": [
+          "behavior",
+          "presentation"
+        ]
       },
       {
-        "role": "contracts"
+        "role": "contracts",
+        "meanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "wiring"
+        "role": "wiring",
+        "meanings": [
+          "structure"
+        ]
       }
     ],
     "concern-core": [
       {
-        "role": "build"
+        "role": "build",
+        "meanings": [
+          "structure"
+        ]
       },
       {
-        "role": "knowledge"
+        "role": "knowledge",
+        "meanings": [
+          "reference"
+        ]
       },
       {
-        "role": "logic"
+        "role": "logic",
+        "meanings": [
+          "behavior"
+        ]
       },
       {
-        "role": "results"
+        "role": "results",
+        "meanings": [
+          "output"
+        ]
       }
     ],
     "concern-style": [
       {
-        "role": "build-style"
+        "role": "build-style",
+        "meanings": [
+          "presentation",
+          "structure"
+        ]
       },
       {
-        "role": "results-style"
+        "role": "results-style",
+        "meanings": [
+          "presentation",
+          "output"
+        ]
       }
     ],
     "data-model": [
       {
-        "role": "dto"
+        "role": "dto",
+        "meanings": [
+          "output",
+          "structure"
+        ]
       },
       {
-        "role": "schema"
+        "role": "schema",
+        "meanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "types"
+        "role": "types",
+        "meanings": [
+          "reference",
+          "structure"
+        ]
       }
     ],
     "deprecated": [
       {
-        "role": "view"
+        "role": "view",
+        "meanings": [
+          "presentation"
+        ]
       }
     ],
     "documentation": [
       {
-        "role": "audit"
+        "role": "audit",
+        "meanings": [
+          "reference",
+          "output"
+        ]
       },
       {
-        "role": "healthcheck"
+        "role": "healthcheck",
+        "meanings": [
+          "reference",
+          "output"
+        ]
       },
       {
-        "role": "plan"
+        "role": "plan",
+        "meanings": [
+          "reference"
+        ]
       },
       {
-        "role": "policy"
+        "role": "policy",
+        "meanings": [
+          "reference"
+        ]
       },
       {
-        "role": "spec"
+        "role": "spec",
+        "meanings": [
+          "reference"
+        ]
       },
       {
-        "role": "workflow"
+        "role": "workflow",
+        "meanings": [
+          "reference",
+          "behavior"
+        ]
       }
     ],
     "indexing-registry": [
       {
-        "role": "anchor"
+        "role": "anchor",
+        "meanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "catalog"
+        "role": "catalog",
+        "meanings": [
+          "reference"
+        ]
       },
       {
-        "role": "ids"
+        "role": "ids",
+        "meanings": [
+          "reference"
+        ]
       },
       {
-        "role": "index"
+        "role": "index",
+        "meanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "manifest"
+        "role": "manifest",
+        "meanings": [
+          "reference",
+          "structure"
+        ]
       },
       {
-        "role": "registry"
+        "role": "registry",
+        "meanings": [
+          "reference"
+        ]
       },
       {
-        "role": "tokens"
+        "role": "tokens",
+        "meanings": [
+          "reference"
+        ]
       }
     ],
     "integration-adapter": [
       {
-        "role": "adapter"
+        "role": "adapter",
+        "meanings": [
+          "behavior",
+          "structure"
+        ]
       },
       {
-        "role": "client"
+        "role": "client",
+        "meanings": [
+          "behavior"
+        ]
       },
       {
-        "role": "gateway"
+        "role": "gateway",
+        "meanings": [
+          "behavior",
+          "structure"
+        ]
       },
       {
-        "role": "mapper"
+        "role": "mapper",
+        "meanings": [
+          "behavior",
+          "output"
+        ]
       },
       {
-        "role": "resolver"
+        "role": "resolver",
+        "meanings": [
+          "behavior",
+          "reference"
+        ]
       }
     ],
     "quality-support": [
       {
-        "role": "benchmark"
+        "role": "benchmark",
+        "meanings": [
+          "reference",
+          "output"
+        ]
       },
       {
-        "role": "fixture"
+        "role": "fixture",
+        "meanings": [
+          "reference"
+        ]
       },
       {
-        "role": "mock"
+        "role": "mock",
+        "meanings": [
+          "behavior"
+        ]
       },
       {
-        "role": "test"
+        "role": "test",
+        "meanings": [
+          "behavior",
+          "output"
+        ]
       }
     ],
     "surface-system": [
       {
-        "role": "entry"
+        "role": "entry",
+        "meanings": [
+          "structure",
+          "behavior"
+        ]
       },
       {
-        "role": "host"
+        "role": "host",
+        "meanings": [
+          "structure"
+        ]
       },
       {
-        "role": "router"
+        "role": "router",
+        "meanings": [
+          "behavior",
+          "structure"
+        ]
       }
     ]
   }
