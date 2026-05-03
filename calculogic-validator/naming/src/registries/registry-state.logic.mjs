@@ -239,6 +239,59 @@ const loadCanonicalRoleStatusByRole = ({ builtinRegistryDir }) => {
   return statusByRole;
 };
 
+const loadLegacyGroupedRoleStatusByRole = ({ builtinRegistryDir }) => {
+  const legacyRolesPath = path.join(builtinRegistryDir, ROLES_REGISTRY_FILENAME);
+
+  if (!fs.existsSync(legacyRolesPath)) {
+    return null;
+  }
+
+  let parsed;
+
+  try {
+    parsed = loadJsonFile(legacyRolesPath);
+  } catch {
+    return null;
+  }
+
+  const rolesByCategory = parsed?.rolesByCategory;
+
+  if (
+    !rolesByCategory ||
+    typeof rolesByCategory !== 'object' ||
+    Array.isArray(rolesByCategory)
+  ) {
+    return null;
+  }
+
+  const statusByRole = new Map();
+
+  for (const roles of Object.values(rolesByCategory)) {
+    if (!Array.isArray(roles)) {
+      continue;
+    }
+
+    for (const roleEntry of roles) {
+      if (!roleEntry || typeof roleEntry !== 'object' || Array.isArray(roleEntry)) {
+        continue;
+      }
+
+      const role = typeof roleEntry.role === 'string' ? roleEntry.role.trim() : '';
+      const status = typeof roleEntry.status === 'string' ? roleEntry.status.trim() : '';
+
+      if (!role || !status || !ALLOWED_ROLE_STATUSES.has(status)) {
+        continue;
+      }
+
+      if (!statusByRole.has(role)) {
+        statusByRole.set(role, status);
+      }
+    }
+  }
+
+  return statusByRole;
+};
+
 const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
   const categoryRolePerspectivePath = path.join(
     builtinRegistryDir,
@@ -259,6 +312,10 @@ const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
   const canonicalStatusByRole = hasCategoryRolePerspective
     ? loadCanonicalRoleStatusByRole({ builtinRegistryDir })
     : null;
+  const legacyGroupedStatusByRole =
+    hasCategoryRolePerspective && canonicalStatusByRole === null
+      ? loadLegacyGroupedRoleStatusByRole({ builtinRegistryDir })
+      : null;
 
   const flattenedRoles = [];
 
@@ -272,7 +329,9 @@ const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
     for (const roleEntry of roles) {
       const role = typeof roleEntry?.role === 'string' ? roleEntry.role.trim() : '';
       const canonicalStatus = role ? canonicalStatusByRole?.get(role) : undefined;
-      const status = canonicalStatus ?? roleEntry?.status;
+      const perspectiveStatus = roleEntry?.status;
+      const legacyGroupedStatus = role ? legacyGroupedStatusByRole?.get(role) : undefined;
+      const status = canonicalStatus ?? perspectiveStatus ?? legacyGroupedStatus;
       flattenedRoles.push({ ...roleEntry, category, status });
     }
   }

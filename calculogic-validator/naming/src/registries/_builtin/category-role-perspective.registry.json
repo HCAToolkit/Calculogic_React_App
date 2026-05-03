@@ -2,67 +2,141 @@
   "version": "1",
   "rolesByCategory": {
     "architecture-support": [
-      { "role": "boundary", "status": "active" },
-      { "role": "cli", "status": "active" },
-      { "role": "contracts", "status": "active" },
-      { "role": "wiring", "status": "active" }
+      {
+        "role": "boundary"
+      },
+      {
+        "role": "cli"
+      },
+      {
+        "role": "contracts"
+      },
+      {
+        "role": "wiring"
+      }
     ],
     "concern-core": [
-      { "role": "build", "status": "active" },
-      { "role": "knowledge", "status": "active" },
-      { "role": "logic", "status": "active" },
-      { "role": "results", "status": "active" }
+      {
+        "role": "build"
+      },
+      {
+        "role": "knowledge"
+      },
+      {
+        "role": "logic"
+      },
+      {
+        "role": "results"
+      }
     ],
     "concern-style": [
-      { "role": "build-style", "status": "active" },
-      { "role": "results-style", "status": "active" }
+      {
+        "role": "build-style"
+      },
+      {
+        "role": "results-style"
+      }
     ],
     "data-model": [
-      { "role": "dto", "status": "active" },
-      { "role": "schema", "status": "active" },
-      { "role": "types", "status": "active" }
+      {
+        "role": "dto"
+      },
+      {
+        "role": "schema"
+      },
+      {
+        "role": "types"
+      }
     ],
     "deprecated": [
       {
-        "role": "view",
-        "status": "deprecated",
-        "notes": "Historical role from pre-current concern split; manual migration required."
+        "role": "view"
       }
     ],
     "documentation": [
-      { "role": "audit", "status": "active" },
-      { "role": "healthcheck", "status": "active" },
-      { "role": "plan", "status": "active" },
-      { "role": "policy", "status": "active" },
-      { "role": "spec", "status": "active" },
-      { "role": "workflow", "status": "active" }
+      {
+        "role": "audit"
+      },
+      {
+        "role": "healthcheck"
+      },
+      {
+        "role": "plan"
+      },
+      {
+        "role": "policy"
+      },
+      {
+        "role": "spec"
+      },
+      {
+        "role": "workflow"
+      }
     ],
     "indexing-registry": [
-      { "role": "anchor", "status": "active" },
-      { "role": "catalog", "status": "active" },
-      { "role": "ids", "status": "active" },
-      { "role": "index", "status": "active" },
-      { "role": "manifest", "status": "active" },
-      { "role": "registry", "status": "active" },
-      { "role": "tokens", "status": "active" }
+      {
+        "role": "anchor"
+      },
+      {
+        "role": "catalog"
+      },
+      {
+        "role": "ids"
+      },
+      {
+        "role": "index"
+      },
+      {
+        "role": "manifest"
+      },
+      {
+        "role": "registry"
+      },
+      {
+        "role": "tokens"
+      }
     ],
     "integration-adapter": [
-      { "role": "adapter", "status": "active" },
-      { "role": "client", "status": "active" },
-      { "role": "gateway", "status": "active" },
-      { "role": "mapper", "status": "active" },
-      { "role": "resolver", "status": "active" }
+      {
+        "role": "adapter"
+      },
+      {
+        "role": "client"
+      },
+      {
+        "role": "gateway"
+      },
+      {
+        "role": "mapper"
+      },
+      {
+        "role": "resolver"
+      }
     ],
     "quality-support": [
-      { "role": "benchmark", "status": "active" },
-      { "role": "fixture", "status": "active" },
-      { "role": "mock", "status": "active" },
-      { "role": "test", "status": "active" }
+      {
+        "role": "benchmark"
+      },
+      {
+        "role": "fixture"
+      },
+      {
+        "role": "mock"
+      },
+      {
+        "role": "test"
+      }
     ],
     "surface-system": [
-      { "role": "entry", "status": "active" },
-      { "role": "host", "status": "active" },
-      { "role": "router", "status": "active" }
+      {
+        "role": "entry"
+      },
+      {
+        "role": "host"
+      },
+      {
+        "role": "router"
+      }
     ]
   }
 }
