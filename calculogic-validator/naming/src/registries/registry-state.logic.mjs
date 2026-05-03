@@ -196,16 +196,51 @@ function loadJsonFile(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+const loadCanonicalRoleStatusByRole = ({ builtinRegistryDir }) => {
+  const canonicalRolesPath = path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME);
+
+  if (!fs.existsSync(canonicalRolesPath)) {
+    return null;
+  }
+
+  const parsed = loadJsonFile(canonicalRolesPath);
+  const roles = parsed?.roles;
+
+  if (!Array.isArray(roles)) {
+    return null;
+  }
+
+  const statusByRole = new Map();
+
+  for (const roleEntry of roles) {
+    if (!roleEntry || typeof roleEntry !== 'object' || Array.isArray(roleEntry)) {
+      continue;
+    }
+
+    const role = typeof roleEntry.role === 'string' ? roleEntry.role.trim() : '';
+    const status = typeof roleEntry.status === 'string' ? roleEntry.status.trim() : '';
+
+    if (!role || !status || !ALLOWED_ROLE_STATUSES.has(status)) {
+      continue;
+    }
+
+    if (!statusByRole.has(role)) {
+      statusByRole.set(role, status);
+    }
+  }
+
+  return statusByRole;
+};
+
 const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
   const categoryRolePerspectivePath = path.join(
     builtinRegistryDir,
     CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME,
   );
-  const legacyGroupedRolesPath = path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME);
-
-  const groupedRolesPath = fs.existsSync(categoryRolePerspectivePath)
+  const hasCategoryRolePerspective = fs.existsSync(categoryRolePerspectivePath);
+  const groupedRolesPath = hasCategoryRolePerspective
     ? categoryRolePerspectivePath
-    : legacyGroupedRolesPath;
+    : path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME);
 
   const parsed = loadJsonFile(groupedRolesPath);
   const rolesByCategory = parsed?.rolesByCategory;
@@ -213,6 +248,10 @@ const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
   if (!rolesByCategory || typeof rolesByCategory !== 'object' || Array.isArray(rolesByCategory)) {
     throw new Error('Invalid builtin roles registry: expected rolesByCategory object.');
   }
+
+  const canonicalStatusByRole = hasCategoryRolePerspective
+    ? loadCanonicalRoleStatusByRole({ builtinRegistryDir })
+    : null;
 
   const flattenedRoles = [];
 
@@ -224,7 +263,10 @@ const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
     }
 
     for (const roleEntry of roles) {
-      flattenedRoles.push({ ...roleEntry, category });
+      const role = typeof roleEntry?.role === 'string' ? roleEntry.role.trim() : '';
+      const canonicalStatus = role ? canonicalStatusByRole?.get(role) : undefined;
+      const status = canonicalStatus ?? roleEntry?.status;
+      flattenedRoles.push({ ...roleEntry, category, status });
     }
   }
 
