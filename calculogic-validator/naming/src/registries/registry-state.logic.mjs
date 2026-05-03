@@ -10,7 +10,7 @@ import { loadOverlayCapabilitiesFromFile } from './naming-overlay-capabilities-r
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const BUILTIN_REGISTRY_DIR = path.join(MODULE_DIR, '_builtin');
-const LEGACY_GROUPED_ROLES_REGISTRY_FILENAME = 'roles.registry.json';
+const ROLES_REGISTRY_FILENAME = 'roles.registry.json';
 const CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME = 'category-role-perspective.registry.json';
 const REQUIRED_BUILTIN_REGISTRY_FILES = [
   'categories.registry.json',
@@ -36,7 +36,7 @@ const hasRequiredBuiltinRegistryFiles = ({ builtinRegistryDir }) => {
 
   return (
     fs.existsSync(path.join(builtinRegistryDir, CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME)) ||
-    fs.existsSync(path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME))
+    fs.existsSync(path.join(builtinRegistryDir, ROLES_REGISTRY_FILENAME))
   );
 };
 
@@ -197,7 +197,7 @@ function loadJsonFile(filePath) {
 }
 
 const loadCanonicalRoleStatusByRole = ({ builtinRegistryDir }) => {
-  const canonicalRolesPath = path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME);
+  const canonicalRolesPath = path.join(builtinRegistryDir, ROLES_REGISTRY_FILENAME);
 
   if (!fs.existsSync(canonicalRolesPath)) {
     return null;
@@ -238,11 +238,11 @@ const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
     CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME,
   );
   const hasCategoryRolePerspective = fs.existsSync(categoryRolePerspectivePath);
-  const groupedRolesPath = hasCategoryRolePerspective
+  const membershipSourcePath = hasCategoryRolePerspective
     ? categoryRolePerspectivePath
-    : path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME);
+    : path.join(builtinRegistryDir, ROLES_REGISTRY_FILENAME);
 
-  const parsed = loadJsonFile(groupedRolesPath);
+  const parsed = loadJsonFile(membershipSourcePath);
   const rolesByCategory = parsed?.rolesByCategory;
 
   if (!rolesByCategory || typeof rolesByCategory !== 'object' || Array.isArray(rolesByCategory)) {
