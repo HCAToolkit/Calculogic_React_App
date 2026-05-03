@@ -471,6 +471,62 @@ test('legacy grouped roles fallback keeps legacy status when category-role persp
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 });
+
+
+test('category-role perspective membership remains authoritative when canonical roles registry is malformed', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
+      categories: [{ category: 'architecture-support' }],
+    });
+
+    writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
+      rolesByCategory: {
+        'architecture-support': [{ role: 'host', status: 'deprecated' }],
+      },
+    });
+
+    fs.writeFileSync(path.join(tempRoot, '_builtin', 'roles.registry.json'), '{ not valid json');
+
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), { reportableExtensions: ['.ts'] });
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), { reportableRootFiles: ['package.json'] });
+    writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), { classificationBuckets: ['canonical'], secondaryBucketFamilies: ['codeCounts'] });
+    writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), { missingRolePatterns: [] });
+    writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), { outcomes: { canonical: { code: 'TEMP_CANONICAL', severity: 'info', classification: 'canonical', message: 'Temporary canonical policy.', ruleRef: 'temp-rule-ref' } } });
+    writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), DEFAULT_OVERLAY_CAPABILITIES_REGISTRY);
+    writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), { semanticName: { style: 'kebab-case' } });
+
+    const result = resolveNamingRegistryInputs({ registryRootDir: tempRoot });
+    assert.deepEqual(result.roles, [{ role: 'host', category: 'architecture-support', status: 'deprecated' }]);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('legacy grouped roles registry remains strict membership source when category-role perspective is absent', () => {
+  const tempRoot = makeTempRegistryRoot();
+
+  try {
+    writeJson(path.join(tempRoot, '_builtin', 'categories.registry.json'), {
+      categories: [{ category: 'architecture-support' }],
+    });
+
+    fs.writeFileSync(path.join(tempRoot, '_builtin', 'roles.registry.json'), '{ malformed legacy membership source');
+
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), { reportableExtensions: ['.ts'] });
+    writeJson(path.join(tempRoot, '_builtin', 'reportable-root-files.registry.json'), { reportableRootFiles: ['package.json'] });
+    writeJson(path.join(tempRoot, '_builtin', 'summary-buckets.registry.json'), { classificationBuckets: ['canonical'], secondaryBucketFamilies: ['codeCounts'] });
+    writeJson(path.join(tempRoot, '_builtin', 'missing-role-patterns.registry.json'), { missingRolePatterns: [] });
+    writeJson(path.join(tempRoot, '_builtin', 'finding-policy.registry.json'), { outcomes: { canonical: { code: 'TEMP_CANONICAL', severity: 'info', classification: 'canonical', message: 'Temporary canonical policy.', ruleRef: 'temp-rule-ref' } } });
+    writeJson(path.join(tempRoot, '_builtin', 'overlay-capabilities.registry.json'), DEFAULT_OVERLAY_CAPABILITIES_REGISTRY);
+    writeJson(path.join(tempRoot, '_builtin', 'case-rules.registry.json'), { semanticName: { style: 'kebab-case' } });
+
+    assert.throws(() => resolveNamingRegistryInputs({ registryRootDir: tempRoot }), SyntaxError);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
 test('registryRootDir falls back to module _builtin when temp _builtin is incomplete', () => {
   const tempRoot = makeTempRegistryRoot();
 

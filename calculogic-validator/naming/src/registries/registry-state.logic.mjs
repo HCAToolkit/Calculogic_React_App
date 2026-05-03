@@ -203,7 +203,14 @@ const loadCanonicalRoleStatusByRole = ({ builtinRegistryDir }) => {
     return null;
   }
 
-  const parsed = loadJsonFile(canonicalRolesPath);
+  let parsed;
+
+  try {
+    parsed = loadJsonFile(canonicalRolesPath);
+  } catch {
+    return null;
+  }
+
   const roles = parsed?.roles;
 
   if (!Array.isArray(roles)) {
