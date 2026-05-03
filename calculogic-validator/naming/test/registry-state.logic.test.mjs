@@ -138,7 +138,9 @@ test('builtin resolution loads roles and reportable extensions from _builtin JSO
         const normalized = {
           role: entry.role.trim(),
           category,
-          status: canonicalStatusByRole.get(entry.role.trim()) ?? entry.status.trim(),
+          status:
+            canonicalStatusByRole.get(entry.role.trim()) ??
+            (typeof entry.status === 'string' ? entry.status.trim() : ''),
         };
 
         if (typeof entry.notes === 'string' && entry.notes.trim()) {
@@ -216,8 +218,11 @@ test('registryRootDir drives builtin roles, extensions, and categories from the 
 
     writeJson(path.join(tempRoot, '_builtin', 'category-role-perspective.registry.json'), {
       rolesByCategory: {
-        'from-temp-root': [{ role: 'temp-builtin-role', status: 'active' }],
+        'from-temp-root': [{ role: 'temp-builtin-role' }],
       },
+    });
+    writeJson(path.join(tempRoot, '_builtin', 'roles.registry.json'), {
+      roles: [{ role: 'temp-builtin-role', status: 'active' }],
     });
 
     writeJson(path.join(tempRoot, '_builtin', 'reportable-extensions.registry.json'), {
