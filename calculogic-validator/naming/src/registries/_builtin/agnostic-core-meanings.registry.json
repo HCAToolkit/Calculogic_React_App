@@ -1,0 +1,30 @@
+{
+  "version": "1",
+  "meanings": [
+    {
+      "meaning": "structure",
+      "status": "active",
+      "definition": "Composition, arrangement, and assembly of parts into a coherent whole."
+    },
+    {
+      "meaning": "behavior",
+      "status": "active",
+      "definition": "Actions, responses, decisions, state, and change over time."
+    },
+    {
+      "meaning": "reference",
+      "status": "active",
+      "definition": "Declarative meaning, static knowledge, reusable facts, or domain reference content."
+    },
+    {
+      "meaning": "output",
+      "status": "active",
+      "definition": "Consumer-ready result shaping."
+    },
+    {
+      "meaning": "presentation",
+      "status": "active",
+      "definition": "How information, capabilities, or deliverables are surfaced, arranged, formatted, or made usable."
+    }
+  ]
+}
