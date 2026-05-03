@@ -4,27 +4,27 @@
     "architecture-support": [
       {
         "role": "boundary",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "structure"
         ]
       },
       {
         "role": "cli",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior",
           "presentation"
         ]
       },
       {
         "role": "contracts",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "structure"
         ]
       },
       {
         "role": "wiring",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "structure"
         ]
       }
@@ -32,25 +32,25 @@
     "concern-core": [
       {
         "role": "build",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "structure"
         ]
       },
       {
         "role": "knowledge",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       },
       {
         "role": "logic",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior"
         ]
       },
       {
         "role": "results",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "output"
         ]
       }
@@ -58,37 +58,57 @@
     "concern-style": [
       {
         "role": "build-style",
-        "meanings": [
-          "presentation",
+        "inheritsFrom": {
+          "category": "concern-core",
+          "role": "build"
+        },
+        "baseMeanings": [
           "structure"
+        ],
+        "overlayMeanings": [
+          "presentation"
+        ],
+        "agnosticCoreMeanings": [
+          "structure",
+          "presentation"
         ]
       },
       {
         "role": "results-style",
-        "meanings": [
-          "presentation",
+        "inheritsFrom": {
+          "category": "concern-core",
+          "role": "results"
+        },
+        "baseMeanings": [
           "output"
+        ],
+        "overlayMeanings": [
+          "presentation"
+        ],
+        "agnosticCoreMeanings": [
+          "output",
+          "presentation"
         ]
       }
     ],
     "data-model": [
       {
         "role": "dto",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "output",
           "structure"
         ]
       },
       {
         "role": "schema",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "structure"
         ]
       },
       {
         "role": "types",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "structure"
         ]
@@ -97,7 +117,7 @@
     "deprecated": [
       {
         "role": "view",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "presentation"
         ]
       }
@@ -105,39 +125,39 @@
     "documentation": [
       {
         "role": "audit",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "output"
         ]
       },
       {
         "role": "healthcheck",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "output"
         ]
       },
       {
         "role": "plan",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       },
       {
         "role": "policy",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       },
       {
         "role": "spec",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       },
       {
         "role": "workflow",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "behavior"
         ]
@@ -146,46 +166,46 @@
     "indexing-registry": [
       {
         "role": "anchor",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "structure"
         ]
       },
       {
         "role": "catalog",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       },
       {
         "role": "ids",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       },
       {
         "role": "index",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "structure"
         ]
       },
       {
         "role": "manifest",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "structure"
         ]
       },
       {
         "role": "registry",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       },
       {
         "role": "tokens",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       }
@@ -193,34 +213,34 @@
     "integration-adapter": [
       {
         "role": "adapter",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior",
           "structure"
         ]
       },
       {
         "role": "client",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior"
         ]
       },
       {
         "role": "gateway",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior",
           "structure"
         ]
       },
       {
         "role": "mapper",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior",
           "output"
         ]
       },
       {
         "role": "resolver",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior",
           "reference"
         ]
@@ -229,26 +249,26 @@
     "quality-support": [
       {
         "role": "benchmark",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference",
           "output"
         ]
       },
       {
         "role": "fixture",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "reference"
         ]
       },
       {
         "role": "mock",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior"
         ]
       },
       {
         "role": "test",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior",
           "output"
         ]
@@ -257,20 +277,20 @@
     "surface-system": [
       {
         "role": "entry",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "structure",
           "behavior"
         ]
       },
       {
         "role": "host",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "structure"
         ]
       },
       {
         "role": "router",
-        "meanings": [
+        "agnosticCoreMeanings": [
           "behavior",
           "structure"
         ]
