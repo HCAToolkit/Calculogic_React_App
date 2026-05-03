@@ -1,31 +1,135 @@
 {
   "version": "1",
   "categories": [
-    { "category": "architecture-support", "status": "active" },
-    { "category": "build-system", "status": "active" },
-    { "category": "concern-core", "status": "active" },
-    { "category": "concern-style", "status": "active" },
-    { "category": "concurrency", "status": "active" },
-    { "category": "configuration", "status": "active" },
-    { "category": "data-model", "status": "active" },
-    { "category": "deprecated", "status": "active" },
-    { "category": "documentation", "status": "active" },
-    { "category": "examples", "status": "active" },
-    { "category": "experimental", "status": "active" },
-    { "category": "generated", "status": "active" },
-    { "category": "indexing-registry", "status": "active" },
-    { "category": "integration-adapter", "status": "active" },
-    { "category": "localization", "status": "active" },
-    { "category": "migration", "status": "active" },
-    { "category": "networking", "status": "active" },
-    { "category": "observability", "status": "active" },
-    { "category": "operations-support", "status": "active" },
-    { "category": "performance", "status": "active" },
-    { "category": "persistence", "status": "active" },
-    { "category": "quality-support", "status": "active" },
-    { "category": "security", "status": "active" },
-    { "category": "surface-system", "status": "active" },
-    { "category": "tooling", "status": "active" },
-    { "category": "vendor", "status": "active" }
+    {
+      "category": "architecture-support",
+      "status": "active",
+      "definition": "Category for files that define, protect, or connect architectural boundaries, contracts, commands, and wiring."
+    },
+    {
+      "category": "build-system",
+      "status": "active",
+      "definition": "Category for files that define build pipelines, compile orchestration, packaging flows, and build-time system integration behavior."
+    },
+    {
+      "category": "concern-core",
+      "status": "active",
+      "definition": "Category for core concern roles that express primary structure, behavior, reference knowledge, and output shaping."
+    },
+    {
+      "category": "concern-style",
+      "status": "active",
+      "definition": "Category for presentation-layer style roles that mutate or refine user-visible structure or results."
+    },
+    {
+      "category": "concurrency",
+      "status": "active",
+      "definition": "Category for files that coordinate scheduling, parallel work, race-safety boundaries, and deterministic concurrent execution behavior."
+    },
+    {
+      "category": "configuration",
+      "status": "active",
+      "definition": "Category for files that declare configurable options, policy values, mode controls, and bounded parameter contracts."
+    },
+    {
+      "category": "data-model",
+      "status": "active",
+      "definition": "Category for files that define data shapes, transfer objects, schemas, and type contracts."
+    },
+    {
+      "category": "deprecated",
+      "status": "active",
+      "definition": "Category for roles retained only for compatibility, migration, or historical interpretation."
+    },
+    {
+      "category": "documentation",
+      "status": "active",
+      "definition": "Category for written specifications, plans, policies, audits, workflows, and other documentation artifacts."
+    },
+    {
+      "category": "examples",
+      "status": "active",
+      "definition": "Category for illustrative files that demonstrate usage patterns, reference scenarios, or instructional implementation examples."
+    },
+    {
+      "category": "experimental",
+      "status": "active",
+      "definition": "Category for files that isolate exploratory implementations, bounded trials, and non-stable experiment slices."
+    },
+    {
+      "category": "generated",
+      "status": "active",
+      "definition": "Category for files produced by generators or automation pipelines rather than maintained as primary authored sources."
+    },
+    {
+      "category": "indexing-registry",
+      "status": "active",
+      "definition": "Category for files that provide canonical registries, indexes, identifiers, catalogs, manifests, anchors, or reusable tokens."
+    },
+    {
+      "category": "integration-adapter",
+      "status": "active",
+      "definition": "Category for files that connect, adapt, map, resolve, or mediate between systems, services, boundaries, or data shapes."
+    },
+    {
+      "category": "localization",
+      "status": "active",
+      "definition": "Category for files that define language resources, locale mappings, translation assets, and regional presentation variants."
+    },
+    {
+      "category": "migration",
+      "status": "active",
+      "definition": "Category for files that define staged implementation path transitions, compatibility bridges, and bounded migration procedures."
+    },
+    {
+      "category": "networking",
+      "status": "active",
+      "definition": "Category for files that define transport interactions, request/response handling, protocol boundaries, and connection-layer integration behavior."
+    },
+    {
+      "category": "observability",
+      "status": "active",
+      "definition": "Category for files that define logging, tracing, metrics, diagnostics, and visibility support for runtime behavior inspection."
+    },
+    {
+      "category": "operations-support",
+      "status": "active",
+      "definition": "Category for files that support deployment, environment operations, runtime administration, and operational maintenance workflows."
+    },
+    {
+      "category": "performance",
+      "status": "active",
+      "definition": "Category for files that define performance constraints, optimization strategies, profiling support, and efficiency-focused execution boundaries."
+    },
+    {
+      "category": "persistence",
+      "status": "active",
+      "definition": "Category for files that define storage interaction patterns, data retention boundaries, serialization formats, and persistence-layer contracts."
+    },
+    {
+      "category": "quality-support",
+      "status": "active",
+      "definition": "Category for tests, fixtures, mocks, benchmarks, and other verification-support artifacts."
+    },
+    {
+      "category": "security",
+      "status": "active",
+      "definition": "Category for files that define authentication, authorization, secrecy, integrity controls, and security-policy enforcement boundaries."
+    },
+    {
+      "category": "surface-system",
+      "status": "active",
+      "definition": "Category for files that define entrypoints, hosts, routers, or other surface-level system access points."
+    },
+    {
+      "category": "tooling",
+      "status": "active",
+      "definition": "Category for files that define developer tools, automation utilities, workflow helpers, and instrumentation used to operate repository processes."
+    },
+    {
+      "category": "vendor",
+      "status": "active",
+      "definition": "Category for third-party or externally sourced integration files preserved for deterministic consumption within repository workflows."
+    }
   ]
 }
