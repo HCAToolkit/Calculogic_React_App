@@ -10,7 +10,7 @@ import { loadOverlayCapabilitiesFromFile } from './naming-overlay-capabilities-r
 const DEFAULT_REGISTRY_STATE = 'builtin';
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const BUILTIN_REGISTRY_DIR = path.join(MODULE_DIR, '_builtin');
-const LEGACY_GROUPED_ROLES_REGISTRY_FILENAME = 'roles.registry.json';
+const ROLES_REGISTRY_FILENAME = 'roles.registry.json';
 const CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME = 'category-role-perspective.registry.json';
 const REQUIRED_BUILTIN_REGISTRY_FILES = [
   'categories.registry.json',
@@ -36,7 +36,7 @@ const hasRequiredBuiltinRegistryFiles = ({ builtinRegistryDir }) => {
 
   return (
     fs.existsSync(path.join(builtinRegistryDir, CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME)) ||
-    fs.existsSync(path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME))
+    fs.existsSync(path.join(builtinRegistryDir, ROLES_REGISTRY_FILENAME))
   );
 };
 
@@ -196,23 +196,69 @@ function loadJsonFile(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+const loadCanonicalRoleStatusByRole = ({ builtinRegistryDir }) => {
+  const canonicalRolesPath = path.join(builtinRegistryDir, ROLES_REGISTRY_FILENAME);
+
+  if (!fs.existsSync(canonicalRolesPath)) {
+    return null;
+  }
+
+  let parsed;
+
+  try {
+    parsed = loadJsonFile(canonicalRolesPath);
+  } catch {
+    return null;
+  }
+
+  const roles = parsed?.roles;
+
+  if (!Array.isArray(roles)) {
+    return null;
+  }
+
+  const statusByRole = new Map();
+
+  for (const roleEntry of roles) {
+    if (!roleEntry || typeof roleEntry !== 'object' || Array.isArray(roleEntry)) {
+      continue;
+    }
+
+    const role = typeof roleEntry.role === 'string' ? roleEntry.role.trim() : '';
+    const status = typeof roleEntry.status === 'string' ? roleEntry.status.trim() : '';
+
+    if (!role || !status || !ALLOWED_ROLE_STATUSES.has(status)) {
+      continue;
+    }
+
+    if (!statusByRole.has(role)) {
+      statusByRole.set(role, status);
+    }
+  }
+
+  return statusByRole;
+};
+
 const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
   const categoryRolePerspectivePath = path.join(
     builtinRegistryDir,
     CATEGORY_ROLE_PERSPECTIVE_REGISTRY_FILENAME,
   );
-  const legacyGroupedRolesPath = path.join(builtinRegistryDir, LEGACY_GROUPED_ROLES_REGISTRY_FILENAME);
-
-  const groupedRolesPath = fs.existsSync(categoryRolePerspectivePath)
+  const hasCategoryRolePerspective = fs.existsSync(categoryRolePerspectivePath);
+  const membershipSourcePath = hasCategoryRolePerspective
     ? categoryRolePerspectivePath
-    : legacyGroupedRolesPath;
+    : path.join(builtinRegistryDir, ROLES_REGISTRY_FILENAME);
 
-  const parsed = loadJsonFile(groupedRolesPath);
+  const parsed = loadJsonFile(membershipSourcePath);
   const rolesByCategory = parsed?.rolesByCategory;
 
   if (!rolesByCategory || typeof rolesByCategory !== 'object' || Array.isArray(rolesByCategory)) {
     throw new Error('Invalid builtin roles registry: expected rolesByCategory object.');
   }
+
+  const canonicalStatusByRole = hasCategoryRolePerspective
+    ? loadCanonicalRoleStatusByRole({ builtinRegistryDir })
+    : null;
 
   const flattenedRoles = [];
 
@@ -224,7 +270,10 @@ const loadBuiltinRolesPayload = ({ builtinRegistryDir }) => {
     }
 
     for (const roleEntry of roles) {
-      flattenedRoles.push({ ...roleEntry, category });
+      const role = typeof roleEntry?.role === 'string' ? roleEntry.role.trim() : '';
+      const canonicalStatus = role ? canonicalStatusByRole?.get(role) : undefined;
+      const status = canonicalStatus ?? roleEntry?.status;
+      flattenedRoles.push({ ...roleEntry, category, status });
     }
   }
 
