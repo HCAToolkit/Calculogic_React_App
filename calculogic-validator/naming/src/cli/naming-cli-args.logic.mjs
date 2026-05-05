@@ -1,4 +1,4 @@
-import { DEFAULT_VALIDATOR_SCOPE } from '../../../src/core/validator-scopes.runtime.mjs';
+import { DEFAULT_VALIDATOR_SCOPE } from '../../../src/core/validator-scopes.logic.mjs';
 import { parseRepeatableTargetArgument } from '../../../src/core/cli/validator-cli-targets.logic.mjs';
 
 export const parseNamingCliArguments = (argv) => {

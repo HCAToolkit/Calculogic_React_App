@@ -168,7 +168,7 @@ D├─ src/
 │ │ 5├─ validator-report-meta.logic.mjs
 │ │ 6├─ validator-runner.logic.mjs
 │ │ 7├─ validator-registry.knowledge.mjs
-│ │ 8├─ validator-scopes.runtime.mjs
+│ │ 8├─ validator-scopes.logic.mjs
 │ │ 9├─ validator-root-files.knowledge.mjs
 │ │ 10└─ source-snapshot.logic.mjs
 │ B└─ config/

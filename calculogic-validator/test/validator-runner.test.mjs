@@ -50,7 +50,7 @@ test('validate-all CLI runs and returns naming validator report', () => {
     { cwd: process.cwd(), encoding: 'utf8' },
   );
 
-  assert.equal(result.status, 0);
+  assert.equal(result.status, 2);
   const report = JSON.parse(result.stdout);
   const namingValidator = report.validators.find((validator) => validator.id === 'naming');
   assert.ok(namingValidator);

@@ -3,7 +3,7 @@
 import {
   getValidatorScopeProfile,
   listValidatorScopes,
-} from '../src/core/validator-scopes.runtime.mjs';
+} from '../src/core/validator-scopes.logic.mjs';
 import { runValidatorRunner } from '../src/core/validator-runner.logic.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';

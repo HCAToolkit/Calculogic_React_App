@@ -5,14 +5,14 @@ import packageJson from '../package.json' with { type: 'json' };
 import * as validatorIndex from '../src/index.mjs';
 import * as runnerCore from '../src/core/validator-runner.logic.mjs';
 import * as registryCore from '../src/core/validator-registry.knowledge.mjs';
-import * as scopesCore from '../src/core/validator-scopes.runtime.mjs';
+import * as scopesCore from '../src/core/validator-scopes.logic.mjs';
 import * as treeHost from '../tree/src/tree-structure-advisor.host.mjs';
 import * as namingHost from '../naming/src/naming-validator.host.mjs';
 
 test('package exports subpaths target canonical module ownership paths', () => {
   assert.equal(packageJson.exports['./runner'], './src/core/validator-runner.logic.mjs');
   assert.equal(packageJson.exports['./registry'], './src/core/validator-registry.knowledge.mjs');
-  assert.equal(packageJson.exports['./scopes'], './src/core/validator-scopes.runtime.mjs');
+  assert.equal(packageJson.exports['./scopes'], './src/core/validator-scopes.logic.mjs');
   assert.equal(packageJson.exports['./tree'], './tree/src/tree-structure-advisor.host.mjs');
   assert.equal(packageJson.exports['./naming'], './naming/src/naming-validator.host.mjs');
 });

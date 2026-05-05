@@ -1,4 +1,4 @@
-import { getValidatorScopeProfile } from '../validator-scopes.runtime.mjs';
+import { getValidatorScopeProfile } from '../validator-scopes.logic.mjs';
 import { runValidatorRunner } from '../validator-runner.logic.mjs';
 import { loadValidatorConfigFromFile } from '../config/validator-config.logic.mjs';
 import {

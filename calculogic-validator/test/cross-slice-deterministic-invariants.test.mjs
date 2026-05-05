@@ -7,9 +7,9 @@ import {
   DEFAULT_VALIDATOR_SCOPE,
   getValidatorScopeProfile,
   listValidatorScopes,
-} from '../src/core/validator-scopes.runtime.mjs';
+} from '../src/core/validator-scopes.logic.mjs';
 import { deriveExitCodeFromFindings } from '../src/core/validator-exit-code.logic.mjs';
-import { getBuiltinExitPolicies } from '../src/registries/validator-exit-policy.registry.runtime.mjs';
+import { getBuiltinExitPolicies } from '../src/registries/validator-exit-policy.logic.mjs';
 import {
   collectRepositoryPaths,
   summarizeFindings as summarizeNamingFindings,

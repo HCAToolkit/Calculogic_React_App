@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getValidatorScopeProfile, DEFAULT_VALIDATOR_SCOPE } from './validator-scopes.runtime.mjs';
+import { getValidatorScopeProfile, DEFAULT_VALIDATOR_SCOPE } from './validator-scopes.logic.mjs';
 import {
   normalizePath,
   resolveScopedTargets,

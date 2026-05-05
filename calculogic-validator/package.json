@@ -20,7 +20,7 @@
     ".": "./src/index.mjs",
     "./runner": "./src/core/validator-runner.logic.mjs",
     "./registry": "./src/core/validator-registry.knowledge.mjs",
-    "./scopes": "./src/core/validator-scopes.runtime.mjs",
+    "./scopes": "./src/core/validator-scopes.logic.mjs",
     "./naming": "./naming/src/naming-validator.host.mjs",
     "./tree": "./tree/src/tree-structure-advisor.host.mjs"
   },

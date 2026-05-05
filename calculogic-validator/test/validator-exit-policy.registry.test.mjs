@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import {
   getBuiltinExitPolicies,
   loadExitPolicyRegistryFromPayload,
-} from '../src/registries/validator-exit-policy.registry.runtime.mjs';
+} from '../src/registries/validator-exit-policy.logic.mjs';
 import { deriveExitCodeFromFindings } from '../src/core/validator-exit-code.logic.mjs';
 
 test('builtin exit policy registry preserves deterministic policy order', () => {

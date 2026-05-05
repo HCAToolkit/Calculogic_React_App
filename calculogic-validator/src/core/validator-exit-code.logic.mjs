@@ -1,4 +1,4 @@
-import { getBuiltinExitPolicies } from '../registries/validator-exit-policy.registry.runtime.mjs';
+import { getBuiltinExitPolicies } from '../registries/validator-exit-policy.logic.mjs';
 
 const toBooleanStrictOption = (options) => Boolean(options?.strict);
 

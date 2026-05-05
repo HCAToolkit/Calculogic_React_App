@@ -32,7 +32,7 @@ The prior audit’s extraction queue is effectively complete for this scope (no 
 
 | Area | Current owner | Reassessment | Rationale | Classification |
 |---|---|---|---|---|
-| System-scope compatibility wildcard expansion (`eslint.config.*`, `vite.config.*`, `tsconfig*.json`) | `src/core/validator-scopes.runtime.mjs` | **Keep hardcoded for now** (with guardrail tests/doc hardening) | Expansion is tightly coupled to `ROOT_APP_FILES` and is currently implemented as a compatibility bridge from wildcard registry tokens to explicit deterministic root files. Extracting this further before root-file contract stabilization risks split ownership between scope policy and root-file knowledge. | keep as-is for now |
+| System-scope compatibility wildcard expansion (`eslint.config.*`, `vite.config.*`, `tsconfig*.json`) | `src/core/validator-scopes.logic.mjs` | **Keep hardcoded for now** (with guardrail tests/doc hardening) | Expansion is tightly coupled to `ROOT_APP_FILES` and is currently implemented as a compatibility bridge from wildcard registry tokens to explicit deterministic root files. Extracting this further before root-file contract stabilization risks split ownership between scope policy and root-file knowledge. | keep as-is for now |
 | Traversal/sorting mechanics (`sortPaths`, deterministic file-order scans, path/code stable sort) | naming/tree runtime logic + wiring | **Keep hardcoded** | These are engine mechanics (deterministic execution and output ordering), not policy vocabularies. Registry extraction here would reduce clarity and blur algorithm-vs-policy boundaries. | keep as-is for now |
 | Parser mechanics (`parseCanonicalName`, segment handling, semantic/role/extension split) | naming rule logic | **Keep hardcoded** | Parser behavior is algorithmic grammar enforcement, not a policy lookup table. Externalizing would likely produce regex-dump complexity and weaker debuggability. | keep as-is for now |
 
@@ -129,7 +129,7 @@ Assessment: strong baseline; best next ROI is **cross-slice invariant test reinf
 
 ## keep as-is for now
 
-1. System-scope wildcard expansion implementation placement in `validator-scopes.runtime.mjs` (until root-file contract stabilization).
+1. System-scope wildcard expansion implementation placement in `validator-scopes.logic.mjs` (until root-file contract stabilization).
 2. Traversal/sorting mechanics as code-owned engine behavior.
 3. Parser mechanics (`parseCanonicalName` and adjacent grammar logic) as code-owned engine behavior.
 
