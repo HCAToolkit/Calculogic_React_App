@@ -142,6 +142,11 @@
       "definition": "Operations-support role for infrastructure shape, infrastructure policy, or environment resource structure."
     },
     {
+      "role": "inventory",
+      "status": "active",
+      "definition": "Documentation role for enumerating existing artifacts, migration state, classification status, or cleanup targets without itself defining policy, formal specification, workflow, or execution behavior."
+    },
+    {
       "role": "knowledge",
       "status": "active",
       "definition": "Role for static reference meaning, domain reference content, or declarative support data."
@@ -185,6 +190,11 @@
       "role": "monitoring",
       "status": "active",
       "definition": "Operations or observability role for monitoring signals, health visibility, or operational watch behavior."
+    },
+    {
+      "role": "note",
+      "status": "active",
+      "definition": "Documentation role for bounded explanatory or implementation notes that clarify context without defining policy, formal specification, workflow, audit findings, or planned work."
     },
     {
       "role": "packaging",
