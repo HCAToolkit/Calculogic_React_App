@@ -1,0 +1,20 @@
+{
+  "version": "1",
+  "folderKinds": [
+    {
+      "folderKind": "structural",
+      "status": "active",
+      "definition": "Folder whose primary meaning comes from a recognized structural or concern-oriented home."
+    },
+    {
+      "folderKind": "semantic",
+      "status": "active",
+      "definition": "Folder whose primary meaning comes from semantic-family or semantic-root alignment."
+    },
+    {
+      "folderKind": "unspecified",
+      "status": "active",
+      "definition": "Folder whose meaning is not yet strong enough to classify confidently as structural or semantic."
+    }
+  ]
+}
