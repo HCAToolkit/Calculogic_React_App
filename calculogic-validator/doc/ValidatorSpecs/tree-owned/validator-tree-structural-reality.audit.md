@@ -30,7 +30,7 @@ Classification: Audit
 3. **Cross-surface docs are structured by authority lane, not mixed ad hoc.**
    - `doc/ValidatorSpecs/` root keeps canonical entrypoints.
    - `doc/ValidatorSpecs/tree-owned/`, `naming-owned/`, `cross-cutting/`, and `suite-owned/` provide clear ownership-specific supporting lanes.
-   - `doc/Indexes/ValidatorDocsIndex.md` provides explicit authority routing.
+   - `doc/Indexes/validator-docs.index.md` provides explicit authority routing.
 
 4. **Operational surfaces are intentionally split by role and are discoverable.**
    - `scripts/` holds host wrappers (`validate-*.host.mjs`, report-capture scripts).

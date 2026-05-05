@@ -46,8 +46,8 @@ Use this sequence for naming implementation tasks (runtime behavior, wiring/cont
 7. `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction.spec.md`
 8. `calculogic-validator/doc/ValidatorSpecs/validator-config.spec.md`
 9. `doc/nl-config/cfg-namingValidator.md` (supporting implementation context only)
-10. `calculogic-validator/doc/naming-compatibility-inventory.md` (transitional migration context)
-11. `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg-inventory.md` (this doc; routing/ownership metadata only)
+10. `calculogic-validator/doc/naming-compatibility.inventory.md` (transitional migration context)
+11. `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg.inventory.md` (this doc; routing/ownership metadata only)
 
 Interpretation notes:
 
@@ -69,8 +69,8 @@ Interpretation notes:
 | `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-semantic-family-and-interpretation.spec.md` | Naming interpretation spec for semantic-family semantics | **Bounded normative supporting spec** (active for documentation-first modeling) | Naming interpretation implementation tasks and bounded design alignment | **Moved to `naming-owned/`** for easier same-owner discovery | **Keep in `naming-owned/`; do not merge into master list authority** |
 | `calculogic-validator/doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction.spec.md` | Naming registry model and slice interaction reference | **Bounded normative supporting spec** (suite-level model constraints) | Wiring/modeling decisions and slice-boundary context | **Moved to `cross-cutting/`** because forcing it under naming would blur suite-level ownership | **Keep in `cross-cutting/`; consider later split by concern only if document growth harms scanability** |
 | `doc/nl-config/cfg-namingValidator.md` | Repo-local naming NL/config note | **Supporting implementation guidance** (repo-local/external to validator-owned canonical set) | Implementation sequencing/context for local repo tasks | **Stay put** | **Reference only** |
-| `calculogic-validator/doc/naming-compatibility-inventory.md` | Naming migration/compatibility snapshot | **Transitional inventory** | Migration context, retirements, follow-up hardening routing | **Stay put** | **Keep as transitional inventory** |
-| `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg-inventory.md` | Naming routing and bounded reorg map | **Transitional inventory** | First-stop navigation for naming documentation and ownership decisions | **Moved to `naming-owned/`** to colocate the navigation map with the docs it routes | **Keep and maintain** |
+| `calculogic-validator/doc/naming-compatibility.inventory.md` | Naming migration/compatibility snapshot | **Transitional inventory** | Migration context, retirements, follow-up hardening routing | **Stay put** | **Keep as transitional inventory** |
+| `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg.inventory.md` | Naming routing and bounded reorg map | **Transitional inventory** | First-stop navigation for naming documentation and ownership decisions | **Moved to `naming-owned/`** to colocate the navigation map with the docs it routes | **Keep and maintain** |
 | `calculogic-validator/doc/ConventionRoutines/CCPP.md` | Comment/provenance protocol used during naming implementation changes | **Supporting implementation guidance** | Implementation discipline, provenance/comment consistency | **Stay put** | **Reference only** |
 | `calculogic-validator/doc/ConventionRoutines/CCS.md` | Concern-separation architecture conventions affecting naming changes | **Supporting implementation guidance** | Ownership boundaries and dependency-direction enforcement | **Stay put** | **Reference only** |
 | `doc/ConventionRoutines/General-NL-Skeletons.md` | NL skeleton conventions for deterministic doc/code structure | **Supporting implementation guidance** | NL-first documentation and structure consistency | **Stay put** | **Reference only** |
@@ -85,7 +85,7 @@ Interpretation notes:
 - Keep `FileNamingMasterList-V1_1.md` as canonical naming grammar/taxonomy authority in `ConventionRoutines`.
 - Keep `validator-config.spec.md` at the `ValidatorSpecs` root because it is a canonical first-read config contract referenced across slices.
 - Keep `filename-case-and-interpretation-contract.md` at the `ValidatorSpecs` root because it is a shared contract lane used by multiple slices and already acts as a stable first-read contract surface.
-- Keep `naming-compatibility-inventory.md` outside the ownership buckets because it remains a cross-path transitional inventory rather than a validator-spec owner document.
+- Keep `naming-compatibility.inventory.md` outside the ownership buckets because it remains a cross-path transitional inventory rather than a validator-spec owner document.
 
 ### Completed bounded move (current layout)
 

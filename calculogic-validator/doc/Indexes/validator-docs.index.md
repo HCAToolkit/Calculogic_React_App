@@ -82,13 +82,13 @@ Authority labels used in this index:
 
 ## 5) Transitional inventories / migration routing
 
-- `doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg-inventory.md`
+- `doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg.inventory.md`
   **Authority:** transitional inventory. **Intended use:** naming-document routing/ownership guidance and bounded reorg context; does not define runtime behavior.
 
 - `doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`
   **Authority:** transitional inventory. **Intended use:** tree-document routing/ownership guidance and bounded reorg context; does not define runtime behavior.
 
-- `doc/naming-compatibility-inventory.md`
+- `doc/naming-compatibility.inventory.md`
   **Authority:** transitional inventory. **Intended use:** naming runtime compatibility/migration tracking; does not define runtime behavior or naming-spec authority.
 
 ## 6) Drafts
