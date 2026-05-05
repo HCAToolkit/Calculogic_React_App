@@ -138,6 +138,19 @@
         ]
       },
       {
+        "role": "inventory",
+        "agnosticCoreMeanings": [
+          "reference",
+          "structure"
+        ]
+      },
+      {
+        "role": "note",
+        "agnosticCoreMeanings": [
+          "reference"
+        ]
+      },
+      {
         "role": "plan",
         "agnosticCoreMeanings": [
           "reference"
