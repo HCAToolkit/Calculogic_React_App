@@ -11,7 +11,7 @@ This document records current runtime truth and current implementation reality f
 Run date: 2026-05-04 (UTC).
 
 1. `npm run validate:naming -- --scope=validator --target calculogic-validator/naming/src/registries`
-   - Outcome: exited 0, findings present (expected audit input).
+   - Outcome: exited 2, findings present (expected audit input).
    - Key counts: canonical 20, legacy-exception 1, invalid-ambiguous 2.
 2. `npm run validate:naming -- --scope=validator --target calculogic-validator/src`
    - Outcome: exited 2, findings present (expected audit input).
@@ -24,10 +24,10 @@ Run date: 2026-05-04 (UTC).
    - Key counts: canonical 7.
 5. `npm run validate:naming -- --scope=validator --target calculogic-validator/doc`
    - Outcome: exited 0, findings present (expected audit input).
-   - Key counts: canonical 18, legacy-exception 29.
+   - Key counts: canonical 19, legacy-exception 29.
 6. Broad check used for context: `npm run validate:naming -- --scope=validator`
    - Outcome: exited 2, findings present (expected audit input).
-   - Key counts: canonical 108, allowed-special-case 55, legacy-exception 31, invalid-ambiguous 8.
+   - Key counts: canonical 109, allowed-special-case 55, legacy-exception 31, invalid-ambiguous 8.
 
 ## 3. Current validator findings summary
 
