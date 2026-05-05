@@ -157,14 +157,14 @@
       "definition": "Localization role for locale-specific messages, formatting, translation payloads, or audience-localized data."
     },
     {
-      "role": "logging",
-      "status": "active",
-      "definition": "Observability role for emitted logs, logging behavior, or diagnostic event output."
-    },
-    {
       "role": "logic",
       "status": "active",
       "definition": "Role for behavior, state, decisions, and response."
+    },
+    {
+      "role": "logging",
+      "status": "active",
+      "definition": "Observability role for emitted logs, logging behavior, or diagnostic event output."
     },
     {
       "role": "manifest",
