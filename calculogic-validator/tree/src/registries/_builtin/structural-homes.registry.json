@@ -1,0 +1,75 @@
+{
+  "version": "1",
+  "structuralHomes": [
+    {
+      "structuralHome": "src",
+      "status": "active",
+      "definition": "Primary source or implementation home for shipped or executed code."
+    },
+    {
+      "structuralHome": "app",
+      "status": "active",
+      "definition": "Application composition or framework-level app home for route, layout, host, or entry structures."
+    },
+    {
+      "structuralHome": "doc",
+      "status": "active",
+      "definition": "Human-facing documentation home."
+    },
+    {
+      "structuralHome": "tests",
+      "status": "active",
+      "definition": "Quality-support home for tests, fixtures, mocks, benchmarks, or validation artifacts."
+    },
+    {
+      "structuralHome": "scripts",
+      "status": "active",
+      "definition": "Tooling automation home for scripts, CLIs, migrations, codegen, or repository tasks."
+    },
+    {
+      "structuralHome": "config",
+      "status": "active",
+      "definition": "Configuration and environment-oriented setup home."
+    },
+    {
+      "structuralHome": "data",
+      "status": "active",
+      "definition": "Structured payload, registry-data, fixture-data, or reusable data home."
+    },
+    {
+      "structuralHome": "ops",
+      "status": "active",
+      "definition": "Operations, infrastructure, deployment, monitoring, or CI/CD home."
+    },
+    {
+      "structuralHome": "assets",
+      "status": "active",
+      "definition": "Static asset or shipped resource home."
+    },
+    {
+      "structuralHome": "generated",
+      "status": "active",
+      "definition": "Machine-generated output home where generated status is structurally important."
+    },
+    {
+      "structuralHome": "vendor",
+      "status": "active",
+      "definition": "Third-party, vendored, or externally maintained material home."
+    },
+    {
+      "structuralHome": "examples",
+      "status": "active",
+      "definition": "Demo, tutorial, sample, or demonstrative material home."
+    },
+    {
+      "structuralHome": "experimental",
+      "status": "active",
+      "definition": "Prototype, spike, playground, or relaxed-rule exploratory home."
+    },
+    {
+      "structuralHome": "compat",
+      "status": "active",
+      "definition": "Compatibility, shim, adapter, or transition-support home."
+    }
+  ]
+}
