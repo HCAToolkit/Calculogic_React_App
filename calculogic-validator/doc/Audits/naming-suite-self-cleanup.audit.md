@@ -35,7 +35,6 @@ Run date: 2026-05-04 (UTC).
 
 - `calculogic-validator/src/**`
   - `NAMING_MISSING_ROLE`: `calculogic-validator/src/index.mjs`.
-  - `NAMING_UNKNOWN_ROLE`: `calculogic-validator/src/core/validator-scopes.logic.mjs`, `calculogic-validator/src/registries/validator-exit-policy.logic.mjs`.
 - `calculogic-validator/naming/src/registries/**`
   - `NAMING_MISSING_ROLE`: `calculogic-validator/naming/src/registries/registry-state.json`.
   - `NAMING_UNKNOWN_ROLE`: `_custom/*.registry.custom.json` pair.
@@ -52,7 +51,7 @@ Run date: 2026-05-04 (UTC).
   - `bin/**` and `scripts/**` previously rename-candidate host surfaces are now canonical host-named files.
 - Newly changed / now explicit after registry split:
   - `_custom/*.registry.custom.json` now stand out as explicit unknown-role compatibility surfaces.
-  - `validator-scopes.logic.mjs` and `validator-exit-policy.logic.mjs` expose `runtime`-token pressure in suite-core/shared lanes.
+  - Prior `validator-scopes.runtime.mjs` and `validator-exit-policy.registry.runtime.mjs` unknown-role findings were resolved by the issue-#449 bounded rename slice to active `logic` role filenames.
 - Deferred (same lane as prior + still valid):
   - custom registry UX/state switching surfaces.
   - Tree documentation-map and Tree transition inventory surfaces.
@@ -67,22 +66,12 @@ Reason: remaining active findings are either role-vocabulary pressure, compatibi
 
 ## 5. Ambiguous files
 
-1. `calculogic-validator/src/core/validator-scopes.logic.mjs`
-   - Ambiguity: responsibility is clear (scope runtime interpretation), but taxonomy fit is ambiguous because `runtime` is not an active role.
-   - Decision needed: whether to fold into existing `*.logic.mjs` naming or defer until explicit role policy slice.
-   - Recommended disposition: rename later (not now).
-
-2. `calculogic-validator/src/registries/validator-exit-policy.logic.mjs`
-   - Ambiguity: mixed surface (`registry` semantic-name + runtime implementation surface) with inactive `runtime` role token.
-   - Decision needed: whether this should be `*.logic.mjs`, split into loader-vs-runtime files, or preserved as compatibility bridge.
-   - Recommended disposition: split-or-rename later after explicit ownership pass.
-
-3. `calculogic-validator/doc/Audits/validator-shim-cleanup-design-checkpoint.md`
+1. `calculogic-validator/doc/Audits/validator-shim-cleanup-design-checkpoint.md`
    - Ambiguity: mixed checkpoint/decision posture.
    - Decision needed: lock as audit history vs planning note.
    - Recommended disposition: leave alone for now.
 
-4. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-top-root-registry-transition-inventory.md`
+2. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-top-root-registry-transition-inventory.md`
    - Ambiguity: inventory + spec-like semantics coexist.
    - Decision needed: split inventory from spec authority, or keep mixed with explicit classification.
    - Recommended disposition: defer to Tree work.
@@ -165,7 +154,7 @@ Tree registry/runtime interpretation changes are not current runtime truth for t
 
 ## 11. Recommended next minimal slices
 
-1. **Minimal slice A (highest confidence):** suite-core naming cleanup for inactive `runtime` role tokens in `src/core` and `src/registries` without behavior changes (rename plan + references update only).
+1. **Minimal slice A (completed in issue #449):** suite-core naming cleanup for inactive `runtime` role tokens in `src/core` and `src/registries` without behavior changes (rename + references update only).
 2. **Minimal slice B:** documentation inventory-role evidence pass limited to `doc/Indexes` + naming-owned map/inventory docs, producing a role-governance decision memo (no role addition yet).
 3. **Minimal slice C:** custom registry compatibility audit-only deep dive to decide keep-for-now vs eventual extraction path, explicitly outside #442 runtime behavior.
 

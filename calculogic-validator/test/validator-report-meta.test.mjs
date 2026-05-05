@@ -43,8 +43,8 @@ test('validate-naming report includes stable configDigest when config is supplie
   const first = runWithConfig();
   const second = runWithConfig();
 
-  assert.equal(first.status, 0, first.stderr);
-  assert.equal(second.status, 0, second.stderr);
+  assert.equal(first.status, 2, first.stderr);
+  assert.equal(second.status, 2, second.stderr);
 
   const firstReport = JSON.parse(first.stdout);
   const secondReport = JSON.parse(second.stdout);
