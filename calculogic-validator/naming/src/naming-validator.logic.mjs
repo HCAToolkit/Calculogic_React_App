@@ -4,7 +4,7 @@ import {
   DEFAULT_VALIDATOR_SCOPE,
   listValidatorScopes,
   getValidatorScopeProfile,
-} from '../../src/core/validator-scopes.runtime.mjs';
+} from '../../src/core/validator-scopes.logic.mjs';
 import {
   normalizePath,
   filterScopedPathsByProfile,

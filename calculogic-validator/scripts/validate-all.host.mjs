@@ -1,6 +1,6 @@
 import {
   listValidatorScopes,
-} from '../src/core/validator-scopes.runtime.mjs';
+} from '../src/core/validator-scopes.logic.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
 import { parseRepeatableTargetArgument } from '../src/core/cli/validator-cli-targets.logic.mjs';

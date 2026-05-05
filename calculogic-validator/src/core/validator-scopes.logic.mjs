@@ -5,7 +5,7 @@ import { ROOT_APP_FILES } from './validator-root-files.knowledge.mjs';
 
 // Ownership decision (2026-03 narrow audit slice):
 // - Keep this module as the canonical validator-owned runtime owner for builtin scope profiles.
-// - Canonical path is now `validator-scopes.runtime.mjs` (rename-only churn-managed pass from
+// - Canonical path is now `validator-scopes.logic.mjs` (rename-only churn-managed pass from
 //   `validator-scopes.knowledge.mjs`) with no behavior change.
 // - Policy source-of-truth remains the builtin registry payload, not ad hoc static data in this module.
 

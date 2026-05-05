@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   DEFAULT_VALIDATOR_SCOPE,
   getValidatorScopeProfile,
-} from '../src/core/validator-scopes.runtime.mjs';
+} from '../src/core/validator-scopes.logic.mjs';
 import { ROOT_APP_FILES } from '../src/core/validator-root-files.knowledge.mjs';
 
 const SYSTEM_SCOPE = 'system';

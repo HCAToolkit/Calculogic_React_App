@@ -1,4 +1,4 @@
-import { getValidatorScopeProfile } from '../validator-scopes.runtime.mjs';
+import { getValidatorScopeProfile } from '../validator-scopes.logic.mjs';
 
 const PREFERRED_VALIDATOR_SCOPE_ORDER = ['repo', 'app', 'docs', 'validator', 'system'];
 

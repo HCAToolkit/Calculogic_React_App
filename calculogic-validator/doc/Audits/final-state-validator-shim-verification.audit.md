@@ -57,7 +57,7 @@ Key final-state conclusion: detector output now aligns cleanly with the manually
 11. `calculogic-validator/src/validator-report.contracts.mjs`
 12. `calculogic-validator/src/validator-root-files.knowledge.mjs`
 13. `calculogic-validator/src/validator-runner.logic.mjs`
-14. `calculogic-validator/src/validator-scopes.runtime.mjs`
+14. `calculogic-validator/src/validator-scopes.logic.mjs`
 15. `calculogic-validator/src/validators/naming-validator.logic.mjs`
 
 ### 4.2 Intentional canonical/public pass-through entrypoints (non-debt, 3)

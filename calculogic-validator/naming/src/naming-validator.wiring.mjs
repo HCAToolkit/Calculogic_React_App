@@ -26,7 +26,7 @@ import {
   resolveScopedTargets,
   filterScopedPathsByTargets,
 } from '../../src/core/scoped-target-paths.logic.mjs';
-import { DEFAULT_VALIDATOR_SCOPE } from '../../src/core/validator-scopes.runtime.mjs';
+import { DEFAULT_VALIDATOR_SCOPE } from '../../src/core/validator-scopes.logic.mjs';
 
 export const prepareNamingRuntimeInputs = (config) => {
   const registryInputs = resolveNamingRegistryInputs({ config });

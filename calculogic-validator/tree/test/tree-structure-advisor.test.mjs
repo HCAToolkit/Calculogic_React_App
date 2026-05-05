@@ -11,7 +11,7 @@ import { prepareTreeStructureAdvisorInputs } from '../src/tree-structure-advisor
 import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../src/tree-structure-advisor.logic.mjs';
 import { collectShimCompatFindings } from '../src/tree-shim-detection.logic.mjs';
 import { listRegisteredValidators } from '../../src/core/validator-registry.knowledge.mjs';
-import { getValidatorScopeProfile } from '../../src/core/validator-scopes.runtime.mjs';
+import { getValidatorScopeProfile } from '../../src/core/validator-scopes.logic.mjs';
 
 const writeJson = async (filePath, value) => {
   await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');

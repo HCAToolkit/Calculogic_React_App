@@ -48,7 +48,7 @@ These are thin forwarding modules that preserve legacy import surfaces while for
 | `calculogic-validator/src/validator-report.contracts.mjs` | Confirmed thin re-export shim | Single-line pass-through export | `./core/validator-report.contracts.mjs` | Yes |
 | `calculogic-validator/src/validator-root-files.knowledge.mjs` | Confirmed thin re-export shim | Single-line pass-through export | `./core/validator-root-files.knowledge.mjs` | Yes |
 | `calculogic-validator/src/validator-runner.logic.mjs` | Confirmed thin re-export shim | Single-line pass-through export | `./core/validator-runner.logic.mjs` | Yes |
-| `calculogic-validator/src/validator-scopes.runtime.mjs` | Confirmed thin re-export shim | Single-line pass-through export | `./core/validator-scopes.runtime.mjs` | Yes |
+| `calculogic-validator/src/validator-scopes.logic.mjs` | Confirmed thin re-export shim | Single-line pass-through export | `./core/validator-scopes.logic.mjs` | Yes |
 | `calculogic-validator/src/validators/naming-validator.logic.mjs` | Confirmed thin re-export shim | Single-line pass-through export | `../naming/naming-validator.host.mjs` | Yes (explicitly documented as legacy compat shim) |
 
 ### 4.2 Shim-like but intentional non-debt pass-through entrypoints
@@ -80,7 +80,7 @@ These are thin pass-through files but are better treated as canonical/public bou
 | `calculogic-validator/src/validator-report.contracts.mjs` | Confirmed compatibility shim | Yes | Confirmed shim detection | Correct detection |
 | `calculogic-validator/src/validator-root-files.knowledge.mjs` | Confirmed compatibility shim | Yes | Confirmed shim detection | Correct detection |
 | `calculogic-validator/src/validator-runner.logic.mjs` | Confirmed compatibility shim | Yes | Correct but expected debt | Explicit legacy shim parity is tested |
-| `calculogic-validator/src/validator-scopes.runtime.mjs` | Confirmed compatibility shim | Yes | Correct but expected debt | Explicit legacy shim parity is tested |
+| `calculogic-validator/src/validator-scopes.logic.mjs` | Confirmed compatibility shim | Yes | Correct but expected debt | Explicit legacy shim parity is tested |
 | `calculogic-validator/src/validators/naming-validator.logic.mjs` | Confirmed compatibility shim | Yes | Correct but expected debt | Explicitly documented legacy compat shim |
 | `calculogic-validator/test/core-compat-shims.test.mjs` | Test file (not shim) | Yes | Likely false positive | Triggered by name token `compat`, not forwarding behavior |
 

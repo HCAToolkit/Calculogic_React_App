@@ -35,7 +35,7 @@ Run date: 2026-05-04 (UTC).
 
 - `calculogic-validator/src/**`
   - `NAMING_MISSING_ROLE`: `calculogic-validator/src/index.mjs`.
-  - `NAMING_UNKNOWN_ROLE`: `calculogic-validator/src/core/validator-scopes.runtime.mjs`, `calculogic-validator/src/registries/validator-exit-policy.registry.runtime.mjs`.
+  - `NAMING_UNKNOWN_ROLE`: `calculogic-validator/src/core/validator-scopes.logic.mjs`, `calculogic-validator/src/registries/validator-exit-policy.logic.mjs`.
 - `calculogic-validator/naming/src/registries/**`
   - `NAMING_MISSING_ROLE`: `calculogic-validator/naming/src/registries/registry-state.json`.
   - `NAMING_UNKNOWN_ROLE`: `_custom/*.registry.custom.json` pair.
@@ -52,7 +52,7 @@ Run date: 2026-05-04 (UTC).
   - `bin/**` and `scripts/**` previously rename-candidate host surfaces are now canonical host-named files.
 - Newly changed / now explicit after registry split:
   - `_custom/*.registry.custom.json` now stand out as explicit unknown-role compatibility surfaces.
-  - `validator-scopes.runtime.mjs` and `validator-exit-policy.registry.runtime.mjs` expose `runtime`-token pressure in suite-core/shared lanes.
+  - `validator-scopes.logic.mjs` and `validator-exit-policy.logic.mjs` expose `runtime`-token pressure in suite-core/shared lanes.
 - Deferred (same lane as prior + still valid):
   - custom registry UX/state switching surfaces.
   - Tree documentation-map and Tree transition inventory surfaces.
@@ -67,12 +67,12 @@ Reason: remaining active findings are either role-vocabulary pressure, compatibi
 
 ## 5. Ambiguous files
 
-1. `calculogic-validator/src/core/validator-scopes.runtime.mjs`
+1. `calculogic-validator/src/core/validator-scopes.logic.mjs`
    - Ambiguity: responsibility is clear (scope runtime interpretation), but taxonomy fit is ambiguous because `runtime` is not an active role.
    - Decision needed: whether to fold into existing `*.logic.mjs` naming or defer until explicit role policy slice.
    - Recommended disposition: rename later (not now).
 
-2. `calculogic-validator/src/registries/validator-exit-policy.registry.runtime.mjs`
+2. `calculogic-validator/src/registries/validator-exit-policy.logic.mjs`
    - Ambiguity: mixed surface (`registry` semantic-name + runtime implementation surface) with inactive `runtime` role token.
    - Decision needed: whether this should be `*.logic.mjs`, split into loader-vs-runtime files, or preserved as compatibility bridge.
    - Recommended disposition: split-or-rename later after explicit ownership pass.

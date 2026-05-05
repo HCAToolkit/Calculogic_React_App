@@ -49,7 +49,7 @@ No broader refactor or compat-surface redesign was performed.
 
 1. `calculogic-validator/src/validator-runner.logic.mjs`
 2. `calculogic-validator/src/validator-registry.knowledge.mjs`
-3. `calculogic-validator/src/validator-scopes.runtime.mjs`
+3. `calculogic-validator/src/validator-scopes.logic.mjs`
 4. `calculogic-validator/src/tree-structure-advisor.host.mjs`
 5. `calculogic-validator/src/tree-structure-advisor.logic.mjs`
 

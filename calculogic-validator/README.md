@@ -50,7 +50,7 @@ calculogic-validator/
 │  │  ├─ validator-report-meta.logic.mjs
 │  │  ├─ validator-runner.logic.mjs
 │  │  ├─ validator-registry.knowledge.mjs
-│  │  ├─ validator-scopes.runtime.mjs
+│  │  ├─ validator-scopes.logic.mjs
 │  │  ├─ validator-root-files.knowledge.mjs
 │  │  ├─ source-snapshot.logic.mjs
 │  │  └─ config/

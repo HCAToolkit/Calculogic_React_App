@@ -10,7 +10,7 @@ Before deletion, the remaining five shim-debt files were re-verified as thin re-
 
 1. `calculogic-validator/src/validator-runner.logic.mjs` → `./core/validator-runner.logic.mjs`
 2. `calculogic-validator/src/validator-registry.knowledge.mjs` → `./core/validator-registry.knowledge.mjs`
-3. `calculogic-validator/src/validator-scopes.runtime.mjs` → `./core/validator-scopes.runtime.mjs`
+3. `calculogic-validator/src/validator-scopes.logic.mjs` → `./core/validator-scopes.logic.mjs`
 4. `calculogic-validator/src/tree-structure-advisor.host.mjs` → `../tree/src/tree-structure-advisor.host.mjs`
 5. `calculogic-validator/src/tree-structure-advisor.logic.mjs` → `../tree/src/tree-structure-advisor.logic.mjs`
 
@@ -22,7 +22,7 @@ Updated package subpath export targets to canonical core ownership modules:
 
 - `exports["./runner"]`: `./src/validator-runner.logic.mjs` → `./src/core/validator-runner.logic.mjs`
 - `exports["./registry"]`: `./src/validator-registry.knowledge.mjs` → `./src/core/validator-registry.knowledge.mjs`
-- `exports["./scopes"]`: `./src/validator-scopes.runtime.mjs` → `./src/core/validator-scopes.runtime.mjs`
+- `exports["./scopes"]`: `./src/validator-scopes.logic.mjs` → `./src/core/validator-scopes.logic.mjs`
 
 Public subpath contracts are preserved:
 
@@ -65,7 +65,7 @@ Deleted from `calculogic-validator/src/**`:
 
 1. `validator-runner.logic.mjs`
 2. `validator-registry.knowledge.mjs`
-3. `validator-scopes.runtime.mjs`
+3. `validator-scopes.logic.mjs`
 4. `tree-structure-advisor.host.mjs`
 5. `tree-structure-advisor.logic.mjs`
 

@@ -18,7 +18,7 @@ Remaining shim-debt files and current canonical targets:
 
 1. `src/validator-runner.logic.mjs` → `src/core/validator-runner.logic.mjs`
 2. `src/validator-registry.knowledge.mjs` → `src/core/validator-registry.knowledge.mjs`
-3. `src/validator-scopes.runtime.mjs` → `src/core/validator-scopes.runtime.mjs`
+3. `src/validator-scopes.logic.mjs` → `src/core/validator-scopes.logic.mjs`
 4. `src/tree-structure-advisor.host.mjs` → `tree/src/tree-structure-advisor.host.mjs`
 5. `src/tree-structure-advisor.logic.mjs` → `tree/src/tree-structure-advisor.logic.mjs`
 
@@ -111,7 +111,7 @@ Proposed split basis:
 - **End compat contract for the three core-root shim paths now**
   - `src/validator-runner.logic.mjs`
   - `src/validator-registry.knowledge.mjs`
-  - `src/validator-scopes.runtime.mjs`
+  - `src/validator-scopes.logic.mjs`
 - **Keep temporary compat contract for the two root tree shim paths for one additional bounded cycle**
   - `src/tree-structure-advisor.host.mjs`
   - `src/tree-structure-advisor.logic.mjs`
@@ -163,7 +163,7 @@ Policy statement (post-checkpoint target):
 Planned pass 3 actions:
 
 1. **Core-root shim contract end**
-   - remove `src/validator-runner.logic.mjs`, `src/validator-registry.knowledge.mjs`, `src/validator-scopes.runtime.mjs`
+   - remove `src/validator-runner.logic.mjs`, `src/validator-registry.knowledge.mjs`, `src/validator-scopes.logic.mjs`
    - update package export targets for `./runner`, `./registry`, `./scopes` directly to `src/core/**` canonical modules (preserving subpath API while removing shim files)
 
 2. **Compat test strategy update**

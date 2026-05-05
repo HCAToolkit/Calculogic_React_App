@@ -39,7 +39,7 @@ Internal references were rewritten from shim-debt paths to canonical owned modul
 
 1. `src/validator-runner.logic.mjs`
 2. `src/validator-registry.knowledge.mjs`
-3. `src/validator-scopes.runtime.mjs`
+3. `src/validator-scopes.logic.mjs`
 4. `src/tree-structure-advisor.host.mjs`
 5. `src/tree-structure-advisor.logic.mjs`
 

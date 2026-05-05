@@ -20,7 +20,7 @@ This note is a lightweight transitional map for later hardening/removal follow-u
 - `BUILTIN_SPECIAL_CASE_RULES` retired after runtime/test import audit confirmed no internal consumers; runtime path remains `getBuiltinSpecialCaseRules()`.
 - `naming/src/registries/naming-roles.knowledge.mjs` removed after runtime/test import audit confirmed no internal consumers.
 - `naming/src/registries/naming-extensions.knowledge.mjs` removed after runtime/test import audit confirmed no internal consumers.
-- `naming/src/registries/naming-scope-profiles.knowledge.mjs` removed after runtime/test import audit + consumer repointing to `src/core/validator-scopes.runtime.mjs`.
+- `naming/src/registries/naming-scope-profiles.knowledge.mjs` removed after runtime/test import audit + consumer repointing to `src/core/validator-scopes.logic.mjs`.
 
 ## Compatibility exports retained
 - None.
@@ -28,7 +28,7 @@ This note is a lightweight transitional map for later hardening/removal follow-u
 ## Registry loader seams
 - `naming/src/registries/naming-special-cases.knowledge.mjs` removed after runtime/test import audit + consumer repointing to dedicated runtime-owner loader modules (`naming-special-case-rules-registry.logic.mjs`, `naming-walk-exclusions-registry.logic.mjs`).
 - `naming/src/registries/naming-case-rules.knowledge.mjs` removed after runtime/test import audit + consumer repointing to `naming/src/rules/naming-rule-check-semantic-case.logic.mjs`.
-- `core/validator-scopes.runtime.mjs` is kept as the canonical validator-owned runtime owner for builtin scope profiles; getter-backed runtime APIs (`getBuiltinScopeProfiles`, `listValidatorScopes`, `getValidatorScopeProfile`) are the primary contract. The prior `.knowledge` filename/path was retired in a churn-managed rename-only pass; canonical runtime ownership and behavior are unchanged in this slice.
+- `core/validator-scopes.logic.mjs` is kept as the canonical validator-owned runtime owner for builtin scope profiles; getter-backed runtime APIs (`getBuiltinScopeProfiles`, `listValidatorScopes`, `getValidatorScopeProfile`) are the primary contract. The prior `.knowledge` filename/path was retired in a churn-managed rename-only pass; canonical runtime ownership and behavior are unchanged in this slice.
 
 ## Primary runtime paths
 - Getter-backed registry accessors (`getBuiltin*`, `getSemanticNameCaseRule`).

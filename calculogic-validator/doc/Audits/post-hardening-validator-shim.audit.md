@@ -50,7 +50,7 @@ Each file below is a thin, single-target forwarding re-export that preserves leg
 | `calculogic-validator/src/validator-report.contracts.mjs` | Confirmed thin re-export shim debt | Single-line forwarding export | `./core/validator-report.contracts.mjs` | Legacy compat preservation |
 | `calculogic-validator/src/validator-root-files.knowledge.mjs` | Confirmed thin re-export shim debt | Single-line forwarding export | `./core/validator-root-files.knowledge.mjs` | Legacy compat preservation |
 | `calculogic-validator/src/validator-runner.logic.mjs` | Confirmed thin re-export shim debt | Single-line forwarding export | `./core/validator-runner.logic.mjs` | Legacy compat preservation |
-| `calculogic-validator/src/validator-scopes.runtime.mjs` | Confirmed thin re-export shim debt | Single-line forwarding export | `./core/validator-scopes.runtime.mjs` | Legacy compat preservation |
+| `calculogic-validator/src/validator-scopes.logic.mjs` | Confirmed thin re-export shim debt | Single-line forwarding export | `./core/validator-scopes.logic.mjs` | Legacy compat preservation |
 | `calculogic-validator/src/validators/naming-validator.logic.mjs` | Confirmed thin re-export shim debt | Single-line forwarding export | `../naming/naming-validator.host.mjs` | Legacy validator-path compat |
 
 ### 4.2 Shim-like but intentional canonical/public pass-through entrypoints (non-debt)
@@ -82,7 +82,7 @@ These are intentionally thin pass-through boundaries and should not be treated a
 | `calculogic-validator/src/validator-report.contracts.mjs` | Confirmed compatibility shim debt | Confirmed shim detection | Correct |
 | `calculogic-validator/src/validator-root-files.knowledge.mjs` | Confirmed compatibility shim debt | Confirmed shim detection | Correct |
 | `calculogic-validator/src/validator-runner.logic.mjs` | Confirmed compatibility shim debt | Confirmed shim detection | Correct |
-| `calculogic-validator/src/validator-scopes.runtime.mjs` | Confirmed compatibility shim debt | Confirmed shim detection | Correct |
+| `calculogic-validator/src/validator-scopes.logic.mjs` | Confirmed compatibility shim debt | Confirmed shim detection | Correct |
 | `calculogic-validator/src/validators/naming-validator.logic.mjs` | Confirmed compatibility shim debt | Correct but expected current debt | Legacy naming-validator compat shim |
 | `calculogic-validator/src/tree/tree-shim-detection.logic.mjs` | Runtime detector implementation (not a shim) | Ambiguous / weak-signal-only report | Name-token signal (`shim`) without thin re-export behavior |
 

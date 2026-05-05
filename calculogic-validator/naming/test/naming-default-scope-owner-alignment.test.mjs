@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { DEFAULT_VALIDATOR_SCOPE, getValidatorScopeProfile } from '../../src/core/validator-scopes.runtime.mjs';
+import { DEFAULT_VALIDATOR_SCOPE, getValidatorScopeProfile } from '../../src/core/validator-scopes.logic.mjs';
 import { parseNamingCliArguments } from '../src/cli/naming-cli-args.logic.mjs';
 import { prepareNamingValidatorInputs } from '../src/naming-validator.wiring.mjs';
 
