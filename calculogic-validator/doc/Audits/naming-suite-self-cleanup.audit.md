@@ -47,7 +47,7 @@ Run date: 2026-05-04 (UTC).
 - Still current:
   - `src/index.mjs` role-vocabulary pressure remains.
   - `naming/src/registries/registry-state.json` missing-role pressure remains.
-  - `doc/Indexes/ValidatorDocsIndex.md`, `doc/...inventory...`, and many convention/spec files remain missing-role findings.
+  - `doc/Indexes/validator-docs.index.md`, `doc/...inventory...`, and many convention/spec files remain missing-role findings.
 - Already resolved since historical pass:
   - `bin/**` and `scripts/**` previously rename-candidate host surfaces are now canonical host-named files.
 - Newly changed / now explicit after registry split:
@@ -101,14 +101,14 @@ Reason: remaining active findings are either role-vocabulary pressure, compatibi
    - Candidate role: `inventory`/`note` not a fit; this is configuration/state semantics.
    - Recommendation: defer until explicit registry-state naming policy slice.
 
-3. `calculogic-validator/doc/Indexes/ValidatorDocsIndex.md`
+3. `calculogic-validator/doc/Indexes/validator-docs.index.md`
    - Responsibility: doc routing index.
    - Distortion today: missing active role for index/inventory-like document surfaces.
    - Candidate role: `inventory` is plausible and should be considered in a later role-addition slice.
 
-4. `calculogic-validator/doc/ConventionRoutines/NamingInterpretationHardening-TransitionalInventory.md`
-5. `calculogic-validator/doc/naming-compatibility-inventory.md`
-6. `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg-inventory.md`
+4. `calculogic-validator/doc/ConventionRoutines/naming-interpretation-hardening-transitional.inventory.md`
+5. `calculogic-validator/doc/naming-compatibility.inventory.md`
+6. `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg.inventory.md`
 7. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`
    - Responsibility cluster: inventory/map/transition-note docs.
    - Distortion today: they are neither pure `spec` nor pure `audit`.

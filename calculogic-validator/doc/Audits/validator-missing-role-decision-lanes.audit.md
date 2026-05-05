@@ -78,10 +78,10 @@ These files have clear current responsibility, but the current active role vocab
 |---|---|---|
 | `calculogic-validator/src/index.mjs` | Package/root export barrel for validator public exports | `host`, `wiring`, and `contracts` all miss the dominant barrel/export-surface identity. This looks more like a reserved barrel/special-case or a later explicit surface role discussion than a forced rename target. |
 | `calculogic-validator/naming/src/registries/registry-state.json` | Tiny runtime state snapshot selecting active registry source | Active roles do not honestly express state-snapshot/config-state ownership. Forcing `contracts` or `knowledge` would blur mutable runtime-state semantics. |
-| `calculogic-validator/doc/Indexes/ValidatorDocsIndex.md` | Pure validator documentation routing/index surface | Current active roles do not honestly capture index/navigation ownership. This is direct evidence for the later `index` / inventory-family discussion already foreshadowed in the master list. |
-| `calculogic-validator/doc/naming-compatibility-inventory.md` | Transitional compatibility inventory / migration tracking note | `plan`, `audit`, and `spec` all distort the inventory-tracking responsibility. |
-| `calculogic-validator/doc/ConventionRoutines/NamingInterpretationHardening-TransitionalInventory.md` | Transitional hardening inventory for implementation mapping | Same inventory-role pressure; not honestly a spec/policy/workflow. |
-| `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg-inventory.md` | Naming routing map plus bounded reorg inventory metadata | Current active roles do not express map/inventory navigation ownership. |
+| `calculogic-validator/doc/Indexes/validator-docs.index.md` | Pure validator documentation routing/index surface | Current active roles do not honestly capture index/navigation ownership. This is direct evidence for the later `index` / inventory-family discussion already foreshadowed in the master list. |
+| `calculogic-validator/doc/naming-compatibility.inventory.md` | Transitional compatibility inventory / migration tracking note | `plan`, `audit`, and `spec` all distort the inventory-tracking responsibility. |
+| `calculogic-validator/doc/ConventionRoutines/naming-interpretation-hardening-transitional.inventory.md` | Transitional hardening inventory for implementation mapping | Same inventory-role pressure; not honestly a spec/policy/workflow. |
+| `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg.inventory.md` | Naming routing map plus bounded reorg inventory metadata | Current active roles do not express map/inventory navigation ownership. |
 | `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md` | Tree routing map plus bounded reorg inventory metadata | Same map/inventory vocabulary pressure. |
 | `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md` | Validator-owned NL/config implementation note | The active roles do not honestly capture “NL/config note” semantics; forcing `spec`, `workflow`, or `plan` would flatten an implementation-note lane into the wrong authority level. |
 
@@ -104,7 +104,7 @@ This pass reviewed every current validator-scope `NAMING_MISSING_ROLE` finding f
 13. `calculogic-validator/doc/ConventionRoutines/DeterministicStructuralAddressingSpec-Draft.md`
 14. `calculogic-validator/doc/ConventionRoutines/DocumentContentClassificationConvention-V1.md`
 15. `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
-16. `calculogic-validator/doc/ConventionRoutines/NamingInterpretationHardening-TransitionalInventory.md`
+16. `calculogic-validator/doc/ConventionRoutines/naming-interpretation-hardening-transitional.inventory.md`
 17. `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
 18. `calculogic-validator/doc/ConventionRoutines/TerminologyScoping-Conventions-V1.md`
 19. `calculogic-validator/doc/ConventionRoutines/ValidatorHelperAreas-And-Reuse-Conventions.md`
@@ -113,10 +113,10 @@ This pass reviewed every current validator-scope `NAMING_MISSING_ROLE` finding f
 22. `calculogic-validator/doc/ConventionRoutines/ValidatorRuleIds-Contract.md`
 23. `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
 24. `calculogic-validator/doc/ConventionRoutines/ValidatorSuiteOwnedSharedHelpers-And-Capabilities.md`
-25. `calculogic-validator/doc/Indexes/ValidatorDocsIndex.md`
-26. `calculogic-validator/doc/naming-compatibility-inventory.md`
+25. `calculogic-validator/doc/Indexes/validator-docs.index.md`
+26. `calculogic-validator/doc/naming-compatibility.inventory.md`
 27. `calculogic-validator/doc/ValidatorSpecs/filename-case-and-interpretation-contract.md`
-28. `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg-inventory.md`
+28. `calculogic-validator/doc/ValidatorSpecs/naming-owned/naming-documentation-map-and-reorg.inventory.md`
 29. `calculogic-validator/doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
 30. `calculogic-validator/doc/ValidatorSpecs/suite-owned/registry-customization-state-system-draft.md`
 31. `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`
