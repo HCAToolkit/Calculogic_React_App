@@ -110,3 +110,122 @@ For this docs-only slice, no stop condition was triggered:
 - no runtime behavior change was required,
 - no Naming/Tree runner/CLI/report shape change was required,
 - no ambiguous equivalent authoritative inventory file path blocked this addition.
+
+## 8) Issue #461 checkpoint — known roots vs structural homes relationship (docs-only)
+
+Status/Authority for this section:
+- **Status:** Audit clarification for Slice 4 checkpoint issue #461 (under #459, roadmap #452).
+- **Scope:** docs-only; no runtime, registry payload, or CLI/report behavior changes.
+- **Framing terms:** Uses exact status language: **current runtime truth**, **current implementation reality**, **target architecture**, **staged implementation path**.
+
+### 8.1 current runtime truth — suite scope profiles vs Tree interpretation
+
+1. Suite-owned `scope-profiles.registry.json` owns scope-selection boundaries (`repo`, `app`, `docs`, `validator`, `system`) via `includeRoots` and `includeRootFiles`.
+2. That ownership is separate from Tree structural interpretation.
+3. Tree structural interpretation starts after scope/target selection and is owned by Tree runtime logic and Tree registries.
+
+Checkpoint answer:
+- `--scope=validator`, `--scope=app`, `--scope=docs`, etc. are suite boundary selection concerns, not Tree structural-home placement policy.
+
+### 8.2 current runtime truth — what `tree-known-roots.registry.json` owns now
+
+`tree-known-roots.registry.json` currently functions as the Tree runtime repo-top vocabulary and classification source for this repository.
+
+It currently owns:
+- known repo-top root names,
+- per-root `kind` classification (`structural` or `semantic`),
+- normalized known-root set consumed by Tree runtime top-level checks.
+
+Runtime effects currently wired:
+- feeds `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` (`knownTopLevelDirectories` set in Tree runtime),
+- feeds occurrence classification through `tree-occurrence-classification.logic.mjs` (`repo-top-structural-root` vs `repo-top-semantic-root`),
+- provides current runtime structural top-root classification via `topRoots.kind=structural`.
+
+Checkpoint answer:
+- It is not merely passive documentation; it is an active runtime input used by current Tree checks.
+
+### 8.3 Relationship verdict — known roots vs structural homes
+
+Verdict: **partially overlapping, not equivalent**.
+
+- `tree-known-roots.registry.json` is a **narrower runtime repo-top root vocabulary + top-root kind classifier**.
+- `structural-homes.registry.json` is a **broader structural-home identity vocabulary** that includes identities not limited to repo-top roots (for example `app`, `config`, `data`, `ops`, `generated`, `vendor`, `compat`).
+- Overlap exists for some identities (`src`, `doc`, `scripts`, and quality-domain naming family intent), but payload semantics and consumption responsibility are not the same.
+
+Therefore:
+- known roots are **not current runtime equivalent** to structural homes,
+- treating them as identical would collapse two different policy layers and create competing truth.
+
+### 8.4 What `structural-homes.registry.json` should own now
+
+Recommended ownership now:
+- Structural Home identity vocabulary and definitions (identity layer),
+- target architecture reference surface for future Tree runtime normalization,
+- not the direct runtime authority for current top-root checks yet (that remains known roots in current runtime truth).
+
+`test` vs `tests` checkpoint:
+- current runtime known root uses `test`,
+- structural-home vocabulary currently includes `tests`.
+
+Recommendation:
+- Use `test` as the current quality structural-home identity for runtime-alignment slices until an explicit migration decision is modeled and bridged.
+- Rationale: preserving deterministic current runtime truth avoids immediate drift between repo-top known-root runtime checks and future perspective/identity payloads.
+
+### 8.5 `folderKind` on Structural Home records
+
+Recommendation:
+- Do **not** add `folderKind` to structural-home records in this slice.
+
+Reasoning:
+- Folder-kind classification is Tree-owned occurrence/classification vocabulary.
+- Structural-home records are identity vocabulary.
+- Duplicating folder-kind semantics inside structural-home records would risk competing truth with known-roots `kind` and Tree occurrence classification contracts.
+
+### 8.6 Agnostic-core meanings in Surface → Structural Home perspective
+
+Recommendation:
+- Agnostic-core meanings should remain a separate shared interpretation-evidence layer.
+- Future Surface → Structural Home perspective entries should not inline agnostic-core payload as placement truth.
+
+Allowed future use:
+- perspective layer may reference agnostic meanings as bounded evidence hints,
+- but agnostic meanings are **not current runtime truth** for placement authority and should not become placement truth.
+
+### 8.7 What `surface-structural-home-perspective.registry.json` should own in #459
+
+Recommended ownership for that future registry:
+- Surface → Structural Home affinity/evidence mapping only,
+- no scope-selection semantics,
+- no known-root runtime authority,
+- no final placement/confidence authority.
+
+Recommended shape direction:
+- prefer grouped perspective axis shape (`structuralHomesBySurface`) over a flat list (`surfaceStructuralHomePerspective`) to align with perspective ownership patterns and scanability.
+
+Modeling guardrail:
+- distinguish entries representing **current runtime known-root aligned identities** from entries representing **target architecture broader structural-home identities**.
+- if this distinction is not explicitly modeled, pause implementation and add the minimal relationship contract first.
+
+### 8.8 Recommendation for PR #460 / Slice 4
+
+Recommendation: **pause and revise with docs-first clarification before continuing implementation payload work**.
+
+Specific guidance:
+1. Do not proceed as-is with flat `surfaceStructuralHomePerspective` payload.
+2. Revise toward grouped `structuralHomesBySurface` shape once known-root vs structural-home relationship modeling is explicit.
+3. Resolve `test` vs `tests` identity decision explicitly in docs/spec-first form before runtime-impacting registry wiring.
+4. Reopen or continue PR #460 as a narrower implementation slice only after the relationship contract is documented and accepted.
+
+### 8.9 staged implementation path (minimal next action)
+
+Recommended next minimal action:
+1. keep this checkpoint as docs-only (current change),
+2. add a narrowly scoped follow-up docs/spec note in #459 clarifying relationship contract fields:
+   - known-root identity,
+   - structural-home identity,
+   - relationship status (`aligned`, `alias`, `target-only`),
+3. then revise PR #460 payload shape accordingly (grouped perspective, with explicit current-vs-target labeling),
+4. only after that, consider loader/runtime bridge updates.
+
+This preserves deterministic ownership boundaries while unblocking Surface → Structural Home perspective work via a staged implementation path.
+
