@@ -1,0 +1,101 @@
+{
+  "version": "1",
+  "surfaceStructuralHomePerspective": [
+    {
+      "surface": "runtime",
+      "structuralHome": "src",
+      "signalStrength": "strong",
+      "rationale": "Runtime artifacts commonly live under source or implementation homes."
+    },
+    {
+      "surface": "runtime",
+      "structuralHome": "app",
+      "signalStrength": "contextual",
+      "rationale": "Application frameworks may place runtime route, layout, host, or entry structures under app homes."
+    },
+    {
+      "surface": "runtime",
+      "structuralHome": "compat",
+      "signalStrength": "contextual",
+      "rationale": "Compatibility and adapter materials may support runtime behavior without becoming the primary runtime home."
+    },
+    {
+      "surface": "ui-facing",
+      "structuralHome": "app",
+      "signalStrength": "strong",
+      "rationale": "UI-facing application composition often lives under app homes."
+    },
+    {
+      "surface": "ui-facing",
+      "structuralHome": "src",
+      "signalStrength": "contextual",
+      "rationale": "UI-facing implementation may also live under source homes depending on framework structure."
+    },
+    {
+      "surface": "quality",
+      "structuralHome": "test",
+      "signalStrength": "strong",
+      "rationale": "Quality-support artifacts align with the current repo's singular test structural home."
+    },
+    {
+      "surface": "docs",
+      "structuralHome": "doc",
+      "signalStrength": "strong",
+      "rationale": "Documentation surfaces align with documentation homes."
+    },
+    {
+      "surface": "tooling",
+      "structuralHome": "scripts",
+      "signalStrength": "strong",
+      "rationale": "Tooling automation commonly lives under scripts homes."
+    },
+    {
+      "surface": "config",
+      "structuralHome": "config",
+      "signalStrength": "strong",
+      "rationale": "Configuration surfaces align with configuration homes."
+    },
+    {
+      "surface": "data",
+      "structuralHome": "data",
+      "signalStrength": "strong",
+      "rationale": "Data surfaces align with structured data homes."
+    },
+    {
+      "surface": "ops",
+      "structuralHome": "ops",
+      "signalStrength": "strong",
+      "rationale": "Operational surfaces align with operations homes."
+    },
+    {
+      "surface": "assets",
+      "structuralHome": "assets",
+      "signalStrength": "strong",
+      "rationale": "Asset surfaces align with static asset homes."
+    },
+    {
+      "surface": "generated",
+      "structuralHome": "generated",
+      "signalStrength": "strong",
+      "rationale": "Generated surfaces align with generated output homes."
+    },
+    {
+      "surface": "vendor",
+      "structuralHome": "vendor",
+      "signalStrength": "strong",
+      "rationale": "Vendor surfaces align with third-party or externally maintained homes."
+    },
+    {
+      "surface": "examples",
+      "structuralHome": "examples",
+      "signalStrength": "strong",
+      "rationale": "Example surfaces align with demo, sample, or tutorial homes."
+    },
+    {
+      "surface": "experimental",
+      "structuralHome": "experimental",
+      "signalStrength": "strong",
+      "rationale": "Experimental surfaces align with prototype or exploratory homes."
+    }
+  ]
+}
