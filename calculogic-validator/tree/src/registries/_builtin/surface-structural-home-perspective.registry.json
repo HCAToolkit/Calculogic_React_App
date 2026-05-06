@@ -1,0 +1,127 @@
+{
+  "version": "1",
+  "structuralHomesBySurface": {
+    "runtime": [
+      {
+        "structuralHome": "src",
+        "relationshipStatus": "current-known-root-aligned",
+        "signalStrength": "strong",
+        "rationale": "Runtime artifacts commonly live under source or implementation homes."
+      },
+      {
+        "structuralHome": "app",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "contextual",
+        "rationale": "Application frameworks may place runtime route, layout, host, or entry structures under app homes."
+      },
+      {
+        "structuralHome": "compat",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "contextual",
+        "rationale": "Compatibility and adapter materials may support runtime behavior without becoming the primary runtime home."
+      }
+    ],
+    "ui-facing": [
+      {
+        "structuralHome": "app",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "UI-facing application composition often lives under app homes."
+      },
+      {
+        "structuralHome": "src",
+        "relationshipStatus": "current-known-root-aligned",
+        "signalStrength": "contextual",
+        "rationale": "UI-facing implementation may also live under source homes depending on framework structure."
+      }
+    ],
+    "quality": [
+      {
+        "structuralHome": "test",
+        "relationshipStatus": "current-known-root-aligned",
+        "signalStrength": "strong",
+        "rationale": "Quality-support artifacts align with the current repo's singular test known root."
+      }
+    ],
+    "docs": [
+      {
+        "structuralHome": "doc",
+        "relationshipStatus": "current-known-root-aligned",
+        "signalStrength": "strong",
+        "rationale": "Documentation surfaces align with documentation homes."
+      }
+    ],
+    "tooling": [
+      {
+        "structuralHome": "scripts",
+        "relationshipStatus": "current-known-root-aligned",
+        "signalStrength": "strong",
+        "rationale": "Tooling automation commonly lives under scripts homes."
+      }
+    ],
+    "config": [
+      {
+        "structuralHome": "config",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "Configuration surfaces align with configuration homes."
+      }
+    ],
+    "data": [
+      {
+        "structuralHome": "data",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "Data surfaces align with structured data homes."
+      }
+    ],
+    "ops": [
+      {
+        "structuralHome": "ops",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "Operational surfaces align with operations homes."
+      }
+    ],
+    "assets": [
+      {
+        "structuralHome": "assets",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "Asset surfaces align with static asset homes."
+      }
+    ],
+    "generated": [
+      {
+        "structuralHome": "generated",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "Generated surfaces align with generated output homes."
+      }
+    ],
+    "vendor": [
+      {
+        "structuralHome": "vendor",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "Vendor surfaces align with third-party or externally maintained homes."
+      }
+    ],
+    "examples": [
+      {
+        "structuralHome": "examples",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "Example surfaces align with demo, sample, or tutorial homes."
+      }
+    ],
+    "experimental": [
+      {
+        "structuralHome": "experimental",
+        "relationshipStatus": "target-structural-home",
+        "signalStrength": "strong",
+        "rationale": "Experimental surfaces align with prototype or exploratory homes."
+      }
+    ]
+  }
+}
