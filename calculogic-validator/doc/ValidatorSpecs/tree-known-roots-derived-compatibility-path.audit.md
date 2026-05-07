@@ -132,7 +132,7 @@ Why safest now:
 
 ### Recommended next minimal path
 
-Recommend Option D (hybrid transition path).
+Preferred recommendation, unless the audit finds a clearer lower-risk path: Option D (hybrid transition path).
 
 ## 5) Relationship to Tree occurrence addressing
 
