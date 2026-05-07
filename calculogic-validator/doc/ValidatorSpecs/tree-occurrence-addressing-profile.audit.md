@@ -86,6 +86,16 @@ A.C.F.B   = calculogic-validator/tree/src/
 A.C.F.B.1 = calculogic-validator/tree/src/tree-structure-advisor.host.mjs
 ```
 
+
+## Distinction between address and interpretation layers
+
+To avoid ownership drift, this profile distinguishes the following layers:
+- occurrence address: deterministic location identity for a folder/file occurrence within the active scope,
+- Structural Home identity: reusable structural-home concept assignment (for example `src`, `doc`, `test`, `scripts`, `config`),
+- Semantic Home derivation: Tree/Naming-informed semantic-home interpretation from context and lineage,
+- known-root transitional runtime vocabulary: current runtime top-root vocabulary in `tree-known-roots.registry.json`,
+- final Tree placement interpretation: full Tree placement result after combining address, lineage, and evidence layers.
+
 ## Required ownership boundaries
 
 - Suite scope profiles own command/report scan boundaries.
