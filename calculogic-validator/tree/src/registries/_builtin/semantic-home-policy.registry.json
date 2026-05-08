@@ -1,0 +1,53 @@
+{
+  "version": "1",
+  "semanticHomePolicy": [
+    {
+      "policyId": "folder-context",
+      "inputLane": "folder-context",
+      "status": "active",
+      "definition": "Folder token and local folder context may contribute Semantic Home evidence.",
+      "derivationMeaning": "May support Semantic Home derivation when combined with lineage and other bounded evidence.",
+      "guardrails": "Evidence only; not final placement truth and not Naming ownership."
+    },
+    {
+      "policyId": "parent-lineage",
+      "inputLane": "parent-lineage",
+      "status": "active",
+      "definition": "Parent chain context may contribute nested semantic interpretation evidence.",
+      "derivationMeaning": "May support Semantic Home derivation only when parent lineage context remains coherent with nearby structure.",
+      "guardrails": "Evidence only; not final placement truth and not Structural Home identity by itself."
+    },
+    {
+      "policyId": "naming-bridge",
+      "inputLane": "naming-bridge",
+      "status": "active",
+      "definition": "Naming bridge outputs may contribute semantic-name or semantic-family evidence.",
+      "derivationMeaning": "May support Semantic Home derivation only through bounded bridge interpretation inside Tree-owned advisory reasoning.",
+      "guardrails": "Naming retains ownership of semantic-name and semantic-family interpretation; this lane consumes bounded evidence only."
+    },
+    {
+      "policyId": "structural-home-boundary",
+      "inputLane": "structural-home-boundary",
+      "status": "active",
+      "definition": "Structural Home context may contribute boundary evidence around candidate semantic interpretation.",
+      "derivationMeaning": "May constrain or contextualize Semantic Home derivation without becoming Semantic Home truth by itself.",
+      "guardrails": "Structural Home identity remains separately owned and must not be replaced by Semantic Home guidance."
+    },
+    {
+      "policyId": "structural-signal-boundary",
+      "inputLane": "structural-signal-boundary",
+      "status": "active",
+      "definition": "Structural-home signal policy outputs may provide weak or contextual boundary evidence.",
+      "derivationMeaning": "Must remain bounded as supporting evidence and must not become standalone Semantic Home truth.",
+      "guardrails": "Does not replace structural-home signal policy registry ownership and remains evidence only."
+    },
+    {
+      "policyId": "known-root-compatibility-boundary",
+      "inputLane": "known-root-compatibility-boundary",
+      "status": "active",
+      "definition": "Known-root compatibility context may provide boundary checks for semantic interpretation.",
+      "derivationMeaning": "May gate or contextualize interpretation but must not become canonical Semantic Home truth.",
+      "guardrails": "Known-root compatibility ownership remains in the known-roots registry as current runtime truth."
+    }
+  ]
+}
