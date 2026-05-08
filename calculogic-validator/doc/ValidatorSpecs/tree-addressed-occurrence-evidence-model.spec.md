@@ -1,9 +1,9 @@
-# Tree Addressed-Occurrence Evidence Model Design (Hybrid Transition, Slice #469)
+# Tree Addressed-Occurrence Evidence Model Spec (Hybrid Transition, Slice #469)
 
 ## Status and Scope
 
-- **Document type:** Design model (docs/design-only).
-- **Issue context:** child slice design for `#469` under parent roadmap `#452`.
+- **Document type:** Spec model (docs/spec-only).
+- **Issue context:** child slice spec for `#469` under parent roadmap `#452`.
 - **Current runtime stance:** this document records design direction only and implements no runtime behavior changes.
 - **Runtime authority boundary:** for **current runtime truth** and **current implementation reality**, continue to treat current tree runtime + current builtin registries as authoritative.
 
