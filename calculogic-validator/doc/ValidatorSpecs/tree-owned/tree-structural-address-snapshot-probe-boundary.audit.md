@@ -134,12 +134,13 @@ Conclusion:
 
 ### 4.1 Is a future neutral probe slice needed?
 
-**Yes** for target architecture hygiene and to prevent runtime drift across layers.
+**Yes**, but the immediate need is boundary formalization; this issue does not require selecting a runtime command surface.
 
 Reasoning:
 
 - Current runtime truth has the ingredients.
 - Missing piece is a clearly scoped neutral contract that exposes structural-address evidence without coupling to findings/report logic.
+- In this audit context, “get-tree” means neutral addressed tree structure/probe concept, not mandatory command implementation.
 
 ### 4.2 Smallest safe slice definition
 
@@ -158,9 +159,14 @@ If implemented in a future issue, smallest safe get-tree/probe slice should be:
      - `parentResolvedPath`, `depth`, `lineageSegments`
      - `markerSegments`, `occurrenceMarker`
 
-3. **Surface mode**
-   - Internal API first (lowest blast radius).
-   - CLI command can be evaluated only after internal contract proves stable.
+3. **Surface mode decision space (future slice choice, not implemented here)**
+   - docs-only contract formalization,
+   - internal API,
+   - debug/probe output,
+   - command surface,
+   - or a staged combination.
+
+   Audit recommendation for smallest safe progression: docs-only contract first, then evaluate internal API/probe exposure if needed; command surface is optional and deferred.
 
 4. **Hard boundaries for that slice**
    - no finding/report semantics changes,
@@ -213,15 +219,15 @@ This audit explicitly performs no runtime, loader, registry, naming, CLI-output,
 
 Recommended next minimal issue (docs-first and boundary-safe):
 
-1. **Answer: Is existing occurrence snapshot enough substrate?**
-   - Yes: enough as current implementation reality substrate for structural-address evidence.
+1. **Gap classification (required precision):**
+   - **mostly sufficient but needs docs/contract formalization**.
 
 2. **Answer: Is dedicated get-tree/probe formalization needed?**
-   - Yes: dedicated boundary formalization is needed to separate pre-reasoning evidence contract from Tree findings/runtime interpretation layers.
+   - Yes. Formalization is needed as a neutral boundary contract; this does not require choosing a command in this issue.
 
 3. **Answer: Should loader/normalization wait?**
-   - Yes: loader/normalization migration should wait until probe boundary contract is explicitly documented and accepted, to avoid policy/runtime coupling drift.
+   - Yes. Loader/normalization migration should wait until the boundary contract is explicitly documented and accepted, to avoid policy/runtime coupling drift.
 
 4. **Smallest safe next step**
-   - Add a tree-owned spec contract that formalizes an internal neutral probe output using current snapshot fields (no behavior change), plus conformance notes showing no findings/report impact.
-   - If implementation is required after that spec, keep it internal-only adapter exposure first, with no CLI/report semantics changes.
+   - Publish a tree-owned docs-only contract slice that formalizes neutral probe evidence shape using current occurrence snapshot fields (no runtime behavior change), with conformance notes showing no findings/report impact.
+   - After docs-only acceptance, evaluate whether internal API or debug/probe output is needed; keep command surface optional and deferred.
