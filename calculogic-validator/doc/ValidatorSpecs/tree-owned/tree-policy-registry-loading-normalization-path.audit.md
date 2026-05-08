@@ -136,28 +136,50 @@ Normalization must preserve these boundaries:
 
 Classification: Informative
 
+### 5.0 Current occurrence snapshot vs proposed structural-address snapshot/probe
+
+- **Current occurrence snapshot (current implementation reality):**
+  - `prepareTreeOccurrenceSnapshot` already collects deterministic folder/file occurrence records for active Tree scoped inputs.
+  - This flow is already wired through `tree-structure-advisor.wiring.mjs` and consumed in `tree-structure-advisor.logic.mjs` via `occurrenceSnapshot.occurrenceRecords`.
+  - It already provides occurrence identity scaffolding (`resolvedPath`, lineage segments, parent linkage, depth, occurrence markers, scope-root binding).
+
+- **Proposed structural-address snapshot/probe (possible next formalization slice):**
+  - would formalize deterministic structural addresses as a stable address model contract,
+  - would produce a neutral structural tree snapshot/probe ("get tree" style output lane),
+  - would explicitly separate occurrence location substrate from interpretation/meaning lanes,
+  - would provide a clean pre-reasoning handoff shape for later policy-registry-backed Tree reasoning.
+
+Interpretation boundary for this audit:
+
+- Do not treat current occurrence snapshot behavior as absent.
+- Do not assume it is already complete structural-address formalization.
+- Treat sufficiency as an explicit checkpoint question before loader/normalization expansion.
+
 ### 5.1 Should loader/normalization wait until a structural-address snapshot/probe exists?
 
-**Recommendation:** Yes, for any loader adoption that would influence Tree runtime reasoning about placement/meaning.
+**Recommendation:** Yes, for any loader adoption that would influence Tree runtime reasoning about placement/meaning, unless the current occurrence snapshot is explicitly confirmed as a sufficient structural-address substrate.
 
 Rationale:
 
-- Tree policy registries now define identity/evidence/policy vocabularies, but addressed-occurrence location evidence is still the safer precursor for interpretation.
-- Without a deterministic addressed-occurrence snapshot lane, early loader consumption risks normalizing policy data before Tree can deterministically bind evidence to where occurrences actually live.
-- Preserving known-root compatibility as current runtime truth is easier when structural addressing is introduced as neutral evidence production first.
+- Tree policy registries now define identity/evidence/policy vocabularies, and Tree already has occurrence snapshot behavior that should be evaluated as the starting substrate.
+- Before loader consumption expands meaning lanes, verify whether the current snapshot contract already supplies a sufficiently stable deterministic address model and neutral handoff shape.
+- If sufficiency gaps remain, structural-address formalization should land first so policy normalization does not outrun location substrate clarity.
+- Preserving known-root compatibility as current runtime truth is easier when addressed-occurrence substrate remains neutral evidence production first.
 
 ### 5.2 Should the next minimal issue after #476 be a structural-address snapshot/probe rather than loader integration?
 
-**Recommendation:** Yes.
+**Recommendation:** Conditional Yes.
 
-- The staged implementation path should insert a minimal structural-address snapshot/probe checkpoint before bounded loader integration.
-- This is the smallest risk-reducing slice that improves input determinism without changing findings or report semantics.
+- First run a bounded sufficiency audit on the current occurrence snapshot contract (`prepareTreeOccurrenceSnapshot` + `occurrenceSnapshot.occurrenceRecords`) as structural-address substrate.
+- If sufficient, proceed to a bounded loader/normalization or compatibility-wrapper slice.
+- If not sufficient, next minimal issue should formalize/extend the existing occurrence snapshot into a structural-address snapshot/probe.
+- This keeps the step minimal and avoids re-planning occurrence collection from scratch.
 
 ### 5.3 Would structural addressing provide a safer pre-reasoning input layer before policy consumption?
 
 **Recommendation:** Yes.
 
-A structural-address snapshot/probe would provide a bounded addressed-occurrence substrate that later Tree reasoning can consume before interpreting:
+A structural-address snapshot/probe (or a formalized extension of the current occurrence snapshot) would provide a bounded addressed-occurrence substrate that later Tree reasoning can consume before interpreting:
 
 - Structural Home identity,
 - Surface → Structural Home evidence,
@@ -171,8 +193,8 @@ This keeps the distinction between occurrence location and occurrence meaning ex
 
 **Proposed smallest slice (docs-defined implementation target for follow-up issue):**
 
-1. Walk active Tree scoped inputs using existing scope/target behavior.
-2. Produce deterministic addressed occurrence records for folder/file occurrences only.
+1. Reuse existing occurrence snapshot collection path (`prepareTreeOccurrenceSnapshot`) as the base substrate.
+2. Add/formalize deterministic structural-address contract fields only where current snapshot shape is insufficient (no restart from scratch).
 3. Preserve resolved path truth and known-root compatibility truth unchanged.
 4. Keep output as neutral internal snapshot/probe evidence lane (no new findings, no report-shape changes required for this first slice).
 5. Do not consume policy registries for interpretation in this slice.
@@ -192,9 +214,10 @@ Guardrail:
 
 **Recommendation detail:**
 
-- Next minimal issue should define and land a structural-address snapshot/probe evidence slice first, without changing runtime findings behavior.
-- After that checkpoint, use the hybrid bounded-loader path only for one clear first runtime consumer.
-- If first-consumer clarity is still absent after the probe slice, keep registries data-only and continue narrow docs/spec preparation.
+- Before loader/normalization work, run a bounded sufficiency audit on the current occurrence snapshot as structural-address substrate.
+- If sufficient, proceed to the hybrid bounded-loader or compatibility-wrapper path for one clear first runtime consumer.
+- If insufficient, next minimal issue should formalize/extend current occurrence snapshot into a structural-address snapshot/probe evidence slice without changing runtime findings behavior.
+- If first-consumer clarity is still absent after that checkpoint, keep registries data-only and continue narrow docs/spec preparation.
 
 ### Candidate first bounded consumer (if confirmed)
 
