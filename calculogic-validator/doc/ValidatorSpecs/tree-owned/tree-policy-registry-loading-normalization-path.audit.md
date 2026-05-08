@@ -10,7 +10,8 @@
 Context boundary for this checkpoint:
 
 - `tree-known-roots.registry.json` remains current runtime truth for known-root compatibility behavior.
-- The newer Tree policy registries are present as data-only policy/evidence vocabularies and are not current runtime truth.
+- Builtin tree signal-policy registries loaded via `getBuiltinTreeSignalPolicy()` are also current runtime truth for active shim/signal detection evidence lanes.
+- The newer Tree policy registries listed in this checkpoint remain data-only policy/evidence vocabularies and are not current runtime truth yet.
 - `tree-addressed-occurrence-evidence-model.spec.md` remains docs/spec-only design guardrail and future runtime input.
 
 ---
@@ -21,19 +22,24 @@ Context boundary for this checkpoint:
 
 | Artifact | Current role classification | Notes for loading/normalization path |
 |---|---|---|
+| `calculogic-validator/tree/src/registries/_builtin/tree-known-roots.registry.json` | current runtime truth; data-only identity registry; future runtime input | Active known-root compatibility baseline consumed by shipped runtime loaders/wiring. |
+| `calculogic-validator/tree/src/registries/_builtin/validator-owned-signals.registry.json` | current runtime truth; data-only evidence registry; data-only policy registry | Active runtime signal-policy payload for validator-owned basename signal matching through `getBuiltinTreeSignalPolicy()`. |
+| `calculogic-validator/tree/src/registries/_builtin/shim-detection-signals.registry.json` | current runtime truth; data-only evidence registry; data-only policy registry | Active runtime signal-policy payload for shim detection/suppression vocabularies and extension allowlist through `getBuiltinTreeSignalPolicy()`. |
+| `calculogic-validator/tree/src/registries/tree-signal-policy-registry.logic.mjs` | current runtime truth | Loader/cache/runtime preparation owner for active signal-policy registries consumed by tree runtime modules. |
+| `calculogic-validator/tree/src/tree-shim-detection.logic.mjs` | current runtime truth | Runtime consumer of active signal-policy registries for shim evidence collection and suppression lanes. |
+| `calculogic-validator/tree/src/tree-structure-advisor.logic.mjs` | current runtime truth | Runtime consumer of known-roots and signal-policy registries for advisory detection flow. |
 | `calculogic-validator/tree/src/registries/_builtin/folder-kinds.registry.json` | data-only identity registry; data-only policy registry; future runtime input | Defines bounded folder-kind vocabulary (`structural`, `semantic`, `unspecified`) and should stay declarative until a bounded consumer exists. |
 | `calculogic-validator/tree/src/registries/_builtin/structural-homes.registry.json` | data-only identity registry; data-only policy registry; future runtime input | Defines structural-home identity vocabulary and definitions; currently not wired as runtime decision source. |
 | `calculogic-validator/tree/src/registries/_builtin/surface-structural-home-perspective.registry.json` | data-only evidence registry; data-only policy registry; future runtime input | Encodes perspective/evidence relationships from surface to candidate structural homes; evidence layer, not placement truth. |
-| `calculogic-validator/tree/src/registries/_builtin/structural-home-signal-policy.registry.json` | data-only evidence registry; data-only policy registry; future runtime input | Encodes token signal categories and evidence meaning; explicitly evidence-only language. |
+| `calculogic-validator/tree/src/registries/_builtin/structural-home-signal-policy.registry.json` | data-only evidence registry; data-only policy registry; future runtime input | Newer structural-home signal policy lane remains data-only in this checkpoint and is not the same as the already-active shim/validator signal-policy registries. |
 | `calculogic-validator/tree/src/registries/_builtin/semantic-home-policy.registry.json` | data-only evidence registry; data-only policy registry; future runtime input | Encodes semantic-home derivation lanes/guardrails; bounded policy/evidence input only. |
-| `calculogic-validator/tree/src/registries/_builtin/tree-known-roots.registry.json` | current runtime truth; data-only identity registry; future runtime input | Active known-root compatibility baseline consumed by shipped runtime loaders/wiring. |
 | `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-addressed-occurrence-evidence-model.spec.md` | docs/spec-only design guardrail; future runtime input | Defines addressed-occurrence evidence modeling guidance; not runtime-wired in current implementation reality. |
 
 ### 1.2 Current implementation reality summary
 
-- The current implementation reality is intentionally mixed: one active runtime registry (`tree-known-roots`) plus several staged policy/evidence registries that are documentation-backed data assets.
-- This split is clean with respect to ownership: runtime compatibility behavior still depends on known-roots mechanics, while newer policy/evidence registries preserve target architecture direction without forcing premature runtime coupling.
-- This checkpoint confirms the new registries are not current runtime truth, and they should remain non-authoritative for findings until a bounded consumer slice is selected.
+- The current implementation reality is intentionally mixed: active runtime registry lanes include both known-roots compatibility (`tree-known-roots`) and active signal-policy registries loaded through `getBuiltinTreeSignalPolicy()`, while several newer policy/evidence registries remain staged as data-only assets.
+- This split is clean with respect to ownership: known-roots stays current runtime truth for compatibility classification, active shim/validator signal-policy registries stay current runtime truth for signal detection lanes, and newer structural-home/semantic-home policy registries remain staged implementation path inputs.
+- This checkpoint confirms the newer Tree policy registries (`folder-kinds`, `structural-homes`, `surface-structural-home-perspective`, `structural-home-signal-policy`, `semantic-home-policy`) are not current runtime truth, and they should remain non-authoritative for findings until a bounded consumer slice is selected.
 
 ---
 
