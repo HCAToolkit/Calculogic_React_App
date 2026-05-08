@@ -136,69 +136,68 @@ Normalization must preserve these boundaries:
 
 Classification: Informative
 
-### 5.0 Current occurrence snapshot vs proposed structural-address snapshot/probe
+### 5.0 Three-layer distinction: known-root compatibility vs occurrence snapshot vs structural-address probe
 
-- **Current occurrence snapshot (current implementation reality):**
-  - `prepareTreeOccurrenceSnapshot` already collects deterministic folder/file occurrence records for active Tree scoped inputs.
-  - This flow is already wired through `tree-structure-advisor.wiring.mjs` and consumed in `tree-structure-advisor.logic.mjs` via `occurrenceSnapshot.occurrenceRecords`.
-  - It already provides occurrence identity scaffolding (`resolvedPath`, lineage segments, parent linkage, depth, occurrence markers, scope-root binding).
+- **Layer 1 — current known-root compatibility (current runtime truth):**
+  - Known-root compatibility is active runtime truth for top-root compatibility interpretation.
+  - This lane is compatibility classification truth, not structural-addressing grammar by itself.
 
-- **Proposed structural-address snapshot/probe (possible next formalization slice):**
-  - would formalize deterministic structural addresses as a stable address model contract,
-  - would produce a neutral structural tree snapshot/probe ("get tree" style output lane),
-  - would explicitly separate occurrence location substrate from interpretation/meaning lanes,
-  - would provide a clean pre-reasoning handoff shape for later policy-registry-backed Tree reasoning.
+- **Layer 2 — current Tree occurrence snapshot (current implementation reality):**
+  - `prepareTreeOccurrenceSnapshot` collects folder/file occurrence records for active Tree scoped inputs.
+  - The flow is wired through `tree-structure-advisor.wiring.mjs` and consumed in `tree-structure-advisor.logic.mjs` via `occurrenceSnapshot.occurrenceRecords`.
+  - The current snapshot already provides occurrence substrate fields (`resolvedPath`, lineage segments, parent linkage, depth, occurrence markers, scope-root binding).
+
+- **Layer 3 — proposed structural-address snapshot/probe (deterministic addressing formalization target):**
+  - formalizes the tree-specific deterministic addressing model described in `tree-occurrence-model-and-addressing.spec.md` (illustrative lane):
+    - scoped root starts at `A`,
+    - folder siblings are addressed alphabetically (`A`, `B`, ...),
+    - file siblings are addressed numerically (`1`, `2`, ...),
+    - folder and file counters rebase locally per parent lineage depth,
+    - lineage addresses such as `A.D.A.3` are explicit and inspectable.
+  - can emit a neutral addressed tree snapshot / "get tree" style output lane.
+  - acts as pre-reasoning evidence production before interpretation/meaning lanes.
 
 Interpretation boundary for this audit:
 
 - Do not treat current occurrence snapshot behavior as absent.
-- Do not assume it is already complete structural-address formalization.
-- Treat sufficiency as an explicit checkpoint question before loader/normalization expansion.
+- Do not auto-equate current occurrence snapshot with full structural-address formalization.
+- Treat sufficiency against the addressing model as an explicit checkpoint before loader/normalization expansion.
 
-### 5.1 Should loader/normalization wait until a structural-address snapshot/probe exists?
+### 5.1 Does the current occurrence snapshot implement the full deterministic A-Z / numeric local-rebasing address model from the spec?
 
-**Recommendation:** Yes, for any loader adoption that would influence Tree runtime reasoning about placement/meaning, unless the current occurrence snapshot is explicitly confirmed as a sufficient structural-address substrate.
+**Answer:** Partially, but not yet proven as full formalization in this audit.
 
 Rationale:
 
-- Tree policy registries now define identity/evidence/policy vocabularies, and Tree already has occurrence snapshot behavior that should be evaluated as the starting substrate.
-- Before loader consumption expands meaning lanes, verify whether the current snapshot contract already supplies a sufficiently stable deterministic address model and neutral handoff shape.
-- If sufficiency gaps remain, structural-address formalization should land first so policy normalization does not outrun location substrate clarity.
-- Preserving known-root compatibility as current runtime truth is easier when addressed-occurrence substrate remains neutral evidence production first.
+- Current snapshot behavior already carries occurrence markers and lineage-bound records.
+- This audit does not yet prove that the current runtime contract is explicitly closed as the full A-root + folder-alpha + file-numeric + local-rebasing structural-address model authority.
+- Therefore, treat the current snapshot as likely substrate, with sufficiency to be explicitly audited/formalized before loader-driven interpretation expansion.
 
-### 5.2 Should the next minimal issue after #476 be a structural-address snapshot/probe rather than loader integration?
+### 5.2 Does current behavior expose or support a neutral addressed tree snapshot / get-tree style output?
 
-**Recommendation:** Conditional Yes.
+**Answer:** Not yet as an explicit, stable addressed-tree contract in this checkpoint.
 
-- First run a bounded sufficiency audit on the current occurrence snapshot contract (`prepareTreeOccurrenceSnapshot` + `occurrenceSnapshot.occurrenceRecords`) as structural-address substrate.
-- If sufficient, proceed to a bounded loader/normalization or compatibility-wrapper slice.
-- If not sufficient, next minimal issue should formalize/extend the existing occurrence snapshot into a structural-address snapshot/probe.
-- This keeps the step minimal and avoids re-planning occurrence collection from scratch.
+- Current occurrence records are runtime-consumed inputs, but the neutral addressed-tree probe lane is not yet explicitly closed as a standalone contract surface in this audit.
+- This is the key gap to confirm/formalize before broader policy-registry consumption drives interpretation lanes.
 
-### 5.3 Would structural addressing provide a safer pre-reasoning input layer before policy consumption?
+### 5.3 Does current behavior provide a clean pre-reasoning handoff shape for Tree?
 
-**Recommendation:** Yes.
+**Answer:** Partially.
 
-A structural-address snapshot/probe (or a formalized extension of the current occurrence snapshot) would provide a bounded addressed-occurrence substrate that later Tree reasoning can consume before interpreting:
+- Current occurrence snapshot already hands occurrence records into Tree runtime.
+- The audit still recommends formalizing the addressed-occurrence handoff shape when measured against the deterministic addressing model expectations from `tree-occurrence-model-and-addressing.spec.md`.
+- This preserves the architecture principle: location substrate first, interpretation later.
 
-- Structural Home identity,
-- Surface → Structural Home evidence,
-- structural-home signal policy,
-- Semantic Home policy,
-- known-root compatibility annotations.
-
-This keeps the distinction between occurrence location and occurrence meaning explicit and inspectable.
-
-### 5.4 Smallest structural-address slice that proves the model without runtime behavior change
+### 5.4 If not fully sufficient, what minimal structural-addressing slice is still needed before loader/runtime registry consumption?
 
 **Proposed smallest slice (docs-defined implementation target for follow-up issue):**
 
 1. Reuse existing occurrence snapshot collection path (`prepareTreeOccurrenceSnapshot`) as the base substrate.
-2. Add/formalize deterministic structural-address contract fields only where current snapshot shape is insufficient (no restart from scratch).
-3. Preserve resolved path truth and known-root compatibility truth unchanged.
-4. Keep output as neutral internal snapshot/probe evidence lane (no new findings, no report-shape changes required for this first slice).
-5. Do not consume policy registries for interpretation in this slice.
-6. Do not derive Semantic Home truth, placement confidence, or structural-home final interpretation.
+2. Explicitly close/formalize deterministic addressing semantics aligned to the tree occurrence/addressing spec illustration (A-root, folder-alpha, file-numeric, local sibling-counter rebasing per parent lineage).
+3. Expose a neutral addressed-tree snapshot/probe ("get tree" style) as evidence lane contract without changing findings/report behavior.
+4. Preserve resolved path truth and known-root compatibility truth unchanged.
+5. Keep policy registries out of interpretation in this slice (evidence producer only).
+6. Defer Semantic Home truth, placement confidence, and final interpretation to later bounded consumers.
 
 Guardrail:
 
