@@ -1,0 +1,128 @@
+{
+  "version": "1",
+  "structuralHomeSignalPolicy": [
+    {
+      "token": "src",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for source/runtime implementation roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "app",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for application-centric implementation roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "doc",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for documentation-focused organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "test",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for test-oriented organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "scripts",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for scripted automation roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "config",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for configuration organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "data",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for data-oriented organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "ops",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for operations-oriented organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "assets",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for asset-focused organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "generated",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for generated artifact organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "vendor",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for vendored dependency organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "examples",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for example-oriented organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "experimental",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for experimental-work organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {
+      "token": "compat",
+      "signalCategory": "strong",
+      "status": "active",
+      "definition": "Strong evidence signal for compatibility-layer organization roots.",
+      "evidenceMeaning": "May support Structural Home interpretation when lineage and scope context agree.",
+      "notes": "Evidence only; not final placement truth."
+    },
+    {"token":"lib","signalCategory":"contextual","status":"active","definition":"Contextual evidence signal often used for library scope.","evidenceMeaning":"May support Structural Home interpretation only with supporting lineage or convention context.","notes":"Evidence only; not final placement truth."},
+    {"token":"core","signalCategory":"contextual","status":"active","definition":"Contextual evidence signal often used for central implementation scope.","evidenceMeaning":"May support Structural Home interpretation only with supporting lineage or convention context.","notes":"Evidence only; not final placement truth."},
+    {"token":"shared","signalCategory":"contextual","status":"active","definition":"Contextual evidence signal often used for shared ownership scope.","evidenceMeaning":"May support Structural Home interpretation only with supporting lineage or convention context.","notes":"Evidence only; not final placement truth."},
+    {"token":"internal","signalCategory":"contextual","status":"active","definition":"Contextual evidence signal often used for internal-visibility scope.","evidenceMeaning":"May support Structural Home interpretation only with supporting lineage or convention context.","notes":"Evidence only; not final placement truth."},
+    {"token":"public","signalCategory":"contextual","status":"active","definition":"Contextual evidence signal often used for outward-facing scope.","evidenceMeaning":"May support Structural Home interpretation only with supporting lineage or convention context.","notes":"Evidence only; not final placement truth."},
+    {"token":"tools","signalCategory":"contextual","status":"active","definition":"Contextual evidence signal often used for tooling or support scope.","evidenceMeaning":"May support Structural Home interpretation only with supporting lineage or convention context.","notes":"Evidence only; not final placement truth."},
+    {"token":"utils","signalCategory":"weak","status":"active","definition":"Weak evidence signal commonly used as a broad helper bucket.","evidenceMeaning":"Should not be treated as strong Structural Home evidence on its own.","notes":"Evidence only; not final placement truth."},
+    {"token":"helpers","signalCategory":"weak","status":"active","definition":"Weak evidence signal commonly used for mixed helper content.","evidenceMeaning":"Should not be treated as strong Structural Home evidence on its own.","notes":"Evidence only; not final placement truth."},
+    {"token":"common","signalCategory":"weak","status":"active","definition":"Weak evidence signal commonly used as an ambiguous shared bucket.","evidenceMeaning":"Should not be treated as strong Structural Home evidence on its own.","notes":"Evidence only; not final placement truth."},
+    {"token":"misc","signalCategory":"anti-pattern","status":"active","definition":"Anti-pattern evidence signal that often indicates unclear ownership boundaries.","evidenceMeaning":"May indicate low structural specificity and should trigger caution in interpretation.","notes":"Evidence only; not final placement truth."},
+    {"token":"old","signalCategory":"anti-pattern","status":"active","definition":"Anti-pattern evidence signal that often indicates stale or unclear structural ownership.","evidenceMeaning":"May indicate low structural specificity and should trigger caution in interpretation.","notes":"Evidence only; not final placement truth."}
+  ]
+}
