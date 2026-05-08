@@ -79,6 +79,15 @@ Context boundary for this checkpoint:
 - **When appropriate:** when the first runtime consumer is concrete and acceptance criteria are narrow.
 - **Should it happen now:** **Not in this audit issue**; candidate for the next issue only if a clear first consumer is identified.
 
+
+### Option 6 — Structural-address snapshot/probe before loader integration
+
+- **Benefit:** creates a deterministic pre-reasoning evidence lane (occurrence location first, meaning later) before policy registry consumption expands.
+- **Risk:** adds one more staged slice before loader adoption, which can delay policy consumption.
+- **Ownership impact:** keeps addressing evidence production separated from interpretation/policy consumption, preserving clean tree ownership boundaries.
+- **When appropriate:** when addressed-occurrence identity is not yet a stable runtime input lane for policy reasoning.
+- **Should it happen now:** **Strong Yes (as next minimal checkpoint candidate)** if loader/normalization would otherwise infer meaning without a stable addressed-occurrence substrate.
+
 ---
 
 ## 3. Normalization boundaries
@@ -116,16 +125,70 @@ Normalization must preserve these boundaries:
 
 ---
 
+
+## 5. Structural-address checkpoint evaluation before loader/normalization
+
+Classification: Informative
+
+### 5.1 Should loader/normalization wait until a structural-address snapshot/probe exists?
+
+**Recommendation:** Yes, for any loader adoption that would influence Tree runtime reasoning about placement/meaning.
+
+Rationale:
+
+- Tree policy registries now define identity/evidence/policy vocabularies, but addressed-occurrence location evidence is still the safer precursor for interpretation.
+- Without a deterministic addressed-occurrence snapshot lane, early loader consumption risks normalizing policy data before Tree can deterministically bind evidence to where occurrences actually live.
+- Preserving known-root compatibility as current runtime truth is easier when structural addressing is introduced as neutral evidence production first.
+
+### 5.2 Should the next minimal issue after #476 be a structural-address snapshot/probe rather than loader integration?
+
+**Recommendation:** Yes.
+
+- The staged implementation path should insert a minimal structural-address snapshot/probe checkpoint before bounded loader integration.
+- This is the smallest risk-reducing slice that improves input determinism without changing findings or report semantics.
+
+### 5.3 Would structural addressing provide a safer pre-reasoning input layer before policy consumption?
+
+**Recommendation:** Yes.
+
+A structural-address snapshot/probe would provide a bounded addressed-occurrence substrate that later Tree reasoning can consume before interpreting:
+
+- Structural Home identity,
+- Surface → Structural Home evidence,
+- structural-home signal policy,
+- Semantic Home policy,
+- known-root compatibility annotations.
+
+This keeps the distinction between occurrence location and occurrence meaning explicit and inspectable.
+
+### 5.4 Smallest structural-address slice that proves the model without runtime behavior change
+
+**Proposed smallest slice (docs-defined implementation target for follow-up issue):**
+
+1. Walk active Tree scoped inputs using existing scope/target behavior.
+2. Produce deterministic addressed occurrence records for folder/file occurrences only.
+3. Preserve resolved path truth and known-root compatibility truth unchanged.
+4. Keep output as neutral internal snapshot/probe evidence lane (no new findings, no report-shape changes required for this first slice).
+5. Do not consume policy registries for interpretation in this slice.
+6. Do not derive Semantic Home truth, placement confidence, or structural-home final interpretation.
+
+Guardrail:
+
+- This probe is an evidence producer only; it is not a meaning interpreter.
+
+---
+
 ## 4. Recommendation
 
 ## Recommended next minimal issue
 
-**Recommended category:** bounded loader/normalization slice.
+**Recommended category:** another docs/spec slice (structural-address snapshot/probe issue definition), then bounded loader/normalization slice.
 
 **Recommendation detail:**
 
-- Use the hybrid path as the next minimal step, but only for one clear first runtime consumer.
-- If no concrete first consumer is agreed at issue-definition time, defer to another docs/spec slice instead of introducing loaders.
+- Next minimal issue should define and land a structural-address snapshot/probe evidence slice first, without changing runtime findings behavior.
+- After that checkpoint, use the hybrid bounded-loader path only for one clear first runtime consumer.
+- If first-consumer clarity is still absent after the probe slice, keep registries data-only and continue narrow docs/spec preparation.
 
 ### Candidate first bounded consumer (if confirmed)
 
