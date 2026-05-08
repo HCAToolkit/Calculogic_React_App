@@ -92,7 +92,7 @@ Context boundary for this checkpoint:
 - **Risk:** adds one more staged slice before loader adoption, which can delay policy consumption.
 - **Ownership impact:** keeps addressing evidence production separated from interpretation/policy consumption, preserving clean tree ownership boundaries.
 - **When appropriate:** when addressed-occurrence identity is not yet a stable runtime input lane for policy reasoning.
-- **Should it happen now:** **Strong Yes (as next minimal checkpoint candidate)** if loader/normalization would otherwise infer meaning without a stable addressed-occurrence substrate.
+- **Should it happen now:** **Yes as a next checkpoint candidate**, but first verify whether the current occurrence snapshot already satisfies enough of the structural-address model or needs a dedicated get-tree/probe formalization slice.
 
 ---
 
