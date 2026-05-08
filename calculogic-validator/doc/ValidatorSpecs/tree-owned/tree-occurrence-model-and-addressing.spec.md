@@ -12,6 +12,7 @@ The model is designed to prevent token-only interpretation (for example treating
 Status posture for this document:
 
 - **Current modeling contract:** terms, object model, and interpretation rules in this file.
+- **Boundary audit reference:** `calculogic-validator/doc/ValidatorSpecs/tree-owned/tree-structural-address-snapshot-probe-boundary.audit.md` documents the checkpoint boundary between current occurrence snapshot runtime substrate and structural-address/get-tree probe formalization.
 - **No runtime change claim:** this pass does not change tree runtime behavior.
 - **Tree-specific addressing direction:** tree occurrence notation in this file is scoped modeling guidance unless/until promoted into canonical runtime grammar.
 
