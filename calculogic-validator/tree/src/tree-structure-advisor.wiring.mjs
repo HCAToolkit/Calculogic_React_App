@@ -60,7 +60,6 @@ export const prepareTreeStructureAdvisorInputs = (
       targets: scopedSnapshotInputs.targets,
       includeRoots: scopedSnapshotInputs.includeRoots,
       scope: {
-        scopeRootPath: scopedSnapshotInputs.includeRoots[0] ?? '.',
         source: 'tree-structure-advisor.wiring',
       },
     }),

@@ -179,6 +179,27 @@ test('tree-structure-advisor runtime report output remains unchanged by structur
   }
 });
 
+test('tree-structure-advisor structural-address handoff keeps target-derived scope root in targeted runs', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-targeted-root-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, {
+      scope: 'repo',
+      targets: ['calculogic-validator/src'],
+    });
+    const snapshot = preparedInputs.structuralAddressSnapshot;
+
+    assert.ok(snapshot);
+    assert.equal(snapshot.scope.scopeRootPath, snapshot.scopeRoots[0]);
+    assert.equal(snapshot.scope.scopeRootPath, 'calculogic-validator/src');
+    assert.equal(snapshot.scope.source, 'tree-structure-advisor.wiring');
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 
 test('tree-structure-advisor known roots come from bounded registry policy without behavior drift', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-known-roots-registry-'));
