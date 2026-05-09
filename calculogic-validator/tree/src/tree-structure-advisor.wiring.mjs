@@ -10,6 +10,7 @@ import {
   collectSuiteScopedSnapshotInputs,
 } from '../../src/core/suite-scoped-snapshot-input.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from './tree-occurrence-snapshot.logic.mjs';
+import { prepareTreeStructuralAddressSnapshot } from './tree-structural-address-snapshot.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -54,6 +55,15 @@ export const prepareTreeStructureAdvisorInputs = (
     }),
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: scopedSnapshotInputs.targets,
+    structuralAddressSnapshot: prepareTreeStructuralAddressSnapshot({
+      selectedPaths,
+      targets: scopedSnapshotInputs.targets,
+      includeRoots: scopedSnapshotInputs.includeRoots,
+      scope: {
+        scopeRootPath: scopedSnapshotInputs.includeRoots[0] ?? '.',
+        source: 'tree-structure-advisor.wiring',
+      },
+    }),
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
       selectedPaths,
