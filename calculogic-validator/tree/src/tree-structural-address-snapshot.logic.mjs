@@ -1,18 +1,55 @@
 import { prepareTreeOccurrenceSnapshot } from './tree-occurrence-snapshot.logic.mjs';
 
+const POSIX_SEPARATOR = '/';
+
+const normalizeRelativePath = (relativePath) =>
+  String(relativePath ?? '')
+    .replaceAll('\\', POSIX_SEPARATOR)
+    .replace(/^\.\//u, '')
+    .replace(/\/$/u, '');
+
 const normalizeScopeRootPath = (scopeRoots = []) => scopeRoots[0] ?? '.';
 
-const inferTargetKind = (targets = []) => {
+const normalizeTargetDescriptor = (targetDescriptor) => {
+  if (typeof targetDescriptor === 'string') {
+    return {
+      kind: null,
+      relPath: normalizeRelativePath(targetDescriptor),
+    };
+  }
+
+  return {
+    kind: targetDescriptor?.kind ?? null,
+    relPath: normalizeRelativePath(targetDescriptor?.relPath ?? ''),
+  };
+};
+
+const inferTargetKind = (targets = [], selectedPaths = []) => {
   if (targets.length !== 1) {
     return 'mixed';
   }
 
-  const targetKind = targets[0]?.kind;
-  if (targetKind === 'dir' || targetKind === 'file') {
-    return targetKind;
+  const targetDescriptor = normalizeTargetDescriptor(targets[0]);
+  if (targetDescriptor.kind === 'dir' || targetDescriptor.kind === 'file') {
+    return targetDescriptor.kind;
   }
 
-  return 'mixed';
+  if (!targetDescriptor.relPath || targetDescriptor.relPath === '.') {
+    return 'mixed';
+  }
+
+  const selectedPathSet = new Set(
+    selectedPaths.map((selectedPath) => normalizeRelativePath(selectedPath)).filter(Boolean),
+  );
+  const hasNestedMatch = [...selectedPathSet].some((selectedPath) =>
+    selectedPath.startsWith(`${targetDescriptor.relPath}${POSIX_SEPARATOR}`),
+  );
+
+  if (hasNestedMatch) {
+    return 'dir';
+  }
+
+  return selectedPathSet.has(targetDescriptor.relPath) ? 'file' : 'dir';
 };
 
 export const prepareTreeStructuralAddressSnapshot = ({
@@ -31,7 +68,7 @@ export const prepareTreeStructuralAddressSnapshot = ({
   return {
     scope: {
       scopeRootPath: scope?.scopeRootPath ?? normalizeScopeRootPath(occurrenceSnapshot.scopeRoots),
-      targetKind: scope?.targetKind ?? inferTargetKind(targets),
+      targetKind: scope?.targetKind ?? inferTargetKind(targets, selectedPaths),
       source: scope?.source ?? source,
     },
     scopeRoots: occurrenceSnapshot.scopeRoots,
