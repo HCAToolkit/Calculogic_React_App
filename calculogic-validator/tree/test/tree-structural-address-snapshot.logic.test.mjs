@@ -49,3 +49,21 @@ test('structural-address snapshot markers preserve deterministic folder/file add
   assert.equal(records['root/folder-b/sub-b/file-b-2.txt'].resolvedPath, 'root/folder-b/sub-b/file-b-2.txt');
   assert.deepEqual(records['root/folder-b/sub-b/file-b-3.txt'].markerSegments, ['A', 'B', 'B', '2']);
 });
+
+test('structural-address snapshot infers target kind for single string file target', () => {
+  const snapshot = prepareTreeStructuralAddressSnapshot({
+    selectedPaths: ['root/folder/file.txt'],
+    targets: ['root/folder/file.txt'],
+  });
+
+  assert.equal(snapshot.scope.targetKind, 'file');
+});
+
+test('structural-address snapshot infers target kind for single string directory target', () => {
+  const snapshot = prepareTreeStructuralAddressSnapshot({
+    selectedPaths: ['root/folder/file.txt'],
+    targets: ['root/folder'],
+  });
+
+  assert.equal(snapshot.scope.targetKind, 'dir');
+});
