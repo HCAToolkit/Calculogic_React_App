@@ -53,25 +53,29 @@ const inferTargetKind = (targets = [], selectedPaths = []) => {
 };
 
 export const prepareTreeStructuralAddressSnapshot = ({
+  occurrenceSnapshot = null,
   selectedPaths = [],
   targets = [],
   includeRoots = [],
   scope = null,
   source = 'tree-occurrence-snapshot',
 } = {}) => {
-  const occurrenceSnapshot = prepareTreeOccurrenceSnapshot({
-    selectedPaths,
-    targets,
-    includeRoots,
-  });
+  const resolvedOccurrenceSnapshot =
+    occurrenceSnapshot && Array.isArray(occurrenceSnapshot.scopeRoots) && Array.isArray(occurrenceSnapshot.occurrenceRecords)
+      ? occurrenceSnapshot
+      : prepareTreeOccurrenceSnapshot({
+          selectedPaths,
+          targets,
+          includeRoots,
+        });
 
   return {
     scope: {
-      scopeRootPath: scope?.scopeRootPath ?? normalizeScopeRootPath(occurrenceSnapshot.scopeRoots),
+      scopeRootPath: scope?.scopeRootPath ?? normalizeScopeRootPath(resolvedOccurrenceSnapshot.scopeRoots),
       targetKind: scope?.targetKind ?? inferTargetKind(targets, selectedPaths),
       source: scope?.source ?? source,
     },
-    scopeRoots: occurrenceSnapshot.scopeRoots,
-    occurrenceRecords: occurrenceSnapshot.occurrenceRecords,
+    scopeRoots: resolvedOccurrenceSnapshot.scopeRoots,
+    occurrenceRecords: resolvedOccurrenceSnapshot.occurrenceRecords,
   };
 };

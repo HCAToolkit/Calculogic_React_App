@@ -44,18 +44,20 @@ export const prepareTreeStructureAdvisorInputs = (
     skipDotDirectories: true,
   });
   const selectedPaths = scopedSnapshotInputs.selectedPaths;
+  const occurrenceSnapshot = prepareTreeOccurrenceSnapshot({
+    selectedPaths,
+    targets: scopedSnapshotInputs.targets,
+    includeRoots: scopedSnapshotInputs.includeRoots,
+  });
 
   return {
     scope: scopedSnapshotInputs.scope,
     selectedPaths,
-    occurrenceSnapshot: prepareTreeOccurrenceSnapshot({
-      selectedPaths,
-      targets: scopedSnapshotInputs.targets,
-      includeRoots: scopedSnapshotInputs.includeRoots,
-    }),
+    occurrenceSnapshot,
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: scopedSnapshotInputs.targets,
     structuralAddressSnapshot: prepareTreeStructuralAddressSnapshot({
+      occurrenceSnapshot,
       selectedPaths,
       targets: scopedSnapshotInputs.targetDescriptors ?? scopedSnapshotInputs.targets,
       includeRoots: scopedSnapshotInputs.includeRoots,

@@ -146,6 +146,8 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'resolvedPath')), true);
     assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'placementConfidence')), false);
     assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'severity')), false);
+    assert.equal(snapshot.scopeRoots, preparedInputs.occurrenceSnapshot.scopeRoots);
+    assert.equal(snapshot.occurrenceRecords, preparedInputs.occurrenceSnapshot.occurrenceRecords);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
