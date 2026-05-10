@@ -128,6 +128,103 @@ test('tree-structure-advisor is conservative for normal known repository shape',
   }
 });
 
+test('tree-structure-advisor wiring carries neutral structural-address snapshot as internal evidence', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-handoff-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo' });
+    const snapshot = preparedInputs.structuralAddressSnapshot;
+
+    assert.ok(snapshot);
+    assert.deepEqual(Object.keys(snapshot).sort(), ['occurrenceRecords', 'scope', 'scopeRoots']);
+    assert.deepEqual(Object.keys(snapshot.scope).sort(), ['scopeRootPath', 'source', 'targetKind']);
+    assert.equal(Array.isArray(snapshot.scopeRoots), true);
+    assert.equal(Array.isArray(snapshot.occurrenceRecords), true);
+    assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'occurrenceMarker')), true);
+    assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'resolvedPath')), true);
+    assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'placementConfidence')), false);
+    assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'severity')), false);
+    assert.equal(snapshot.scopeRoots, preparedInputs.occurrenceSnapshot.scopeRoots);
+    assert.equal(snapshot.occurrenceRecords, preparedInputs.occurrenceSnapshot.occurrenceRecords);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor runtime report output remains unchanged by structural-address handoff presence', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-neutrality-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'experiments'), { recursive: true });
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'validator-runner.logic.mjs'),
+      'export const misplaced = true\n',
+      'utf8',
+    );
+
+    const preparedWithHandoff = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo' });
+    const { structuralAddressSnapshot: _omittedSnapshot, ...preparedWithoutHandoff } = preparedWithHandoff;
+
+    const withHandoff = runTreeStructureAdvisorRuntime(preparedWithHandoff);
+    const withoutHandoff = runTreeStructureAdvisorRuntime(preparedWithoutHandoff);
+
+    assert.deepEqual(withHandoff, withoutHandoff);
+    assert.equal(
+      withHandoff.findings.some((finding) => Object.hasOwn(finding, 'placementConfidence')),
+      false,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor structural-address handoff keeps target-derived scope root in targeted runs', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-targeted-root-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, {
+      scope: 'repo',
+      targets: ['calculogic-validator/src'],
+    });
+    const snapshot = preparedInputs.structuralAddressSnapshot;
+
+    assert.ok(snapshot);
+    assert.equal(snapshot.scope.scopeRootPath, snapshot.scopeRoots[0]);
+    assert.equal(snapshot.scope.scopeRootPath, 'calculogic-validator/src');
+    assert.equal(snapshot.scope.source, 'tree-structure-advisor.wiring');
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor structural-address handoff preserves file target kind when target is outside active scope', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-targeted-file-kind-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, {
+      scope: 'validator',
+      targets: ['package.json'],
+    });
+    const snapshot = preparedInputs.structuralAddressSnapshot;
+
+    assert.ok(snapshot);
+    assert.equal(preparedInputs.selectedPaths.length, 0);
+    assert.equal(snapshot.scope.targetKind, 'file');
+    assert.equal(snapshot.scope.source, 'tree-structure-advisor.wiring');
+    assert.deepEqual(snapshot.scopeRoots, ['.']);
+    assert.equal(snapshot.occurrenceRecords.length, 0);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 
 test('tree-structure-advisor known roots come from bounded registry policy without behavior drift', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-known-roots-registry-'));

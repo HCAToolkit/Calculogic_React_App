@@ -10,6 +10,7 @@ import {
   collectSuiteScopedSnapshotInputs,
 } from '../../src/core/suite-scoped-snapshot-input.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from './tree-occurrence-snapshot.logic.mjs';
+import { prepareTreeStructuralAddressSnapshot } from './tree-structural-address-snapshot.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -43,17 +44,28 @@ export const prepareTreeStructureAdvisorInputs = (
     skipDotDirectories: true,
   });
   const selectedPaths = scopedSnapshotInputs.selectedPaths;
+  const structuralAddressTargets = scopedSnapshotInputs.targetDescriptors ?? scopedSnapshotInputs.targets;
+  const occurrenceSnapshot = prepareTreeOccurrenceSnapshot({
+    selectedPaths,
+    targets: structuralAddressTargets,
+    includeRoots: scopedSnapshotInputs.includeRoots,
+  });
 
   return {
     scope: scopedSnapshotInputs.scope,
     selectedPaths,
-    occurrenceSnapshot: prepareTreeOccurrenceSnapshot({
-      selectedPaths,
-      targets: scopedSnapshotInputs.targets,
-      includeRoots: scopedSnapshotInputs.includeRoots,
-    }),
+    occurrenceSnapshot,
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: scopedSnapshotInputs.targets,
+    structuralAddressSnapshot: prepareTreeStructuralAddressSnapshot({
+      occurrenceSnapshot,
+      selectedPaths,
+      targets: structuralAddressTargets,
+      includeRoots: scopedSnapshotInputs.includeRoots,
+      scope: {
+        source: 'tree-structure-advisor.wiring',
+      },
+    }),
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
       selectedPaths,
