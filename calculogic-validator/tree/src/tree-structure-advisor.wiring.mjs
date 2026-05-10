@@ -44,9 +44,10 @@ export const prepareTreeStructureAdvisorInputs = (
     skipDotDirectories: true,
   });
   const selectedPaths = scopedSnapshotInputs.selectedPaths;
+  const structuralAddressTargets = scopedSnapshotInputs.targetDescriptors ?? scopedSnapshotInputs.targets;
   const occurrenceSnapshot = prepareTreeOccurrenceSnapshot({
     selectedPaths,
-    targets: scopedSnapshotInputs.targets,
+    targets: structuralAddressTargets,
     includeRoots: scopedSnapshotInputs.includeRoots,
   });
 
@@ -59,7 +60,7 @@ export const prepareTreeStructureAdvisorInputs = (
     structuralAddressSnapshot: prepareTreeStructuralAddressSnapshot({
       occurrenceSnapshot,
       selectedPaths,
-      targets: scopedSnapshotInputs.targetDescriptors ?? scopedSnapshotInputs.targets,
+      targets: structuralAddressTargets,
       includeRoots: scopedSnapshotInputs.includeRoots,
       scope: {
         source: 'tree-structure-advisor.wiring',

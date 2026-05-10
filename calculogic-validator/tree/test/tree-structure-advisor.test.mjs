@@ -218,6 +218,8 @@ test('tree-structure-advisor structural-address handoff preserves file target ki
     assert.equal(preparedInputs.selectedPaths.length, 0);
     assert.equal(snapshot.scope.targetKind, 'file');
     assert.equal(snapshot.scope.source, 'tree-structure-advisor.wiring');
+    assert.deepEqual(snapshot.scopeRoots, ['.']);
+    assert.equal(snapshot.occurrenceRecords.length, 0);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
