@@ -57,7 +57,7 @@ export const prepareTreeStructureAdvisorInputs = (
     targets: scopedSnapshotInputs.targets,
     structuralAddressSnapshot: prepareTreeStructuralAddressSnapshot({
       selectedPaths,
-      targets: scopedSnapshotInputs.targets,
+      targets: scopedSnapshotInputs.targetDescriptors ?? scopedSnapshotInputs.targets,
       includeRoots: scopedSnapshotInputs.includeRoots,
       scope: {
         source: 'tree-structure-advisor.wiring',

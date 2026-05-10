@@ -200,6 +200,27 @@ test('tree-structure-advisor structural-address handoff keeps target-derived sco
   }
 });
 
+test('tree-structure-advisor structural-address handoff preserves file target kind when target is outside active scope', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-targeted-file-kind-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, {
+      scope: 'validator',
+      targets: ['package.json'],
+    });
+    const snapshot = preparedInputs.structuralAddressSnapshot;
+
+    assert.ok(snapshot);
+    assert.equal(preparedInputs.selectedPaths.length, 0);
+    assert.equal(snapshot.scope.targetKind, 'file');
+    assert.equal(snapshot.scope.source, 'tree-structure-advisor.wiring');
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 
 test('tree-structure-advisor known roots come from bounded registry policy without behavior drift', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-known-roots-registry-'));

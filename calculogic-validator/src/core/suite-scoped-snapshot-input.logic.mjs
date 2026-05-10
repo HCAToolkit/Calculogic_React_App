@@ -129,6 +129,10 @@ export const collectSuiteScopedSnapshotInputs = (
       scopedCollection.inScopePaths,
       resolvedTargets,
     ),
+    targetDescriptors: resolvedTargets.map((target) => ({
+      kind: target.kind,
+      relPath: target.relPath,
+    })),
     targets: resolvedTargets.map((target) => target.relPath),
   };
 };
