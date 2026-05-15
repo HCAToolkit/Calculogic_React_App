@@ -308,3 +308,89 @@ test('input child arrays are not mutated while assigning sorted markers', () => 
   assert.deepEqual(input.scopeRoots[0].children.map((child) => child.path), topLevelOrderBefore);
   assert.deepEqual(input.scopeRoots[0].children[2].children.map((child) => child.path), nestedOrderBefore);
 });
+
+
+test('malformed sibling missing name fails deterministically before sort comparator execution', () => {
+  assert.throws(
+    () =>
+      prepareTreeCodebaseAddressedSnapshot({
+        scopeRoots: [
+          {
+            name: 'calculogic-validator',
+            path: 'calculogic-validator',
+            occurrenceType: 'folder',
+            children: [
+              { occurrenceType: 'file', path: 'calculogic-validator/B.md' },
+              { name: 'A.md', path: 'calculogic-validator/A.md', occurrenceType: 'file' },
+            ],
+          },
+        ],
+      }),
+    /Tree-codebase occurrence node name is required\./u,
+  );
+});
+
+test('malformed sibling missing path fails deterministically before sort comparator execution', () => {
+  assert.throws(
+    () =>
+      prepareTreeCodebaseAddressedSnapshot({
+        scopeRoots: [
+          {
+            name: 'calculogic-validator',
+            path: 'calculogic-validator',
+            occurrenceType: 'folder',
+            children: [
+              { name: 'B.md', occurrenceType: 'file' },
+              { name: 'A.md', path: 'calculogic-validator/A.md', occurrenceType: 'file' },
+            ],
+          },
+        ],
+      }),
+    /Tree-codebase occurrence node path is required\./u,
+  );
+});
+
+test('malformed sibling unsupported occurrenceType fails deterministically before sort comparator execution', () => {
+  assert.throws(
+    () =>
+      prepareTreeCodebaseAddressedSnapshot({
+        scopeRoots: [
+          {
+            name: 'calculogic-validator',
+            path: 'calculogic-validator',
+            occurrenceType: 'folder',
+            children: [
+              { name: 'B.md', path: 'calculogic-validator/B.md', occurrenceType: 'unsupported' },
+              { name: 'A.md', path: 'calculogic-validator/A.md', occurrenceType: 'file' },
+            ],
+          },
+        ],
+      }),
+    /Tree-codebase occurrence type is unsupported: unsupported\./u,
+  );
+});
+
+test('malformed sibling invalid children shape fails deterministically before sort comparator execution', () => {
+  assert.throws(
+    () =>
+      prepareTreeCodebaseAddressedSnapshot({
+        scopeRoots: [
+          {
+            name: 'calculogic-validator',
+            path: 'calculogic-validator',
+            occurrenceType: 'folder',
+            children: [
+              {
+                name: 'doc',
+                path: 'calculogic-validator/doc',
+                occurrenceType: 'folder',
+                children: {},
+              },
+              { name: 'A.md', path: 'calculogic-validator/A.md', occurrenceType: 'file' },
+            ],
+          },
+        ],
+      }),
+    /Tree-codebase occurrence node children must be an array when provided\./u,
+  );
+});
