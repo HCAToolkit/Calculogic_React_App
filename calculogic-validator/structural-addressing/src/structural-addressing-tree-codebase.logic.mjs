@@ -51,6 +51,15 @@ const assertValidOccurrenceNode = (node) => {
   }
 };
 
+
+const sortTreeCodebaseSiblings = (nodes) =>
+  [...nodes].sort(
+    (left, right) =>
+      left.name.localeCompare(right.name) ||
+      left.occurrenceType.localeCompare(right.occurrenceType) ||
+      left.path.localeCompare(right.path),
+  );
+
 const resolveMarkerStrategy = (occurrenceType) => {
   const rule = TREE_CODEBASE_ADDRESSING_PROFILE.levelRules.find((entry) => entry.occurrenceType === occurrenceType);
   if (!rule) {
@@ -65,7 +74,9 @@ const traverseOccurrences = ({ nodes, parentAddressPath, depth, records, nextOrd
   let fileCounter = 0;
   let orderIndex = nextOrderIndex;
 
-  for (const node of nodes) {
+  const sortedNodes = sortTreeCodebaseSiblings(nodes);
+
+  for (const node of sortedNodes) {
     assertValidOccurrenceNode(node);
 
     const isFolder = node.occurrenceType === STRUCTURAL_ADDRESSING_OCCURRENCE_TYPES.FOLDER;

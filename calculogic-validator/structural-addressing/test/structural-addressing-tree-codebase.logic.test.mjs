@@ -134,7 +134,7 @@ test('occurrence records include required fields with deterministic parentAddres
 
   assert.equal(childFile?.parentAddressPath, 'A');
   assert.equal(childFile?.depth, 1);
-  assert.equal(childFile?.orderIndex, 1);
+  assert.equal(childFile?.orderIndex, 3);
   assert.deepEqual(result.occurrenceRecords.map((record) => record.orderIndex), [0, 1, 2, 3, 4]);
 });
 
@@ -191,4 +191,120 @@ test('fails deterministically for invalid children shape', () => {
       }),
     /Tree-codebase occurrence node children must be an array when provided\./u,
   );
+});
+
+
+test('sibling marker assignment stays stable across varied input sibling order including nested children', () => {
+  const fixtureA = {
+    sourceNamespace: 'calculogic-validator',
+    scope: 'validator',
+    target: null,
+    scopeRoots: [
+      {
+        name: 'calculogic-validator',
+        path: 'calculogic-validator',
+        occurrenceType: 'folder',
+        children: [
+          { name: 'README.md', path: 'calculogic-validator/README.md', occurrenceType: 'file' },
+          { name: 'LICENSE', path: 'calculogic-validator/LICENSE', occurrenceType: 'file' },
+          {
+            name: 'doc',
+            path: 'calculogic-validator/doc',
+            occurrenceType: 'folder',
+            children: [
+              { name: 'Zeta', path: 'calculogic-validator/doc/Zeta', occurrenceType: 'folder', children: [] },
+              { name: 'Alpha', path: 'calculogic-validator/doc/Alpha', occurrenceType: 'folder', children: [] },
+              { name: 'z-note.md', path: 'calculogic-validator/doc/z-note.md', occurrenceType: 'file' },
+              { name: 'a-note.md', path: 'calculogic-validator/doc/a-note.md', occurrenceType: 'file' },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  const fixtureB = {
+    sourceNamespace: 'calculogic-validator',
+    scope: 'validator',
+    target: null,
+    scopeRoots: [
+      {
+        name: 'calculogic-validator',
+        path: 'calculogic-validator',
+        occurrenceType: 'folder',
+        children: [
+          {
+            name: 'doc',
+            path: 'calculogic-validator/doc',
+            occurrenceType: 'folder',
+            children: [
+              { name: 'a-note.md', path: 'calculogic-validator/doc/a-note.md', occurrenceType: 'file' },
+              { name: 'Alpha', path: 'calculogic-validator/doc/Alpha', occurrenceType: 'folder', children: [] },
+              { name: 'z-note.md', path: 'calculogic-validator/doc/z-note.md', occurrenceType: 'file' },
+              { name: 'Zeta', path: 'calculogic-validator/doc/Zeta', occurrenceType: 'folder', children: [] },
+            ],
+          },
+          { name: 'LICENSE', path: 'calculogic-validator/LICENSE', occurrenceType: 'file' },
+          { name: 'README.md', path: 'calculogic-validator/README.md', occurrenceType: 'file' },
+        ],
+      },
+    ],
+  };
+
+  const resultA = prepareTreeCodebaseAddressedSnapshot(fixtureA);
+  const resultB = prepareTreeCodebaseAddressedSnapshot(fixtureB);
+
+  const getAddressMap = (records) =>
+    Object.fromEntries(records.map((record) => [record.path, record.addressPath]));
+
+  const addressMapA = getAddressMap(resultA.occurrenceRecords);
+  const addressMapB = getAddressMap(resultB.occurrenceRecords);
+
+  assert.equal(addressMapA['calculogic-validator'], 'A');
+  assert.equal(addressMapA['calculogic-validator/LICENSE'], 'A.1');
+  assert.equal(addressMapA['calculogic-validator/README.md'], 'A.2');
+  assert.equal(addressMapA['calculogic-validator/doc'], 'A.A');
+
+  assert.equal(addressMapA['calculogic-validator/doc/a-note.md'], 'A.A.1');
+  assert.equal(addressMapA['calculogic-validator/doc/z-note.md'], 'A.A.2');
+  assert.equal(addressMapA['calculogic-validator/doc/Alpha'], 'A.A.A');
+  assert.equal(addressMapA['calculogic-validator/doc/Zeta'], 'A.A.B');
+
+  assert.deepEqual(addressMapB, addressMapA);
+});
+
+test('input child arrays are not mutated while assigning sorted markers', () => {
+  const input = {
+    sourceNamespace: 'calculogic-validator',
+    scope: 'validator',
+    target: null,
+    scopeRoots: [
+      {
+        name: 'calculogic-validator',
+        path: 'calculogic-validator',
+        occurrenceType: 'folder',
+        children: [
+          { name: 'README.md', path: 'calculogic-validator/README.md', occurrenceType: 'file' },
+          { name: 'LICENSE', path: 'calculogic-validator/LICENSE', occurrenceType: 'file' },
+          {
+            name: 'doc',
+            path: 'calculogic-validator/doc',
+            occurrenceType: 'folder',
+            children: [
+              { name: 'z-note.md', path: 'calculogic-validator/doc/z-note.md', occurrenceType: 'file' },
+              { name: 'a-note.md', path: 'calculogic-validator/doc/a-note.md', occurrenceType: 'file' },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  const topLevelOrderBefore = input.scopeRoots[0].children.map((child) => child.path);
+  const nestedOrderBefore = input.scopeRoots[0].children[2].children.map((child) => child.path);
+
+  prepareTreeCodebaseAddressedSnapshot(input);
+
+  assert.deepEqual(input.scopeRoots[0].children.map((child) => child.path), topLevelOrderBefore);
+  assert.deepEqual(input.scopeRoots[0].children[2].children.map((child) => child.path), nestedOrderBefore);
 });
