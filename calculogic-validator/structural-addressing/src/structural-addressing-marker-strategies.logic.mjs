@@ -1,4 +1,4 @@
-import { STRUCTURAL_ADDRESSING_MARKER_STRATEGIES } from './structural-addressing-profile.constants.mjs';
+import { STRUCTURAL_ADDRESSING_MARKER_STRATEGIES } from './structural-addressing-profile.knowledge.mjs';
 
 const assertValidMarkerIndex = (index) => {
   if (index === undefined) {
@@ -29,7 +29,13 @@ const toUpperAlphaMarker = (index) => {
 
 const toArabicNumberMarker = (index) => String(index);
 
-export const buildStructuralAddressingMarker = ({ markerStrategy, index } = {}) => {
+export const buildStructuralAddressingMarker = (options = {}) => {
+  if (!options || typeof options !== 'object') {
+    throw new Error('Marker options must be an object.');
+  }
+
+  const { markerStrategy, index } = options;
+
   assertValidMarkerIndex(index);
 
   if (markerStrategy === STRUCTURAL_ADDRESSING_MARKER_STRATEGIES.UPPER_ALPHA) {

@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildStructuralAddressingMarker } from '../src/structural-addressing-marker-strategies.logic.mjs';
 
+
+
+test('marker options must be an object for null/non-object input', () => {
+  assert.throws(() => buildStructuralAddressingMarker(null), /Marker options must be an object\./u);
+  assert.throws(() => buildStructuralAddressingMarker('upper-alpha'), /Marker options must be an object\./u);
+});
+
+test('undefined options fall through deterministic validation', () => {
+  assert.throws(() => buildStructuralAddressingMarker(undefined), /Marker index is required\./u);
+});
 test('upper-alpha marker generation is deterministic', () => {
   assert.equal(buildStructuralAddressingMarker({ markerStrategy: 'upper-alpha', index: 1 }), 'A');
   assert.equal(buildStructuralAddressingMarker({ markerStrategy: 'upper-alpha', index: 2 }), 'B');

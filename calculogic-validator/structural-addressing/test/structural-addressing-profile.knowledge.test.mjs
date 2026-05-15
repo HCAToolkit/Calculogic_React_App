@@ -6,7 +6,7 @@ import {
   STRUCTURAL_ADDRESSING_MARKER_STRATEGIES,
   STRUCTURAL_ADDRESSING_OCCURRENCE_TYPES,
   TREE_CODEBASE_ADDRESSING_PROFILE,
-} from '../src/structural-addressing-profile.constants.mjs';
+} from '../src/structural-addressing-profile.knowledge.mjs';
 
 test('TREE_CODEBASE_ADDRESSING_PROFILE uses expected identity and addressing constants', () => {
   assert.equal(TREE_CODEBASE_ADDRESSING_PROFILE.profileId, 'tree-codebase');
