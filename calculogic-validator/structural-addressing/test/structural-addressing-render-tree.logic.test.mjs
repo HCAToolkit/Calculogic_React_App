@@ -177,6 +177,161 @@ test('subtree siblings keep continuation bars and later sibling connectors', () 
 
 
 
+
+test('duplicate addressPath records fail deterministically', () => {
+  assert.throws(
+    () =>
+      renderTreeCodebaseAddressedSnapshot({
+        occurrenceRecords: [
+          {
+            address: 'A',
+            addressPath: 'A',
+            displayMarker: 'A',
+            occurrenceType: 'folder',
+            name: 'root-a',
+            path: 'root-a',
+            parentAddressPath: null,
+            depth: 0,
+            orderIndex: 0,
+          },
+          {
+            address: 'A',
+            addressPath: 'A',
+            displayMarker: 'A',
+            occurrenceType: 'folder',
+            name: 'root-b',
+            path: 'root-b',
+            parentAddressPath: null,
+            depth: 0,
+            orderIndex: 1,
+          },
+        ],
+      }),
+    /duplicate addressPath is not allowed: A\./u,
+  );
+});
+
+test('child depth greater than parent depth + 1 fails deterministically', () => {
+  assert.throws(
+    () =>
+      renderTreeCodebaseAddressedSnapshot({
+        occurrenceRecords: [
+          {
+            address: 'A',
+            addressPath: 'A',
+            displayMarker: 'A',
+            occurrenceType: 'folder',
+            name: 'root',
+            path: 'root',
+            parentAddressPath: null,
+            depth: 0,
+            orderIndex: 0,
+          },
+          {
+            address: 'A.1',
+            addressPath: 'A.1',
+            displayMarker: '1',
+            occurrenceType: 'file',
+            name: 'child.txt',
+            path: 'root/child.txt',
+            parentAddressPath: 'A',
+            depth: 2,
+            orderIndex: 1,
+          },
+        ],
+      }),
+    /depth must be parent depth \+ 1 for addressPath: A\.1\./u,
+  );
+});
+
+test('child depth less than parent depth + 1 fails deterministically', () => {
+  assert.throws(
+    () =>
+      renderTreeCodebaseAddressedSnapshot({
+        occurrenceRecords: [
+          {
+            address: 'R',
+            addressPath: 'R',
+            displayMarker: 'R',
+            occurrenceType: 'folder',
+            name: 'root',
+            path: 'root',
+            parentAddressPath: null,
+            depth: 0,
+            orderIndex: 0,
+          },
+          {
+            address: 'A',
+            addressPath: 'A',
+            displayMarker: 'A',
+            occurrenceType: 'folder',
+            name: 'parent',
+            path: 'root/parent',
+            parentAddressPath: 'R',
+            depth: 1,
+            orderIndex: 1,
+          },
+          {
+            address: 'A.1',
+            addressPath: 'A.1',
+            displayMarker: '1',
+            occurrenceType: 'file',
+            name: 'child.txt',
+            path: 'root/parent/child.txt',
+            parentAddressPath: 'A',
+            depth: 1,
+            orderIndex: 2,
+          },
+        ],
+      }),
+    /depth must be parent depth \+ 1 for addressPath: A\.1\./u,
+  );
+});
+
+test('valid parent depth increments render normally', () => {
+  const result = renderTreeCodebaseAddressedSnapshot({
+    occurrenceRecords: [
+      {
+        address: 'A',
+        addressPath: 'A',
+        displayMarker: 'A',
+        occurrenceType: 'folder',
+        name: 'root',
+        path: 'root',
+        parentAddressPath: null,
+        depth: 0,
+        orderIndex: 0,
+      },
+      {
+        address: 'A.A',
+        addressPath: 'A.A',
+        displayMarker: 'A',
+        occurrenceType: 'folder',
+        name: 'child-folder',
+        path: 'root/child-folder',
+        parentAddressPath: 'A',
+        depth: 1,
+        orderIndex: 1,
+      },
+      {
+        address: 'A.A.1',
+        addressPath: 'A.A.1',
+        displayMarker: '1',
+        occurrenceType: 'file',
+        name: 'grandchild.txt',
+        path: 'root/child-folder/grandchild.txt',
+        parentAddressPath: 'A.A',
+        depth: 2,
+        orderIndex: 2,
+      },
+    ],
+  });
+
+  assert.equal(result.renderedTree, `A: root/
+└─ A: child-folder/
+   └─ 1: grandchild.txt`);
+});
+
 test('null parentAddressPath with depth greater than 0 fails deterministically', () => {
   assert.throws(
     () =>
@@ -314,7 +469,7 @@ test('two-record parentAddressPath cycle fails deterministically', () => {
           },
         ],
       }),
-    /Tree-codebase renderedTree parentAddressPath cycle detected at addressPath: B\./u,
+    /Tree-codebase renderedTree parentAddressPath cycle detected at addressPath: (A|B)\./u,
   );
 });
 

@@ -90,7 +90,84 @@ const buildLaterSiblingMap = (sortedRecords) => {
   return hasLaterSiblingByAddressPath;
 };
 
-const buildRecordByAddressPathMap = (sortedRecords) => new Map(sortedRecords.map((record) => [record.addressPath, record]));
+const buildRecordByAddressPathMap = (sortedRecords) => {
+  const recordByAddressPath = new Map();
+
+  for (const record of sortedRecords) {
+    if (recordByAddressPath.has(record.addressPath)) {
+      throw new Error(
+        `Tree-codebase renderedTree duplicate addressPath is not allowed: ${record.addressPath}.`,
+      );
+    }
+
+    recordByAddressPath.set(record.addressPath, record);
+  }
+
+  return recordByAddressPath;
+};
+
+
+
+const assertNoParentAddressPathCycles = ({ sortedRecords, recordByAddressPath }) => {
+  const walkStateByAddressPath = new Map();
+
+  const visit = (record) => {
+    const state = walkStateByAddressPath.get(record.addressPath);
+
+    if (state === 'visiting') {
+      throw new Error(
+        `Tree-codebase renderedTree parentAddressPath cycle detected at addressPath: ${record.addressPath}.`,
+      );
+    }
+
+    if (state === 'visited') {
+      return;
+    }
+
+    walkStateByAddressPath.set(record.addressPath, 'visiting');
+
+    if (record.parentAddressPath !== null) {
+      const parentRecord = recordByAddressPath.get(record.parentAddressPath);
+      if (!parentRecord) {
+        throw new Error(
+          `Tree-codebase renderedTree parentAddressPath reference is missing: ${record.parentAddressPath}.`,
+        );
+      }
+
+      visit(parentRecord);
+    }
+
+    walkStateByAddressPath.set(record.addressPath, 'visited');
+  };
+
+  for (const record of sortedRecords) {
+    visit(record);
+  }
+};
+
+const assertValidParentDepthRelationships = ({ sortedRecords, recordByAddressPath }) => {
+  for (const record of sortedRecords) {
+    if (record.parentAddressPath === null) {
+      continue;
+    }
+
+    const parentRecord = recordByAddressPath.get(record.parentAddressPath);
+
+    if (!parentRecord) {
+      throw new Error(
+        `Tree-codebase renderedTree parentAddressPath reference is missing: ${record.parentAddressPath}.`,
+      );
+    }
+
+    const expectedDepth = parentRecord.depth + 1;
+
+    if (record.depth !== expectedDepth) {
+      throw new Error(
+        `Tree-codebase renderedTree occurrence record depth must be parent depth + 1 for addressPath: ${record.addressPath}.`,
+      );
+    }
+  }
+};
 
 const collectAncestorContinuationState = ({ record, recordByAddressPath, hasLaterSiblingByAddressPath }) => {
   const ancestorHasLaterSiblings = [];
@@ -152,6 +229,16 @@ export const renderTreeCodebaseAddressedSnapshot = (snapshot) => {
 
   const hasLaterSiblingByAddressPath = buildLaterSiblingMap(sortedRecords);
   const recordByAddressPath = buildRecordByAddressPathMap(sortedRecords);
+
+  assertNoParentAddressPathCycles({
+    sortedRecords,
+    recordByAddressPath,
+  });
+
+  assertValidParentDepthRelationships({
+    sortedRecords,
+    recordByAddressPath,
+  });
 
   const lines = sortedRecords.map((record) =>
     toTreeLine({
