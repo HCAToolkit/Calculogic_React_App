@@ -13,3 +13,21 @@ test('root package script wiring exposes addressing:get-tree direct host command
     'node --experimental-strip-types calculogic-validator/scripts/addressing-get-tree.host.mjs',
   );
 });
+
+test('root package script wiring exposes report:addressing:get-tree:validator capture command', async () => {
+  const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
+  const reportScript = packageJson.scripts['report:addressing:get-tree:validator'];
+
+  assert.equal(typeof reportScript, 'string');
+  assert.match(reportScript, /calculogic-report-capture/u);
+  assert.match(reportScript, /--json/u);
+  assert.match(reportScript, /--dir \.\/\.reports/u);
+  assert.match(reportScript, /--keep 20/u);
+  assert.match(reportScript, /--prefix addressing-get-tree-validator/u);
+  assert.match(reportScript, /npm run addressing:get-tree/u);
+  assert.match(reportScript, /npm run addressing:get-tree -- --scope=validator/u);
+  assert.match(reportScript, /--format=both/u);
+  assert.doesNotMatch(reportScript, /validate:addressing/u);
+  assert.doesNotMatch(reportScript, /runValidatorRunnerCli/u);
+  assert.doesNotMatch(reportScript, /runValidatorRunner/u);
+});
