@@ -90,6 +90,91 @@ test('last sibling with descendants renders with terminal connector', () => {
 });
 
 
+
+test('duplicate sibling orderIndex values use sorted rendered position for connectors', () => {
+  const snapshot = {
+    occurrenceRecords: [
+      {
+        address: 'A',
+        addressPath: 'A',
+        displayMarker: 'A',
+        occurrenceType: 'folder',
+        name: 'root',
+        path: 'root',
+        parentAddressPath: null,
+        depth: 0,
+        orderIndex: 0,
+      },
+      {
+        address: 'A.A',
+        addressPath: 'A.A',
+        displayMarker: 'A',
+        occurrenceType: 'folder',
+        name: 'folder-a',
+        path: 'root/folder-a',
+        parentAddressPath: 'A',
+        depth: 1,
+        orderIndex: 1,
+      },
+      {
+        address: 'A.B',
+        addressPath: 'A.B',
+        displayMarker: 'B',
+        occurrenceType: 'folder',
+        name: 'folder-b',
+        path: 'root/folder-b',
+        parentAddressPath: 'A',
+        depth: 1,
+        orderIndex: 1,
+      },
+    ],
+  };
+
+  const result = renderTreeCodebaseAddressedSnapshot(snapshot);
+
+  assert.match(result.renderedTree, /^├─ A: folder-a\/$/mu);
+  assert.match(result.renderedTree, /^└─ B: folder-b\/$/mu);
+});
+
+test('subtree siblings keep continuation bars and later sibling connectors', () => {
+  const snapshot = prepareTreeCodebaseAddressedSnapshot({
+    sourceNamespace: 'calculogic-validator',
+    scope: 'validator',
+    target: null,
+    scopeRoots: [
+      {
+        name: 'root',
+        path: 'root',
+        occurrenceType: 'folder',
+        children: [
+          {
+            name: 'folder-a',
+            path: 'root/folder-a',
+            occurrenceType: 'folder',
+            children: [
+              {
+                name: 'nested',
+                path: 'root/folder-a/nested',
+                occurrenceType: 'folder',
+                children: [],
+              },
+            ],
+          },
+          { name: 'folder-b', path: 'root/folder-b', occurrenceType: 'folder', children: [] },
+          { name: 'file-c', path: 'root/file-c', occurrenceType: 'file' },
+        ],
+      },
+    ],
+  });
+
+  const result = renderTreeCodebaseAddressedSnapshot(snapshot);
+
+  assert.match(result.renderedTree, /^├─ A: folder-a\/$/mu);
+  assert.match(result.renderedTree, /^│  └─ A: nested\/$/mu);
+  assert.match(result.renderedTree, /^├─ 1: file-c$/mu);
+  assert.match(result.renderedTree, /^└─ B: folder-b\/$/mu);
+});
+
 test('self-referential parentAddressPath fails deterministically', () => {
   assert.throws(
     () =>

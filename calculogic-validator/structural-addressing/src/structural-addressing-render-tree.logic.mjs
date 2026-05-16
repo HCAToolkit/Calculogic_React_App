@@ -61,20 +61,18 @@ const assertValidOccurrenceRecord = (record) => {
   }
 };
 
-const hasLaterSibling = ({ sortedRecords, record, index }) =>
-  sortedRecords.slice(index + 1).some(
-    (candidate) =>
-      candidate.depth === record.depth &&
-      candidate.parentAddressPath === record.parentAddressPath &&
-      candidate.orderIndex > record.orderIndex,
-  );
+const getSiblingGroupKey = (record) => `${record.parentAddressPath ?? '__ROOT__'}::${record.depth}`;
 
 const buildLaterSiblingMap = (sortedRecords) => {
+  const hasSeenSiblingByGroup = new Map();
   const hasLaterSiblingByAddressPath = new Map();
 
-  for (let index = 0; index < sortedRecords.length; index += 1) {
+  for (let index = sortedRecords.length - 1; index >= 0; index -= 1) {
     const record = sortedRecords[index];
-    hasLaterSiblingByAddressPath.set(record.addressPath, hasLaterSibling({ sortedRecords, record, index }));
+    const siblingGroupKey = getSiblingGroupKey(record);
+
+    hasLaterSiblingByAddressPath.set(record.addressPath, hasSeenSiblingByGroup.has(siblingGroupKey));
+    hasSeenSiblingByGroup.set(siblingGroupKey, true);
   }
 
   return hasLaterSiblingByAddressPath;
