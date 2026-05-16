@@ -171,24 +171,10 @@ const assertValidParentDepthRelationships = ({ sortedRecords, recordByAddressPat
 
 const collectAncestorContinuationState = ({ record, recordByAddressPath, hasLaterSiblingByAddressPath }) => {
   const ancestorHasLaterSiblings = [];
-  const visitedAddressPaths = new Set();
   let cursorAddressPath = record.parentAddressPath;
 
   while (cursorAddressPath !== null) {
-    if (visitedAddressPaths.has(cursorAddressPath)) {
-      throw new Error(
-        `Tree-codebase renderedTree parentAddressPath cycle detected at addressPath: ${cursorAddressPath}.`,
-      );
-    }
-
-    visitedAddressPaths.add(cursorAddressPath);
-
     const ancestorRecord = recordByAddressPath.get(cursorAddressPath);
-    if (!ancestorRecord) {
-      throw new Error(
-        `Tree-codebase renderedTree parentAddressPath reference is missing: ${cursorAddressPath}.`,
-      );
-    }
 
     if (ancestorRecord.depth > 0) {
       ancestorHasLaterSiblings.unshift(Boolean(hasLaterSiblingByAddressPath.get(cursorAddressPath)));
