@@ -96,7 +96,9 @@ const collectAncestorContinuationState = ({ record, recordByAddressPath, hasLate
 
     const ancestorRecord = recordByAddressPath.get(cursorAddressPath);
     if (!ancestorRecord) {
-      break;
+      throw new Error(
+        `Tree-codebase renderedTree parentAddressPath reference is missing: ${cursorAddressPath}.`,
+      );
     }
 
     if (ancestorRecord.depth > 0) {

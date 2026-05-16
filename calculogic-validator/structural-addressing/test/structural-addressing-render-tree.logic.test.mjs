@@ -175,6 +175,49 @@ test('subtree siblings keep continuation bars and later sibling connectors', () 
   assert.match(result.renderedTree, /^└─ B: folder-b\/$/mu);
 });
 
+
+test('dangling parentAddressPath fails deterministically', () => {
+  assert.throws(
+    () =>
+      renderTreeCodebaseAddressedSnapshot({
+        occurrenceRecords: [
+          {
+            address: 'A.1',
+            addressPath: 'A.1',
+            displayMarker: '1',
+            occurrenceType: 'file',
+            name: 'orphan.txt',
+            path: 'root/orphan.txt',
+            parentAddressPath: 'A.MISSING',
+            depth: 1,
+            orderIndex: 0,
+          },
+        ],
+      }),
+    /Tree-codebase renderedTree parentAddressPath reference is missing: A\.MISSING\./u,
+  );
+});
+
+test('null parentAddressPath root records render normally', () => {
+  const result = renderTreeCodebaseAddressedSnapshot({
+    occurrenceRecords: [
+      {
+        address: 'A',
+        addressPath: 'A',
+        displayMarker: 'A',
+        occurrenceType: 'folder',
+        name: 'root',
+        path: 'root',
+        parentAddressPath: null,
+        depth: 0,
+        orderIndex: 0,
+      },
+    ],
+  });
+
+  assert.deepEqual(result, { renderedTree: 'A: root/' });
+});
+
 test('self-referential parentAddressPath fails deterministically', () => {
   assert.throws(
     () =>
