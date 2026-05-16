@@ -180,11 +180,17 @@ test('symlink targets are handled safely and never recursively traversed', async
   const validatorRoot = path.join(cwd, 'calculogic-validator');
   const cycleLink = path.join(validatorRoot, 'cycle-link');
   const rootLink = path.join(validatorRoot, 'linked-root');
+  const outsideRoot = path.join(cwd, 'outside-root');
+  const linkOut = path.join(validatorRoot, 'link-out');
+
+  await fs.mkdir(path.join(outsideRoot, 'inner'), { recursive: true });
+  await fs.writeFile(path.join(outsideRoot, 'inner', 'secret.txt'), 'secret\n');
 
   const createdCycle = await tryCreateSymlink({ target: validatorRoot, linkPath: cycleLink, type: 'dir' });
   const createdRootLink = await tryCreateSymlink({ target: path.join(validatorRoot, 'structural-addressing'), linkPath: rootLink, type: 'dir' });
+  const createdLinkOut = await tryCreateSymlink({ target: outsideRoot, linkPath: linkOut, type: 'dir' });
 
-  if (!createdCycle || !createdRootLink) {
+  if (!createdCycle || !createdRootLink || !createdLinkOut) {
     await fs.rm(cwd, { recursive: true, force: true });
     t.skip('Symlink creation not supported in this environment.');
     return;
@@ -208,6 +214,20 @@ test('symlink targets are handled safely and never recursively traversed', async
 
   assert.equal(linkExitCode, 1);
   assert.match(linkStderr.read(), /symbolic link and cannot be walked safely/u);
+
+
+  const traversedStdout = makeWritableBuffer();
+  const traversedStderr = makeWritableBuffer();
+  const traversedExitCode = await runAddressingGetTreeHost({
+    argv: ['--scope=validator', '--target', 'calculogic-validator/link-out/inner', '--format=text'],
+    cwd,
+    stdout: traversedStdout,
+    stderr: traversedStderr,
+  });
+
+  assert.equal(traversedExitCode, 1);
+  assert.match(traversedStderr.read(), /traverses a symbolic link/u);
+  assert.equal(traversedStdout.read(), '');
 
   await fs.rm(cwd, { recursive: true, force: true });
 });

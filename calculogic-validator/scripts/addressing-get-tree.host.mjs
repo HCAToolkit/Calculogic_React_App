@@ -144,6 +144,40 @@ export const parseAddressingGetTreeArgs = (argv) => {
   return { helpRequested: false, scope, format, targets };
 };
 
+
+const assertNoSymlinkPathSegments = async ({ absolutePath, allowedRootAbsolute, target }) => {
+  const relative = path.relative(allowedRootAbsolute, absolutePath);
+
+  if (relative === '') {
+    const rootStat = await fs.lstat(absolutePath);
+    if (rootStat.isSymbolicLink()) {
+      throw new Error(`Target path is a symbolic link and cannot be walked safely: ${target}`);
+    }
+    return;
+  }
+
+  const segments = relative.split(path.sep).filter(Boolean);
+  let cursor = allowedRootAbsolute;
+
+  for (const segment of segments) {
+    cursor = path.join(cursor, segment);
+
+    let segmentStat;
+    try {
+      segmentStat = await fs.lstat(cursor);
+    } catch (error) {
+      if (error?.code === 'ENOENT') {
+        throw new Error(`Target path does not exist: ${target}`);
+      }
+      throw error;
+    }
+
+    if (segmentStat.isSymbolicLink()) {
+      throw new Error(`Target path traverses a symbolic link and cannot be walked safely: ${target}`);
+    }
+  }
+};
+
 const toOccurrenceNode = async ({ absolutePath, repoRoot }) => {
   const stat = await fs.lstat(absolutePath);
 
@@ -197,17 +231,11 @@ export const buildTreeCodebaseInputFromFileSystem = async ({ scope, targets, cwd
       throw new Error(`Target is outside supported scope: ${target}`);
     }
 
-    try {
-      const rootTargetStat = await fs.lstat(resolvedTarget);
-      if (rootTargetStat.isSymbolicLink()) {
-        throw new Error(`Target path is a symbolic link and cannot be walked safely: ${target}`);
-      }
-    } catch (error) {
-      if (error?.code === 'ENOENT') {
-        throw new Error(`Target path does not exist: ${target}`);
-      }
-      throw error;
-    }
+    await assertNoSymlinkPathSegments({
+      absolutePath: resolvedTarget,
+      allowedRootAbsolute: scopeConfig.allowedRootAbsolute,
+      target,
+    });
 
     const rootNode = await toOccurrenceNode({ absolutePath: resolvedTarget, repoRoot });
 
