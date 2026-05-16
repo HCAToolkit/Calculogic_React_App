@@ -1,0 +1,244 @@
+import { STRUCTURAL_ADDRESSING_OCCURRENCE_TYPES } from './structural-addressing-profile.knowledge.mjs';
+
+const assertValidSnapshotInput = (snapshot) => {
+  if (snapshot === undefined) {
+    throw new Error('Tree-codebase renderedTree snapshot input is required.');
+  }
+
+  if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) {
+    throw new Error('Tree-codebase renderedTree snapshot input must be an object.');
+  }
+
+  if (!Object.hasOwn(snapshot, 'occurrenceRecords')) {
+    throw new Error('Tree-codebase renderedTree snapshot input must include occurrenceRecords.');
+  }
+
+  if (!Array.isArray(snapshot.occurrenceRecords)) {
+    throw new Error('Tree-codebase renderedTree occurrenceRecords must be an array.');
+  }
+};
+
+const assertValidOccurrenceRecord = (record) => {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    throw new Error('Tree-codebase renderedTree occurrence record must be an object.');
+  }
+
+  if (typeof record.addressPath !== 'string' || record.addressPath.length === 0) {
+    throw new Error('Tree-codebase renderedTree occurrence record addressPath is required.');
+  }
+
+  if (typeof record.displayMarker !== 'string' || record.displayMarker.length === 0) {
+    throw new Error('Tree-codebase renderedTree occurrence record displayMarker is required.');
+  }
+
+  if (
+    record.occurrenceType !== STRUCTURAL_ADDRESSING_OCCURRENCE_TYPES.FOLDER &&
+    record.occurrenceType !== STRUCTURAL_ADDRESSING_OCCURRENCE_TYPES.FILE
+  ) {
+    throw new Error(
+      `Tree-codebase renderedTree occurrence type is unsupported: ${record.occurrenceType ?? '(missing)'}.`,
+    );
+  }
+
+  if (typeof record.name !== 'string' || record.name.length === 0) {
+    throw new Error('Tree-codebase renderedTree occurrence record name is required.');
+  }
+
+  if (typeof record.path !== 'string' || record.path.length === 0) {
+    throw new Error('Tree-codebase renderedTree occurrence record path is required.');
+  }
+
+  if (!(record.parentAddressPath === null || typeof record.parentAddressPath === 'string')) {
+    throw new Error('Tree-codebase renderedTree occurrence record parentAddressPath must be string or null.');
+  }
+
+  if (!Number.isInteger(record.depth) || record.depth < 0) {
+    throw new Error('Tree-codebase renderedTree occurrence record depth must be a non-negative integer.');
+  }
+
+  if (record.parentAddressPath === null && record.depth !== 0) {
+    throw new Error(
+      'Tree-codebase renderedTree occurrence record with null parentAddressPath must have depth 0.',
+    );
+  }
+
+  if (record.parentAddressPath !== null && record.depth === 0) {
+    throw new Error(
+      'Tree-codebase renderedTree occurrence record with parentAddressPath must have depth greater than 0.',
+    );
+  }
+
+  if (!Number.isInteger(record.orderIndex) || record.orderIndex < 0) {
+    throw new Error('Tree-codebase renderedTree occurrence record orderIndex must be a non-negative integer.');
+  }
+};
+
+const getSiblingGroupKey = (record) => `${record.parentAddressPath ?? '__ROOT__'}::${record.depth}`;
+
+const buildLaterSiblingMap = (sortedRecords) => {
+  const hasSeenSiblingByGroup = new Map();
+  const hasLaterSiblingByAddressPath = new Map();
+
+  for (let index = sortedRecords.length - 1; index >= 0; index -= 1) {
+    const record = sortedRecords[index];
+    const siblingGroupKey = getSiblingGroupKey(record);
+
+    hasLaterSiblingByAddressPath.set(record.addressPath, hasSeenSiblingByGroup.has(siblingGroupKey));
+    hasSeenSiblingByGroup.set(siblingGroupKey, true);
+  }
+
+  return hasLaterSiblingByAddressPath;
+};
+
+const buildRecordByAddressPathMap = (sortedRecords) => {
+  const recordByAddressPath = new Map();
+
+  for (const record of sortedRecords) {
+    if (recordByAddressPath.has(record.addressPath)) {
+      throw new Error(
+        `Tree-codebase renderedTree duplicate addressPath is not allowed: ${record.addressPath}.`,
+      );
+    }
+
+    recordByAddressPath.set(record.addressPath, record);
+  }
+
+  return recordByAddressPath;
+};
+
+
+
+const assertNoParentAddressPathCycles = ({ sortedRecords, recordByAddressPath }) => {
+  const walkStateByAddressPath = new Map();
+
+  const visit = (record) => {
+    const state = walkStateByAddressPath.get(record.addressPath);
+
+    if (state === 'visiting') {
+      throw new Error(
+        `Tree-codebase renderedTree parentAddressPath cycle detected at addressPath: ${record.addressPath}.`,
+      );
+    }
+
+    if (state === 'visited') {
+      return;
+    }
+
+    walkStateByAddressPath.set(record.addressPath, 'visiting');
+
+    if (record.parentAddressPath !== null) {
+      const parentRecord = recordByAddressPath.get(record.parentAddressPath);
+      if (!parentRecord) {
+        throw new Error(
+          `Tree-codebase renderedTree parentAddressPath reference is missing: ${record.parentAddressPath}.`,
+        );
+      }
+
+      visit(parentRecord);
+    }
+
+    walkStateByAddressPath.set(record.addressPath, 'visited');
+  };
+
+  for (const record of sortedRecords) {
+    visit(record);
+  }
+};
+
+const assertValidParentDepthRelationships = ({ sortedRecords, recordByAddressPath }) => {
+  for (const record of sortedRecords) {
+    if (record.parentAddressPath === null) {
+      continue;
+    }
+
+    const parentRecord = recordByAddressPath.get(record.parentAddressPath);
+
+    if (!parentRecord) {
+      throw new Error(
+        `Tree-codebase renderedTree parentAddressPath reference is missing: ${record.parentAddressPath}.`,
+      );
+    }
+
+    const expectedDepth = parentRecord.depth + 1;
+
+    if (record.depth !== expectedDepth) {
+      throw new Error(
+        `Tree-codebase renderedTree occurrence record depth must be parent depth + 1 for addressPath: ${record.addressPath}.`,
+      );
+    }
+  }
+};
+
+const collectAncestorContinuationState = ({ record, recordByAddressPath, hasLaterSiblingByAddressPath }) => {
+  const ancestorHasLaterSiblings = [];
+  let cursorAddressPath = record.parentAddressPath;
+
+  while (cursorAddressPath !== null) {
+    const ancestorRecord = recordByAddressPath.get(cursorAddressPath);
+
+    if (ancestorRecord.depth > 0) {
+      ancestorHasLaterSiblings.unshift(Boolean(hasLaterSiblingByAddressPath.get(cursorAddressPath)));
+    }
+
+    cursorAddressPath = ancestorRecord.parentAddressPath;
+  }
+
+  return ancestorHasLaterSiblings;
+};
+
+const toTreeLine = ({ record, isLast, ancestorHasLaterSiblings }) => {
+  const connector = isLast ? '└─' : '├─';
+  const indentation = ancestorHasLaterSiblings.map((hasNext) => (hasNext ? '│  ' : '   ')).join('');
+  const nameToken =
+    record.occurrenceType === STRUCTURAL_ADDRESSING_OCCURRENCE_TYPES.FOLDER ? `${record.name}/` : record.name;
+
+  if (record.depth === 0) {
+    return `${record.displayMarker}: ${nameToken}`;
+  }
+
+  return `${indentation}${connector} ${record.displayMarker}: ${nameToken}`;
+};
+
+export const renderTreeCodebaseAddressedSnapshot = (snapshot) => {
+  assertValidSnapshotInput(snapshot);
+
+  const sortedRecords = [...snapshot.occurrenceRecords]
+    .map((record) => {
+      assertValidOccurrenceRecord(record);
+      return record;
+    })
+    .sort((left, right) => left.orderIndex - right.orderIndex || left.addressPath.localeCompare(right.addressPath));
+
+  if (sortedRecords.length === 0) {
+    return { renderedTree: '' };
+  }
+
+  const hasLaterSiblingByAddressPath = buildLaterSiblingMap(sortedRecords);
+  const recordByAddressPath = buildRecordByAddressPathMap(sortedRecords);
+
+  assertNoParentAddressPathCycles({
+    sortedRecords,
+    recordByAddressPath,
+  });
+
+  assertValidParentDepthRelationships({
+    sortedRecords,
+    recordByAddressPath,
+  });
+
+  const lines = sortedRecords.map((record) =>
+    toTreeLine({
+      record,
+      isLast: !hasLaterSiblingByAddressPath.get(record.addressPath),
+      ancestorHasLaterSiblings: collectAncestorContinuationState({
+        record,
+        recordByAddressPath,
+        hasLaterSiblingByAddressPath,
+      }),
+    }),
+  );
+
+  return {
+    renderedTree: lines.join('\n'),
+  };
+};
