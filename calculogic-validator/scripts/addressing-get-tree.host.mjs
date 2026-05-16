@@ -22,9 +22,33 @@ const USAGE_TEXT =
 
 const normalizeCliPath = (inputPath) => inputPath.trim().replaceAll('\\', '/');
 
-const normalizeRelativePath = ({ absolutePath, cwd }) => normalizeCliPath(path.relative(cwd, absolutePath));
+const normalizeRelativePath = ({ absolutePath, repoRoot }) => normalizeCliPath(path.relative(repoRoot, absolutePath));
 
-const buildScopeConfig = (scope) => {
+const resolveRepoRelativeTarget = ({ repoRoot, target }) => path.resolve(repoRoot, target);
+
+const isInsideOrEqual = ({ child, parent }) => {
+  const relative = path.relative(parent, child);
+  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+};
+
+export const findRepositoryRoot = async ({ cwd }) => {
+  let cursor = path.resolve(cwd);
+
+  while (true) {
+    try {
+      await fs.access(path.join(cursor, '.git'));
+      return cursor;
+    } catch {
+      const parent = path.dirname(cursor);
+      if (parent === cursor) {
+        throw new Error('Unable to locate repository root.');
+      }
+      cursor = parent;
+    }
+  }
+};
+
+const buildScopeConfig = ({ scope, repoRoot }) => {
   if (scope !== SUPPORTED_SCOPE) {
     throw new Error(`Unsupported scope: ${scope ?? '(missing)'}`);
   }
@@ -33,6 +57,7 @@ const buildScopeConfig = (scope) => {
     scope: SUPPORTED_SCOPE,
     sourceNamespace: SOURCE_NAMESPACE,
     defaultRoots: [DEFAULT_SCOPE_ROOT],
+    allowedRootAbsolute: path.resolve(repoRoot, DEFAULT_SCOPE_ROOT),
   };
 };
 
@@ -108,7 +133,9 @@ export const parseAddressingGetTreeArgs = (argv) => {
     throw new Error('Missing required --scope');
   }
 
-  buildScopeConfig(scope);
+  if (scope !== SUPPORTED_SCOPE) {
+    throw new Error(`Unsupported scope: ${scope}`);
+  }
 
   if (!GET_TREE_RENDER_VIEW.supportedFormats.includes(format)) {
     throw new Error(`Unsupported format: ${format}`);
@@ -117,9 +144,14 @@ export const parseAddressingGetTreeArgs = (argv) => {
   return { helpRequested: false, scope, format, targets };
 };
 
-const toOccurrenceNode = async ({ absolutePath, cwd }) => {
-  const stat = await fs.stat(absolutePath);
-  const relativePath = normalizeRelativePath({ absolutePath, cwd });
+const toOccurrenceNode = async ({ absolutePath, repoRoot }) => {
+  const stat = await fs.lstat(absolutePath);
+
+  if (stat.isSymbolicLink()) {
+    return null;
+  }
+
+  const relativePath = normalizeRelativePath({ absolutePath, repoRoot });
   const name = path.basename(absolutePath);
 
   if (stat.isDirectory()) {
@@ -130,12 +162,10 @@ const toOccurrenceNode = async ({ absolutePath, cwd }) => {
     const childNodes = [];
 
     for (const childName of includedChildren) {
-      childNodes.push(
-        await toOccurrenceNode({
-          absolutePath: path.join(absolutePath, childName),
-          cwd,
-        }),
-      );
+      const childNode = await toOccurrenceNode({ absolutePath: path.join(absolutePath, childName), repoRoot });
+      if (childNode) {
+        childNodes.push(childNode);
+      }
     }
 
     return {
@@ -154,32 +184,38 @@ const toOccurrenceNode = async ({ absolutePath, cwd }) => {
 };
 
 export const buildTreeCodebaseInputFromFileSystem = async ({ scope, targets, cwd }) => {
-  const scopeConfig = buildScopeConfig(scope);
+  const repoRoot = await findRepositoryRoot({ cwd });
+  const scopeConfig = buildScopeConfig({ scope, repoRoot });
 
   const selectedTargets = targets.length > 0 ? [...targets] : scopeConfig.defaultRoots;
   const scopeRoots = [];
 
   for (const target of selectedTargets) {
-    const resolvedTarget = path.resolve(cwd, target);
-    const relativeTarget = normalizeRelativePath({ absolutePath: resolvedTarget, cwd });
+    const resolvedTarget = resolveRepoRelativeTarget({ repoRoot, target });
 
-    if (relativeTarget.startsWith('..')) {
-      throw new Error(`Target is outside supported scope: ${target}`);
-    }
-
-    const validatorRootAbsolute = path.resolve(cwd, DEFAULT_SCOPE_ROOT);
-    const relativeToValidatorRoot = normalizeCliPath(path.relative(validatorRootAbsolute, resolvedTarget));
-    if (!(relativeToValidatorRoot === '' || (!relativeToValidatorRoot.startsWith('..') && !path.isAbsolute(relativeToValidatorRoot)))) {
+    if (!isInsideOrEqual({ child: resolvedTarget, parent: scopeConfig.allowedRootAbsolute })) {
       throw new Error(`Target is outside supported scope: ${target}`);
     }
 
     try {
-      await fs.access(resolvedTarget);
-    } catch {
-      throw new Error(`Target path does not exist: ${target}`);
+      const rootTargetStat = await fs.lstat(resolvedTarget);
+      if (rootTargetStat.isSymbolicLink()) {
+        throw new Error(`Target path is a symbolic link and cannot be walked safely: ${target}`);
+      }
+    } catch (error) {
+      if (error?.code === 'ENOENT') {
+        throw new Error(`Target path does not exist: ${target}`);
+      }
+      throw error;
     }
 
-    scopeRoots.push(await toOccurrenceNode({ absolutePath: resolvedTarget, cwd }));
+    const rootNode = await toOccurrenceNode({ absolutePath: resolvedTarget, repoRoot });
+
+    if (!rootNode) {
+      throw new Error(`Target path is a symbolic link and cannot be walked safely: ${target}`);
+    }
+
+    scopeRoots.push(rootNode);
   }
 
   scopeRoots.sort((left, right) => left.path.localeCompare(right.path));
