@@ -14,6 +14,7 @@
     "validate:naming:validator:naming": "node --experimental-strip-types calculogic-validator/scripts/validate-naming.host.mjs --scope=validator --target calculogic-validator/naming",
     "validate:naming:validator:tree": "node --experimental-strip-types calculogic-validator/scripts/validate-naming.host.mjs --scope=validator --target calculogic-validator/tree",
     "validate:naming:validator:doc": "node --experimental-strip-types calculogic-validator/scripts/validate-naming.host.mjs --scope=validator --target calculogic-validator/doc",
+    "addressing:get-tree": "node --experimental-strip-types calculogic-validator/scripts/addressing-get-tree.host.mjs",
     "validate:all": "node --experimental-strip-types calculogic-validator/scripts/validate-all.host.mjs",
     "health:validator": "node --experimental-strip-types calculogic-validator/scripts/validator-health-check.host.mjs",
     "report:naming:repo": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-repo -- node --experimental-strip-types calculogic-validator/scripts/validate-naming.host.mjs --scope=repo",
