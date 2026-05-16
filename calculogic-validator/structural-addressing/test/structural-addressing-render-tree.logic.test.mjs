@@ -176,6 +176,51 @@ test('subtree siblings keep continuation bars and later sibling connectors', () 
 });
 
 
+
+test('null parentAddressPath with depth greater than 0 fails deterministically', () => {
+  assert.throws(
+    () =>
+      renderTreeCodebaseAddressedSnapshot({
+        occurrenceRecords: [
+          {
+            address: 'A.1',
+            addressPath: 'A.1',
+            displayMarker: '1',
+            occurrenceType: 'file',
+            name: 'orphan.txt',
+            path: 'orphan.txt',
+            parentAddressPath: null,
+            depth: 1,
+            orderIndex: 0,
+          },
+        ],
+      }),
+    /null parentAddressPath must have depth 0\./u,
+  );
+});
+
+test('non-null parentAddressPath with depth 0 fails deterministically', () => {
+  assert.throws(
+    () =>
+      renderTreeCodebaseAddressedSnapshot({
+        occurrenceRecords: [
+          {
+            address: 'A',
+            addressPath: 'A',
+            displayMarker: 'A',
+            occurrenceType: 'folder',
+            name: 'root',
+            path: 'root',
+            parentAddressPath: 'ROOT',
+            depth: 0,
+            orderIndex: 0,
+          },
+        ],
+      }),
+    /with parentAddressPath must have depth greater than 0\./u,
+  );
+});
+
 test('dangling parentAddressPath fails deterministically', () => {
   assert.throws(
     () =>
@@ -231,7 +276,7 @@ test('self-referential parentAddressPath fails deterministically', () => {
             name: 'calculogic-validator',
             path: 'calculogic-validator',
             parentAddressPath: 'A',
-            depth: 0,
+            depth: 1,
             orderIndex: 0,
           },
         ],
@@ -253,7 +298,7 @@ test('two-record parentAddressPath cycle fails deterministically', () => {
             name: 'left',
             path: 'left',
             parentAddressPath: 'B',
-            depth: 0,
+            depth: 1,
             orderIndex: 0,
           },
           {
@@ -264,7 +309,7 @@ test('two-record parentAddressPath cycle fails deterministically', () => {
             name: 'right',
             path: 'right',
             parentAddressPath: 'A',
-            depth: 0,
+            depth: 1,
             orderIndex: 1,
           },
         ],

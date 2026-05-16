@@ -56,6 +56,18 @@ const assertValidOccurrenceRecord = (record) => {
     throw new Error('Tree-codebase renderedTree occurrence record depth must be a non-negative integer.');
   }
 
+  if (record.parentAddressPath === null && record.depth !== 0) {
+    throw new Error(
+      'Tree-codebase renderedTree occurrence record with null parentAddressPath must have depth 0.',
+    );
+  }
+
+  if (record.parentAddressPath !== null && record.depth === 0) {
+    throw new Error(
+      'Tree-codebase renderedTree occurrence record with parentAddressPath must have depth greater than 0.',
+    );
+  }
+
   if (!Number.isInteger(record.orderIndex) || record.orderIndex < 0) {
     throw new Error('Tree-codebase renderedTree occurrence record orderIndex must be a non-negative integer.');
   }
