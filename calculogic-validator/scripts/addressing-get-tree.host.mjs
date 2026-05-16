@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import {
   prepareTreeCodebaseAddressedSnapshot,
 } from '../structural-addressing/src/structural-addressing-tree-codebase.logic.mjs';
@@ -291,7 +292,15 @@ export const runAddressingGetTreeHost = async ({ argv, cwd, stdout, stderr }) =>
   }
 };
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+export const isDirectCliEntrypoint = ({ importMetaUrl, argvPath }) => {
+  if (!argvPath) {
+    return false;
+  }
+
+  return importMetaUrl === pathToFileURL(argvPath).href;
+};
+
+if (isDirectCliEntrypoint({ importMetaUrl: import.meta.url, argvPath: process.argv[1] })) {
   const exitCode = await runAddressingGetTreeHost({
     argv: process.argv.slice(2),
     cwd: process.cwd(),

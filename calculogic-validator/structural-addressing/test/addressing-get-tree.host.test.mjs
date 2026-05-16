@@ -4,9 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import {
+  isDirectCliEntrypoint,
   parseAddressingGetTreeArgs,
   runAddressingGetTreeHost,
 } from '../../scripts/addressing-get-tree.host.mjs';
+import { pathToFileURL } from 'node:url';
 
 const makeWritableBuffer = () => {
   let value = '';
@@ -60,6 +62,29 @@ test('-h exits 0 and prints usage', async () => {
   assert.equal(exitCode, 0);
   assert.match(stdout.read(), /--format text\|json\|both/u);
   assert.equal(stderr.read(), '');
+});
+
+test('isDirectCliEntrypoint handles URL-encoded paths deterministically', async () => {
+  const tempRootWithSpace = await fs.mkdtemp(path.join(os.tmpdir(), 'addressing get tree host '));
+  const scriptPath = path.join(tempRootWithSpace, 'addressing-get-tree.host.mjs');
+
+  const expectedUrl = pathToFileURL(scriptPath).href;
+  assert.equal(
+    isDirectCliEntrypoint({
+      importMetaUrl: expectedUrl,
+      argvPath: scriptPath,
+    }),
+    true,
+  );
+  assert.equal(
+    isDirectCliEntrypoint({
+      importMetaUrl: expectedUrl,
+      argvPath: undefined,
+    }),
+    false,
+  );
+
+  await fs.rm(tempRootWithSpace, { recursive: true, force: true });
 });
 
 test('parse errors are deterministic for missing scope, unsupported scope/format, unknown flag and missing values', () => {
