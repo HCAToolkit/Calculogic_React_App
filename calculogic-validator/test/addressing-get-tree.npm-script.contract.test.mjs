@@ -31,3 +31,11 @@ test('root package script wiring exposes report:addressing:get-tree:validator ca
   assert.doesNotMatch(reportScript, /runValidatorRunnerCli/u);
   assert.doesNotMatch(reportScript, /runValidatorRunner/u);
 });
+
+
+test('root package script wiring keeps validate:addressing namespace unimplemented for get-tree V0', async () => {
+  const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
+  const scriptNames = Object.keys(packageJson.scripts);
+
+  assert.equal(scriptNames.some((name) => name.startsWith('validate:addressing')), false);
+});
