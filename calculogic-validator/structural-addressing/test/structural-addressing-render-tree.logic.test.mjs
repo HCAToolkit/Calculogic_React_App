@@ -34,8 +34,8 @@ const buildInput = () => ({
 });
 
 const expectedTree = `A: calculogic-validator/
-└─ A: doc/
-   └─ A: ConventionRoutines/
+├─ A: doc/
+│  └─ A: ConventionRoutines/
 ├─ 1: LICENSE
 └─ 2: README.md`;
 
@@ -51,7 +51,42 @@ test('renderer output follows addressed snapshot order and not raw fixture order
   assert.deepEqual(rawChildOrder, ['README.md', 'LICENSE', 'doc']);
   assert.match(snapshot.occurrenceRecords.map((record) => record.name).join(','), /doc,ConventionRoutines,LICENSE,README\.md/u);
   const result = renderTreeCodebaseAddressedSnapshot(snapshot);
-  assert.match(result.renderedTree, /└─ A: doc\/\n   └─ A: ConventionRoutines\/\n├─ 1: LICENSE/u);
+  assert.match(result.renderedTree, /├─ A: doc\/\n│  └─ A: ConventionRoutines\/\n├─ 1: LICENSE/u);
+});
+
+test('folder with descendants and a later sibling renders with branch connector and continuation bars', () => {
+  const snapshot = prepareTreeCodebaseAddressedSnapshot(buildInput());
+  const result = renderTreeCodebaseAddressedSnapshot(snapshot);
+
+  assert.match(result.renderedTree, /^├─ A: doc\/$/mu);
+  assert.match(result.renderedTree, /^│  └─ A: ConventionRoutines\/$/mu);
+});
+
+test('last sibling with descendants renders with terminal connector', () => {
+  const snapshot = prepareTreeCodebaseAddressedSnapshot({
+    sourceNamespace: 'calculogic-validator',
+    scope: 'validator',
+    target: null,
+    scopeRoots: [
+      {
+        name: 'root',
+        path: 'root',
+        occurrenceType: 'folder',
+        children: [
+          { name: 'a.txt', path: 'root/a.txt', occurrenceType: 'file' },
+          {
+            name: 'z-doc',
+            path: 'root/z-doc',
+            occurrenceType: 'folder',
+            children: [{ name: 'nested.md', path: 'root/z-doc/nested.md', occurrenceType: 'file' }],
+          },
+        ],
+      },
+    ],
+  });
+
+  const result = renderTreeCodebaseAddressedSnapshot(snapshot);
+  assert.match(result.renderedTree, /^└─ A: z-doc\/$/mu);
 });
 
 test('render is stable for repeated calls with the same snapshot', () => {

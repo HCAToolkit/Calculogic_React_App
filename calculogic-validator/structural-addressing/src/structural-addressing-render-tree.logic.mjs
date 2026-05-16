@@ -61,10 +61,52 @@ const assertValidOccurrenceRecord = (record) => {
   }
 };
 
-const toTreeLine = ({ record, isLast, parentHasNextSiblings }) => {
+const hasLaterSibling = ({ sortedRecords, record, index }) =>
+  sortedRecords.slice(index + 1).some(
+    (candidate) =>
+      candidate.depth === record.depth &&
+      candidate.parentAddressPath === record.parentAddressPath &&
+      candidate.orderIndex > record.orderIndex,
+  );
+
+const buildLaterSiblingMap = (sortedRecords) => {
+  const hasLaterSiblingByAddressPath = new Map();
+
+  for (let index = 0; index < sortedRecords.length; index += 1) {
+    const record = sortedRecords[index];
+    hasLaterSiblingByAddressPath.set(record.addressPath, hasLaterSibling({ sortedRecords, record, index }));
+  }
+
+  return hasLaterSiblingByAddressPath;
+};
+
+const buildRecordByAddressPathMap = (sortedRecords) => new Map(sortedRecords.map((record) => [record.addressPath, record]));
+
+const collectAncestorContinuationState = ({ record, recordByAddressPath, hasLaterSiblingByAddressPath }) => {
+  const ancestorHasLaterSiblings = [];
+  let cursorAddressPath = record.parentAddressPath;
+
+  while (cursorAddressPath !== null) {
+    const ancestorRecord = recordByAddressPath.get(cursorAddressPath);
+    if (!ancestorRecord) {
+      break;
+    }
+
+    if (ancestorRecord.depth > 0) {
+      ancestorHasLaterSiblings.unshift(Boolean(hasLaterSiblingByAddressPath.get(cursorAddressPath)));
+    }
+
+    cursorAddressPath = ancestorRecord.parentAddressPath;
+  }
+
+  return ancestorHasLaterSiblings;
+};
+
+const toTreeLine = ({ record, isLast, ancestorHasLaterSiblings }) => {
   const connector = isLast ? '└─' : '├─';
-  const indentation = parentHasNextSiblings.map((hasNext) => (hasNext ? '│  ' : '   ')).join('');
-  const nameToken = record.occurrenceType === STRUCTURAL_ADDRESSING_OCCURRENCE_TYPES.FOLDER ? `${record.name}/` : record.name;
+  const indentation = ancestorHasLaterSiblings.map((hasNext) => (hasNext ? '│  ' : '   ')).join('');
+  const nameToken =
+    record.occurrenceType === STRUCTURAL_ADDRESSING_OCCURRENCE_TYPES.FOLDER ? `${record.name}/` : record.name;
 
   if (record.depth === 0) {
     return `${record.displayMarker}: ${nameToken}`;
@@ -87,25 +129,20 @@ export const renderTreeCodebaseAddressedSnapshot = (snapshot) => {
     return { renderedTree: '' };
   }
 
-  const lines = [];
-  const siblingStateByDepth = [];
+  const hasLaterSiblingByAddressPath = buildLaterSiblingMap(sortedRecords);
+  const recordByAddressPath = buildRecordByAddressPathMap(sortedRecords);
 
-  for (let index = 0; index < sortedRecords.length; index += 1) {
-    const record = sortedRecords[index];
-    const next = sortedRecords[index + 1] ?? null;
-
-    const sameParentNextSibling =
-      next && next.parentAddressPath === record.parentAddressPath && next.depth === record.depth;
-    siblingStateByDepth[record.depth] = Boolean(sameParentNextSibling);
-
-    lines.push(
-      toTreeLine({
+  const lines = sortedRecords.map((record) =>
+    toTreeLine({
+      record,
+      isLast: !hasLaterSiblingByAddressPath.get(record.addressPath),
+      ancestorHasLaterSiblings: collectAncestorContinuationState({
         record,
-        isLast: !sameParentNextSibling,
-        parentHasNextSiblings: siblingStateByDepth.slice(1, record.depth),
+        recordByAddressPath,
+        hasLaterSiblingByAddressPath,
       }),
-    );
-  }
+    }),
+  );
 
   return {
     renderedTree: lines.join('\n'),
