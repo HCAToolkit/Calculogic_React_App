@@ -62,6 +62,40 @@ test('folder with descendants and a later sibling renders with branch connector 
   assert.match(result.renderedTree, /^│  └─ A: ConventionRoutines\/$/mu);
 });
 
+
+
+test('later-sibling detection stays correct across non-adjacent preorder subtree boundaries', () => {
+  const snapshot = prepareTreeCodebaseAddressedSnapshot({
+    sourceNamespace: 'calculogic-validator',
+    scope: 'validator',
+    target: null,
+    scopeRoots: [
+      {
+        name: 'root',
+        path: 'root',
+        occurrenceType: 'folder',
+        children: [
+          {
+            name: 'folder-a',
+            path: 'root/folder-a',
+            occurrenceType: 'folder',
+            children: [
+              { name: 'nested', path: 'root/folder-a/nested', occurrenceType: 'folder', children: [] },
+            ],
+          },
+          { name: 'folder-b', path: 'root/folder-b', occurrenceType: 'folder', children: [] },
+          { name: 'z-file-c', path: 'root/z-file-c', occurrenceType: 'file' },
+        ],
+      },
+    ],
+  });
+
+  const { renderedTree } = renderTreeCodebaseAddressedSnapshot(snapshot);
+  assert.match(renderedTree, /^├─ A: folder-a\/$/mu);
+  assert.match(renderedTree, /^│  └─ A: nested\/$/mu);
+  assert.match(renderedTree, /^├─ B: folder-b\/$/mu);
+  assert.match(renderedTree, /^└─ 1: z-file-c$/mu);
+});
 test('last sibling with descendants renders with terminal connector', () => {
   const snapshot = prepareTreeCodebaseAddressedSnapshot({
     sourceNamespace: 'calculogic-validator',
