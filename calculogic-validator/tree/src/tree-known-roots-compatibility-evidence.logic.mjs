@@ -46,6 +46,12 @@ const toTopRootLookup = (topRoots) => {
   return lookup;
 };
 
+const isScopeTopFolderOccurrence = (occurrenceRecord) =>
+  occurrenceRecord.occurrenceType === 'folder'
+  && occurrenceRecord.depth === 1
+  && typeof occurrenceRecord.parentAddressPath === 'string'
+  && occurrenceRecord.parentAddressPath.length > 0;
+
 const toEvidenceRecord = (occurrenceRecord, knownRootMetadata) => ({
   addressPath: occurrenceRecord.addressPath,
   path: occurrenceRecord.path,
@@ -73,7 +79,7 @@ export const prepareTreeKnownRootsCompatibilityEvidence = (input) => {
       continue;
     }
 
-    if (occurrenceRecord.occurrenceType !== 'folder') {
+    if (!isScopeTopFolderOccurrence(occurrenceRecord)) {
       continue;
     }
 

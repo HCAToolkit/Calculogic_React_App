@@ -21,9 +21,10 @@ test('matches folder occurrence names against known-roots compatibility data and
   const result = prepareTreeKnownRootsCompatibilityEvidence({
     addressedTreeSnapshot: {
       occurrenceRecords: [
-        { addressPath: 'A', path: 'repo/src', name: 'src', occurrenceType: 'folder' },
-        { addressPath: 'A.1', path: 'repo/src/index.js', name: 'index.js', occurrenceType: 'file' },
-        { addressPath: 'B', path: 'repo/test', name: 'test', occurrenceType: 'folder' },
+        { addressPath: 'A', parentAddressPath: null, depth: 0, path: 'repo', name: 'repo', occurrenceType: 'folder' },
+        { addressPath: 'A.A', parentAddressPath: 'A', depth: 1, path: 'repo/src', name: 'src', occurrenceType: 'folder' },
+        { addressPath: 'A.A.A', parentAddressPath: 'A.A', depth: 2, path: 'repo/src/test', name: 'test', occurrenceType: 'folder' },
+        { addressPath: 'A.1', parentAddressPath: 'A', depth: 1, path: 'repo/readme.md', name: 'readme.md', occurrenceType: 'file' },
       ],
     },
     knownRootsRegistry: normalizeKnownRootsRegistry({
@@ -34,7 +35,7 @@ test('matches folder occurrence names against known-roots compatibility data and
     }),
   });
 
-  assert.deepEqual(result.evidenceRecords.map((record) => record.addressPath), ['A', 'B']);
+  assert.deepEqual(result.evidenceRecords.map((record) => record.addressPath), ['A.A']);
   assert.equal(result.evidenceRecords.some((record) => record.occurrenceType === 'file'), false);
   assert.equal(result.evidenceRecords[0].path, 'repo/src');
   assert.equal(result.evidenceRecords[0].name, 'src');
@@ -48,8 +49,9 @@ test('preserves current known-root values without test/tests normalization', () 
   const result = prepareTreeKnownRootsCompatibilityEvidence({
     addressedTreeSnapshot: {
       occurrenceRecords: [
-        { addressPath: 'A', path: 'repo/test', name: 'test', occurrenceType: 'folder' },
-        { addressPath: 'B', path: 'repo/tests', name: 'tests', occurrenceType: 'folder' },
+        { addressPath: 'A', parentAddressPath: null, depth: 0, path: 'repo', name: 'repo', occurrenceType: 'folder' },
+        { addressPath: 'A.A', parentAddressPath: 'A', depth: 1, path: 'repo/test', name: 'test', occurrenceType: 'folder' },
+        { addressPath: 'A.B', parentAddressPath: 'A', depth: 1, path: 'repo/tests', name: 'tests', occurrenceType: 'folder' },
       ],
     },
     knownRootsRegistry: normalizeKnownRootsRegistry({
@@ -63,7 +65,7 @@ test('preserves current known-root values without test/tests normalization', () 
 test('does not emit findings, severity, placement verdicts, confidence scores, or validation report fields', () => {
   const result = prepareTreeKnownRootsCompatibilityEvidence({
     addressedTreeSnapshot: {
-      occurrenceRecords: [{ addressPath: 'A', path: 'repo/src', name: 'src', occurrenceType: 'folder' }],
+      occurrenceRecords: [{ addressPath: 'A.A', parentAddressPath: 'A', depth: 1, path: 'repo/src', name: 'src', occurrenceType: 'folder' }],
     },
     knownRootsRegistry: normalizeKnownRootsRegistry({
       topRoots: [{ root: 'src', kind: 'structural', ownershipSource: 'builtin' }],
@@ -114,4 +116,23 @@ test('consumes an addressed snapshot prepared by prepareTreeCodebaseAddressedSna
   assert.equal(result.evidenceRecords.length, 1);
   assert.equal(result.evidenceRecords[0].name, 'src');
   assert.equal(result.evidenceRecords[0].addressPath, 'A.A');
+});
+
+
+test('matches only scope-top folder children and excludes scope root nested folders and files', () => {
+  const result = prepareTreeKnownRootsCompatibilityEvidence({
+    addressedTreeSnapshot: {
+      occurrenceRecords: [
+        { addressPath: 'A', parentAddressPath: null, depth: 0, path: 'repo/src', name: 'src', occurrenceType: 'folder' },
+        { addressPath: 'A.A', parentAddressPath: 'A', depth: 1, path: 'repo/src', name: 'src', occurrenceType: 'folder' },
+        { addressPath: 'A.A.A', parentAddressPath: 'A.A', depth: 2, path: 'repo/src/src', name: 'src', occurrenceType: 'folder' },
+        { addressPath: 'A.1', parentAddressPath: 'A', depth: 1, path: 'repo/src.js', name: 'src', occurrenceType: 'file' },
+      ],
+    },
+    knownRootsRegistry: normalizeKnownRootsRegistry({
+      topRoots: [{ root: 'src', kind: 'structural', ownershipSource: 'builtin' }],
+    }),
+  });
+
+  assert.deepEqual(result.evidenceRecords.map((record) => record.addressPath), ['A.A']);
 });
