@@ -16,6 +16,10 @@ test('structural-address snapshot returns neutral evidence envelope shape', () =
   assert.equal(Array.isArray(snapshot.scopeRoots), true);
   assert.equal(Array.isArray(snapshot.occurrenceRecords), true);
   assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'resolvedPath')), true);
+  assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'path')), true);
+  assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'name')), true);
+  assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'addressPath')), true);
+  assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'parentAddressPath')), true);
   assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'code')), false);
   assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'severity')), false);
   assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'placementConfidence')), false);
@@ -47,6 +51,10 @@ test('structural-address snapshot markers preserve deterministic folder/file add
   assert.equal(records['root/folder-b/sub-b/file-b-2.txt'].occurrenceMarker, 'A.B.B.1');
   assert.equal(records['root/folder-b/sub-b/file-b-3.txt'].occurrenceMarker, 'A.B.B.2');
   assert.equal(records['root/folder-b/sub-b/file-b-2.txt'].resolvedPath, 'root/folder-b/sub-b/file-b-2.txt');
+  assert.equal(records['root/folder-b/sub-b/file-b-2.txt'].path, 'root/folder-b/sub-b/file-b-2.txt');
+  assert.equal(records['root/folder-b/sub-b/file-b-2.txt'].name, 'file-b-2.txt');
+  assert.equal(records['root/folder-b/sub-b/file-b-2.txt'].addressPath, 'A.B.B.1');
+  assert.equal(records['root/folder-b/sub-b/file-b-2.txt'].parentAddressPath, 'A.B.B');
   assert.deepEqual(records['root/folder-b/sub-b/file-b-3.txt'].markerSegments, ['A', 'B', 'B', '2']);
 });
 

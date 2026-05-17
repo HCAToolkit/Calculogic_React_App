@@ -11,6 +11,8 @@ import {
 } from '../../src/core/suite-scoped-snapshot-input.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from './tree-occurrence-snapshot.logic.mjs';
 import { prepareTreeStructuralAddressSnapshot } from './tree-structural-address-snapshot.logic.mjs';
+import { prepareTreeKnownRootsCompatibilityEvidence } from './tree-known-roots-compatibility-evidence.logic.mjs';
+import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -50,6 +52,16 @@ export const prepareTreeStructureAdvisorInputs = (
     targets: structuralAddressTargets,
     includeRoots: scopedSnapshotInputs.includeRoots,
   });
+  const structuralAddressSnapshot = prepareTreeStructuralAddressSnapshot({
+    occurrenceSnapshot,
+    selectedPaths,
+    targets: structuralAddressTargets,
+    includeRoots: scopedSnapshotInputs.includeRoots,
+    scope: {
+      source: 'tree-structure-advisor.wiring',
+    },
+  });
+  const treeKnownRootsRegistry = getBuiltinTreeKnownRoots();
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -57,15 +69,13 @@ export const prepareTreeStructureAdvisorInputs = (
     occurrenceSnapshot,
     topLevelDirectoryNames: collectTopLevelDirectoryNames(repositoryRoot),
     targets: scopedSnapshotInputs.targets,
-    structuralAddressSnapshot: prepareTreeStructuralAddressSnapshot({
-      occurrenceSnapshot,
-      selectedPaths,
-      targets: structuralAddressTargets,
-      includeRoots: scopedSnapshotInputs.includeRoots,
-      scope: {
-        source: 'tree-structure-advisor.wiring',
-      },
-    }),
+    structuralAddressSnapshot,
+    preparedDependencies: {
+      treeKnownRootsCompatibilityEvidence: prepareTreeKnownRootsCompatibilityEvidence({
+        addressedTreeSnapshot: structuralAddressSnapshot,
+        knownRootsRegistry: treeKnownRootsRegistry,
+      }),
+    },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
       selectedPaths,
