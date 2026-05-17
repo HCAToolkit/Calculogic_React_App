@@ -3,11 +3,12 @@
 ## Status and scope
 
 This defines the known-roots / Structural Addressing compatibility bridge for Tree.
-It documents current Tree known-roots compatibility truth, current Tree-local registry reality, Structural Addressing V0 addressed occurrence ownership, and the staged path toward cleaner evidence consumption.
+It documents current runtime truth, current implementation reality, and the staged implementation path after Slice 4 implementation.
 It does not change runtime behavior, Tree advisor behavior, registry JSON payloads, Structural Addressing logic, Naming integration, or validate:addressing behavior.
 
 Issue linkage for this slice:
 - Refs #505
+- Refs #514
 - Refs #508
 - Follows completed parent #487 (Structural Addressing get-tree V0 implementation path)
 - Incorporates prior context from #452 (Tree registry hardening / known-roots compatibility context)
@@ -20,31 +21,34 @@ This spec provides a focused compatibility bridge description between:
 - Tree known-roots runtime compatibility behavior,
 - Tree-local registry payloads already present in the repository,
 - Structural Addressing V0 addressed occurrence production,
+- Tree-owned evidence preparation now implemented,
 - and a staged implementation path that preserves behavior while clarifying ownership.
 
 ### Relationship to parent #505
 
-This document is the bridge-definition slice under #505. It converts inventory/audit context into explicit ownership and staging boundaries for a later runtime adapter slice.
+This document is the bridge-definition and bridge-state alignment slice under #505.
 
 ### Relationship to completed parent #487
 
-Structural Addressing get-tree V0 from #487 is treated as current implemented ownership for deterministic addressed occurrence production (`scopeRoots`, `occurrenceRecords`, `addressPath`, `parentAddressPath`).
-
-### Relationship to prior parent #452
-
-This bridge keeps #452 guardrails: maintain deterministic staging, keep known-roots as compatibility-only runtime truth for now, and avoid collapsing Structural Home / Surface / Naming ownership boundaries.
+Structural Addressing get-tree V0 from #487 is treated as current runtime truth ownership for deterministic addressed occurrence production (`scopeRoots`, `occurrenceRecords`, `addressPath`, `parentAddressPath`).
 
 ## Core ownership boundary (binding for this bridge)
 
-Structural Addressing owns deterministic addressed occurrence production.
-Tree known-roots remains compatibility runtime truth until replaced or wrapped deliberately.
-Structural Home registries own Structural Home identity and placement evidence inputs.
-Tree owns Tree-specific interpretation and advisory behavior.
-Naming owns semantic-name and semantic-family interpretation.
+Structural Addressing remains the owner of deterministic address production.
+Tree now has an evidence-only known-roots compatibility adapter.
+Tree advisor input preparation now prepares compatibility evidence internally.
+Tree advisor output remains unchanged.
+Known-roots remains compatibility runtime truth.
+Registry alignment remains deferred.
+test / tests normalization remains deferred.
+Shared surfaces.registry.json remains deferred.
 
 Interpretation guardrails:
-- Do not move Structural Addressing ownership back into Tree.
-- Do not treat known roots as the long-term canonical Structural Home or Semantic Home model.
+- This bridge does not move deterministic address ownership back into Tree.
+- This bridge does not make known-roots canonical Structural Home truth.
+- This bridge does not make known-roots canonical Semantic Home truth.
+- This bridge does not make Structural Addressing responsible for Tree interpretation.
+- This bridge does not make prepared compatibility evidence user-facing advisor output.
 
 ## Current runtime truth
 
@@ -56,139 +60,138 @@ Current runtime truth for Tree known-roots compatibility remains:
 - repo-top structural/semantic shortcut behavior,
 - partial structural/semantic hints used as compatibility evidence.
 
-This is current runtime truth, not the target architecture.
+This is current runtime truth, not target architecture.
 
-## Current implementation reality: registry and bridge surfaces
+## Current implementation reality after Slice 4
 
-### Tree built-in registry reality inspected for this slice
+### Implemented docs/spec surfaces
 
-Current implementation reality in `calculogic-validator/tree/src/registries/_builtin/`:
-- `tree-known-roots.registry.json` exists and remains active compatibility runtime truth.
-- `structural-homes.registry.json` exists as Tree-local built-in registry data.
-- `surface-structural-home-perspective.registry.json` exists as Tree-local built-in registry data.
-- `folder-kinds.registry.json` exists as Tree-local built-in registry data.
-- standalone shared `surfaces.registry.json` does not clearly appear to exist yet in this repository path set.
+Current implementation reality includes:
+- Tree structural-address usage inventory exists (`tree-structural-address-usage-inventory.spec.md`).
+- Known-roots / Structural Addressing compatibility bridge spec exists (this document).
+- Tree-owned known-roots compatibility evidence adapter exists.
+- Tree advisor wiring prepares known-roots compatibility evidence internally.
 
-### Observed alignment drift to preserve for follow-up slice
+### Implemented adapter ownership
 
-Current implementation reality includes a naming/alignment mismatch that should be documented, not changed in this slice:
-- `tree-known-roots.registry.json` uses runtime `test` in known roots.
-- `structural-homes.registry.json` uses `tests` as structural home identity.
-- `surface-structural-home-perspective.registry.json` includes quality mapping that references `test`.
+`calculogic-validator/tree/src/tree-known-roots-compatibility-evidence.logic.mjs` owns the Tree-side evidence-only adapter:
 
-This potential `test`/`tests` alignment drift should be handled in a later implementation slice with explicit adapter/normalization scope.
+- input: Structural Addressing-style addressed occurrence records
+- input: current Tree known-roots compatibility vocabulary
+- output: Tree-owned known-roots compatibility evidence records
 
-## Structural Addressing V0 role (already implemented)
+The adapter remains compatibility evidence-only. It does not emit findings, severity, placement verdicts, or confidence scores.
+
+### Implemented internal wiring handoff
+
+`calculogic-validator/tree/src/tree-structure-advisor.wiring.mjs` now prepares compatibility evidence internally and attaches it under:
+
+- `preparedDependencies.treeKnownRootsCompatibilityEvidence`
+
+This is internal preparation state and current implementation reality. It is not current runtime truth for report-visible advisor output.
+
+### Implemented addressed occurrence enrichment support
+
+`calculogic-validator/tree/src/tree-structural-address-snapshot.logic.mjs` now enriches internal structural-address snapshot occurrence records with addressed fields required by compatibility evidence preparation:
+
+- `path`
+- `name`
+- `addressPath`
+- `parentAddressPath`
+
+This enrichment supports internal evidence preparation. It does not change Tree advisor/report behavior.
+
+## Repo-top matching behavior (current implementation reality)
+
+Known-roots compatibility evidence matching is repo-top path-shape based, not scope-depth based.
+
+Current implementation reality examples:
+
+- `src` => may produce known-root compatibility evidence.
+- `test` => may produce known-root compatibility evidence because current known-roots registry contains `test`.
+- `text` => may produce known-root compatibility evidence only if current known-roots registry contains `text`.
+- `calculogic-validator/src` => does not produce known-root compatibility evidence.
+- `docs/test` => does not produce known-root compatibility evidence.
+- `packages/foo/src` => does not produce known-root compatibility evidence.
+
+This bridge does not redefine matching as semantic-home inference, structural-home interpretation, naming semantic-family inference, or scope-depth modeling.
+
+## Current non-observable boundary
+
+Current implementation reality boundary:
+
+- `preparedDependencies.treeKnownRootsCompatibilityEvidence` is prepared internally.
+- The prepared evidence is not emitted as Tree advisor findings.
+- The prepared evidence is not assigned severity.
+- The prepared evidence is not assigned placement verdicts.
+- The prepared evidence is not assigned confidence scores.
+- The prepared evidence does not change report output.
+- The prepared evidence does not change advisor recommendation text.
+- Tree advisor output remains unchanged.
+
+## Structural Addressing and Tree interpretation boundary
 
 Structural Addressing V0 currently owns deterministic addressed occurrence production and render contracts in its slice runtime.
-Tree should consume this addressed occurrence evidence, rather than re-own deterministic address production in Tree-local marker logic.
-
-What is already covered by Structural Addressing V0:
-- deterministic addressed occurrence production,
-- addressed lineage fields (`addressPath`, `parentAddressPath`),
-- occurrence ordering and render inspection output contracts.
-
-What is not changed here:
-- no Tree runtime rewiring,
-- no Structural Addressing runtime changes,
-- no validate:addressing behavior changes.
-
-## Long-term target ownership
-
-Target architecture ownership for this bridge:
-- Structural Addressing V0 locates addressed occurrences.
-- `structural-homes.registry.json` owns Structural Home identity.
-- `surface-structural-home-perspective.registry.json` owns contextual Surface → Structural Home evidence.
-- `surfaces.registry.json`, if/when added, should own canonical Surface identity rather than hiding Surface identity inside Tree perspective data.
-- `tree-known-roots.registry.json` remains compatibility-only until wrapped/reduced/retired.
-- Tree advisor consumes evidence and produces Tree-specific findings.
-- Naming remains owner of semantic-name and semantic-family interpretation.
-
-## Bridge question answers
-
-### What remains compatibility-only now?
-
-`tree-known-roots.registry.json` and current known-roots-driven top-level compatibility behavior remain compatibility-only current runtime truth.
-
-### What belongs to Structural Home registry?
-
-Structural Home identity vocabulary and bounded definitions belong to `structural-homes.registry.json`.
-
-### What belongs to Surface → Structural Home perspective registry?
-
-Affinity/evidence mapping between surfaces and candidate structural homes belongs to `surface-structural-home-perspective.registry.json`; it is evidence, not final placement authority.
-
-### What is missing/deferred for shared surfaces registry?
-
-A standalone shared `surfaces.registry.json` is not clearly present yet in inspected paths. Surface identity therefore remains effectively embedded/implicit in current perspective payloads and surrounding runtime interpretation context.
-
-### What should Tree consume rather than re-own?
-
-Tree should consume:
-- deterministic addressed occurrence outputs from Structural Addressing,
-- Structural Home identity/evidence registries,
-- compatibility hints from known-roots while transition is active,
-then keep Tree-owned advisory interpretation behavior as the final consumer layer.
-
-### What should not change before a runtime adapter slice?
-
-Do not change:
-- Tree advisor behavior,
-- known-roots runtime compatibility behavior,
-- Structural Addressing runtime ownership,
-- registry JSON payload contracts.
-
-### Is there a test/tests alignment concern?
-
-Yes. Current implementation reality shows a likely `test`/`tests` alignment concern across known-roots and structural-home identity vocabulary. This should be addressed by a later implementation slice, not this docs/spec slice.
-
-## Compatibility-only known-roots role
-
-Known-roots remains a compatibility lane that preserves deterministic existing Tree advisories and checks while bridge modeling matures.
-It should be treated as compatibility runtime truth during transition and not promoted to long-term canonical Structural Home or Semantic Home ownership.
-
-## Tree advisor interpretation role
-
 Tree remains owner of Tree-specific interpretation and advisory behavior.
-Even after consuming Structural Addressing addressed occurrence evidence, Tree still owns:
-- Tree-specific policy interpretation,
-- advisory finding logic,
-- confidence/placement interpretation output behavior.
 
-## Staged bridge options and recommended path
+This bridge preserves:
+- deterministic address production ownership in Structural Addressing,
+- compatibility evidence preparation ownership in Tree,
+- report/advisor interpretation ownership in Tree,
+- known-roots compatibility runtime truth during transition.
 
-### Option A — Keep known-roots compatibility only
+## Deferred work (staged implementation path)
 
-Keep existing known-roots runtime behavior unchanged while clarifying ownership and evidence boundaries.
+The following remain deferred and are not current runtime truth:
 
-### Option B — Immediate runtime rewiring
+- registry alignment
+- test / tests normalization
+- standalone shared `surfaces.registry.json` extraction or introduction
+- Tree-local vs shared registry ownership migration
+- semantic-home classification
+- structural-home interpretation
+- Tree advisor findings based on compatibility evidence
+- `validate:addressing` commands
+- NL addressing
+- code-file addressing
+- NL-to-code comparison
+- Naming semantic-family bridge integration
 
-Not recommended for this slice because it risks behavior drift before adapter contracts are explicit.
+## Non-goals
 
-### Option C — Hybrid transition path (recommended)
+This bridge documentation slice does not add or change:
 
-Recommended staged implementation path:
-1. Keep `tree-known-roots` as compatibility runtime truth for current advisories.
-2. Treat Structural Addressing V0 as deterministic addressed occurrence producer.
-3. Treat Structural Home and Surface → Structural Home registries as identity/evidence sources.
-4. Document shared surfaces registry status as missing/deferred current implementation reality.
-5. Implement a future adapter slice that wraps/maps known-roots compatibility around addressed occurrence evidence without changing advisor behavior first.
-6. Add a later implementation slice for registry alignment normalization (`test` vs `tests` and any shared-surface identity extraction), if confirmed.
+- runtime behavior
+- Tree advisor behavior
+- Tree advisor findings
+- finding codes
+- severity
+- placement verdicts
+- confidence scoring
+- validation-style reports
+- semantic-home classification
+- structural-home interpretation
+- broader scatter heuristics
+- `validate:addressing` commands
+- `validate:addressing:nl` commands
+- `validate:addressing:code` commands
+- `validate:addressing:nl-code` commands
+- NL addressing
+- code-file addressing
+- NL-to-code comparison
+- Naming validation integration
+- package bin entrypoints
+- root npm scripts
+- report-capture commands
+- registry JSON payloads
+- shared surfaces registry
+- Structural Addressing runtime logic
+- Tree advisor output behavior
 
-## Recommended next implementation slice
+## Precise status wording map for this bridge
 
-Recommended next slice after this bridge spec:
-- implement a bounded Tree compatibility adapter that consumes Structural Addressing V0 addressed occurrences and maps known-roots compatibility evidence onto that occurrence model,
-- preserve Tree advisor behavior unchanged in the first adapter step,
-- then add a dedicated registry alignment slice if `test`/`tests` normalization or shared-surface identity extraction requires deterministic contract updates.
-
-## Explicit non-goals
-
-This bridge spec intentionally does not:
-- change runtime behavior,
-- change Tree advisor behavior,
-- change Structural Addressing runtime logic,
-- change registry JSON payloads (`tree-known-roots`, `structural-homes`, `surface-structural-home-perspective`, `folder-kinds`, or any future `surfaces.registry.json`),
-- add new shared surfaces registry,
-- change Naming integration,
-- add or change validate:addressing command behavior.
+- current runtime truth: known-roots remains compatibility runtime truth; Structural Addressing owns deterministic address production.
+- current implementation reality: Tree now has an evidence-only compatibility adapter and internal prepared dependency handoff.
+- target architecture: move toward cleaner registry-aligned modeling without changing current report behavior.
+- not current runtime truth: evidence-driven Tree advisor findings, structural-home/semantic-home interpretation outputs, and registry normalization migration.
+- staged implementation path: preserve behavior, preserve ownership boundaries, and migrate in bounded deterministic slices.
