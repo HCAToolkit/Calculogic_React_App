@@ -10,6 +10,8 @@ import {
 import { prepareTreeStructureAdvisorInputs } from '../src/tree-structure-advisor.wiring.mjs';
 import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../src/tree-structure-advisor.logic.mjs';
 import { collectShimCompatFindings } from '../src/tree-shim-detection.logic.mjs';
+import { prepareTreeKnownRootsCompatibilityEvidence } from '../src/tree-known-roots-compatibility-evidence.logic.mjs';
+import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { listRegisteredValidators } from '../../src/core/validator-registry.knowledge.mjs';
 import { getValidatorScopeProfile } from '../../src/core/validator-scopes.logic.mjs';
 
@@ -148,6 +150,22 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'severity')), false);
     assert.equal(snapshot.scopeRoots, preparedInputs.occurrenceSnapshot.scopeRoots);
     assert.equal(snapshot.occurrenceRecords, preparedInputs.occurrenceSnapshot.occurrenceRecords);
+    assert.ok(preparedInputs.preparedDependencies);
+    assert.ok(preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence);
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence,
+      prepareTreeKnownRootsCompatibilityEvidence({
+        addressedTreeSnapshot: snapshot,
+        knownRootsRegistry: getBuiltinTreeKnownRoots(),
+      }),
+    );
+    const evidenceRecords = preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence.evidenceRecords;
+    assert.equal(Array.isArray(evidenceRecords), true);
+    assert.equal(
+      evidenceRecords.some((record) =>
+        ['findingCode', 'severity', 'placementVerdict', 'confidenceScore', 'report'].some((key) => Object.hasOwn(record, key))),
+      false,
+    );
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
@@ -166,7 +184,11 @@ test('tree-structure-advisor runtime report output remains unchanged by structur
     );
 
     const preparedWithHandoff = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo' });
-    const { structuralAddressSnapshot: _omittedSnapshot, ...preparedWithoutHandoff } = preparedWithHandoff;
+    const {
+      structuralAddressSnapshot: _omittedSnapshot,
+      preparedDependencies: _omittedPreparedDependencies,
+      ...preparedWithoutHandoff
+    } = preparedWithHandoff;
 
     const withHandoff = runTreeStructureAdvisorRuntime(preparedWithHandoff);
     const withoutHandoff = runTreeStructureAdvisorRuntime(preparedWithoutHandoff);
