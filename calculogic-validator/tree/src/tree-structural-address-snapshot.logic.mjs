@@ -69,6 +69,22 @@ export const prepareTreeStructuralAddressSnapshot = ({
           includeRoots,
         });
 
+  const addressByResolvedPath = new Map(
+    resolvedOccurrenceSnapshot.occurrenceRecords.map((occurrenceRecord) => [
+      occurrenceRecord.resolvedPath,
+      occurrenceRecord.occurrenceMarker,
+    ]),
+  );
+  const occurrenceRecords = resolvedOccurrenceSnapshot.occurrenceRecords.map((occurrenceRecord) => ({
+    ...occurrenceRecord,
+    path: occurrenceRecord.resolvedPath,
+    name: occurrenceRecord.actualName,
+    addressPath: occurrenceRecord.occurrenceMarker,
+    parentAddressPath: occurrenceRecord.parentResolvedPath
+      ? addressByResolvedPath.get(occurrenceRecord.parentResolvedPath) ?? null
+      : null,
+  }));
+
   return {
     scope: {
       scopeRootPath: scope?.scopeRootPath ?? normalizeScopeRootPath(resolvedOccurrenceSnapshot.scopeRoots),
@@ -76,6 +92,6 @@ export const prepareTreeStructuralAddressSnapshot = ({
       source: scope?.source ?? source,
     },
     scopeRoots: resolvedOccurrenceSnapshot.scopeRoots,
-    occurrenceRecords: resolvedOccurrenceSnapshot.occurrenceRecords,
+    occurrenceRecords,
   };
 };

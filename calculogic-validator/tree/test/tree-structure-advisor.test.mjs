@@ -149,7 +149,11 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'placementConfidence')), false);
     assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'severity')), false);
     assert.equal(snapshot.scopeRoots, preparedInputs.occurrenceSnapshot.scopeRoots);
-    assert.equal(snapshot.occurrenceRecords, preparedInputs.occurrenceSnapshot.occurrenceRecords);
+    assert.equal(snapshot.occurrenceRecords === preparedInputs.occurrenceSnapshot.occurrenceRecords, false);
+    assert.deepEqual(
+      snapshot.occurrenceRecords.map((record) => record.resolvedPath),
+      preparedInputs.occurrenceSnapshot.occurrenceRecords.map((record) => record.resolvedPath),
+    );
     assert.ok(preparedInputs.preparedDependencies);
     assert.ok(preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence);
     assert.deepEqual(
@@ -161,6 +165,12 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     );
     const evidenceRecords = preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence.evidenceRecords;
     assert.equal(Array.isArray(evidenceRecords), true);
+    assert.equal(evidenceRecords.length > 0, true);
+    assert.equal(evidenceRecords.some((record) => record.path === 'src'), true);
+    assert.equal(evidenceRecords.some((record) => record.name === 'src'), true);
+    assert.equal(evidenceRecords.some((record) => record.addressPath === 'A'), true);
+    assert.equal(evidenceRecords.some((record) => record.path === 'calculogic-validator/src'), false);
+    assert.equal(evidenceRecords.some((record) => record.path === 'docs/test'), false);
     assert.equal(
       evidenceRecords.some((record) =>
         ['findingCode', 'severity', 'placementVerdict', 'confidenceScore', 'report'].some((key) => Object.hasOwn(record, key))),
