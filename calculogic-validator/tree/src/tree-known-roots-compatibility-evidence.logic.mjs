@@ -46,11 +46,21 @@ const toTopRootLookup = (topRoots) => {
   return lookup;
 };
 
-const isScopeTopFolderOccurrence = (occurrenceRecord) =>
+const toRepoTopToken = (occurrencePath) => {
+  if (typeof occurrencePath !== 'string' || occurrencePath.length === 0) {
+    return null;
+  }
+
+  if (occurrencePath.includes('/') || occurrencePath.includes('\\')) {
+    return null;
+  }
+
+  return occurrencePath;
+};
+
+const isRepoTopFolderOccurrence = (occurrenceRecord) =>
   occurrenceRecord.occurrenceType === 'folder'
-  && occurrenceRecord.depth === 1
-  && typeof occurrenceRecord.parentAddressPath === 'string'
-  && occurrenceRecord.parentAddressPath.length > 0;
+  && toRepoTopToken(occurrenceRecord.path) !== null;
 
 const toEvidenceRecord = (occurrenceRecord, knownRootMetadata) => ({
   addressPath: occurrenceRecord.addressPath,
@@ -79,11 +89,12 @@ export const prepareTreeKnownRootsCompatibilityEvidence = (input) => {
       continue;
     }
 
-    if (!isScopeTopFolderOccurrence(occurrenceRecord)) {
+    if (!isRepoTopFolderOccurrence(occurrenceRecord)) {
       continue;
     }
 
-    const knownRootMetadata = topRootLookup.get(occurrenceRecord.name);
+    const repoTopToken = toRepoTopToken(occurrenceRecord.path);
+    const knownRootMetadata = topRootLookup.get(repoTopToken);
     if (!knownRootMetadata) {
       continue;
     }
