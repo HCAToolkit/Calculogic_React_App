@@ -87,12 +87,12 @@ Confirmed runtime dependency paths that remain active in current implementation 
 
 ### 4.2 Tree-local vs shared registry ownership
 
-- **Classification:** Needs separate parent/slice.
-- **Current state:** inspected runtime registries are Tree-local for this scope.
-- **Why it matters:** long-term extraction and cross-cutting ownership boundaries need explicit governance.
-- **Recommended staging decision:** treat as separate architecture/registry-governance slice; do not block immediate behavior-preserving replacements if Tree-local lanes can be explicit and deterministic.
-- **What must not change yet:** no ownership migration in this slice.
-- **Recommended follow-up slice:** cross-cutting registry ownership alignment slice.
+- **Classification:** Required before runtime replacement.
+- **Current state:** inspected runtime registries are Tree-local for this scope, and a final shared-boundary contract is not yet explicitly frozen for replacement work.
+- **Why it matters:** replacement of either known-roots runtime dependency path must avoid competing policy truth across Tree-local registries, potential shared registries, and known-roots compatibility data.
+- **Recommended staging decision:** resolve or explicitly freeze the ownership boundary contract before replacing either runtime path. This does not require migrating Tree-local registries to shared registries in this slice.
+- **What must not change yet:** no ownership migration in this slice; no runtime replacement under ambiguous ownership boundaries.
+- **Recommended follow-up slice:** boundary-contract resolution slice before runtime replacement, with separate migration slice if shared ownership migration is later adopted.
 
 ### 4.3 standalone shared surfaces.registry.json status
 
@@ -165,11 +165,15 @@ The following decisions are required before replacing known-roots runtime depend
    - Affects: **both runtime paths** (unexpected top-level folder policy and occurrence-derived classification).
 2. **Tree structural-home interpretation contract over addressed occurrences**  
    - Affects: **only occurrence-derived classification** (`topRoots[].kind` replacement path, plus future cleanup leverage).
-3. **Tree folder-kind interpretation contract with advisor-policy inputs**  
+3. **Tree-local vs shared registry ownership boundary contract**  
+   - Affects: **both runtime paths** (unexpected top-level folder policy and occurrence-derived classification).
+   - Required because replacement work must avoid competing policy truth between Tree-local registries, future shared registries, and compatibility known-roots data.
+   - This requires an explicit boundary decision before replacement, not necessarily a registry migration before replacement.
+4. **Tree folder-kind interpretation contract with advisor-policy inputs**  
    - Affects: **both runtime paths** (classification and top-level folder policy migration consistency).
-4. **Tree semantic-home evidence preparation contract (bounded, behavior-preserving)**  
+5. **Tree semantic-home evidence preparation contract (bounded, behavior-preserving)**  
    - Affects: **only occurrence-derived classification** (semantic root interpretation parity).
-5. **Behavior-preserving advisor-policy replacement contract for current allow-list behavior**  
+6. **Behavior-preserving advisor-policy replacement contract for current allow-list behavior**  
    - Affects: **only unexpected top-level folder policy** (`knownTopLevelDirectories` replacement path).
 
 Items that are **not immediate blockers** but are future cleanup/architecture concerns:
@@ -183,11 +187,11 @@ Items that are **not immediate blockers** but are future cleanup/architecture co
 The following can remain deferred without blocking the next bounded implementation slice, based on current implementation reality and dependency evidence:
 
 - introduction of standalone shared `surfaces.registry.json`
-- Tree-local vs shared ownership migration for these registries
+- actual Tree-local to shared registry migration for these registries, once boundary contract is already explicit
 - full Naming bridge runtime expansion, if next runtime slice first replaces structural-home/folder-kind lanes with behavior parity
 - compatibility adapter removal until no consumer remains
 
-Deferred here means these are **not current runtime truth blockers** for first behavior-preserving replacement increments, provided ownership boundaries remain explicit and no competing policy truth is introduced.
+Deferred here means these are **not current runtime truth blockers** for first behavior-preserving replacement increments, provided ownership boundaries remain explicit and no competing policy truth is introduced. The ownership boundary contract itself is not deferred and is required before runtime replacement.
 
 ## 7) Anti-drift registry guardrails
 
