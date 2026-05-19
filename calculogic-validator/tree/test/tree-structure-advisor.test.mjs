@@ -11,7 +11,9 @@ import { prepareTreeStructureAdvisorInputs } from '../src/tree-structure-advisor
 import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../src/tree-structure-advisor.logic.mjs';
 import { collectShimCompatFindings } from '../src/tree-shim-detection.logic.mjs';
 import { prepareTreeKnownRootsCompatibilityEvidence } from '../src/tree-known-roots-compatibility-evidence.logic.mjs';
+import { prepareTreeStructuralHomeEvidence } from '../src/tree-structural-home-evidence.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
+import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
 import { listRegisteredValidators } from '../../src/core/validator-registry.knowledge.mjs';
 import { getValidatorScopeProfile } from '../../src/core/validator-scopes.logic.mjs';
 
@@ -156,12 +158,29 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     );
     assert.ok(preparedInputs.preparedDependencies);
     assert.ok(preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence);
+    assert.ok(preparedInputs.preparedDependencies.treeStructuralHomeEvidence);
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
+      prepareTreeStructuralHomeEvidence({
+        addressedOccurrenceRecords: snapshot.occurrenceRecords,
+        structuralHomesRegistry: getBuiltinStructuralHomesRegistry(),
+      }),
+    );
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence,
       prepareTreeKnownRootsCompatibilityEvidence({
         addressedTreeSnapshot: snapshot,
         knownRootsRegistry: getBuiltinTreeKnownRoots(),
       }),
+    );
+    const structuralHomeEvidenceRecords = preparedInputs.preparedDependencies.treeStructuralHomeEvidence.evidenceRecords;
+    assert.equal(Array.isArray(structuralHomeEvidenceRecords), true);
+    assert.equal(structuralHomeEvidenceRecords.some((record) => record.path === 'src'), true);
+    assert.equal(structuralHomeEvidenceRecords.some((record) => record.path === 'calculogic-validator/src'), false);
+    assert.equal(
+      structuralHomeEvidenceRecords.some((record) =>
+        ['findingCode', 'severity', 'placementVerdict', 'confidenceScore', 'report', 'isKnownTopRoot', 'isStructuralRoot', 'isSemanticRoot', 'structuralClass', 'structuralKind'].some((key) => Object.hasOwn(record, key))),
+      false,
     );
     const evidenceRecords = preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence.evidenceRecords;
     assert.equal(Array.isArray(evidenceRecords), true);

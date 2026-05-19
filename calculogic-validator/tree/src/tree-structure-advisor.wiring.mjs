@@ -12,7 +12,9 @@ import {
 import { prepareTreeOccurrenceSnapshot } from './tree-occurrence-snapshot.logic.mjs';
 import { prepareTreeStructuralAddressSnapshot } from './tree-structural-address-snapshot.logic.mjs';
 import { prepareTreeKnownRootsCompatibilityEvidence } from './tree-known-roots-compatibility-evidence.logic.mjs';
+import { prepareTreeStructuralHomeEvidence } from './tree-structural-home-evidence.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
+import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -62,6 +64,7 @@ export const prepareTreeStructureAdvisorInputs = (
     },
   });
   const treeKnownRootsRegistry = getBuiltinTreeKnownRoots();
+  const structuralHomesRegistry = getBuiltinStructuralHomesRegistry();
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -74,6 +77,10 @@ export const prepareTreeStructureAdvisorInputs = (
       treeKnownRootsCompatibilityEvidence: prepareTreeKnownRootsCompatibilityEvidence({
         addressedTreeSnapshot: structuralAddressSnapshot,
         knownRootsRegistry: treeKnownRootsRegistry,
+      }),
+      treeStructuralHomeEvidence: prepareTreeStructuralHomeEvidence({
+        addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+        structuralHomesRegistry,
       }),
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
