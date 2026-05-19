@@ -69,7 +69,8 @@ Required artifact inspection result: `calculogic-validator/tree/src/tree-known-r
 
 | Artifact | Current role |
 | --- | --- |
-| `calculogic-validator/tree/src/tree-structure-advisor.logic.mjs` | Loads builtin known-roots at runtime and uses `knownTopLevelDirectories` as the allow-list for `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` findings in repo scope. Report-visible behavior still depends directly on known-roots for unexpected top-level folder behavior. |
+| `calculogic-validator/tree/src/tree-structure-advisor.logic.mjs` | Loads builtin known-roots at runtime, uses `knownTopLevelDirectories` as the allow-list for `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` findings in repo scope, and passes `TREE_KNOWN_ROOTS` into `classifyTreeOccurrenceRecords(...)` for occurrence-derived classification. Report-visible unexpected top-level folder behavior and internal file-reasoning classification still depend on known-roots. |
+| `calculogic-validator/tree/src/tree-occurrence-classification.logic.mjs` | Consumes known-roots `topRoots` metadata to classify repo-top occurrence records. It reads `topRoots[].kind`, then produces `structuralClass`, `structuralKind`, `isKnownTopRoot`, `isStructuralRoot`, and `isSemanticRoot` fields for occurrence records. |
 
 ### Tests
 
@@ -78,6 +79,7 @@ Required artifact inspection result: `calculogic-validator/tree/src/tree-known-r
 | `calculogic-validator/tree/test/tree-known-roots-registry.test.mjs` | Locks registry normalization, legacy flat payload support, structured payload support, structured precedence over dual-shape payloads, enum validation, duplicate conflict failures, non-empty requirements, `styleClass` validation, and current stable known-root values including semantic custom entries. |
 | `calculogic-validator/tree/test/tree-known-roots-compatibility-evidence.logic.test.mjs` | Locks compatibility evidence behavior: empty snapshots produce empty evidence, repo-top folder paths match known-roots, deterministic ordering is preserved, `test` is not normalized to `tests`, report/finding fields are not emitted, invalid inputs fail deterministically, Structural Addressing produced snapshots can be consumed, and nested/scoped known-root name matches are excluded. |
 | `calculogic-validator/tree/test/tree-structure-advisor.test.mjs` | Locks Tree advisor wiring and output neutrality: prepared dependencies include known-roots compatibility evidence, runtime report output remains unchanged by the structural-address handoff, known roots come from bounded registry policy, unexpected top-level folder behavior uses known-roots, and finding summaries remain deterministic. |
+| `calculogic-validator/tree/test/tree-occurrence-classification.test.mjs` | Locks current occurrence classification behavior for known repo-top structural roots, known repo-top semantic roots, scoped rebasing, repeated names across depth/context, and unknown cases. It confirms structural and semantic repo-top classification behavior derived from known-roots metadata. |
 
 ### Docs/specs/audits
 
@@ -115,6 +117,10 @@ Tree advisor runtime reports `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` findings in repo
 
 Structured `topRoots` include `kind: "structural"` for entries such as `src`, `doc`, `docs`, `scripts`, `test`, `tools`, `public`, and `bin`. Current docs describe these as partial structural/semantic hints and state they are compatibility evidence, not canonical Structural Home truth.
 
+### Occurrence-derived structural/semantic classification
+
+Known-roots is not only passive registry metadata. Tree advisor runtime passes `TREE_KNOWN_ROOTS` into `classifyTreeOccurrenceRecords(...)`, and `tree-occurrence-classification.logic.mjs` reads `topRoots[].kind` to produce occurrence classification fields. Current known-roots metadata contributes to `structuralClass`, `structuralKind`, `isKnownTopRoot`, `isStructuralRoot`, and `isSemanticRoot`, including repo-top structural classification and repo-top semantic classification.
+
 ### Semantic-home-ish hints
 
 Structured `topRoots` include `kind: "semantic"` and `ownershipSource: "custom"` for repo-local roots `calculogic-validator` and `calculogic-doc-engine`. Current docs identify this as partial semantic hinting mixed into known-roots compatibility data, not canonical Semantic Home truth.
@@ -147,6 +153,7 @@ Compatibility evidence tests confirm current known-root values are preserved wit
 | Repo-top path-shape matching | Compatibility adapter matches only slash-free repo-top folder `path` values against known-roots. | Structural Addressing occurrence evidence | Replace token matching with addressed occurrence evidence fields that identify repo-top/scope-top occurrences deterministically. | Current adapter is intentionally compatibility-only and still requires known-roots metadata. | Introduce behavior-preserving addressed occurrence evidence path for top-level folders. |
 | Unexpected top-level folder policy | Supplies allow-list used to decide whether a repo-top directory is unexpected. | Tree advisor policy | Move policy to Tree-owned advisor rules fed by addressed occurrence evidence and Tree-owned folder-kind/structural-home evidence. | `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` output currently depends on known-roots list and details payload. | Reduce known-roots runtime usage in bounded advisor-policy slice. |
 | Structural root hints | Stores `kind: "structural"` on builtin roots. | Tree structural-home logic | Replace `kind: structural` hints with Tree-owned structural-home interpretation for addressed folder occurrences. | Structural-home interpretation path is not implemented as a replacement for known-roots. | Introduce Tree-owned structural-home interpretation path. |
+| Occurrence-derived structural/semantic classification | `topRoots[].kind` supplies structural/semantic classification metadata for repo-top occurrence records and currently drives `structuralClass`, `structuralKind`, and known-root flags. | Tree structural-home logic; Tree semantic-home logic; Tree folder-kind logic; possibly Naming-prepared semantic-family evidence for semantic interpretation | Derive classification from addressed occurrence evidence plus Tree-owned structural-home, semantic-home, and folder-kind interpretation instead of known-roots `kind` hints. Semantic interpretation should consume Naming-prepared evidence through an explicit bridge when needed. | Classification logic and tests currently depend on known-roots `topRoots` metadata. | Define target replacement model for occurrence classification before reducing known-roots runtime usage. |
 | Semantic custom root hints | Stores `kind: "semantic"` for repo-local custom roots. | Tree semantic-home logic | Replace semantic root hinting with Tree semantic-home interpretation using occurrence context and prepared evidence. | Semantic-home logic is not implemented as a replacement for known-roots. | Introduce Tree-owned semantic-home interpretation path. |
 | Naming-side semantic family signals | Known-roots currently mixes repo-local semantic identity into Tree compatibility data. | Naming-prepared semantic-family evidence | Naming should prepare semantic-name/semantic-family evidence through an explicit bridge that Tree can consume. | Naming semantic-family bridge is not implemented as a known-roots replacement. | Introduce Naming-prepared semantic-family bridge evidence. |
 | Folder allow-list behavior | `knownTopLevelDirectories` acts as current top-level directory allow-list. | Tree folder-kind logic and Tree advisor policy | Replace flat allow-list with Tree folder-kind interpretation plus advisor policy for allowed/expected top-level folders. | Allow-list details are report-visible today; replacement must preserve or intentionally migrate output in a bounded slice. | Define Tree folder-kind logic and advisor-policy migration plan. |
@@ -160,7 +167,7 @@ Compatibility evidence tests confirm current known-root values are preserved wit
 | --- | --- | --- |
 | `tree-known-roots.registry.json` | keep temporarily | Transitional compatibility runtime truth only; do not delete, rename, split, or promote to permanent architecture in this slice. |
 | `topRoots[].root` | replace with addressed occurrence evidence | Use Structural Addressing for deterministic occurrence/location evidence; Tree may still interpret addressed occurrences. |
-| `topRoots[].kind` | replace with Tree structural-home logic / Tree semantic-home logic | Current `structural` and `semantic` values are compatibility hints only. |
+| `topRoots[].kind` | replace with Tree structural-home logic / Tree semantic-home logic | Current `structural` and `semantic` values are compatibility hints and active occurrence-classification inputs; they feed `structuralClass`, `structuralKind`, and known-root flags for repo-top occurrences. |
 | `topRoots[].ownershipSource` | resolve in registry alignment | Current builtin/custom distinction may inform migration, but owner and replacement registry shape need explicit alignment. |
 | `topRoots[].styleClass` | resolve in registry alignment | Current style class is registry metadata; no confirmed long-term owner in this audit. |
 | `knownTopLevelDirectories` | replace with Tree folder-kind logic and Tree advisor policy | Current allow-list behavior is report-visible and must migrate in behavior-preserving slices. |
@@ -169,6 +176,7 @@ Compatibility evidence tests confirm current known-root values are preserved wit
 | `prepareTreeKnownRootsCompatibilityEvidence` | remove after no runtime dependency remains | Compatibility adapter is scaffolding, not target architecture. |
 | `preparedDependencies.treeKnownRootsCompatibilityEvidence` | remove after no runtime dependency remains | Internal prepared state only; currently locked as output-neutral. |
 | Direct `TREE_KNOWN_ROOTS.knownTopLevelDirectories` advisor usage | replace with Tree advisor policy | Confirmed report-visible dependency for unexpected top-level findings. |
+| Direct `TREE_KNOWN_ROOTS.topRoots` occurrence-classification usage | replace with Tree structural-home logic / Tree semantic-home logic / Tree folder-kind logic | Confirmed runtime dependency through `classifyTreeOccurrenceRecords(...)`; replace before retiring known-roots. |
 | Registry shape tests | keep temporarily | Preserve while current runtime truth exists; replace with registry alignment tests after migration. |
 | Compatibility evidence tests | keep temporarily | Preserve adapter contract until the adapter is removed. |
 | Tree advisor known-roots tests | replace with Tree advisor policy tests | Must be updated only when behavior-preserving replacement path exists. |
@@ -179,6 +187,10 @@ Compatibility evidence tests confirm current known-root values are preserved wit
 ### Confirmed blocker: report-visible unexpected top-level folder behavior
 
 Tree advisor runtime still imports builtin known-roots and uses `knownTopLevelDirectories` to decide `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` findings. Removing known-roots before replacing this policy would change Tree advisor output.
+
+### Confirmed blocker: occurrence classification depends on known-roots topRoots metadata
+
+`tree-structure-advisor.logic.mjs` passes `TREE_KNOWN_ROOTS` into `classifyTreeOccurrenceRecords(...)`. `tree-occurrence-classification.logic.mjs` reads `topRoots[].kind` and uses it to set `structuralClass`, `structuralKind`, `isKnownTopRoot`, `isStructuralRoot`, and `isSemanticRoot`. `tree-occurrence-classification.test.mjs` locks known repo-top structural and semantic classification cases. Removing or replacing only the unexpected-folder allow-list would leave this runtime known-roots dependency in place.
 
 ### Confirmed blocker: registry loader and shape tests
 
@@ -226,15 +238,17 @@ No inspected current artifact establishes Structural Addressing as owner of stru
    - Separate deterministic occurrence evidence, Tree structural-home logic, Tree semantic-home logic, Tree folder-kind logic, Tree advisor policy, and Naming-prepared evidence.
 2. Resolve or stage registry alignment blockers.
    - Decide which replacement registries, if any, own structural-home identities, folder-kind vocabularies, semantic-home evidence, and compatibility metadata.
-3. Introduce a Tree-owned structural-home interpretation path.
+3. Define the target replacement model for occurrence classification before reducing known-roots runtime usage.
+   - Replace `topRoots[].kind`-driven `structuralClass`, `structuralKind`, and known-root flags with addressed occurrence evidence plus Tree-owned interpretation paths.
+4. Introduce a Tree-owned structural-home interpretation path.
    - Consume addressed occurrence evidence and produce Tree-owned structural-home evidence without depending on known-roots `kind: structural` hints.
-4. Introduce a Tree-owned semantic-home interpretation path using Naming-prepared evidence when available.
+5. Introduce a Tree-owned semantic-home interpretation path using Naming-prepared evidence when available.
    - Keep Naming semantic-name and semantic-family interpretation behind an explicit prepared-evidence bridge.
-5. Introduce Tree-owned folder-kind interpretation and advisor-policy replacement for top-level allow-list behavior.
+6. Introduce Tree-owned folder-kind interpretation and advisor-policy replacement for top-level allow-list behavior.
    - Preserve current `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` behavior until a bounded behavior-preserving migration is ready.
-6. Reduce known-roots runtime usage in bounded behavior-preserving slices.
-   - Remove direct advisor usage first only after equivalent prepared evidence/policy exists and tests are updated.
-7. Retire/archive known-roots after dependency analysis proves safe.
+7. Reduce known-roots runtime usage in bounded behavior-preserving slices.
+   - Remove direct advisor and occurrence-classification usage only after equivalent prepared evidence/policy exists and tests are updated.
+8. Retire/archive known-roots after dependency analysis proves safe.
    - Remove compatibility adapter, prepared dependency, registry loader, tests, and payload only after no runtime dependency remains.
 
 ## Final retirement guardrails
