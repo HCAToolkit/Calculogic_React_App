@@ -12,8 +12,10 @@ import { runTreeStructureAdvisor as runTreeStructureAdvisorRuntime } from '../sr
 import { collectShimCompatFindings } from '../src/tree-shim-detection.logic.mjs';
 import { prepareTreeKnownRootsCompatibilityEvidence } from '../src/tree-known-roots-compatibility-evidence.logic.mjs';
 import { prepareTreeStructuralHomeEvidence } from '../src/tree-structural-home-evidence.logic.mjs';
+import { prepareTreeSemanticHomeEvidence } from '../src/tree-semantic-home-evidence.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
+import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { listRegisteredValidators } from '../../src/core/validator-registry.knowledge.mjs';
 import { getValidatorScopeProfile } from '../../src/core/validator-scopes.logic.mjs';
 
@@ -159,6 +161,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies);
     assert.ok(preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence);
     assert.ok(preparedInputs.preparedDependencies.treeStructuralHomeEvidence);
+    assert.ok(preparedInputs.preparedDependencies.treeSemanticHomeEvidence);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       prepareTreeStructuralHomeEvidence({
@@ -171,6 +174,13 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
       prepareTreeKnownRootsCompatibilityEvidence({
         addressedTreeSnapshot: snapshot,
         knownRootsRegistry: getBuiltinTreeKnownRoots(),
+      }),
+    );
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeSemanticHomeEvidence,
+      prepareTreeSemanticHomeEvidence({
+        addressedOccurrenceRecords: snapshot.occurrenceRecords,
+        namingSemanticEvidenceRecords: [],
       }),
     );
     const structuralHomeEvidenceRecords = preparedInputs.preparedDependencies.treeStructuralHomeEvidence.evidenceRecords;
@@ -195,6 +205,81 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         ['findingCode', 'severity', 'placementVerdict', 'confidenceScore', 'report'].some((key) => Object.hasOwn(record, key))),
       false,
     );
+    assert.deepEqual(preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords, []);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor wiring prepares semantic-home evidence using naming semantic bridge inputs without changing runtime output', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-semantic-home-evidence-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.writeFile(
+      path.join(fixtureDir, 'src', 'semantic-family.topic-core.logic.mjs'),
+      'export const semantic = true\n',
+      'utf8',
+    );
+
+    const namingSemanticFamilyBridge = {
+      observations: [
+        {
+          path: 'src',
+          occurrenceType: 'folder',
+          semanticName: 'src',
+          semanticFamily: 'workspace-root',
+          familyRoot: 'workspace',
+          familySubgroup: 'root',
+        },
+        {
+          path: 'src/semantic-family.topic-core.logic.mjs',
+          occurrenceType: 'file',
+          semanticName: 'semantic-family',
+          semanticFamily: 'topic-core',
+          familyRoot: 'topic',
+        },
+      ],
+    };
+
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo', namingSemanticFamilyBridge });
+    const namingSemanticEvidenceBridge = prepareNamingSemanticEvidenceBridge(namingSemanticFamilyBridge);
+    const expectedSemanticHomeEvidence = prepareTreeSemanticHomeEvidence({
+      addressedOccurrenceRecords: preparedInputs.structuralAddressSnapshot.occurrenceRecords,
+      namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
+    });
+
+    assert.deepEqual(preparedInputs.preparedDependencies.treeSemanticHomeEvidence, expectedSemanticHomeEvidence);
+    assert.equal(
+      preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords.some((record) => record.path === 'src'),
+      true,
+    );
+    assert.equal(
+      preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords.some(
+        (record) => record.path === 'src/semantic-family.topic-core.logic.mjs',
+      ),
+      true,
+    );
+    assert.equal(
+      preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords.some(
+        (record) => !Object.hasOwn(record, 'addressPath') || !Object.hasOwn(record, 'parentAddressPath'),
+      ),
+      false,
+    );
+    assert.equal(
+      preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords.some(
+        (record) =>
+          ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision', 'isKnownTopRoot', 'isStructuralRoot', 'isSemanticRoot', 'structuralClass', 'structuralKind'].some((key) =>
+            Object.hasOwn(record, key)),
+      ),
+      false,
+    );
+
+    const runtimeWithBridge = runTreeStructureAdvisorRuntime(preparedInputs);
+    const runtimeWithoutBridge = runTreeStructureAdvisorRuntime(
+      prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo' }),
+    );
+    assert.deepEqual(runtimeWithBridge, runtimeWithoutBridge);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
