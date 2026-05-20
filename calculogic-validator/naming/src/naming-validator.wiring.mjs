@@ -21,6 +21,7 @@ import {
   summarizeFindings as summarizeFindingsRuntime,
 } from './naming-validator.logic.mjs';
 import { projectNamingSemanticFamilyBridge } from './naming-semantic-family-bridge-projection.logic.mjs';
+import { prepareNamingSemanticEvidenceBridge } from './naming-semantic-evidence-bridge.logic.mjs';
 import {
   normalizePath,
   resolveScopedTargets,
@@ -117,4 +118,5 @@ export {
   listNamingValidatorScopes,
   getScopeProfile,
   projectNamingSemanticFamilyBridge,
+  prepareNamingSemanticEvidenceBridge,
 };
