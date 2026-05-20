@@ -13,6 +13,8 @@ import { prepareTreeOccurrenceSnapshot } from './tree-occurrence-snapshot.logic.
 import { prepareTreeStructuralAddressSnapshot } from './tree-structural-address-snapshot.logic.mjs';
 import { prepareTreeKnownRootsCompatibilityEvidence } from './tree-known-roots-compatibility-evidence.logic.mjs';
 import { prepareTreeStructuralHomeEvidence } from './tree-structural-home-evidence.logic.mjs';
+import { prepareTreeSemanticHomeEvidence } from './tree-semantic-home-evidence.logic.mjs';
+import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 
@@ -65,6 +67,9 @@ export const prepareTreeStructureAdvisorInputs = (
   });
   const treeKnownRootsRegistry = getBuiltinTreeKnownRoots();
   const structuralHomesRegistry = getBuiltinStructuralHomesRegistry();
+  const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
+    ? prepareNamingSemanticEvidenceBridge(namingSemanticFamilyBridge)
+    : { observations: [] };
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -81,6 +86,10 @@ export const prepareTreeStructureAdvisorInputs = (
       treeStructuralHomeEvidence: prepareTreeStructuralHomeEvidence({
         addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
         structuralHomesRegistry,
+      }),
+      treeSemanticHomeEvidence: prepareTreeSemanticHomeEvidence({
+        addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+        namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
       }),
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
