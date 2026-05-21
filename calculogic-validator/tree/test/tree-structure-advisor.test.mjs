@@ -16,6 +16,7 @@ import { prepareTreeSemanticHomeEvidence } from '../src/tree-semantic-home-evide
 import { prepareTreeFolderKindEvidence } from '../src/tree-folder-kind-evidence.logic.mjs';
 import { classifyTreeOccurrenceRecords } from '../src/tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceClassificationParityEvidence } from '../src/tree-occurrence-classification-parity-evidence.logic.mjs';
+import { summarizeTreeOccurrenceClassificationParityEvidence } from '../src/tree-occurrence-classification-parity-summary.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
@@ -168,6 +169,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies.treeSemanticHomeEvidence);
     assert.ok(preparedInputs.preparedDependencies.treeFolderKindEvidence);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationParityEvidence);
+    assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       prepareTreeStructuralHomeEvidence({
@@ -211,6 +213,10 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         treeSemanticHomeEvidence: preparedInputs.preparedDependencies.treeSemanticHomeEvidence,
         treeFolderKindEvidence: preparedInputs.preparedDependencies.treeFolderKindEvidence,
       }),
+    );
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
+      summarizeTreeOccurrenceClassificationParityEvidence(preparedInputs.preparedDependencies.treeOccurrenceClassificationParityEvidence),
     );
     const structuralHomeEvidenceRecords = preparedInputs.preparedDependencies.treeStructuralHomeEvidence.evidenceRecords;
     assert.equal(Array.isArray(structuralHomeEvidenceRecords), true);

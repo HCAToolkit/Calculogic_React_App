@@ -17,6 +17,7 @@ import { prepareTreeSemanticHomeEvidence } from './tree-semantic-home-evidence.l
 import { prepareTreeFolderKindEvidence } from './tree-folder-kind-evidence.logic.mjs';
 import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-evidence.logic.mjs';
+import { summarizeTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-summary.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
@@ -95,6 +96,14 @@ export const prepareTreeStructureAdvisorInputs = (
     treeKnownRoots: treeKnownRootsRegistry,
   });
 
+  const treeOccurrenceClassificationParityEvidence = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+    currentOccurrenceClassificationRecords,
+    treeStructuralHomeEvidence,
+    treeSemanticHomeEvidence,
+    treeFolderKindEvidence,
+  });
+
   return {
     scope: scopedSnapshotInputs.scope,
     selectedPaths,
@@ -110,13 +119,8 @@ export const prepareTreeStructureAdvisorInputs = (
       treeStructuralHomeEvidence,
       treeSemanticHomeEvidence,
       treeFolderKindEvidence,
-      treeOccurrenceClassificationParityEvidence: prepareTreeOccurrenceClassificationParityEvidence({
-        addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
-        currentOccurrenceClassificationRecords,
-        treeStructuralHomeEvidence,
-        treeSemanticHomeEvidence,
-        treeFolderKindEvidence,
-      }),
+      treeOccurrenceClassificationParityEvidence,
+      treeOccurrenceClassificationParitySummary: summarizeTreeOccurrenceClassificationParityEvidence(treeOccurrenceClassificationParityEvidence),
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
