@@ -92,6 +92,10 @@ const lookupFirstAvailable = (lookup, record, fallback = null) => {
 };
 
 const toCurrentClassLabel = (record) => {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    return null;
+  }
+
   if (record?.isStructuralRoot === true) {
     return 'structural-root';
   }
@@ -123,12 +127,28 @@ const toReplacementClassLabel = ({ replacementFolderKind, replacementStructuralH
   return 'insufficient-evidence';
 };
 
-const toParityStatus = ({ occurrenceType, currentClassLabel, replacementClassLabel }) => {
-  if (occurrenceType !== 'folder') {
+const isTopRootCandidateOccurrence = (occurrenceRecord, currentRecord) => {
+  if (occurrenceRecord?.occurrenceType !== 'folder') {
+    return false;
+  }
+
+  if (currentRecord?.isKnownTopRoot === true || currentRecord?.isStructuralRoot === true || currentRecord?.isSemanticRoot === true) {
+    return true;
+  }
+
+  if (occurrenceRecord?.isScopeTopOccurrence === true || occurrenceRecord?.depth === 0 || occurrenceRecord?.parentAddressPath === null) {
+    return true;
+  }
+
+  return false;
+};
+
+const toParityStatus = ({ occurrenceType, isTopRootCandidate, hasCurrentClassification, replacementClassLabel, currentClassLabel }) => {
+  if (occurrenceType !== 'folder' || isTopRootCandidate !== true) {
     return 'not-applicable';
   }
 
-  if (replacementClassLabel === 'insufficient-evidence') {
+  if (!hasCurrentClassification || replacementClassLabel === 'insufficient-evidence' || currentClassLabel === null) {
     return 'insufficient-evidence';
   }
 
@@ -188,6 +208,8 @@ export const prepareTreeOccurrenceClassificationParityEvidence = (input) => {
     const replacementSemanticHome = lookupFirstAvailable(semanticHomeLookup, occurrenceRecord);
 
     const currentClassLabel = toCurrentClassLabel(currentRecord);
+    const isTopRootCandidate = isTopRootCandidateOccurrence(occurrenceRecord, currentRecord);
+    const hasCurrentClassification = currentRecord && typeof currentRecord === 'object' && !Array.isArray(currentRecord);
     const replacementClassLabel = toReplacementClassLabel({
       replacementFolderKind,
       replacementStructuralHome,
@@ -196,6 +218,8 @@ export const prepareTreeOccurrenceClassificationParityEvidence = (input) => {
 
     const parityStatus = toParityStatus({
       occurrenceType: occurrenceRecord?.occurrenceType ?? null,
+      isTopRootCandidate,
+      hasCurrentClassification,
       currentClassLabel,
       replacementClassLabel,
     });

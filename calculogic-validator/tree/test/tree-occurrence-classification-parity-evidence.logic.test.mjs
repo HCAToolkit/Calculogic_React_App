@@ -162,3 +162,77 @@ test('addressPath match wins and avoids opportunistic file/folder merge when occ
   assert.equal(fileRecord.replacementFolderKind, 'semantic');
   assert.equal(fileRecord.parityStatus, 'not-applicable');
 });
+
+
+test('nested folder with replacement folder-kind evidence remains not-applicable', () => {
+  const result = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A.B', parentAddressPath: 'A', path: 'src/nested', name: 'nested', occurrenceType: 'folder', depth: 1 },
+    ],
+    currentOccurrenceClassificationRecords: [
+      { path: 'src/nested', occurrenceType: 'folder', structuralClass: 'unclassified', structuralKind: 'unknown', isKnownTopRoot: false, isStructuralRoot: false, isSemanticRoot: false },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeFolderKindEvidence: { source: 'x', evidenceRecords: [{ path: 'src/nested', occurrenceType: 'folder', folderKind: 'structural' }] },
+  });
+
+  assert.equal(result.parityRecords[0].parityStatus, 'not-applicable');
+});
+
+test('nested folder with semantic-home evidence remains not-applicable', () => {
+  const result = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A.B', parentAddressPath: 'A', path: 'docs/guide', name: 'guide', occurrenceType: 'folder', depth: 1 },
+    ],
+    currentOccurrenceClassificationRecords: [
+      { path: 'docs/guide', occurrenceType: 'folder', structuralClass: 'unclassified', structuralKind: 'unknown', isKnownTopRoot: false, isStructuralRoot: false, isSemanticRoot: false },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'docs/guide', occurrenceType: 'folder', semanticHome: 'documentation' }] },
+    treeFolderKindEvidence: { source: 'x', evidenceRecords: [{ path: 'docs/guide', occurrenceType: 'folder', folderKind: 'semantic' }] },
+  });
+
+  assert.equal(result.parityRecords[0].parityStatus, 'not-applicable');
+});
+
+test('top-root candidate with missing current classification becomes insufficient-evidence', () => {
+  const result = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A', parentAddressPath: null, path: 'src', name: 'src', occurrenceType: 'folder', depth: 0 },
+    ],
+    currentOccurrenceClassificationRecords: [],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'src', occurrenceType: 'folder', structuralHome: 'src' }] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeFolderKindEvidence: { source: 'x', evidenceRecords: [{ path: 'src', occurrenceType: 'folder', folderKind: 'structural' }] },
+  });
+
+  assert.equal(result.parityRecords[0].parityStatus, 'insufficient-evidence');
+});
+
+test('matched current non-root remains distinguishable from missing current classification', () => {
+  const matchedCurrent = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A', parentAddressPath: null, path: 'feature', name: 'feature', occurrenceType: 'folder', depth: 0 },
+    ],
+    currentOccurrenceClassificationRecords: [
+      { path: 'feature', occurrenceType: 'folder', structuralClass: 'unclassified', structuralKind: 'unknown', isKnownTopRoot: false, isStructuralRoot: false, isSemanticRoot: false },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeFolderKindEvidence: { source: 'x', evidenceRecords: [{ path: 'feature', occurrenceType: 'folder', folderKind: 'unspecified' }] },
+  });
+
+  const missingCurrent = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A', parentAddressPath: null, path: 'feature', name: 'feature', occurrenceType: 'folder', depth: 0 },
+    ],
+    currentOccurrenceClassificationRecords: [],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeFolderKindEvidence: { source: 'x', evidenceRecords: [{ path: 'feature', occurrenceType: 'folder', folderKind: 'unspecified' }] },
+  });
+
+  assert.equal(matchedCurrent.parityRecords[0].parityStatus, 'matches');
+  assert.equal(missingCurrent.parityRecords[0].parityStatus, 'insufficient-evidence');
+});
