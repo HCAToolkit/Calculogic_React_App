@@ -80,3 +80,85 @@ test('rejects invalid input deterministically', () => {
     /currentOccurrenceClassificationRecords must be an array/u,
   );
 });
+
+test('falls back from addressPath to path+occurrenceType for current and replacement evidence lookup', () => {
+  const result = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'Z.9', parentAddressPath: null, path: 'src', name: 'src', occurrenceType: 'folder' },
+    ],
+    currentOccurrenceClassificationRecords: [
+      { path: 'src', occurrenceType: 'folder', structuralClass: 'repo-top-structural-root', structuralKind: 'top-root-structural', isKnownTopRoot: true, isStructuralRoot: true, isSemanticRoot: false },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'src', occurrenceType: 'folder', structuralHome: 'src' }] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeFolderKindEvidence: { source: 'x', evidenceRecords: [{ path: 'src', occurrenceType: 'folder', folderKind: 'structural' }] },
+  });
+
+  assert.equal(result.parityRecords[0].currentIsStructuralRoot, true);
+  assert.equal(result.parityRecords[0].replacementFolderKind, 'structural');
+  assert.equal(result.parityRecords[0].parityStatus, 'matches');
+});
+
+test('falls back to path when only path evidence exists and preserves precedence ordering', () => {
+  const result = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'Z.1', parentAddressPath: null, path: 'docs', name: 'docs', occurrenceType: 'folder' },
+      { addressPath: 'Z.2', parentAddressPath: null, path: 'lib', name: 'lib', occurrenceType: 'folder' },
+    ],
+    currentOccurrenceClassificationRecords: [
+      { path: 'docs', structuralClass: 'repo-top-semantic-root', structuralKind: 'semantic-root', isKnownTopRoot: true, isStructuralRoot: false, isSemanticRoot: true },
+      { path: 'lib', occurrenceType: 'folder', structuralClass: 'repo-top-structural-root', structuralKind: 'top-root-structural', isKnownTopRoot: true, isStructuralRoot: true, isSemanticRoot: false },
+      { path: 'lib', structuralClass: 'repo-top-semantic-root', structuralKind: 'semantic-root', isKnownTopRoot: true, isStructuralRoot: false, isSemanticRoot: true },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'lib', structuralHome: 'lib' }] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'docs', semanticHome: 'documentation' }] },
+    treeFolderKindEvidence: {
+      source: 'x',
+      evidenceRecords: [
+        { path: 'docs', folderKind: 'semantic' },
+        { path: 'lib', occurrenceType: 'folder', folderKind: 'structural' },
+        { path: 'lib', folderKind: 'semantic' },
+      ],
+    },
+  });
+
+  const docsRecord = result.parityRecords.find((record) => record.path === 'docs');
+  const libRecord = result.parityRecords.find((record) => record.path === 'lib');
+
+  assert.equal(docsRecord.currentIsSemanticRoot, true);
+  assert.equal(docsRecord.replacementFolderKind, 'semantic');
+  assert.equal(libRecord.currentIsStructuralRoot, true);
+  assert.equal(libRecord.replacementFolderKind, 'structural');
+});
+
+test('addressPath match wins and avoids opportunistic file/folder merge when occurrenceType-safe evidence exists', () => {
+  const result = prepareTreeOccurrenceClassificationParityEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A', parentAddressPath: null, path: 'pkg', name: 'pkg', occurrenceType: 'folder' },
+      { addressPath: 'A.1', parentAddressPath: 'A', path: 'pkg', name: 'pkg', occurrenceType: 'file' },
+    ],
+    currentOccurrenceClassificationRecords: [
+      { addressPath: 'A', path: 'pkg', occurrenceType: 'folder', structuralClass: 'repo-top-structural-root', structuralKind: 'top-root-structural', isKnownTopRoot: true, isStructuralRoot: true, isSemanticRoot: false },
+      { path: 'pkg', occurrenceType: 'folder', structuralClass: 'repo-top-semantic-root', structuralKind: 'semantic-root', isKnownTopRoot: true, isStructuralRoot: false, isSemanticRoot: true },
+      { path: 'pkg', occurrenceType: 'file', structuralClass: 'unclassified', structuralKind: 'unknown', isKnownTopRoot: false, isStructuralRoot: false, isSemanticRoot: false },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'pkg', occurrenceType: 'folder', structuralHome: 'pkg' }] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'pkg', occurrenceType: 'file', semanticHome: 'file-semantic' }] },
+    treeFolderKindEvidence: {
+      source: 'x',
+      evidenceRecords: [
+        { addressPath: 'A', path: 'pkg', occurrenceType: 'folder', folderKind: 'structural' },
+        { path: 'pkg', occurrenceType: 'file', folderKind: 'semantic' },
+      ],
+    },
+  });
+
+  const folderRecord = result.parityRecords.find((record) => record.addressPath === 'A');
+  const fileRecord = result.parityRecords.find((record) => record.addressPath === 'A.1');
+
+  assert.equal(folderRecord.currentIsStructuralRoot, true);
+  assert.equal(folderRecord.replacementFolderKind, 'structural');
+  assert.equal(fileRecord.currentIsStructuralRoot, false);
+  assert.equal(fileRecord.replacementFolderKind, 'semantic');
+  assert.equal(fileRecord.parityStatus, 'not-applicable');
+});

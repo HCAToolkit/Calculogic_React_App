@@ -38,13 +38,15 @@ const assertValidInput = (input) => {
   }
 };
 
-const toIdentityKey = (record) => {
+const toIdentityKeys = (record) => {
   if (!record || typeof record !== 'object' || Array.isArray(record)) {
-    return null;
+    return [];
   }
 
+  const keys = [];
+
   if (typeof record.addressPath === 'string' && record.addressPath.length > 0) {
-    return `address:${record.addressPath}`;
+    keys.push(`address:${record.addressPath}`);
   }
 
   if (
@@ -53,29 +55,40 @@ const toIdentityKey = (record) => {
     typeof record.occurrenceType === 'string' &&
     record.occurrenceType.length > 0
   ) {
-    return `path-type:${record.path}::${record.occurrenceType}`;
+    keys.push(`path-type:${record.path}::${record.occurrenceType}`);
   }
 
   if (typeof record.path === 'string' && record.path.length > 0) {
-    return `path:${record.path}`;
+    keys.push(`path:${record.path}`);
   }
 
-  return null;
+  return keys;
 };
 
 const toEvidenceLookup = (evidenceRecords, evidenceKey) => {
   const lookup = new Map();
 
   for (const evidenceRecord of evidenceRecords) {
-    const key = toIdentityKey(evidenceRecord);
-    if (!key || lookup.has(key)) {
-      continue;
-    }
+    for (const key of toIdentityKeys(evidenceRecord)) {
+      if (lookup.has(key)) {
+        continue;
+      }
 
-    lookup.set(key, evidenceRecord[evidenceKey] ?? null);
+      lookup.set(key, evidenceRecord[evidenceKey] ?? null);
+    }
   }
 
   return lookup;
+};
+
+const lookupFirstAvailable = (lookup, record, fallback = null) => {
+  for (const key of toIdentityKeys(record)) {
+    if (lookup.has(key)) {
+      return lookup.get(key);
+    }
+  }
+
+  return fallback;
 };
 
 const toCurrentClassLabel = (record) => {
@@ -156,23 +169,23 @@ export const prepareTreeOccurrenceClassificationParityEvidence = (input) => {
 
   const currentByIdentity = new Map();
   for (const record of input.currentOccurrenceClassificationRecords) {
-    const identityKey = toIdentityKey(record);
-    if (!identityKey || currentByIdentity.has(identityKey)) {
-      continue;
-    }
+    for (const key of toIdentityKeys(record)) {
+      if (currentByIdentity.has(key)) {
+        continue;
+      }
 
-    currentByIdentity.set(identityKey, record);
+      currentByIdentity.set(key, record);
+    }
   }
 
   const parityRecords = [];
 
   for (const occurrenceRecord of input.addressedOccurrenceRecords) {
-    const identityKey = toIdentityKey(occurrenceRecord);
-    const currentRecord = identityKey ? currentByIdentity.get(identityKey) ?? null : null;
+    const currentRecord = lookupFirstAvailable(currentByIdentity, occurrenceRecord);
 
-    const replacementFolderKind = identityKey ? folderKindLookup.get(identityKey) ?? null : null;
-    const replacementStructuralHome = identityKey ? structuralHomeLookup.get(identityKey) ?? null : null;
-    const replacementSemanticHome = identityKey ? semanticHomeLookup.get(identityKey) ?? null : null;
+    const replacementFolderKind = lookupFirstAvailable(folderKindLookup, occurrenceRecord);
+    const replacementStructuralHome = lookupFirstAvailable(structuralHomeLookup, occurrenceRecord);
+    const replacementSemanticHome = lookupFirstAvailable(semanticHomeLookup, occurrenceRecord);
 
     const currentClassLabel = toCurrentClassLabel(currentRecord);
     const replacementClassLabel = toReplacementClassLabel({
