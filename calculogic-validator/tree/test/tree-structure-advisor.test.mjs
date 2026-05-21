@@ -13,8 +13,10 @@ import { collectShimCompatFindings } from '../src/tree-shim-detection.logic.mjs'
 import { prepareTreeKnownRootsCompatibilityEvidence } from '../src/tree-known-roots-compatibility-evidence.logic.mjs';
 import { prepareTreeStructuralHomeEvidence } from '../src/tree-structural-home-evidence.logic.mjs';
 import { prepareTreeSemanticHomeEvidence } from '../src/tree-semantic-home-evidence.logic.mjs';
+import { prepareTreeFolderKindEvidence } from '../src/tree-folder-kind-evidence.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
+import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { listRegisteredValidators } from '../../src/core/validator-registry.knowledge.mjs';
 import { getValidatorScopeProfile } from '../../src/core/validator-scopes.logic.mjs';
@@ -162,6 +164,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies.treeKnownRootsCompatibilityEvidence);
     assert.ok(preparedInputs.preparedDependencies.treeStructuralHomeEvidence);
     assert.ok(preparedInputs.preparedDependencies.treeSemanticHomeEvidence);
+    assert.ok(preparedInputs.preparedDependencies.treeFolderKindEvidence);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       prepareTreeStructuralHomeEvidence({
@@ -181,6 +184,16 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
       prepareTreeSemanticHomeEvidence({
         addressedOccurrenceRecords: snapshot.occurrenceRecords,
         namingSemanticEvidenceRecords: [],
+      }),
+    );
+
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeFolderKindEvidence,
+      prepareTreeFolderKindEvidence({
+        addressedOccurrenceRecords: snapshot.occurrenceRecords,
+        treeStructuralHomeEvidence: preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
+        treeSemanticHomeEvidence: preparedInputs.preparedDependencies.treeSemanticHomeEvidence,
+        folderKindsRegistry: getBuiltinFolderKindsRegistry(),
       }),
     );
     const structuralHomeEvidenceRecords = preparedInputs.preparedDependencies.treeStructuralHomeEvidence.evidenceRecords;
