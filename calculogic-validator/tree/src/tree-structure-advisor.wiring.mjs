@@ -14,9 +14,11 @@ import { prepareTreeStructuralAddressSnapshot } from './tree-structural-address-
 import { prepareTreeKnownRootsCompatibilityEvidence } from './tree-known-roots-compatibility-evidence.logic.mjs';
 import { prepareTreeStructuralHomeEvidence } from './tree-structural-home-evidence.logic.mjs';
 import { prepareTreeSemanticHomeEvidence } from './tree-semantic-home-evidence.logic.mjs';
+import { prepareTreeFolderKindEvidence } from './tree-folder-kind-evidence.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
+import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-registry.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -67,9 +69,19 @@ export const prepareTreeStructureAdvisorInputs = (
   });
   const treeKnownRootsRegistry = getBuiltinTreeKnownRoots();
   const structuralHomesRegistry = getBuiltinStructuralHomesRegistry();
+  const folderKindsRegistry = getBuiltinFolderKindsRegistry();
   const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
     ? prepareNamingSemanticEvidenceBridge(namingSemanticFamilyBridge)
     : { observations: [] };
+
+  const treeStructuralHomeEvidence = prepareTreeStructuralHomeEvidence({
+    addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+    structuralHomesRegistry,
+  });
+  const treeSemanticHomeEvidence = prepareTreeSemanticHomeEvidence({
+    addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+    namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
+  });
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -83,13 +95,13 @@ export const prepareTreeStructureAdvisorInputs = (
         addressedTreeSnapshot: structuralAddressSnapshot,
         knownRootsRegistry: treeKnownRootsRegistry,
       }),
-      treeStructuralHomeEvidence: prepareTreeStructuralHomeEvidence({
+      treeStructuralHomeEvidence,
+      treeSemanticHomeEvidence,
+      treeFolderKindEvidence: prepareTreeFolderKindEvidence({
         addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
-        structuralHomesRegistry,
-      }),
-      treeSemanticHomeEvidence: prepareTreeSemanticHomeEvidence({
-        addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
-        namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
+        treeStructuralHomeEvidence,
+        treeSemanticHomeEvidence,
+        folderKindsRegistry,
       }),
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
