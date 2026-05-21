@@ -18,6 +18,7 @@ import { prepareTreeFolderKindEvidence } from './tree-folder-kind-evidence.logic
 import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-evidence.logic.mjs';
 import { summarizeTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-summary.logic.mjs';
+import { prepareTreeOccurrenceClassificationShadowReport } from './tree-occurrence-classification-shadow-report.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
@@ -104,6 +105,12 @@ export const prepareTreeStructureAdvisorInputs = (
     treeFolderKindEvidence,
   });
 
+  const treeOccurrenceClassificationParitySummary = summarizeTreeOccurrenceClassificationParityEvidence(treeOccurrenceClassificationParityEvidence);
+  const treeOccurrenceClassificationShadowReport = prepareTreeOccurrenceClassificationShadowReport({
+    treeOccurrenceClassificationParityEvidence,
+    treeOccurrenceClassificationParitySummary,
+  });
+
   return {
     scope: scopedSnapshotInputs.scope,
     selectedPaths,
@@ -120,7 +127,8 @@ export const prepareTreeStructureAdvisorInputs = (
       treeSemanticHomeEvidence,
       treeFolderKindEvidence,
       treeOccurrenceClassificationParityEvidence,
-      treeOccurrenceClassificationParitySummary: summarizeTreeOccurrenceClassificationParityEvidence(treeOccurrenceClassificationParityEvidence),
+      treeOccurrenceClassificationParitySummary,
+      treeOccurrenceClassificationShadowReport,
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
