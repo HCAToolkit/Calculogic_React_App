@@ -15,6 +15,8 @@ import { prepareTreeKnownRootsCompatibilityEvidence } from './tree-known-roots-c
 import { prepareTreeStructuralHomeEvidence } from './tree-structural-home-evidence.logic.mjs';
 import { prepareTreeSemanticHomeEvidence } from './tree-semantic-home-evidence.logic.mjs';
 import { prepareTreeFolderKindEvidence } from './tree-folder-kind-evidence.logic.mjs';
+import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.logic.mjs';
+import { prepareTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-evidence.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
@@ -82,6 +84,16 @@ export const prepareTreeStructureAdvisorInputs = (
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
     namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
   });
+  const treeFolderKindEvidence = prepareTreeFolderKindEvidence({
+    addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+    treeStructuralHomeEvidence,
+    treeSemanticHomeEvidence,
+    folderKindsRegistry,
+  });
+  const currentOccurrenceClassificationRecords = classifyTreeOccurrenceRecords({
+    occurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+    treeKnownRoots: treeKnownRootsRegistry,
+  });
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -97,11 +109,13 @@ export const prepareTreeStructureAdvisorInputs = (
       }),
       treeStructuralHomeEvidence,
       treeSemanticHomeEvidence,
-      treeFolderKindEvidence: prepareTreeFolderKindEvidence({
+      treeFolderKindEvidence,
+      treeOccurrenceClassificationParityEvidence: prepareTreeOccurrenceClassificationParityEvidence({
         addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+        currentOccurrenceClassificationRecords,
         treeStructuralHomeEvidence,
         treeSemanticHomeEvidence,
-        folderKindsRegistry,
+        treeFolderKindEvidence,
       }),
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
