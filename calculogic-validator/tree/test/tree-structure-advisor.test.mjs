@@ -20,6 +20,7 @@ import { summarizeTreeOccurrenceClassificationParityEvidence } from '../src/tree
 import { prepareTreeOccurrenceClassificationShadowReport } from '../src/tree-occurrence-classification-shadow-report.logic.mjs';
 import { evaluateTreeOccurrenceClassificationReplacementReadiness } from '../src/tree-occurrence-classification-replacement-readiness.logic.mjs';
 import { recommendTreeOccurrenceClassificationReplacement } from '../src/tree-occurrence-classification-replacement-recommendation.logic.mjs';
+import { planTreeOccurrenceClassificationRuntimeEvaluation } from '../src/tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
@@ -176,6 +177,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation);
+    assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       prepareTreeStructuralHomeEvidence({
@@ -241,6 +243,15 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation,
       recommendTreeOccurrenceClassificationReplacement({
+        treeOccurrenceClassificationReplacementReadiness: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness,
+        treeOccurrenceClassificationShadowReport: preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport,
+        treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
+      }),
+    );
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan,
+      planTreeOccurrenceClassificationRuntimeEvaluation({
+        treeOccurrenceClassificationReplacementRecommendation: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation,
         treeOccurrenceClassificationReplacementReadiness: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness,
         treeOccurrenceClassificationShadowReport: preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport,
         treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
