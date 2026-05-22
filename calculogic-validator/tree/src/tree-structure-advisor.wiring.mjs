@@ -19,6 +19,8 @@ import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.
 import { prepareTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-evidence.logic.mjs';
 import { summarizeTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-summary.logic.mjs';
 import { prepareTreeOccurrenceClassificationShadowReport } from './tree-occurrence-classification-shadow-report.logic.mjs';
+import { evaluateTreeOccurrenceClassificationReplacementReadiness } from './tree-occurrence-classification-replacement-readiness.logic.mjs';
+import { recommendTreeOccurrenceClassificationReplacement } from './tree-occurrence-classification-replacement-recommendation.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
@@ -110,6 +112,15 @@ export const prepareTreeStructureAdvisorInputs = (
     treeOccurrenceClassificationParityEvidence,
     treeOccurrenceClassificationParitySummary,
   });
+  const treeOccurrenceClassificationReplacementReadiness = evaluateTreeOccurrenceClassificationReplacementReadiness({
+    treeOccurrenceClassificationParitySummary,
+    treeOccurrenceClassificationShadowReport,
+  });
+  const treeOccurrenceClassificationReplacementRecommendation = recommendTreeOccurrenceClassificationReplacement({
+    treeOccurrenceClassificationReplacementReadiness,
+    treeOccurrenceClassificationShadowReport,
+    treeOccurrenceClassificationParitySummary,
+  });
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -129,6 +140,8 @@ export const prepareTreeStructureAdvisorInputs = (
       treeOccurrenceClassificationParityEvidence,
       treeOccurrenceClassificationParitySummary,
       treeOccurrenceClassificationShadowReport,
+      treeOccurrenceClassificationReplacementReadiness,
+      treeOccurrenceClassificationReplacementRecommendation,
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
