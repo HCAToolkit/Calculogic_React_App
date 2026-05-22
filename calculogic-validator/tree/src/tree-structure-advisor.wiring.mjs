@@ -21,6 +21,7 @@ import { summarizeTreeOccurrenceClassificationParityEvidence } from './tree-occu
 import { prepareTreeOccurrenceClassificationShadowReport } from './tree-occurrence-classification-shadow-report.logic.mjs';
 import { evaluateTreeOccurrenceClassificationReplacementReadiness } from './tree-occurrence-classification-replacement-readiness.logic.mjs';
 import { recommendTreeOccurrenceClassificationReplacement } from './tree-occurrence-classification-replacement-recommendation.logic.mjs';
+import { planTreeOccurrenceClassificationRuntimeEvaluation } from './tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
@@ -121,6 +122,12 @@ export const prepareTreeStructureAdvisorInputs = (
     treeOccurrenceClassificationShadowReport,
     treeOccurrenceClassificationParitySummary,
   });
+  const treeOccurrenceClassificationRuntimeEvaluationPlan = planTreeOccurrenceClassificationRuntimeEvaluation({
+    treeOccurrenceClassificationReplacementRecommendation,
+    treeOccurrenceClassificationReplacementReadiness,
+    treeOccurrenceClassificationShadowReport,
+    treeOccurrenceClassificationParitySummary,
+  });
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -142,6 +149,7 @@ export const prepareTreeStructureAdvisorInputs = (
       treeOccurrenceClassificationShadowReport,
       treeOccurrenceClassificationReplacementReadiness,
       treeOccurrenceClassificationReplacementRecommendation,
+      treeOccurrenceClassificationRuntimeEvaluationPlan,
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
