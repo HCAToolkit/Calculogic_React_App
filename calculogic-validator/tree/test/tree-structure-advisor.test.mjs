@@ -18,6 +18,8 @@ import { classifyTreeOccurrenceRecords } from '../src/tree-occurrence-classifica
 import { prepareTreeOccurrenceClassificationParityEvidence } from '../src/tree-occurrence-classification-parity-evidence.logic.mjs';
 import { summarizeTreeOccurrenceClassificationParityEvidence } from '../src/tree-occurrence-classification-parity-summary.logic.mjs';
 import { prepareTreeOccurrenceClassificationShadowReport } from '../src/tree-occurrence-classification-shadow-report.logic.mjs';
+import { evaluateTreeOccurrenceClassificationReplacementReadiness } from '../src/tree-occurrence-classification-replacement-readiness.logic.mjs';
+import { recommendTreeOccurrenceClassificationReplacement } from '../src/tree-occurrence-classification-replacement-recommendation.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
@@ -172,6 +174,8 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationParityEvidence);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport);
+    assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness);
+    assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       prepareTreeStructuralHomeEvidence({
@@ -226,6 +230,27 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         treeOccurrenceClassificationParityEvidence: preparedInputs.preparedDependencies.treeOccurrenceClassificationParityEvidence,
         treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
       }),
+    );
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness,
+      evaluateTreeOccurrenceClassificationReplacementReadiness({
+        treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
+        treeOccurrenceClassificationShadowReport: preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport,
+      }),
+    );
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation,
+      recommendTreeOccurrenceClassificationReplacement({
+        treeOccurrenceClassificationReplacementReadiness: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness,
+        treeOccurrenceClassificationShadowReport: preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport,
+        treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
+      }),
+    );
+    const replacementRecommendation = preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation;
+    assert.deepEqual(Object.keys(replacementRecommendation).sort(), ['confidence', 'rationale', 'recommendation', 'source', 'summary']);
+    assert.equal(
+      ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision'].some((key) => Object.hasOwn(replacementRecommendation, key)),
+      false,
     );
     const structuralHomeEvidenceRecords = preparedInputs.preparedDependencies.treeStructuralHomeEvidence.evidenceRecords;
     assert.equal(Array.isArray(structuralHomeEvidenceRecords), true);
