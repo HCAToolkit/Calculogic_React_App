@@ -21,6 +21,7 @@ import { prepareTreeOccurrenceClassificationShadowReport } from '../src/tree-occ
 import { evaluateTreeOccurrenceClassificationReplacementReadiness } from '../src/tree-occurrence-classification-replacement-readiness.logic.mjs';
 import { recommendTreeOccurrenceClassificationReplacement } from '../src/tree-occurrence-classification-replacement-recommendation.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeEvaluation } from '../src/tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
+import { planTreeOccurrenceClassificationRuntimeExecutionContract } from '../src/tree-occurrence-classification-runtime-execution-contract.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
@@ -178,6 +179,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan);
+    assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       prepareTreeStructuralHomeEvidence({
@@ -255,6 +257,42 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         treeOccurrenceClassificationReplacementReadiness: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness,
         treeOccurrenceClassificationShadowReport: preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport,
         treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
+      }),
+    );
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract,
+      planTreeOccurrenceClassificationRuntimeExecutionContract({
+        treeOccurrenceClassificationRuntimeEvaluationPlan: preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan,
+        treeOccurrenceClassificationReplacementRecommendation: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation,
+        treeOccurrenceClassificationReplacementReadiness: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness,
+        treeOccurrenceClassificationShadowReport: preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport,
+        treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
+      }),
+    );
+    const runtimeExecutionContract = preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract;
+    assert.deepEqual(Object.keys(runtimeExecutionContract).sort(), ['executionMode', 'executionStatus', 'rationale', 'requiredGuards', 'source', 'summary']);
+    assert.equal(
+      ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision'].some((key) => Object.hasOwn(runtimeExecutionContract, key)),
+      false,
+    );
+    assert.equal(
+      ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision'].some((key) => Object.hasOwn(runtimeExecutionContract.summary, key)),
+      false,
+    );
+    assert.equal(
+      runtimeExecutionContract.requiredGuards.some((guard) =>
+        ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision'].some((key) => Object.hasOwn(guard, key))),
+      false,
+    );
+    const {
+      treeOccurrenceClassificationRuntimeExecutionContract: _omittedRuntimeExecutionContract,
+      ...preparedDependenciesWithoutRuntimeExecutionContract
+    } = preparedInputs.preparedDependencies;
+    assert.deepEqual(
+      runTreeStructureAdvisorRuntime(preparedInputs),
+      runTreeStructureAdvisorRuntime({
+        ...preparedInputs,
+        preparedDependencies: preparedDependenciesWithoutRuntimeExecutionContract,
       }),
     );
     const runtimeEvaluationPlan = preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan;
