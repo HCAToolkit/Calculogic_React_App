@@ -257,6 +257,25 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
       }),
     );
+    const runtimeEvaluationPlan = preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan;
+    assert.deepEqual(Object.keys(runtimeEvaluationPlan).sort(), ['evaluationMode', 'evaluationStatus', 'rationale', 'source', 'summary']);
+    assert.equal(
+      ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision'].some((key) => Object.hasOwn(runtimeEvaluationPlan, key)),
+      false,
+    );
+    assert.equal(
+      ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision'].some((key) => Object.hasOwn(runtimeEvaluationPlan.summary, key)),
+      false,
+    );
+    assert.deepEqual(
+      runtimeEvaluationPlan,
+      planTreeOccurrenceClassificationRuntimeEvaluation({
+        treeOccurrenceClassificationReplacementRecommendation: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation,
+        treeOccurrenceClassificationReplacementReadiness: preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementReadiness,
+        treeOccurrenceClassificationShadowReport: preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport,
+        treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
+      }),
+    );
     const replacementRecommendation = preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation;
     assert.deepEqual(Object.keys(replacementRecommendation).sort(), ['confidence', 'rationale', 'recommendation', 'source', 'summary']);
     assert.equal(
