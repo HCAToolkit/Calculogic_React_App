@@ -13,7 +13,7 @@ const ALLOWED_INPUT_LANES = new Set([
   'naming-bridge',
   'structural-home-boundary',
   'structural-signal-boundary',
-  'known-root-compatibility-boundary',
+  'repo-top-structural-boundary',
 ]);
 const ALLOWED_STATUSES = new Set(['active']);
 
@@ -65,9 +65,9 @@ test('semantic-home-policy registry has deterministic shape and boundary coverag
 
   assert.equal(seenInputLanes.has('naming-bridge'), true, 'registry should include naming-bridge evidence lane');
   assert.equal(
-    seenInputLanes.has('known-root-compatibility-boundary'),
+    seenInputLanes.has('repo-top-structural-boundary'),
     true,
-    'registry should preserve known-root compatibility boundary lane',
+    'registry should preserve repo-top structural boundary lane',
   );
   assert.equal(
     seenInputLanes.has('structural-home-boundary'),

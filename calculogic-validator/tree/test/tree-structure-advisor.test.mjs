@@ -14,7 +14,6 @@ import { prepareTreeStructuralHomeEvidence } from '../src/tree-structural-home-e
 import { prepareTreeSemanticHomeEvidence } from '../src/tree-semantic-home-evidence.logic.mjs';
 import { prepareTreeFolderKindEvidence } from '../src/tree-folder-kind-evidence.logic.mjs';
 import {
-  classifyTreeOccurrenceRecords,
   prepareTreeOccurrenceClassificationReplacementRuntime,
 } from '../src/tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceClassificationParityEvidence } from '../src/tree-occurrence-classification-parity-evidence.logic.mjs';
@@ -24,8 +23,6 @@ import { evaluateTreeOccurrenceClassificationReplacementReadiness } from '../src
 import { recommendTreeOccurrenceClassificationReplacement } from '../src/tree-occurrence-classification-replacement-recommendation.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeEvaluation } from '../src/tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeExecutionContract } from '../src/tree-occurrence-classification-runtime-execution-contract.logic.mjs';
-import { TREE_KNOWN_ROOTS_RUNTIME_MODES } from '../src/tree-known-roots-runtime-routing.logic.mjs';
-import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
@@ -183,7 +180,6 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime);
-    assert.ok(preparedInputs.preparedDependencies.treeKnownRootsRuntimeRoute);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       prepareTreeStructuralHomeEvidence({
@@ -208,14 +204,18 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         folderKindsRegistry: getBuiltinFolderKindsRegistry(),
       }),
     );
+    const expectedOccurrenceClassificationReplacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+      treeStructuralHomeEvidence: preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
+      treeSemanticHomeEvidence: preparedInputs.preparedDependencies.treeSemanticHomeEvidence,
+      treeFolderKindEvidence: preparedInputs.preparedDependencies.treeFolderKindEvidence,
+    });
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeOccurrenceClassificationParityEvidence,
       prepareTreeOccurrenceClassificationParityEvidence({
         addressedOccurrenceRecords: snapshot.occurrenceRecords,
-        currentOccurrenceClassificationRecords: classifyTreeOccurrenceRecords({
-          occurrenceRecords: snapshot.occurrenceRecords,
-          treeKnownRoots: getBuiltinTreeKnownRoots(),
-        }),
+        currentOccurrenceClassificationRecords: expectedOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(
+          snapshot.occurrenceRecords,
+        ),
         treeStructuralHomeEvidence: preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
         treeSemanticHomeEvidence: preparedInputs.preparedDependencies.treeSemanticHomeEvidence,
         treeFolderKindEvidence: preparedInputs.preparedDependencies.treeFolderKindEvidence,
@@ -266,11 +266,6 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
       }),
     );
-    const expectedOccurrenceClassificationReplacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
-      treeStructuralHomeEvidence: preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
-      treeSemanticHomeEvidence: preparedInputs.preparedDependencies.treeSemanticHomeEvidence,
-      treeFolderKindEvidence: preparedInputs.preparedDependencies.treeFolderKindEvidence,
-    });
     assert.equal(
       preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime.source,
       expectedOccurrenceClassificationReplacementRuntime.source,
@@ -279,13 +274,6 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
       preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(snapshot.occurrenceRecords),
       expectedOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(snapshot.occurrenceRecords),
     );
-    const knownRootsRuntimeRoute = preparedInputs.preparedDependencies.treeKnownRootsRuntimeRoute;
-    assert.equal(knownRootsRuntimeRoute.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.LEGACY);
-    assert.equal(knownRootsRuntimeRoute.fallbackUsed, false);
-    assert.deepEqual(knownRootsRuntimeRoute.legacyRuntimeTruth, {
-      unexpectedTopLevelFolders: 'knownTopLevelDirectories',
-      occurrenceClassification: 'topRoots[].kind',
-    });
     const runtimeExecutionContract = preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract;
     assert.deepEqual(Object.keys(runtimeExecutionContract).sort(), ['executionMode', 'executionStatus', 'rationale', 'requiredGuards', 'source', 'summary']);
     assert.equal(
@@ -450,7 +438,6 @@ test('tree-structure-advisor runtime report output remains unchanged by structur
     const preparedWithHandoff = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo' });
     const {
       structuralAddressSnapshot: _omittedSnapshot,
-      preparedDependencies: _omittedPreparedDependencies,
       ...preparedWithoutHandoff
     } = preparedWithHandoff;
 
@@ -512,8 +499,8 @@ test('tree-structure-advisor structural-address handoff preserves file target ki
 });
 
 
-test('tree-structure-advisor known roots come from bounded registry policy without behavior drift', async () => {
-  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-known-roots-registry-'));
+test('tree-structure-advisor replacement root policy comes from bounded structural-home evidence without behavior drift', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-root-policy-registry-'));
 
   try {
     await writeBaseFixtureRepo(fixtureDir);
@@ -533,16 +520,10 @@ test('tree-structure-advisor known roots come from bounded registry policy witho
     );
     assert.ok(advisory);
     assert.deepEqual(advisory.details.knownRoots, [
-      'bin',
       'calculogic-doc-engine',
       'calculogic-validator',
       'doc',
-      'docs',
-      'public',
-      'scripts',
       'src',
-      'test',
-      'tools',
     ]);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });

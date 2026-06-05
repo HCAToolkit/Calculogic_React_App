@@ -8,20 +8,27 @@ const STRUCTURAL_HOMES_REGISTRY_PATH = new URL(
 );
 
 const EXPECTED_STRUCTURAL_HOMES = [
-  'src',
   'app',
-  'doc',
-  'tests',
-  'scripts',
+  'assets',
+  'bin',
+  'calculogic-doc-engine',
+  'calculogic-validator',
+  'compat',
   'config',
   'data',
-  'ops',
-  'assets',
-  'generated',
-  'vendor',
+  'doc',
+  'docs',
   'examples',
   'experimental',
-  'compat',
+  'generated',
+  'ops',
+  'public',
+  'scripts',
+  'src',
+  'test',
+  'tests',
+  'tools',
+  'vendor',
 ];
 
 test('structural-homes registry provides deterministic active structural-home identities', () => {

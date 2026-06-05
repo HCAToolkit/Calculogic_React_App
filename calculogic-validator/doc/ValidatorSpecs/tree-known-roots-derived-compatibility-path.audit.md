@@ -1,5 +1,8 @@
 # Tree Known-Roots Derived Compatibility Path Audit
 
+> Status after issue #572: This document is retained as historical docs/spec context. Any known-roots statements describing active runtime ownership are not current runtime truth; current runtime truth is that Tree known-roots registry/runtime dependencies are retired and replacement Tree evidence controls the relevant runtime paths.
+
+
 ## 1) Scope and intent
 
 This document is a docs-only audit slice for issue #467 under roadmap context #452.

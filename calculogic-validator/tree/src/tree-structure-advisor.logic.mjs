@@ -1,14 +1,6 @@
 import path from 'node:path';
-import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy-registry.logic.mjs';
-import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.logic.mjs';
-import {
-  resolveTreeOccurrenceClassificationRuntime,
-  resolveTreeUnexpectedTopLevelDirectoryRuntime,
-  selectTreeKnownRootsRuntimeRoute,
-} from './tree-known-roots-runtime-routing.logic.mjs';
 
-const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
 const TREE_SIGNAL_POLICY = getBuiltinTreeSignalPolicy();
 
 const VALIDATOR_SUITE_CORE_ROOT = 'calculogic-validator/src/';
@@ -38,23 +30,44 @@ const sortByPathThenCode = (left, right) => {
 const isValidatorOwnedBasenameSignal = (basename) =>
   TREE_SIGNAL_POLICY.validatorOwnedBasenameSignalMatchers.some(({ matcher }) => matcher.test(basename));
 
-const collectKnownRootsUnexpectedDirectoryNames = (topLevelDirectoryNames) =>
-  topLevelDirectoryNames
-    .filter((directoryName) => !TREE_KNOWN_ROOTS.knownTopLevelDirectories.has(directoryName))
-    .sort((left, right) => left.localeCompare(right));
+const createNeutralReplacementRuntime = () => ({
+  classifyOccurrenceRecords: (occurrenceRecords = []) => occurrenceRecords,
+  collectUnexpectedTopLevelDirectoryNames: () => [],
+});
 
-const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope, runtimeRoute) => {
+const resolveReplacementRuntime = (replacementRuntime) => {
+  if (
+    replacementRuntime &&
+    typeof replacementRuntime === 'object' &&
+    !Array.isArray(replacementRuntime) &&
+    typeof replacementRuntime.classifyOccurrenceRecords === 'function' &&
+    typeof replacementRuntime.collectUnexpectedTopLevelDirectoryNames === 'function'
+  ) {
+    return replacementRuntime;
+  }
+
+  return createNeutralReplacementRuntime();
+};
+
+const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope, replacementRuntime) => {
   if ((scope ?? 'repo') !== 'repo') {
     return [];
   }
 
-  const { unexpectedDirectoryNames } = resolveTreeUnexpectedTopLevelDirectoryRuntime({
-    topLevelDirectoryNames,
-    legacyCollectUnexpectedDirectoryNames: collectKnownRootsUnexpectedDirectoryNames,
-    route: runtimeRoute,
-  });
+  const runtime = resolveReplacementRuntime(replacementRuntime);
+  const unexpectedDirectoryNames = runtime.collectUnexpectedTopLevelDirectoryNames(topLevelDirectoryNames);
+
+  if (!Array.isArray(unexpectedDirectoryNames)) {
+    throw new Error('Tree replacement runtime collectUnexpectedTopLevelDirectoryNames() must return an array.');
+  }
+
+  const unexpectedDirectoryNameSet = new Set(unexpectedDirectoryNames);
+  const knownRoots = topLevelDirectoryNames
+    .filter((directoryName) => !unexpectedDirectoryNameSet.has(directoryName))
+    .sort((left, right) => left.localeCompare(right));
 
   return unexpectedDirectoryNames
+    .sort((left, right) => left.localeCompare(right))
     .map((directoryName) => ({
       code: 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER',
       severity: 'info',
@@ -64,9 +77,7 @@ const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope, 
         'Top-level folder is outside the known project shape for this repository and may indicate structural drift.',
       ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
       details: {
-        knownRoots: Array.from(TREE_KNOWN_ROOTS.knownTopLevelDirectories).sort((a, b) =>
-          a.localeCompare(b),
-        ),
+        knownRoots,
       },
     }));
 };
@@ -152,20 +163,19 @@ const collectOwnedSliceBoundaryDriftFindings = (paths) => {
 };
 
 
-const collectFileReasoningInput = (preparedInputs, runtimeRoute) => {
+const collectFileReasoningInput = (preparedInputs, replacementRuntime) => {
   const occurrenceSnapshot = preparedInputs?.structuralAddressSnapshot ?? preparedInputs?.occurrenceSnapshot;
 
   const occurrenceRecords = occurrenceSnapshot?.occurrenceRecords;
 
   if (Array.isArray(occurrenceRecords)) {
-    const { records: classifiedOccurrenceRecords } = resolveTreeOccurrenceClassificationRuntime({
-      occurrenceRecords,
-      legacyClassifyOccurrenceRecords: (records) => classifyTreeOccurrenceRecords({
-        occurrenceRecords: records,
-        treeKnownRoots: TREE_KNOWN_ROOTS,
-      }),
-      route: runtimeRoute,
-    });
+    const runtime = resolveReplacementRuntime(replacementRuntime);
+    const classifiedOccurrenceRecords = runtime.classifyOccurrenceRecords(occurrenceRecords);
+
+    if (!Array.isArray(classifiedOccurrenceRecords)) {
+      throw new Error('Tree replacement runtime classifyOccurrenceRecords() must return an array.');
+    }
+
     const fileRecords = classifiedOccurrenceRecords.filter(
       (record) =>
         record &&
@@ -255,12 +265,12 @@ const collectContributorFindings = (preparedInputs) => {
 
 export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const prepared = assertPreparedTreeInputs(preparedInputs);
-  const knownRootsRuntimeRoute = prepared.preparedDependencies?.treeKnownRootsRuntimeRoute ?? selectTreeKnownRootsRuntimeRoute();
-  const fileReasoningInput = collectFileReasoningInput(prepared, knownRootsRuntimeRoute);
+  const replacementRuntime = prepared.preparedDependencies?.treeOccurrenceClassificationReplacementRuntime;
+  const fileReasoningInput = collectFileReasoningInput(prepared, replacementRuntime);
   const selectedPathsForReasoning = fileReasoningInput.resolvedFilePaths;
 
   const findings = [
-    ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope, knownRootsRuntimeRoute),
+    ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope, replacementRuntime),
     ...collectValidatorOwnedOutsideTreeFindings(selectedPathsForReasoning),
     ...collectOwnedSliceBoundaryDriftFindings(selectedPathsForReasoning),
     ...collectContributorFindings(prepared),

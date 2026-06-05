@@ -1,25 +1,37 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  classifyTreeOccurrenceRecords,
   prepareTreeOccurrenceClassificationReplacementRuntime,
 } from '../src/tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from '../src/tree-occurrence-snapshot.logic.mjs';
 import { prepareTreeStructuralAddressSnapshot } from '../src/tree-structural-address-snapshot.logic.mjs';
-import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
-
-const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
-
-const classifySnapshot = (snapshot) =>
-  classifyTreeOccurrenceRecords({
-    occurrenceRecords: snapshot.occurrenceRecords,
-    treeKnownRoots: TREE_KNOWN_ROOTS,
+const classifySnapshot = (snapshot) => {
+  const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence: {
+      source: 'test',
+      evidenceRecords: [{ path: 'src', occurrenceType: 'folder', structuralHome: 'src' }],
+    },
+    treeSemanticHomeEvidence: {
+      source: 'test',
+      evidenceRecords: [{ path: 'calculogic-validator', occurrenceType: 'folder', semanticHome: 'validator' }],
+    },
+    treeFolderKindEvidence: {
+      source: 'test',
+      evidenceRecords: [
+        { path: 'src', occurrenceType: 'folder', folderKind: 'structural' },
+        { path: 'calculogic-validator', occurrenceType: 'folder', folderKind: 'semantic' },
+        { path: 'experiments', occurrenceType: 'folder', folderKind: 'unspecified' },
+      ],
+    },
   });
+
+  return replacementRuntime.classifyOccurrenceRecords(snapshot.occurrenceRecords);
+};
 
 const byResolvedPath = (occurrenceRecords) =>
   Object.fromEntries(occurrenceRecords.map((record) => [record.resolvedPath, record]));
 
-test('tree occurrence classification marks known repo-top structural roots deterministically', () => {
+test('tree occurrence classification marks replacement repo-top structural roots deterministically', () => {
   const snapshot = prepareTreeOccurrenceSnapshot({
     selectedPaths: ['src/index.js'],
     includeRoots: [],
@@ -35,7 +47,7 @@ test('tree occurrence classification marks known repo-top structural roots deter
   assert.equal(records.src.isSemanticRoot, false);
 });
 
-test('tree occurrence classification marks known repo-top semantic roots deterministically', () => {
+test('tree occurrence classification marks replacement repo-top semantic roots deterministically', () => {
   const snapshot = prepareTreeOccurrenceSnapshot({
     selectedPaths: ['calculogic-validator/src/index.mjs'],
     includeRoots: [],

@@ -1,5 +1,8 @@
 # Tree Registry Definitions and Relationships Spec (Modeling Contract, V0.1.0)
 
+> Status after issue #572: This document is retained as historical docs/spec context. Any known-roots statements describing active runtime ownership are not current runtime truth; current runtime truth is that Tree known-roots registry/runtime dependencies are retired and replacement Tree evidence controls the relevant runtime paths.
+
+
 ## Purpose
 
 Define the first bounded interpretive registry model for tree so tree can reason deterministically about:

@@ -15,7 +15,6 @@ import { prepareTreeStructuralHomeEvidence } from './tree-structural-home-eviden
 import { prepareTreeSemanticHomeEvidence } from './tree-semantic-home-evidence.logic.mjs';
 import { prepareTreeFolderKindEvidence } from './tree-folder-kind-evidence.logic.mjs';
 import {
-  classifyTreeOccurrenceRecords,
   prepareTreeOccurrenceClassificationReplacementRuntime,
 } from './tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-evidence.logic.mjs';
@@ -26,10 +25,8 @@ import { recommendTreeOccurrenceClassificationReplacement } from './tree-occurre
 import { planTreeOccurrenceClassificationRuntimeEvaluation } from './tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeExecutionContract } from './tree-occurrence-classification-runtime-execution-contract.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
-import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-registry.logic.mjs';
-import { selectTreeKnownRootsRuntimeRoute } from './tree-known-roots-runtime-routing.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -54,7 +51,7 @@ const collectTopLevelDirectoryNames = (repositoryRoot) =>
 
 export const prepareTreeStructureAdvisorInputs = (
   repositoryRoot,
-  { scope, targets, namingSemanticFamilyBridge, treeKnownRootsRuntimeSelection } = {},
+  { scope, targets, namingSemanticFamilyBridge } = {},
 ) => {
   const scopedSnapshotInputs = collectSuiteScopedSnapshotInputs(repositoryRoot, {
     scope,
@@ -78,7 +75,6 @@ export const prepareTreeStructureAdvisorInputs = (
       source: 'tree-structure-advisor.wiring',
     },
   });
-  const treeKnownRootsRegistry = getBuiltinTreeKnownRoots();
   const structuralHomesRegistry = getBuiltinStructuralHomesRegistry();
   const folderKindsRegistry = getBuiltinFolderKindsRegistry();
   const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
@@ -99,10 +95,14 @@ export const prepareTreeStructureAdvisorInputs = (
     treeSemanticHomeEvidence,
     folderKindsRegistry,
   });
-  const currentOccurrenceClassificationRecords = classifyTreeOccurrenceRecords({
-    occurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
-    treeKnownRoots: treeKnownRootsRegistry,
+  const treeOccurrenceClassificationReplacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence,
+    treeSemanticHomeEvidence,
+    treeFolderKindEvidence,
   });
+  const currentOccurrenceClassificationRecords = treeOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(
+    structuralAddressSnapshot.occurrenceRecords,
+  );
 
   const treeOccurrenceClassificationParityEvidence = prepareTreeOccurrenceClassificationParityEvidence({
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
@@ -139,17 +139,6 @@ export const prepareTreeStructureAdvisorInputs = (
     treeOccurrenceClassificationShadowReport,
     treeOccurrenceClassificationParitySummary,
   });
-  const treeOccurrenceClassificationReplacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
-    treeStructuralHomeEvidence,
-    treeSemanticHomeEvidence,
-    treeFolderKindEvidence,
-  });
-  const treeKnownRootsRuntimeRoute = selectTreeKnownRootsRuntimeRoute({
-    requestedMode: treeKnownRootsRuntimeSelection?.requestedMode,
-    replacementRuntime: treeKnownRootsRuntimeSelection?.replacementRuntime ?? treeOccurrenceClassificationReplacementRuntime,
-    runtimeExecutionContract: treeOccurrenceClassificationRuntimeExecutionContract,
-  });
-
   return {
     scope: scopedSnapshotInputs.scope,
     selectedPaths,
@@ -169,7 +158,6 @@ export const prepareTreeStructureAdvisorInputs = (
       treeOccurrenceClassificationRuntimeEvaluationPlan,
       treeOccurrenceClassificationRuntimeExecutionContract,
       treeOccurrenceClassificationReplacementRuntime,
-      treeKnownRootsRuntimeRoute,
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
@@ -179,12 +167,11 @@ export const prepareTreeStructureAdvisorInputs = (
   };
 };
 
-export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets, namingSemanticFamilyBridge, treeKnownRootsRuntimeSelection } = {}) => {
+export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets, namingSemanticFamilyBridge } = {}) => {
   const preparedInputs = prepareTreeStructureAdvisorInputs(repositoryRoot, {
     scope,
     targets,
     namingSemanticFamilyBridge,
-    treeKnownRootsRuntimeSelection,
   });
   return runTreeStructureAdvisorRuntime(preparedInputs);
 };

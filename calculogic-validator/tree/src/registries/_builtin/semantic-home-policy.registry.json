@@ -42,12 +42,12 @@
       "guardrails": "Does not replace structural-home signal policy registry ownership and remains evidence only."
     },
     {
-      "policyId": "known-root-compatibility-boundary",
-      "inputLane": "known-root-compatibility-boundary",
+      "policyId": "repo-top-structural-boundary",
+      "inputLane": "repo-top-structural-boundary",
       "status": "active",
-      "definition": "Known-root compatibility context may provide boundary checks for semantic interpretation.",
+      "definition": "Repo-top structural-home context may provide boundary checks for semantic interpretation.",
       "derivationMeaning": "May gate or contextualize interpretation but must not become canonical Semantic Home truth.",
-      "guardrails": "Known-root compatibility ownership remains in the known-roots registry as current runtime truth."
+      "guardrails": "Repo-top structural-home evidence remains Tree-owned and does not replace Naming semantic interpretation."
     }
   ]
 }
