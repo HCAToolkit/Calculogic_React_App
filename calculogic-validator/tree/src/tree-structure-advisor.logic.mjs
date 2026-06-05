@@ -1,7 +1,11 @@
 import path from 'node:path';
 import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy-registry.logic.mjs';
+import { getBuiltinTreeRepoShapePolicy } from './registries/tree-repo-shape-policy-registry.logic.mjs';
 
 const TREE_SIGNAL_POLICY = getBuiltinTreeSignalPolicy();
+const TREE_REPO_SHAPE_POLICY = getBuiltinTreeRepoShapePolicy();
+const ALLOWED_TOP_LEVEL_DIRECTORY_NAMES = TREE_REPO_SHAPE_POLICY.allowedTopLevelDirectories;
+const ALLOWED_TOP_LEVEL_DIRECTORY_NAME_SET = new Set(ALLOWED_TOP_LEVEL_DIRECTORY_NAMES);
 
 const VALIDATOR_SUITE_CORE_ROOT = 'calculogic-validator/src/';
 const SUITE_CORE_BOUNDARY_DRIFT_CARVEOUT_PREFIXES = [
@@ -32,7 +36,16 @@ const isValidatorOwnedBasenameSignal = (basename) =>
 
 const createNeutralReplacementRuntime = () => ({
   classifyOccurrenceRecords: (occurrenceRecords = []) => occurrenceRecords,
-  collectUnexpectedTopLevelDirectoryNames: () => [],
+  collectUnexpectedTopLevelDirectoryNames: (topLevelDirectoryNames = []) => {
+    if (!Array.isArray(topLevelDirectoryNames)) {
+      throw new Error('Tree unexpected top-level fallback runtime requires topLevelDirectoryNames array.');
+    }
+
+    return topLevelDirectoryNames
+      .filter((directoryName) => typeof directoryName === 'string' && directoryName.length > 0)
+      .filter((directoryName) => !ALLOWED_TOP_LEVEL_DIRECTORY_NAME_SET.has(directoryName))
+      .sort((left, right) => left.localeCompare(right));
+  },
 });
 
 const resolveReplacementRuntime = (replacementRuntime) => {
@@ -61,10 +74,7 @@ const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope, 
     throw new Error('Tree replacement runtime collectUnexpectedTopLevelDirectoryNames() must return an array.');
   }
 
-  const unexpectedDirectoryNameSet = new Set(unexpectedDirectoryNames);
-  const knownRoots = topLevelDirectoryNames
-    .filter((directoryName) => !unexpectedDirectoryNameSet.has(directoryName))
-    .sort((left, right) => left.localeCompare(right));
+  const knownRoots = [...ALLOWED_TOP_LEVEL_DIRECTORY_NAMES];
 
   return unexpectedDirectoryNames
     .sort((left, right) => left.localeCompare(right))
