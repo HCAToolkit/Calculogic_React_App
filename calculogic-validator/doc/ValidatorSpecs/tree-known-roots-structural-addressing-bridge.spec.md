@@ -35,10 +35,10 @@ Structural Addressing get-tree V0 from #487 is treated as current runtime truth 
 ## Core ownership boundary (binding for this bridge)
 
 Structural Addressing remains the owner of deterministic address production.
-Tree now has an evidence-only known-roots compatibility adapter.
-Tree advisor input preparation now prepares compatibility evidence internally.
+Tree no longer has an evidence-only known-roots compatibility adapter in current implementation reality.
+Tree advisor input preparation no longer prepares known-roots compatibility evidence internally.
 Tree advisor output remains unchanged.
-Known-roots remains compatibility runtime truth.
+Known-roots remains default legacy/fallback compatibility runtime truth only.
 Registry alignment remains deferred.
 test / tests normalization remains deferred.
 Shared surfaces.registry.json remains deferred.
@@ -69,64 +69,40 @@ This is current runtime truth, not target architecture.
 Current implementation reality includes:
 - Tree structural-address usage inventory exists (`tree-structural-address-usage-inventory.spec.md`).
 - Known-roots / Structural Addressing compatibility bridge spec exists (this document).
-- Tree-owned known-roots compatibility evidence adapter exists.
-- Tree advisor wiring prepares known-roots compatibility evidence internally.
+- Tree-owned known-roots compatibility evidence adapter was removed by the #569 cleanup bridge after occurrence classification and unexpected top-level folder guarded replacement coverage existed.
+- Tree advisor wiring no longer prepares known-roots compatibility evidence internally; retained known-roots runtime use is limited to default legacy/fallback paths and final-deletion candidates.
 
-### Implemented adapter ownership
+### Retired adapter ownership
 
-`calculogic-validator/tree/src/tree-known-roots-compatibility-evidence.logic.mjs` owns the Tree-side evidence-only adapter:
+`calculogic-validator/tree/src/tree-known-roots-compatibility-evidence.logic.mjs` was a Tree-side evidence-only adapter for known-roots compatibility matching. Current implementation reality after the #569 cleanup bridge is that the adapter and its wiring handoff are removed because no guarded replacement or fallback runtime path consumes `preparedDependencies.treeKnownRootsCompatibilityEvidence`.
 
-- input: Structural Addressing-style addressed occurrence records
-- input: current Tree known-roots compatibility vocabulary
-- output: Tree-owned known-roots compatibility evidence records
-
-The adapter remains compatibility evidence-only. It does not emit findings, severity, placement verdicts, or confidence scores.
-
-### Implemented internal wiring handoff
-
-`calculogic-validator/tree/src/tree-structure-advisor.wiring.mjs` now prepares compatibility evidence internally and attaches it under:
-
-- `preparedDependencies.treeKnownRootsCompatibilityEvidence`
-
-This is internal preparation state and current implementation reality. It is not current runtime truth for report-visible advisor output.
+Retained known-roots references remain compatibility/fallback dependencies for the default legacy path and final-deletion candidates for a later known-roots deletion slice.
 
 ### Implemented addressed occurrence enrichment support
 
-`calculogic-validator/tree/src/tree-structural-address-snapshot.logic.mjs` now enriches internal structural-address snapshot occurrence records with addressed fields required by compatibility evidence preparation:
+`calculogic-validator/tree/src/tree-structural-address-snapshot.logic.mjs` enriches internal structural-address snapshot occurrence records with addressed fields used by Tree evidence preparation:
 
 - `path`
 - `name`
 - `addressPath`
 - `parentAddressPath`
 
-This enrichment supports internal evidence preparation. It does not change Tree advisor/report behavior.
+This enrichment supports internal Tree evidence preparation. It does not change Tree advisor/report behavior.
 
-## Repo-top matching behavior (current implementation reality)
+## Repo-top matching behavior (retired bridge behavior)
 
-Known-roots compatibility evidence matching is repo-top path-shape based, not scope-depth based.
+Known-roots compatibility evidence matching was repo-top path-shape based, not scope-depth based. Current implementation reality no longer prepares that evidence bridge.
 
-Current implementation reality examples:
-
-- `src` => may produce known-root compatibility evidence.
-- `test` => may produce known-root compatibility evidence because current known-roots registry contains `test`.
-- `text` => may produce known-root compatibility evidence only if current known-roots registry contains `text`.
-- `calculogic-validator/src` => does not produce known-root compatibility evidence.
-- `docs/test` => does not produce known-root compatibility evidence.
-- `packages/foo/src` => does not produce known-root compatibility evidence.
-
-This bridge does not redefine matching as semantic-home inference, structural-home interpretation, naming semantic-family inference, or scope-depth modeling.
+This retired bridge did not redefine matching as semantic-home inference, structural-home interpretation, naming semantic-family inference, or scope-depth modeling.
 
 ## Current non-observable boundary
 
 Current implementation reality boundary:
 
-- `preparedDependencies.treeKnownRootsCompatibilityEvidence` is prepared internally.
-- The prepared evidence is not emitted as Tree advisor findings.
-- The prepared evidence is not assigned severity.
-- The prepared evidence is not assigned placement verdicts.
-- The prepared evidence is not assigned confidence scores.
-- The prepared evidence does not change report output.
-- The prepared evidence does not change advisor recommendation text.
+- `preparedDependencies.treeKnownRootsCompatibilityEvidence` is no longer prepared internally.
+- Known-roots-backed runtime behavior remains available only through default legacy/fallback paths.
+- Removed compatibility evidence was not emitted as Tree advisor findings.
+- Removed compatibility evidence was not assigned severity, placement verdicts, confidence scores, report output, or advisor recommendation text.
 - Tree advisor output remains unchanged.
 
 ## Structural Addressing and Tree interpretation boundary
@@ -136,9 +112,9 @@ Tree remains owner of Tree-specific interpretation and advisory behavior.
 
 This bridge preserves:
 - deterministic address production ownership in Structural Addressing,
-- compatibility evidence preparation ownership in Tree,
+- compatibility/fallback runtime ownership in Tree,
 - report/advisor interpretation ownership in Tree,
-- known-roots compatibility runtime truth during transition.
+- known-roots-backed default legacy/fallback runtime truth during transition.
 
 ## Deferred work (staged implementation path)
 

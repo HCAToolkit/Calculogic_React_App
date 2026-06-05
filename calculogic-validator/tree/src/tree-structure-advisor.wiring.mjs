@@ -11,7 +11,6 @@ import {
 } from '../../src/core/suite-scoped-snapshot-input.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from './tree-occurrence-snapshot.logic.mjs';
 import { prepareTreeStructuralAddressSnapshot } from './tree-structural-address-snapshot.logic.mjs';
-import { prepareTreeKnownRootsCompatibilityEvidence } from './tree-known-roots-compatibility-evidence.logic.mjs';
 import { prepareTreeStructuralHomeEvidence } from './tree-structural-home-evidence.logic.mjs';
 import { prepareTreeSemanticHomeEvidence } from './tree-semantic-home-evidence.logic.mjs';
 import { prepareTreeFolderKindEvidence } from './tree-folder-kind-evidence.logic.mjs';
@@ -159,10 +158,6 @@ export const prepareTreeStructureAdvisorInputs = (
     targets: scopedSnapshotInputs.targets,
     structuralAddressSnapshot,
     preparedDependencies: {
-      treeKnownRootsCompatibilityEvidence: prepareTreeKnownRootsCompatibilityEvidence({
-        addressedTreeSnapshot: structuralAddressSnapshot,
-        knownRootsRegistry: treeKnownRootsRegistry,
-      }),
       treeStructuralHomeEvidence,
       treeSemanticHomeEvidence,
       treeFolderKindEvidence,
