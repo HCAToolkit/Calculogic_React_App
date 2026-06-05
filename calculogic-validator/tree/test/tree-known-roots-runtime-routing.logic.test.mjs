@@ -36,6 +36,8 @@ const alignedReplacementRuntime = {
     isSemanticRoot: false,
     isSubtreePartitionCandidate: false,
   })),
+  collectUnexpectedTopLevelDirectoryNames: (topLevelDirectoryNames) =>
+    topLevelDirectoryNames.filter((directoryName) => directoryName === 'experiments'),
 };
 
 const legacyClassifyOccurrenceRecords = (occurrenceRecords) => occurrenceRecords.map((record) => ({
@@ -234,7 +236,104 @@ test('tree known-roots runtime routing preserves legacy occurrence classificatio
   assert.deepEqual(resolved.records, legacyClassifyOccurrenceRecords(occurrenceRecords));
 });
 
-test('tree known-roots runtime routing preserves legacy unexpected top-level behavior when replacement route is selected', () => {
+test('tree known-roots runtime routing preserves legacy unexpected top-level behavior in default mode', () => {
+  const route = selectTreeKnownRootsRuntimeRoute({
+    replacementRuntime: alignedReplacementRuntime,
+    runtimeExecutionContract: safeRuntimeExecutionContract,
+  });
+
+  const resolved = resolveTreeUnexpectedTopLevelDirectoryRuntime({
+    topLevelDirectoryNames: ['experiments', 'src'],
+    legacyCollectUnexpectedDirectoryNames: (topLevelDirectoryNames) =>
+      topLevelDirectoryNames.filter((directoryName) => directoryName === 'experiments'),
+    route,
+  });
+
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.LEGACY);
+  assert.equal(resolved.route.fallbackReason, null);
+  assert.deepEqual(resolved.unexpectedDirectoryNames, ['experiments']);
+});
+
+test('tree known-roots runtime routing selects replacement unexpected top-level policy when safe and parity-aligned', () => {
+  const selectedReplacementRuntime = {
+    ...alignedReplacementRuntime,
+    collectUnexpectedTopLevelDirectoryNames: (topLevelDirectoryNames) =>
+      topLevelDirectoryNames
+        .filter((directoryName) => directoryName === 'experiments')
+        .map((directoryName) => directoryName),
+  };
+  const route = selectTreeKnownRootsRuntimeRoute({
+    requestedMode: TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT,
+    replacementRuntime: selectedReplacementRuntime,
+    runtimeExecutionContract: safeRuntimeExecutionContract,
+  });
+
+  const resolved = resolveTreeUnexpectedTopLevelDirectoryRuntime({
+    topLevelDirectoryNames: ['experiments', 'src'],
+    legacyCollectUnexpectedDirectoryNames: (topLevelDirectoryNames) =>
+      topLevelDirectoryNames.filter((directoryName) => directoryName === 'experiments'),
+    route,
+  });
+
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT);
+  assert.equal(resolved.route.fallbackUsed, false);
+  assert.equal(resolved.route.fallbackReason, null);
+  assert.deepEqual(resolved.unexpectedDirectoryNames, ['experiments']);
+});
+
+test('tree known-roots runtime routing falls back when replacement unexpected top-level policy is unavailable', () => {
+  const route = selectTreeKnownRootsRuntimeRoute({
+    requestedMode: TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT,
+    replacementRuntime: {
+      classifyOccurrenceRecords: alignedReplacementRuntime.classifyOccurrenceRecords,
+    },
+    runtimeExecutionContract: safeRuntimeExecutionContract,
+  });
+
+  const resolved = resolveTreeUnexpectedTopLevelDirectoryRuntime({
+    topLevelDirectoryNames: ['experiments', 'src'],
+    legacyCollectUnexpectedDirectoryNames: (topLevelDirectoryNames) =>
+      topLevelDirectoryNames.filter((directoryName) => directoryName === 'experiments'),
+    route: {
+      ...route,
+      activeExecutionMode: TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT,
+      replacementRuntime: {
+        classifyOccurrenceRecords: alignedReplacementRuntime.classifyOccurrenceRecords,
+      },
+    },
+  });
+
+  assert.equal(route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK);
+  assert.equal(route.fallbackReason, 'replacement-runtime-unavailable');
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK);
+  assert.equal(resolved.route.fallbackReason, 'replacement-runtime-unavailable');
+  assert.deepEqual(resolved.unexpectedDirectoryNames, ['experiments']);
+});
+
+test('tree known-roots runtime routing falls back when replacement unexpected top-level policy is incomplete', () => {
+  const incompleteReplacementRuntime = {
+    ...alignedReplacementRuntime,
+    collectUnexpectedTopLevelDirectoryNames: () => ['experiments', 'missing-from-input'],
+  };
+  const route = selectTreeKnownRootsRuntimeRoute({
+    requestedMode: TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT,
+    replacementRuntime: incompleteReplacementRuntime,
+    runtimeExecutionContract: safeRuntimeExecutionContract,
+  });
+
+  const resolved = resolveTreeUnexpectedTopLevelDirectoryRuntime({
+    topLevelDirectoryNames: ['experiments', 'src'],
+    legacyCollectUnexpectedDirectoryNames: (topLevelDirectoryNames) =>
+      topLevelDirectoryNames.filter((directoryName) => directoryName === 'experiments'),
+    route,
+  });
+
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK);
+  assert.equal(resolved.route.fallbackReason, 'replacement-runtime-incomplete');
+  assert.deepEqual(resolved.unexpectedDirectoryNames, ['experiments']);
+});
+
+test('tree known-roots runtime routing falls back when replacement unexpected top-level policy diverges', () => {
   const divergentReplacementRuntime = {
     ...alignedReplacementRuntime,
     collectUnexpectedTopLevelDirectoryNames: () => [],
@@ -252,7 +351,7 @@ test('tree known-roots runtime routing preserves legacy unexpected top-level beh
     route,
   });
 
-  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT);
-  assert.equal(resolved.route.fallbackReason, null);
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK);
+  assert.equal(resolved.route.fallbackReason, 'replacement-runtime-divergent');
   assert.deepEqual(resolved.unexpectedDirectoryNames, ['experiments']);
 });

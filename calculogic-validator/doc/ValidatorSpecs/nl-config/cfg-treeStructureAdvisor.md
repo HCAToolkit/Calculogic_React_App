@@ -97,9 +97,9 @@ V0.1.7 introduces a suite-core scoped snapshot/input helper boundary and migrate
 - tree-run default contributor selection is owned by a dedicated assembly/wiring module so tree wiring only prepares tree-core inputs
 - shim/content-backed diagnostics are attached from a shim-owned contributor helper that prepares lazy content access (cache + selected-path guard) so tree-core runtime does not require file-content access
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
-- Tree known-roots runtime routing is now explicit and Tree-owned: default execution remains the legacy/current known-roots-backed path, `knownTopLevelDirectories` remains current runtime truth for unexpected top-level folder behavior, and `topRoots[].kind` remains current runtime truth for occurrence classification.
-- Prepared occurrence-classification replacement execution is only eligible when explicitly selected, available, guarded safe, structurally complete, and parity-aligned; unavailable, unsafe, incomplete, or divergent replacement execution falls back to the known-roots-backed occurrence classifier and must not become default behavior in this slice.
-- The guarded replacement slice is limited to occurrence classification (`topRoots[].kind` current runtime truth): `knownTopLevelDirectories` remains the current runtime truth for unexpected top-level folder behavior in both legacy and explicit replacement modes.
+- Tree known-roots runtime routing is explicit and Tree-owned: default execution remains the legacy/current known-roots-backed path, `knownTopLevelDirectories` remains current runtime truth for default unexpected top-level folder behavior, and `topRoots[].kind` remains current runtime truth for default occurrence classification.
+- Prepared replacement execution is only eligible when explicitly selected, available, guarded safe, structurally complete, and parity-aligned; unavailable, unsafe, incomplete, or divergent replacement execution falls back to the known-roots-backed runtime path and must not become default behavior in this slice.
+- The guarded replacement slice now covers occurrence classification and unexpected top-level folder policy: accepted replacement execution uses prepared Tree evidence instead of depending on `knownTopLevelDirectories` as runtime truth, while default legacy mode and all guarded fallback outcomes preserve known-roots-backed output.
 
 Target behaviors in V0.1.2:
 

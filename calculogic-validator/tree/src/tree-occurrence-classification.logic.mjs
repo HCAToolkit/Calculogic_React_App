@@ -283,5 +283,30 @@ export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => 
         }),
       }));
     },
+    collectUnexpectedTopLevelDirectoryNames: (topLevelDirectoryNames = []) => {
+      if (!Array.isArray(topLevelDirectoryNames)) {
+        throw new Error('Tree unexpected top-level replacement runtime requires topLevelDirectoryNames array.');
+      }
+
+      return topLevelDirectoryNames
+        .filter((directoryName) => typeof directoryName === 'string' && directoryName.length > 0)
+        .filter((directoryName) => {
+          const classification = classifyWithPreparedEvidence({
+            occurrenceRecord: {
+              path: directoryName,
+              resolvedPath: directoryName,
+              actualName: directoryName,
+              name: directoryName,
+              occurrenceType: 'folder',
+            },
+            structuralHomeLookup,
+            semanticHomeLookup,
+            folderKindLookup,
+          });
+
+          return classification.isKnownTopRoot !== true;
+        })
+        .sort((left, right) => left.localeCompare(right));
+    },
   };
 };
