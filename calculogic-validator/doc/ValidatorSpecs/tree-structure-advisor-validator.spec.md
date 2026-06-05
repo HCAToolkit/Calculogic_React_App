@@ -778,6 +778,8 @@ Deferred candidates above are a documentation menu only. They are not current ru
 - Tree core consumes **prepared tree-core inputs only** and fails closed when that contract is bypassed.
 - Tree core consumes occurrence-derived file records from `occurrenceSnapshot.occurrenceRecords` when available for bounded structural helpers (`TREE_VALIDATOR_OWNED_FILE_OUTSIDE_TREE`, `TREE_OWNED_SLICE_BOUNDARY_DRIFT`) while keeping findings path output on resolved paths.
 - Occurrence-derived records are enriched with a bounded structural class interpretation layer (`structuralClass`, `structuralKind`, `isKnownTopRoot`, `isSemanticRoot`, `isStructuralRoot`, `isSubtreePartitionCandidate`, `isRepoTopOccurrence`, `isScopedRootOccurrence`) for tree-local reasoning substrate use; findings envelopes remain unchanged.
+- Tree known-roots runtime routing keeps default legacy behavior as current runtime truth: `topRoots[].kind` backs occurrence classification and `knownTopLevelDirectories` backs unexpected top-level folder policy.
+- Explicit guarded replacement mode may use prepared Tree evidence for occurrence classification and unexpected top-level folder policy only when replacement execution is available, guarded safe, structurally complete, and parity-aligned; unavailable, unsafe, incomplete, or divergent replacement execution deterministically falls back to the legacy known-roots-backed path with an inspectable fallback reason.
 - If occurrence snapshot is missing or malformed, tree core deterministically falls back to prepared `selectedPaths` for file-path reasoning.
 - Required prepared tree-core fields:
   - `selectedPaths` (array)

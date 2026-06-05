@@ -149,3 +149,29 @@ test('tree occurrence classification replacement runtime classifies from prepare
   assert.equal(records['src/components'].structuralClass, 'subtree-structural-partition-candidate');
   assert.equal(records['src/components'].isSubtreePartitionCandidate, true);
 });
+
+test('tree occurrence classification replacement runtime collects unexpected top-level directories from prepared evidence', () => {
+  const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence: {
+      source: 'test',
+      evidenceRecords: [{ path: 'src', occurrenceType: 'folder', structuralHome: 'src' }],
+    },
+    treeSemanticHomeEvidence: {
+      source: 'test',
+      evidenceRecords: [{ path: 'calculogic-validator', occurrenceType: 'folder', semanticHome: 'validator' }],
+    },
+    treeFolderKindEvidence: {
+      source: 'test',
+      evidenceRecords: [
+        { path: 'src', occurrenceType: 'folder', folderKind: 'structural' },
+        { path: 'calculogic-validator', occurrenceType: 'folder', folderKind: 'semantic' },
+        { path: 'experiments', occurrenceType: 'folder', folderKind: 'unspecified' },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    replacementRuntime.collectUnexpectedTopLevelDirectoryNames(['src', 'experiments', 'calculogic-validator']),
+    ['experiments'],
+  );
+});

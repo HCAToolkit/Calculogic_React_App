@@ -23,7 +23,7 @@ const REQUIRED_OCCURRENCE_CLASSIFICATION_FIELDS = Object.freeze([
   'isSubtreePartitionCandidate',
 ]);
 
-const REPLACEMENT_RUNTIME_FUNCTIONS = ['classifyOccurrenceRecords'];
+const REPLACEMENT_RUNTIME_FUNCTIONS = ['classifyOccurrenceRecords', 'collectUnexpectedTopLevelDirectoryNames'];
 
 const isObject = (value) => value && typeof value === 'object' && !Array.isArray(value);
 
@@ -157,6 +157,36 @@ const withFallback = (route, fallbackReason) => ({
   fallbackReason,
 });
 
+const toUnexpectedDirectoryComparable = (directoryNames) =>
+  directoryNames.map((directoryName) => String(directoryName)).sort((left, right) => left.localeCompare(right));
+
+const unexpectedDirectoryResultsDiverge = (leftDirectoryNames, rightDirectoryNames) =>
+  JSON.stringify(toUnexpectedDirectoryComparable(leftDirectoryNames)) !==
+  JSON.stringify(toUnexpectedDirectoryComparable(rightDirectoryNames));
+
+const replacementUnexpectedDirectoryNamesAreStructurallyComplete = (replacementDirectoryNames, topLevelDirectoryNames) => {
+  const topLevelDirectoryNameSet = new Set(topLevelDirectoryNames);
+  const seen = new Set();
+
+  for (const directoryName of replacementDirectoryNames) {
+    if (typeof directoryName !== 'string' || directoryName.length === 0) {
+      return false;
+    }
+
+    if (!topLevelDirectoryNameSet.has(directoryName)) {
+      return false;
+    }
+
+    if (seen.has(directoryName)) {
+      return false;
+    }
+
+    seen.add(directoryName);
+  }
+
+  return true;
+};
+
 export const resolveTreeOccurrenceClassificationRuntime = ({
   occurrenceRecords,
   legacyClassifyOccurrenceRecords,
@@ -231,8 +261,39 @@ export const resolveTreeUnexpectedTopLevelDirectoryRuntime = ({
     throw new Error('Tree known-roots runtime routing legacy unexpected top-level directory collector must return an array.');
   }
 
+  if (route?.activeExecutionMode !== TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT) {
+    return {
+      route,
+      unexpectedDirectoryNames: legacyDirectoryNames,
+    };
+  }
+
+  const replacementDirectoryNames =
+    route.replacementRuntime?.collectUnexpectedTopLevelDirectoryNames?.(topLevelDirectoryNames);
+
+  if (!Array.isArray(replacementDirectoryNames)) {
+    return {
+      route: withFallback(route, 'replacement-runtime-unavailable'),
+      unexpectedDirectoryNames: legacyDirectoryNames,
+    };
+  }
+
+  if (!replacementUnexpectedDirectoryNamesAreStructurallyComplete(replacementDirectoryNames, topLevelDirectoryNames)) {
+    return {
+      route: withFallback(route, 'replacement-runtime-incomplete'),
+      unexpectedDirectoryNames: legacyDirectoryNames,
+    };
+  }
+
+  if (unexpectedDirectoryResultsDiverge(replacementDirectoryNames, legacyDirectoryNames)) {
+    return {
+      route: withFallback(route, 'replacement-runtime-divergent'),
+      unexpectedDirectoryNames: legacyDirectoryNames,
+    };
+  }
+
   return {
     route,
-    unexpectedDirectoryNames: legacyDirectoryNames,
+    unexpectedDirectoryNames: toUnexpectedDirectoryComparable(replacementDirectoryNames),
   };
 };
