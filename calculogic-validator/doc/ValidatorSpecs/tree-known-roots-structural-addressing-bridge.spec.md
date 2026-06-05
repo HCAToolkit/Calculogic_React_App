@@ -167,7 +167,7 @@ This bridge documentation slice does not add or change:
 ## Precise status wording map for this bridge
 
 - current runtime truth: known-roots remains compatibility runtime truth; Structural Addressing owns deterministic address production.
-- current implementation reality: Tree now has an evidence-only compatibility adapter and internal prepared dependency handoff.
+- current implementation reality: the evidence-only compatibility adapter and internal prepared dependency handoff were removed by #569 / PR #570; retained known-roots references remain default legacy/fallback compatibility dependencies or final-deletion candidates.
 - target architecture: move toward cleaner registry-aligned modeling without changing current report behavior.
 - not current runtime truth: evidence-driven Tree advisor findings, structural-home/semantic-home interpretation outputs, and registry normalization migration.
 - staged implementation path: preserve behavior, preserve ownership boundaries, and migrate in bounded deterministic slices.
