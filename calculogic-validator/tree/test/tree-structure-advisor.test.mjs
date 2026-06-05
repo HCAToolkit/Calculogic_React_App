@@ -22,6 +22,7 @@ import { evaluateTreeOccurrenceClassificationReplacementReadiness } from '../src
 import { recommendTreeOccurrenceClassificationReplacement } from '../src/tree-occurrence-classification-replacement-recommendation.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeEvaluation } from '../src/tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeExecutionContract } from '../src/tree-occurrence-classification-runtime-execution-contract.logic.mjs';
+import { TREE_KNOWN_ROOTS_RUNTIME_MODES } from '../src/tree-known-roots-runtime-routing.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
@@ -180,6 +181,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract);
+    assert.ok(preparedInputs.preparedDependencies.treeKnownRootsRuntimeRoute);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       prepareTreeStructuralHomeEvidence({
@@ -269,6 +271,13 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
       }),
     );
+    const knownRootsRuntimeRoute = preparedInputs.preparedDependencies.treeKnownRootsRuntimeRoute;
+    assert.equal(knownRootsRuntimeRoute.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.LEGACY);
+    assert.equal(knownRootsRuntimeRoute.fallbackUsed, false);
+    assert.deepEqual(knownRootsRuntimeRoute.legacyRuntimeTruth, {
+      unexpectedTopLevelFolders: 'knownTopLevelDirectories',
+      occurrenceClassification: 'topRoots[].kind',
+    });
     const runtimeExecutionContract = preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract;
     assert.deepEqual(Object.keys(runtimeExecutionContract).sort(), ['executionMode', 'executionStatus', 'rationale', 'requiredGuards', 'source', 'summary']);
     assert.equal(

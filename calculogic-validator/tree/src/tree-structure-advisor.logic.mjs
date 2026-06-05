@@ -2,6 +2,11 @@ import path from 'node:path';
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinTreeSignalPolicy } from './registries/tree-signal-policy-registry.logic.mjs';
 import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.logic.mjs';
+import {
+  resolveTreeOccurrenceClassificationRuntime,
+  resolveTreeUnexpectedTopLevelDirectoryRuntime,
+  selectTreeKnownRootsRuntimeRoute,
+} from './tree-known-roots-runtime-routing.logic.mjs';
 
 const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
 const TREE_SIGNAL_POLICY = getBuiltinTreeSignalPolicy();
@@ -33,14 +38,23 @@ const sortByPathThenCode = (left, right) => {
 const isValidatorOwnedBasenameSignal = (basename) =>
   TREE_SIGNAL_POLICY.validatorOwnedBasenameSignalMatchers.some(({ matcher }) => matcher.test(basename));
 
-const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope) => {
+const collectKnownRootsUnexpectedDirectoryNames = (topLevelDirectoryNames) =>
+  topLevelDirectoryNames
+    .filter((directoryName) => !TREE_KNOWN_ROOTS.knownTopLevelDirectories.has(directoryName))
+    .sort((left, right) => left.localeCompare(right));
+
+const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope, runtimeRoute) => {
   if ((scope ?? 'repo') !== 'repo') {
     return [];
   }
 
-  return topLevelDirectoryNames
-    .filter((directoryName) => !TREE_KNOWN_ROOTS.knownTopLevelDirectories.has(directoryName))
-    .sort((left, right) => left.localeCompare(right))
+  const { unexpectedDirectoryNames } = resolveTreeUnexpectedTopLevelDirectoryRuntime({
+    topLevelDirectoryNames,
+    legacyCollectUnexpectedDirectoryNames: collectKnownRootsUnexpectedDirectoryNames,
+    route: runtimeRoute,
+  });
+
+  return unexpectedDirectoryNames
     .map((directoryName) => ({
       code: 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER',
       severity: 'info',
@@ -138,15 +152,19 @@ const collectOwnedSliceBoundaryDriftFindings = (paths) => {
 };
 
 
-const collectFileReasoningInput = (preparedInputs) => {
+const collectFileReasoningInput = (preparedInputs, runtimeRoute) => {
   const occurrenceSnapshot = preparedInputs?.occurrenceSnapshot;
 
   const occurrenceRecords = occurrenceSnapshot?.occurrenceRecords;
 
   if (Array.isArray(occurrenceRecords)) {
-    const classifiedOccurrenceRecords = classifyTreeOccurrenceRecords({
+    const { records: classifiedOccurrenceRecords } = resolveTreeOccurrenceClassificationRuntime({
       occurrenceRecords,
-      treeKnownRoots: TREE_KNOWN_ROOTS,
+      legacyClassifyOccurrenceRecords: (records) => classifyTreeOccurrenceRecords({
+        occurrenceRecords: records,
+        treeKnownRoots: TREE_KNOWN_ROOTS,
+      }),
+      route: runtimeRoute,
     });
     const fileRecords = classifiedOccurrenceRecords.filter(
       (record) =>
@@ -237,11 +255,12 @@ const collectContributorFindings = (preparedInputs) => {
 
 export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const prepared = assertPreparedTreeInputs(preparedInputs);
-  const fileReasoningInput = collectFileReasoningInput(prepared);
+  const knownRootsRuntimeRoute = prepared.preparedDependencies?.treeKnownRootsRuntimeRoute ?? selectTreeKnownRootsRuntimeRoute();
+  const fileReasoningInput = collectFileReasoningInput(prepared, knownRootsRuntimeRoute);
   const selectedPathsForReasoning = fileReasoningInput.resolvedFilePaths;
 
   const findings = [
-    ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope),
+    ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope, knownRootsRuntimeRoute),
     ...collectValidatorOwnedOutsideTreeFindings(selectedPathsForReasoning),
     ...collectOwnedSliceBoundaryDriftFindings(selectedPathsForReasoning),
     ...collectContributorFindings(prepared),

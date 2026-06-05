@@ -27,6 +27,7 @@ import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-sem
 import { getBuiltinTreeKnownRoots } from './registries/tree-known-roots-registry.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-registry.logic.mjs';
+import { selectTreeKnownRootsRuntimeRoute } from './tree-known-roots-runtime-routing.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -51,7 +52,7 @@ const collectTopLevelDirectoryNames = (repositoryRoot) =>
 
 export const prepareTreeStructureAdvisorInputs = (
   repositoryRoot,
-  { scope, targets, namingSemanticFamilyBridge } = {},
+  { scope, targets, namingSemanticFamilyBridge, treeKnownRootsRuntimeSelection } = {},
 ) => {
   const scopedSnapshotInputs = collectSuiteScopedSnapshotInputs(repositoryRoot, {
     scope,
@@ -136,6 +137,11 @@ export const prepareTreeStructureAdvisorInputs = (
     treeOccurrenceClassificationShadowReport,
     treeOccurrenceClassificationParitySummary,
   });
+  const treeKnownRootsRuntimeRoute = selectTreeKnownRootsRuntimeRoute({
+    requestedMode: treeKnownRootsRuntimeSelection?.requestedMode,
+    replacementRuntime: treeKnownRootsRuntimeSelection?.replacementRuntime,
+    runtimeExecutionContract: treeOccurrenceClassificationRuntimeExecutionContract,
+  });
 
   return {
     scope: scopedSnapshotInputs.scope,
@@ -159,6 +165,7 @@ export const prepareTreeStructureAdvisorInputs = (
       treeOccurrenceClassificationReplacementRecommendation,
       treeOccurrenceClassificationRuntimeEvaluationPlan,
       treeOccurrenceClassificationRuntimeExecutionContract,
+      treeKnownRootsRuntimeRoute,
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
@@ -168,11 +175,12 @@ export const prepareTreeStructureAdvisorInputs = (
   };
 };
 
-export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets, namingSemanticFamilyBridge } = {}) => {
+export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets, namingSemanticFamilyBridge, treeKnownRootsRuntimeSelection } = {}) => {
   const preparedInputs = prepareTreeStructureAdvisorInputs(repositoryRoot, {
     scope,
     targets,
     namingSemanticFamilyBridge,
+    treeKnownRootsRuntimeSelection,
   });
   return runTreeStructureAdvisorRuntime(preparedInputs);
 };
