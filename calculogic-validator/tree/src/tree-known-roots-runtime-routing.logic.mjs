@@ -101,8 +101,8 @@ export const selectTreeKnownRootsRuntimeRoute = ({
 };
 
 const toClassificationComparable = (record) => ({
-  path: record?.path ?? record?.resolvedPath ?? null,
-  resolvedPath: record?.resolvedPath ?? record?.path ?? null,
+  path: record?.path ?? null,
+  resolvedPath: record?.resolvedPath ?? null,
   occurrenceType: record?.occurrenceType ?? null,
   structuralClass: record?.structuralClass ?? null,
   structuralKind: record?.structuralKind ?? null,

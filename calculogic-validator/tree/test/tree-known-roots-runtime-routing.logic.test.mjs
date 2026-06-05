@@ -148,6 +148,40 @@ test('tree known-roots runtime routing preserves legacy occurrence classificatio
   assert.deepEqual(resolved.records, legacyClassifyOccurrenceRecords(occurrenceRecords));
 });
 
+test('tree known-roots runtime routing preserves legacy occurrence classification when replacement omits resolvedPath', () => {
+  const missingResolvedPathReplacementRuntime = {
+    ...alignedReplacementRuntime,
+    classifyOccurrenceRecords: (records) => records.map((record) => {
+      const { resolvedPath: _omittedResolvedPath, ...recordWithoutResolvedPath } = record;
+
+      return {
+        ...recordWithoutResolvedPath,
+        structuralClass: 'repo-top-structural-root',
+        structuralKind: 'top-root-structural',
+        isKnownTopRoot: true,
+        isStructuralRoot: true,
+        isSemanticRoot: false,
+        isSubtreePartitionCandidate: false,
+      };
+    }),
+  };
+  const route = selectTreeKnownRootsRuntimeRoute({
+    requestedMode: TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT,
+    replacementRuntime: missingResolvedPathReplacementRuntime,
+    runtimeExecutionContract: safeRuntimeExecutionContract,
+  });
+
+  const resolved = resolveTreeOccurrenceClassificationRuntime({
+    occurrenceRecords,
+    legacyClassifyOccurrenceRecords,
+    route,
+  });
+
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK);
+  assert.equal(resolved.route.fallbackReason, 'replacement-runtime-divergent');
+  assert.deepEqual(resolved.records, legacyClassifyOccurrenceRecords(occurrenceRecords));
+});
+
 test('tree known-roots runtime routing preserves legacy unexpected top-level behavior on divergent replacement output', () => {
   const divergentReplacementRuntime = {
     ...alignedReplacementRuntime,
