@@ -1,5 +1,8 @@
 # Tree Top-Root Registry Transition Inventory/Contract
 
+> Status after issue #572: This document is retained as historical docs/spec context. Any known-roots statements describing active runtime ownership are not current runtime truth; current runtime truth is that Tree known-roots registry/runtime dependencies are retired and replacement Tree evidence controls the relevant runtime paths.
+
+
 ## 1) Purpose
 
 Define a bounded, implementation-facing transition contract for moving tree top-root registry shape from the current flat runtime list to a structured metadata model.

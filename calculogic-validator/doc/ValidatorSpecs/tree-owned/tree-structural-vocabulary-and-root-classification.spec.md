@@ -1,5 +1,8 @@
 # Tree Structural Vocabulary and Root Classification Spec (Modeling Contract, V0.1.0)
 
+> Status after issue #572: This document is retained as historical docs/spec context. Any known-roots statements describing active runtime ownership are not current runtime truth; current runtime truth is that Tree known-roots registry/runtime dependencies are retired and replacement Tree evidence controls the relevant runtime paths.
+
+
 ## Purpose
 
 This document defines a documentation-first modeling contract for **non-semantic tree structure vocabulary** so tree work can proceed without conflating:

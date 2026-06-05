@@ -1,5 +1,8 @@
 # Tree Policy Registry Loading/Normalization Path Audit
 
+> Status after issue #572: This document is retained as historical docs/spec context. Any known-roots statements describing active runtime ownership are not current runtime truth; current runtime truth is that Tree known-roots registry/runtime dependencies are retired and replacement Tree evidence controls the relevant runtime paths.
+
+
 ## Status and scope
 
 - **Document type:** Tree-owned docs/audit checkpoint

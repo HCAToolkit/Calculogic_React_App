@@ -2,29 +2,34 @@
   "version": "1",
   "structuralHomes": [
     {
-      "structuralHome": "src",
-      "status": "active",
-      "definition": "Primary source or implementation home for shipped or executed code."
-    },
-    {
       "structuralHome": "app",
       "status": "active",
       "definition": "Application composition or framework-level app home for route, layout, host, or entry structures."
     },
     {
-      "structuralHome": "doc",
+      "structuralHome": "assets",
       "status": "active",
-      "definition": "Human-facing documentation home."
+      "definition": "Static asset or shipped resource home."
     },
     {
-      "structuralHome": "tests",
+      "structuralHome": "bin",
       "status": "active",
-      "definition": "Quality-support home for tests, fixtures, mocks, benchmarks, or validation artifacts."
+      "definition": "Executable command or package-bin surface home."
     },
     {
-      "structuralHome": "scripts",
+      "structuralHome": "calculogic-doc-engine",
       "status": "active",
-      "definition": "Tooling automation home for scripts, CLIs, migrations, codegen, or repository tasks."
+      "definition": "Repository-owned document-engine package root home."
+    },
+    {
+      "structuralHome": "calculogic-validator",
+      "status": "active",
+      "definition": "Repository-owned validator package root home."
+    },
+    {
+      "structuralHome": "compat",
+      "status": "active",
+      "definition": "Compatibility, shim, adapter, or transition-support home."
     },
     {
       "structuralHome": "config",
@@ -37,24 +42,14 @@
       "definition": "Structured payload, registry-data, fixture-data, or reusable data home."
     },
     {
-      "structuralHome": "ops",
+      "structuralHome": "doc",
       "status": "active",
-      "definition": "Operations, infrastructure, deployment, monitoring, or CI/CD home."
+      "definition": "Human-facing documentation home."
     },
     {
-      "structuralHome": "assets",
+      "structuralHome": "docs",
       "status": "active",
-      "definition": "Static asset or shipped resource home."
-    },
-    {
-      "structuralHome": "generated",
-      "status": "active",
-      "definition": "Machine-generated output home where generated status is structurally important."
-    },
-    {
-      "structuralHome": "vendor",
-      "status": "active",
-      "definition": "Third-party, vendored, or externally maintained material home."
+      "definition": "Human-facing documentation home using plural docs convention."
     },
     {
       "structuralHome": "examples",
@@ -67,9 +62,49 @@
       "definition": "Prototype, spike, playground, or relaxed-rule exploratory home."
     },
     {
-      "structuralHome": "compat",
+      "structuralHome": "generated",
       "status": "active",
-      "definition": "Compatibility, shim, adapter, or transition-support home."
+      "definition": "Machine-generated output home where generated status is structurally important."
+    },
+    {
+      "structuralHome": "ops",
+      "status": "active",
+      "definition": "Operations, infrastructure, deployment, monitoring, or CI/CD home."
+    },
+    {
+      "structuralHome": "public",
+      "status": "active",
+      "definition": "Public static asset or framework public resource home."
+    },
+    {
+      "structuralHome": "scripts",
+      "status": "active",
+      "definition": "Tooling automation home for scripts, CLIs, migrations, codegen, or repository tasks."
+    },
+    {
+      "structuralHome": "src",
+      "status": "active",
+      "definition": "Primary source or implementation home for shipped or executed code."
+    },
+    {
+      "structuralHome": "test",
+      "status": "active",
+      "definition": "Quality-support home using singular test convention."
+    },
+    {
+      "structuralHome": "tests",
+      "status": "active",
+      "definition": "Quality-support home for tests, fixtures, mocks, benchmarks, or validation artifacts."
+    },
+    {
+      "structuralHome": "tools",
+      "status": "active",
+      "definition": "Repository tooling, support utility, or developer-tool home."
+    },
+    {
+      "structuralHome": "vendor",
+      "status": "active",
+      "definition": "Third-party, vendored, or externally maintained material home."
     }
   ]
 }
