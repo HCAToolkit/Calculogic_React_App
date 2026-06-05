@@ -779,7 +779,8 @@ Deferred candidates above are a documentation menu only. They are not current ru
 - Tree core consumes occurrence-derived file records from `occurrenceSnapshot.occurrenceRecords` when available for bounded structural helpers (`TREE_VALIDATOR_OWNED_FILE_OUTSIDE_TREE`, `TREE_OWNED_SLICE_BOUNDARY_DRIFT`) while keeping findings path output on resolved paths.
 - Occurrence-derived records are enriched with a bounded structural class interpretation layer (`structuralClass`, `structuralKind`, `isKnownTopRoot`, `isSemanticRoot`, `isStructuralRoot`, `isSubtreePartitionCandidate`, `isRepoTopOccurrence`, `isScopedRootOccurrence`) for tree-local reasoning substrate use; findings envelopes remain unchanged.
 - Tree known-roots registry/runtime dependencies are retired in current runtime truth: `topRoots[].kind` does not back occurrence classification and `knownTopLevelDirectories` does not back unexpected top-level folder policy.
-- Occurrence classification and unexpected top-level folder policy now use prepared Tree replacement evidence from addressed occurrences, structural-home evidence, semantic-home evidence, and folder-kind evidence; the former guarded known-roots fallback route is not current runtime truth.
+- Occurrence classification now uses prepared Tree replacement evidence from addressed occurrences, structural-home evidence, semantic-home evidence, and folder-kind evidence; the former guarded known-roots fallback route is not current runtime truth.
+- Unexpected top-level folder policy now uses an explicit Tree-owned repo-shape policy boundary; general structural-home evidence does not automatically make a top-level folder expected for `TREE_UNEXPECTED_TOP_LEVEL_FOLDER`.
 - If occurrence snapshot is missing or malformed, tree core deterministically falls back to prepared `selectedPaths` for file-path reasoning.
 - Required prepared tree-core fields:
   - `selectedPaths` (array)

@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "allowedTopLevelDirectories": [
+    "bin",
+    "calculogic-doc-engine",
+    "calculogic-validator",
+    "doc",
+    "docs",
+    "public",
+    "scripts",
+    "src",
+    "test",
+    "tools"
+  ]
+}

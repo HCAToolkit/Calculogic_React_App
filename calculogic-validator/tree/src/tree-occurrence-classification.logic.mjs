@@ -62,6 +62,12 @@ const lookupFirstAvailable = (lookup, record, fallback = null) => {
   return fallback;
 };
 
+const toAllowedTopLevelDirectorySet = (allowedTopLevelDirectories) =>
+  new Set(
+    allowedTopLevelDirectories
+      .filter((directoryName) => typeof directoryName === 'string' && directoryName.length > 0),
+  );
+
 const assertReplacementRuntimeInput = (input) => {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
     throw new Error('Tree occurrence classification replacement runtime input must be an object.');
@@ -89,6 +95,14 @@ const assertReplacementRuntimeInput = (input) => {
 
   if (!Array.isArray(input.treeFolderKindEvidence.evidenceRecords)) {
     throw new Error('Tree occurrence classification replacement runtime treeFolderKindEvidence.evidenceRecords must be an array.');
+  }
+
+  if (!input.treeRepoShapePolicy || typeof input.treeRepoShapePolicy !== 'object' || Array.isArray(input.treeRepoShapePolicy)) {
+    throw new Error('Tree occurrence classification replacement runtime input must include treeRepoShapePolicy object.');
+  }
+
+  if (!Array.isArray(input.treeRepoShapePolicy.allowedTopLevelDirectories)) {
+    throw new Error('Tree occurrence classification replacement runtime treeRepoShapePolicy.allowedTopLevelDirectories must be an array.');
   }
 };
 
@@ -190,6 +204,9 @@ export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => 
   const structuralHomeLookup = toEvidenceLookup(input.treeStructuralHomeEvidence.evidenceRecords, 'structuralHome');
   const semanticHomeLookup = toEvidenceLookup(input.treeSemanticHomeEvidence.evidenceRecords, 'semanticHome');
   const folderKindLookup = toEvidenceLookup(input.treeFolderKindEvidence.evidenceRecords, 'folderKind');
+  const allowedTopLevelDirectorySet = toAllowedTopLevelDirectorySet(
+    input.treeRepoShapePolicy.allowedTopLevelDirectories,
+  );
 
   return {
     source: SOURCE_ID,
@@ -215,22 +232,7 @@ export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => 
 
       return topLevelDirectoryNames
         .filter((directoryName) => typeof directoryName === 'string' && directoryName.length > 0)
-        .filter((directoryName) => {
-          const classification = classifyWithPreparedEvidence({
-            occurrenceRecord: {
-              path: directoryName,
-              resolvedPath: directoryName,
-              actualName: directoryName,
-              name: directoryName,
-              occurrenceType: 'folder',
-            },
-            structuralHomeLookup,
-            semanticHomeLookup,
-            folderKindLookup,
-          });
-
-          return classification.isKnownTopRoot !== true;
-        })
+        .filter((directoryName) => !allowedTopLevelDirectorySet.has(directoryName))
         .sort((left, right) => left.localeCompare(right));
     },
   };

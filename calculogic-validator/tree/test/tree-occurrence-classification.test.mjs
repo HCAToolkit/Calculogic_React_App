@@ -5,6 +5,21 @@ import {
 } from '../src/tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from '../src/tree-occurrence-snapshot.logic.mjs';
 import { prepareTreeStructuralAddressSnapshot } from '../src/tree-structural-address-snapshot.logic.mjs';
+
+const TEST_REPO_SHAPE_POLICY = {
+  allowedTopLevelDirectories: [
+    'bin',
+    'calculogic-doc-engine',
+    'calculogic-validator',
+    'doc',
+    'docs',
+    'public',
+    'scripts',
+    'src',
+    'test',
+    'tools',
+  ],
+};
 const classifySnapshot = (snapshot) => {
   const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
     treeStructuralHomeEvidence: {
@@ -15,6 +30,7 @@ const classifySnapshot = (snapshot) => {
       source: 'test',
       evidenceRecords: [{ path: 'calculogic-validator', occurrenceType: 'folder', semanticHome: 'validator' }],
     },
+    treeRepoShapePolicy: TEST_REPO_SHAPE_POLICY,
     treeFolderKindEvidence: {
       source: 'test',
       evidenceRecords: [
@@ -136,6 +152,7 @@ test('tree occurrence classification replacement runtime classifies from prepare
       source: 'test',
       evidenceRecords: [{ path: 'calculogic-validator', occurrenceType: 'folder', semanticHome: 'validator' }],
     },
+    treeRepoShapePolicy: TEST_REPO_SHAPE_POLICY,
     treeFolderKindEvidence: {
       source: 'test',
       evidenceRecords: [
@@ -162,7 +179,7 @@ test('tree occurrence classification replacement runtime classifies from prepare
   assert.equal(records['src/components'].isSubtreePartitionCandidate, true);
 });
 
-test('tree occurrence classification replacement runtime collects unexpected top-level directories from prepared evidence', () => {
+test('tree occurrence classification replacement runtime collects unexpected top-level directories from repo-shape policy', () => {
   const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
     treeStructuralHomeEvidence: {
       source: 'test',
@@ -172,6 +189,7 @@ test('tree occurrence classification replacement runtime collects unexpected top
       source: 'test',
       evidenceRecords: [{ path: 'calculogic-validator', occurrenceType: 'folder', semanticHome: 'validator' }],
     },
+    treeRepoShapePolicy: TEST_REPO_SHAPE_POLICY,
     treeFolderKindEvidence: {
       source: 'test',
       evidenceRecords: [
@@ -185,5 +203,38 @@ test('tree occurrence classification replacement runtime collects unexpected top
   assert.deepEqual(
     replacementRuntime.collectUnexpectedTopLevelDirectoryNames(['src', 'experiments', 'calculogic-validator']),
     ['experiments'],
+  );
+});
+
+test('tree unexpected top-level replacement policy does not allow general structural-home folders', () => {
+  const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence: {
+      source: 'test',
+      evidenceRecords: [
+        { path: 'data', occurrenceType: 'folder', structuralHome: 'data' },
+        { path: 'vendor', occurrenceType: 'folder', structuralHome: 'vendor' },
+        { path: 'assets', occurrenceType: 'folder', structuralHome: 'assets' },
+        { path: 'ops', occurrenceType: 'folder', structuralHome: 'ops' },
+      ],
+    },
+    treeSemanticHomeEvidence: {
+      source: 'test',
+      evidenceRecords: [],
+    },
+    treeRepoShapePolicy: TEST_REPO_SHAPE_POLICY,
+    treeFolderKindEvidence: {
+      source: 'test',
+      evidenceRecords: [
+        { path: 'data', occurrenceType: 'folder', folderKind: 'structural' },
+        { path: 'vendor', occurrenceType: 'folder', folderKind: 'structural' },
+        { path: 'assets', occurrenceType: 'folder', folderKind: 'structural' },
+        { path: 'ops', occurrenceType: 'folder', folderKind: 'structural' },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    replacementRuntime.collectUnexpectedTopLevelDirectoryNames(['src', 'data', 'vendor', 'assets', 'ops']),
+    ['assets', 'data', 'ops', 'vendor'],
   );
 });

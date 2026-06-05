@@ -34,6 +34,7 @@ const writeJson = async (filePath, value) => {
 };
 
 
+
 const collectExpectedPathsFromScopeProfile = async (fixtureDir, scope) => {
   const profile = getValidatorScopeProfile(scope);
 
@@ -208,6 +209,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
       treeStructuralHomeEvidence: preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
       treeSemanticHomeEvidence: preparedInputs.preparedDependencies.treeSemanticHomeEvidence,
       treeFolderKindEvidence: preparedInputs.preparedDependencies.treeFolderKindEvidence,
+      treeRepoShapePolicy: preparedInputs.preparedDependencies.treeRepoShapePolicy,
     });
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeOccurrenceClassificationParityEvidence,
@@ -525,6 +527,29 @@ test('tree-structure-advisor replacement root policy comes from bounded structur
       'doc',
       'src',
     ]);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+
+test('tree-structure-advisor keeps general structural-home top-level folders unexpected unless repo-shape policy allows them', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-repo-shape-policy-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'data'), { recursive: true });
+    await fs.mkdir(path.join(fixtureDir, 'vendor'), { recursive: true });
+    await fs.mkdir(path.join(fixtureDir, 'assets'), { recursive: true });
+    await fs.mkdir(path.join(fixtureDir, 'ops'), { recursive: true });
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const unexpectedPaths = result.findings
+      .filter((finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER')
+      .map((finding) => finding.path)
+      .sort((left, right) => left.localeCompare(right));
+
+    assert.deepEqual(unexpectedPaths, ['assets', 'data', 'ops', 'vendor']);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }

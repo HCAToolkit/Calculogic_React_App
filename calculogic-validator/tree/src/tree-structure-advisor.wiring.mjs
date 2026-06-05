@@ -27,6 +27,7 @@ import { planTreeOccurrenceClassificationRuntimeExecutionContract } from './tree
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-registry.logic.mjs';
+import { getBuiltinTreeRepoShapePolicy } from './registries/tree-repo-shape-policy-registry.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -77,6 +78,7 @@ export const prepareTreeStructureAdvisorInputs = (
   });
   const structuralHomesRegistry = getBuiltinStructuralHomesRegistry();
   const folderKindsRegistry = getBuiltinFolderKindsRegistry();
+  const treeRepoShapePolicy = getBuiltinTreeRepoShapePolicy();
   const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
     ? prepareNamingSemanticEvidenceBridge(namingSemanticFamilyBridge)
     : { observations: [] };
@@ -99,6 +101,7 @@ export const prepareTreeStructureAdvisorInputs = (
     treeStructuralHomeEvidence,
     treeSemanticHomeEvidence,
     treeFolderKindEvidence,
+    treeRepoShapePolicy,
   });
   const currentOccurrenceClassificationRecords = treeOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(
     structuralAddressSnapshot.occurrenceRecords,
@@ -150,6 +153,7 @@ export const prepareTreeStructureAdvisorInputs = (
       treeStructuralHomeEvidence,
       treeSemanticHomeEvidence,
       treeFolderKindEvidence,
+      treeRepoShapePolicy,
       treeOccurrenceClassificationParityEvidence,
       treeOccurrenceClassificationParitySummary,
       treeOccurrenceClassificationShadowReport,

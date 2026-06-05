@@ -98,7 +98,8 @@ V0.1.7 introduces a suite-core scoped snapshot/input helper boundary and migrate
 - shim/content-backed diagnostics are attached from a shim-owned contributor helper that prepares lazy content access (cache + selected-path guard) so tree-core runtime does not require file-content access
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
 - Tree known-roots registry/runtime dependencies are retired in current runtime truth: `knownTopLevelDirectories` no longer controls unexpected top-level folder behavior, and `topRoots[].kind` no longer controls occurrence classification.
-- Tree runtime now uses prepared replacement evidence for occurrence classification and unexpected top-level folder policy from addressed occurrences, structural-home evidence, semantic-home evidence, and folder-kind evidence.
+- Tree runtime now uses prepared replacement evidence for occurrence classification from addressed occurrences, structural-home evidence, semantic-home evidence, and folder-kind evidence.
+- Unexpected top-level folder policy now uses an explicit Tree-owned repo-shape policy boundary; structural-home vocabulary does not automatically allow repo-top folders for `TREE_UNEXPECTED_TOP_LEVEL_FOLDER`.
 - The former guarded known-roots fallback route is historical context only and is not current runtime truth.
 
 Target behaviors in V0.1.2:
