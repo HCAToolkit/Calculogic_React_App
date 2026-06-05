@@ -781,6 +781,8 @@ Deferred candidates above are a documentation menu only. They are not current ru
 - Tree known-roots registry/runtime dependencies are retired in current runtime truth: `topRoots[].kind` does not back occurrence classification and `knownTopLevelDirectories` does not back unexpected top-level folder policy.
 - Occurrence classification now uses prepared Tree replacement evidence from addressed occurrences, structural-home evidence, semantic-home evidence, and folder-kind evidence; the former guarded known-roots fallback route is not current runtime truth.
 - Unexpected top-level folder policy now uses an explicit Tree-owned repo-shape policy boundary; general structural-home evidence does not automatically make a top-level folder expected for `TREE_UNEXPECTED_TOP_LEVEL_FOLDER`.
+- Direct runtime callers that provide the required prepared tree-core inputs but omit the occurrence-classification replacement runtime still use the explicit Tree-owned repo-shape policy fallback for `TREE_UNEXPECTED_TOP_LEVEL_FOLDER`; missing replacement composition must not silently suppress unexpected top-level folder findings.
+- `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` finding details report the full Tree-owned allowed repo-shape policy in `details.knownRoots`, not only the observed allowed top-level folder subset, so the payload explains the bounded policy used to classify a folder as unexpected.
 - If occurrence snapshot is missing or malformed, tree core deterministically falls back to prepared `selectedPaths` for file-path reasoning.
 - Required prepared tree-core fields:
   - `selectedPaths` (array)

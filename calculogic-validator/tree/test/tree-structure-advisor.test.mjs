@@ -33,7 +33,18 @@ const writeJson = async (filePath, value) => {
   await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');
 };
 
-
+const EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES = [
+  'bin',
+  'calculogic-doc-engine',
+  'calculogic-validator',
+  'doc',
+  'docs',
+  'public',
+  'scripts',
+  'src',
+  'test',
+  'tools',
+];
 
 const collectExpectedPathsFromScopeProfile = async (fixtureDir, scope) => {
   const profile = getValidatorScopeProfile(scope);
@@ -500,6 +511,24 @@ test('tree-structure-advisor structural-address handoff preserves file target ki
   }
 });
 
+test('tree-structure-advisor runtime fallback preserves unexpected top-level folder findings without replacement runtime', () => {
+  const result = runTreeStructureAdvisorRuntime({
+    selectedPaths: [],
+    topLevelDirectoryNames: ['src', 'experiments'],
+    targets: [],
+  });
+
+  const advisory = result.findings.find(
+    (finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER' && finding.path === 'experiments',
+  );
+
+  assert.ok(advisory);
+  assert.deepEqual(advisory.details.knownRoots, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
+  assert.equal(advisory.details.knownRoots.includes('doc'), true);
+  assert.equal(advisory.details.knownRoots.includes('calculogic-validator'), true);
+  assert.equal(advisory.details.knownRoots.includes('src'), true);
+  assert.notDeepEqual(advisory.details.knownRoots, ['src']);
+});
 
 test('tree-structure-advisor replacement root policy comes from bounded structural-home evidence without behavior drift', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-root-policy-registry-'));
@@ -521,17 +550,11 @@ test('tree-structure-advisor replacement root policy comes from bounded structur
       false,
     );
     assert.ok(advisory);
-    assert.deepEqual(advisory.details.knownRoots, [
-      'calculogic-doc-engine',
-      'calculogic-validator',
-      'doc',
-      'src',
-    ]);
+    assert.deepEqual(advisory.details.knownRoots, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
 });
-
 
 test('tree-structure-advisor keeps general structural-home top-level folders unexpected unless repo-shape policy allows them', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-repo-shape-policy-'));
