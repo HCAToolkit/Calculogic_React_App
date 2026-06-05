@@ -14,7 +14,10 @@ import { prepareTreeKnownRootsCompatibilityEvidence } from '../src/tree-known-ro
 import { prepareTreeStructuralHomeEvidence } from '../src/tree-structural-home-evidence.logic.mjs';
 import { prepareTreeSemanticHomeEvidence } from '../src/tree-semantic-home-evidence.logic.mjs';
 import { prepareTreeFolderKindEvidence } from '../src/tree-folder-kind-evidence.logic.mjs';
-import { classifyTreeOccurrenceRecords } from '../src/tree-occurrence-classification.logic.mjs';
+import {
+  classifyTreeOccurrenceRecords,
+  prepareTreeOccurrenceClassificationReplacementRuntime,
+} from '../src/tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceClassificationParityEvidence } from '../src/tree-occurrence-classification-parity-evidence.logic.mjs';
 import { summarizeTreeOccurrenceClassificationParityEvidence } from '../src/tree-occurrence-classification-parity-summary.logic.mjs';
 import { prepareTreeOccurrenceClassificationShadowReport } from '../src/tree-occurrence-classification-shadow-report.logic.mjs';
@@ -181,6 +184,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRecommendation);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeEvaluationPlan);
     assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract);
+    assert.ok(preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime);
     assert.ok(preparedInputs.preparedDependencies.treeKnownRootsRuntimeRoute);
     assert.deepEqual(
       preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
@@ -270,6 +274,19 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         treeOccurrenceClassificationShadowReport: preparedInputs.preparedDependencies.treeOccurrenceClassificationShadowReport,
         treeOccurrenceClassificationParitySummary: preparedInputs.preparedDependencies.treeOccurrenceClassificationParitySummary,
       }),
+    );
+    const expectedOccurrenceClassificationReplacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+      treeStructuralHomeEvidence: preparedInputs.preparedDependencies.treeStructuralHomeEvidence,
+      treeSemanticHomeEvidence: preparedInputs.preparedDependencies.treeSemanticHomeEvidence,
+      treeFolderKindEvidence: preparedInputs.preparedDependencies.treeFolderKindEvidence,
+    });
+    assert.equal(
+      preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime.source,
+      expectedOccurrenceClassificationReplacementRuntime.source,
+    );
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(snapshot.occurrenceRecords),
+      expectedOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(snapshot.occurrenceRecords),
     );
     const knownRootsRuntimeRoute = preparedInputs.preparedDependencies.treeKnownRootsRuntimeRoute;
     assert.equal(knownRootsRuntimeRoute.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.LEGACY);

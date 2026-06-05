@@ -11,7 +11,19 @@ const LEGACY_RUNTIME_TRUTH = Object.freeze({
   occurrenceClassification: 'topRoots[].kind',
 });
 
-const REPLACEMENT_RUNTIME_FUNCTIONS = ['classifyOccurrenceRecords', 'collectUnexpectedTopLevelDirectoryNames'];
+const REQUIRED_OCCURRENCE_CLASSIFICATION_FIELDS = Object.freeze([
+  'path',
+  'resolvedPath',
+  'occurrenceType',
+  'structuralClass',
+  'structuralKind',
+  'isKnownTopRoot',
+  'isStructuralRoot',
+  'isSemanticRoot',
+  'isSubtreePartitionCandidate',
+]);
+
+const REPLACEMENT_RUNTIME_FUNCTIONS = ['classifyOccurrenceRecords'];
 
 const isObject = (value) => value && typeof value === 'object' && !Array.isArray(value);
 
@@ -116,6 +128,28 @@ const classificationResultsDiverge = (leftRecords, rightRecords) =>
   JSON.stringify(leftRecords.map(toClassificationComparable)) !==
   JSON.stringify(rightRecords.map(toClassificationComparable));
 
+const replacementRecordsAreStructurallyComplete = (replacementRecords, legacyRecords) => {
+  if (replacementRecords.length !== legacyRecords.length) {
+    return false;
+  }
+
+  return legacyRecords.every((legacyRecord, index) => {
+    const replacementRecord = replacementRecords[index];
+
+    if (!replacementRecord || typeof replacementRecord !== 'object' || Array.isArray(replacementRecord)) {
+      return false;
+    }
+
+    return REQUIRED_OCCURRENCE_CLASSIFICATION_FIELDS.every((fieldName) => {
+      if (!Object.hasOwn(legacyRecord ?? {}, fieldName)) {
+        return true;
+      }
+
+      return Object.hasOwn(replacementRecord, fieldName);
+    });
+  });
+};
+
 const withFallback = (route, fallbackReason) => ({
   ...route,
   activeExecutionMode: TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK,
@@ -158,6 +192,13 @@ export const resolveTreeOccurrenceClassificationRuntime = ({
     };
   }
 
+  if (!replacementRecordsAreStructurallyComplete(replacementRecords, legacyRecords)) {
+    return {
+      route: withFallback(route, 'replacement-runtime-incomplete'),
+      records: legacyRecords,
+    };
+  }
+
   if (classificationResultsDiverge(replacementRecords, legacyRecords)) {
     return {
       route: withFallback(route, 'replacement-runtime-divergent'),
@@ -190,34 +231,8 @@ export const resolveTreeUnexpectedTopLevelDirectoryRuntime = ({
     throw new Error('Tree known-roots runtime routing legacy unexpected top-level directory collector must return an array.');
   }
 
-  if (route?.activeExecutionMode !== TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT) {
-    return {
-      route,
-      unexpectedDirectoryNames: legacyDirectoryNames,
-    };
-  }
-
-  const replacementDirectoryNames = route.replacementRuntime?.collectUnexpectedTopLevelDirectoryNames?.(topLevelDirectoryNames);
-
-  if (!Array.isArray(replacementDirectoryNames)) {
-    return {
-      route: withFallback(route, 'replacement-runtime-unavailable'),
-      unexpectedDirectoryNames: legacyDirectoryNames,
-    };
-  }
-
-  const sortedReplacementDirectoryNames = [...replacementDirectoryNames].sort((left, right) => left.localeCompare(right));
-  const sortedLegacyDirectoryNames = [...legacyDirectoryNames].sort((left, right) => left.localeCompare(right));
-
-  if (JSON.stringify(sortedReplacementDirectoryNames) !== JSON.stringify(sortedLegacyDirectoryNames)) {
-    return {
-      route: withFallback(route, 'replacement-runtime-divergent'),
-      unexpectedDirectoryNames: legacyDirectoryNames,
-    };
-  }
-
   return {
     route,
-    unexpectedDirectoryNames: sortedReplacementDirectoryNames,
+    unexpectedDirectoryNames: legacyDirectoryNames,
   };
 };

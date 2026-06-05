@@ -1,5 +1,7 @@
 const SUBTREE_PARTITION_CANDIDATE_NAMES = new Set(['assets', 'components', 'content', 'shared']);
 
+const SOURCE_ID = 'tree-occurrence-classification-replacement-runtime';
+
 const buildTopRootKindByName = (treeKnownRoots) => {
   const topRoots = Array.isArray(treeKnownRoots?.topRoots) ? treeKnownRoots.topRoots : [];
 
@@ -79,4 +81,207 @@ export const classifyTreeOccurrenceRecords = ({ occurrenceRecords = [], treeKnow
     ...occurrenceRecord,
     ...classifyWithTopRootMap(occurrenceRecord, topRootKindByName),
   }));
+};
+
+
+const toIdentityKeys = (record) => {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    return [];
+  }
+
+  const keys = [];
+
+  if (typeof record.addressPath === 'string' && record.addressPath.length > 0) {
+    keys.push(`address:${record.addressPath}`);
+  }
+
+  if (
+    typeof record.path === 'string' &&
+    record.path.length > 0 &&
+    typeof record.occurrenceType === 'string' &&
+    record.occurrenceType.length > 0
+  ) {
+    keys.push(`path-type:${record.path}::${record.occurrenceType}`);
+  }
+
+  if (typeof record.path === 'string' && record.path.length > 0) {
+    keys.push(`path:${record.path}`);
+  }
+
+  return keys;
+};
+
+const toEvidenceLookup = (evidenceRecords, evidenceKey) => {
+  const lookup = new Map();
+
+  for (const evidenceRecord of evidenceRecords) {
+    for (const key of toIdentityKeys(evidenceRecord)) {
+      if (lookup.has(key)) {
+        continue;
+      }
+
+      lookup.set(key, evidenceRecord[evidenceKey] ?? null);
+    }
+  }
+
+  return lookup;
+};
+
+const lookupFirstAvailable = (lookup, record, fallback = null) => {
+  for (const key of toIdentityKeys(record)) {
+    if (lookup.has(key)) {
+      return lookup.get(key);
+    }
+  }
+
+  return fallback;
+};
+
+const assertReplacementRuntimeInput = (input) => {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) {
+    throw new Error('Tree occurrence classification replacement runtime input must be an object.');
+  }
+
+  if (!input.treeStructuralHomeEvidence || typeof input.treeStructuralHomeEvidence !== 'object' || Array.isArray(input.treeStructuralHomeEvidence)) {
+    throw new Error('Tree occurrence classification replacement runtime input must include treeStructuralHomeEvidence object.');
+  }
+
+  if (!Array.isArray(input.treeStructuralHomeEvidence.evidenceRecords)) {
+    throw new Error('Tree occurrence classification replacement runtime treeStructuralHomeEvidence.evidenceRecords must be an array.');
+  }
+
+  if (!input.treeSemanticHomeEvidence || typeof input.treeSemanticHomeEvidence !== 'object' || Array.isArray(input.treeSemanticHomeEvidence)) {
+    throw new Error('Tree occurrence classification replacement runtime input must include treeSemanticHomeEvidence object.');
+  }
+
+  if (!Array.isArray(input.treeSemanticHomeEvidence.evidenceRecords)) {
+    throw new Error('Tree occurrence classification replacement runtime treeSemanticHomeEvidence.evidenceRecords must be an array.');
+  }
+
+  if (!input.treeFolderKindEvidence || typeof input.treeFolderKindEvidence !== 'object' || Array.isArray(input.treeFolderKindEvidence)) {
+    throw new Error('Tree occurrence classification replacement runtime input must include treeFolderKindEvidence object.');
+  }
+
+  if (!Array.isArray(input.treeFolderKindEvidence.evidenceRecords)) {
+    throw new Error('Tree occurrence classification replacement runtime treeFolderKindEvidence.evidenceRecords must be an array.');
+  }
+};
+
+const toReplacementRootClassification = ({ folderKind, structuralHome, semanticHome }) => {
+  if (folderKind === 'structural' || structuralHome) {
+    return {
+      structuralClass: 'repo-top-structural-root',
+      structuralKind: 'top-root-structural',
+      isKnownTopRoot: true,
+      isStructuralRoot: true,
+      isSemanticRoot: false,
+    };
+  }
+
+  if (folderKind === 'semantic' || semanticHome) {
+    return {
+      structuralClass: 'repo-top-semantic-root',
+      structuralKind: 'semantic-root',
+      isKnownTopRoot: true,
+      isStructuralRoot: false,
+      isSemanticRoot: true,
+    };
+  }
+
+  return {
+    structuralClass: 'unclassified',
+    structuralKind: 'unknown',
+    isKnownTopRoot: false,
+    isStructuralRoot: false,
+    isSemanticRoot: false,
+  };
+};
+
+const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, semanticHomeLookup, folderKindLookup }) => {
+  if (!occurrenceRecord || typeof occurrenceRecord !== 'object') {
+    return {
+      structuralClass: 'unclassified',
+      structuralKind: 'unknown',
+      isRepoTopOccurrence: false,
+      isScopedRootOccurrence: false,
+      isKnownTopRoot: false,
+      isStructuralRoot: false,
+      isSemanticRoot: false,
+      isSubtreePartitionCandidate: false,
+    };
+  }
+
+  const resolvedPath = String(occurrenceRecord.resolvedPath ?? '');
+  const actualName = String(occurrenceRecord.actualName ?? '');
+  const occurrenceType = String(occurrenceRecord.occurrenceType ?? '');
+  const isRepoTopOccurrence = isRepoTopOccurrencePath(resolvedPath);
+  const isScopedRootOccurrence = occurrenceRecord.isScopedRoot === true;
+  const isSubtreePartitionCandidate =
+    occurrenceType === 'folder' &&
+    !isRepoTopOccurrence &&
+    SUBTREE_PARTITION_CANDIDATE_NAMES.has(actualName);
+
+  if (occurrenceType === 'folder' && isRepoTopOccurrence) {
+    return {
+      ...toReplacementRootClassification({
+        folderKind: lookupFirstAvailable(folderKindLookup, occurrenceRecord),
+        structuralHome: lookupFirstAvailable(structuralHomeLookup, occurrenceRecord),
+        semanticHome: lookupFirstAvailable(semanticHomeLookup, occurrenceRecord),
+      }),
+      isRepoTopOccurrence,
+      isScopedRootOccurrence,
+      isSubtreePartitionCandidate,
+    };
+  }
+
+  if (isSubtreePartitionCandidate) {
+    return {
+      structuralClass: 'subtree-structural-partition-candidate',
+      structuralKind: 'subtree-partition',
+      isRepoTopOccurrence,
+      isScopedRootOccurrence,
+      isKnownTopRoot: false,
+      isStructuralRoot: false,
+      isSemanticRoot: false,
+      isSubtreePartitionCandidate,
+    };
+  }
+
+  return {
+    structuralClass: 'unclassified',
+    structuralKind: 'unknown',
+    isRepoTopOccurrence,
+    isScopedRootOccurrence,
+    isKnownTopRoot: false,
+    isStructuralRoot: false,
+    isSemanticRoot: false,
+    isSubtreePartitionCandidate,
+  };
+};
+
+export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => {
+  assertReplacementRuntimeInput(input);
+
+  const structuralHomeLookup = toEvidenceLookup(input.treeStructuralHomeEvidence.evidenceRecords, 'structuralHome');
+  const semanticHomeLookup = toEvidenceLookup(input.treeSemanticHomeEvidence.evidenceRecords, 'semanticHome');
+  const folderKindLookup = toEvidenceLookup(input.treeFolderKindEvidence.evidenceRecords, 'folderKind');
+
+  return {
+    source: SOURCE_ID,
+    classifyOccurrenceRecords: (occurrenceRecords = []) => {
+      if (!Array.isArray(occurrenceRecords)) {
+        throw new Error('Tree occurrence classification replacement runtime requires occurrenceRecords array.');
+      }
+
+      return occurrenceRecords.map((occurrenceRecord) => ({
+        ...occurrenceRecord,
+        ...classifyWithPreparedEvidence({
+          occurrenceRecord,
+          structuralHomeLookup,
+          semanticHomeLookup,
+          folderKindLookup,
+        }),
+      }));
+    },
+  };
 };

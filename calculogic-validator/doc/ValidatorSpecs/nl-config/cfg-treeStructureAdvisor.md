@@ -98,7 +98,8 @@ V0.1.7 introduces a suite-core scoped snapshot/input helper boundary and migrate
 - shim/content-backed diagnostics are attached from a shim-owned contributor helper that prepares lazy content access (cache + selected-path guard) so tree-core runtime does not require file-content access
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
 - Tree known-roots runtime routing is now explicit and Tree-owned: default execution remains the legacy/current known-roots-backed path, `knownTopLevelDirectories` remains current runtime truth for unexpected top-level folder behavior, and `topRoots[].kind` remains current runtime truth for occurrence classification.
-- Prepared replacement execution is only eligible when explicitly selected, available, and guarded safe; unavailable, unsafe, or divergent replacement execution falls back to the known-roots-backed path and must not become default behavior in this slice.
+- Prepared occurrence-classification replacement execution is only eligible when explicitly selected, available, guarded safe, structurally complete, and parity-aligned; unavailable, unsafe, incomplete, or divergent replacement execution falls back to the known-roots-backed occurrence classifier and must not become default behavior in this slice.
+- The guarded replacement slice is limited to occurrence classification (`topRoots[].kind` current runtime truth): `knownTopLevelDirectories` remains the current runtime truth for unexpected top-level folder behavior in both legacy and explicit replacement modes.
 
 Target behaviors in V0.1.2:
 

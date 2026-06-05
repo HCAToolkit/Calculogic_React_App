@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { classifyTreeOccurrenceRecords } from '../src/tree-occurrence-classification.logic.mjs';
+import {
+  classifyTreeOccurrenceRecords,
+  prepareTreeOccurrenceClassificationReplacementRuntime,
+} from '../src/tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from '../src/tree-occurrence-snapshot.logic.mjs';
+import { prepareTreeStructuralAddressSnapshot } from '../src/tree-structural-address-snapshot.logic.mjs';
 import { getBuiltinTreeKnownRoots } from '../src/registries/tree-known-roots-registry.logic.mjs';
 
 const TREE_KNOWN_ROOTS = getBuiltinTreeKnownRoots();
@@ -95,4 +99,53 @@ test('tree occurrence classification keeps unknown cases deterministic and bound
   assert.equal(records.experiments.structuralKind, 'unknown');
   assert.equal(records.experiments.isKnownTopRoot, false);
   assert.equal(records.experiments.isSubtreePartitionCandidate, false);
+});
+
+
+test('tree occurrence classification replacement runtime classifies from prepared Tree evidence', () => {
+  const snapshot = prepareTreeOccurrenceSnapshot({
+    selectedPaths: ['src/components/button.js', 'calculogic-validator/tree/index.mjs'],
+    includeRoots: [],
+    targets: [],
+  });
+  const addressedSnapshot = prepareTreeStructuralAddressSnapshot({
+    occurrenceSnapshot: snapshot,
+    selectedPaths: ['src/components/button.js', 'calculogic-validator/tree/index.mjs'],
+    targets: [],
+    includeRoots: [],
+    scope: { source: 'test' },
+  });
+  const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence: {
+      source: 'test',
+      evidenceRecords: [{ path: 'src', occurrenceType: 'folder', structuralHome: 'src' }],
+    },
+    treeSemanticHomeEvidence: {
+      source: 'test',
+      evidenceRecords: [{ path: 'calculogic-validator', occurrenceType: 'folder', semanticHome: 'validator' }],
+    },
+    treeFolderKindEvidence: {
+      source: 'test',
+      evidenceRecords: [
+        { path: 'src', occurrenceType: 'folder', folderKind: 'structural' },
+        { path: 'calculogic-validator', occurrenceType: 'folder', folderKind: 'semantic' },
+      ],
+    },
+  });
+
+  const records = byResolvedPath(replacementRuntime.classifyOccurrenceRecords(addressedSnapshot.occurrenceRecords));
+
+  assert.equal(replacementRuntime.source, 'tree-occurrence-classification-replacement-runtime');
+  assert.equal(records.src.structuralClass, 'repo-top-structural-root');
+  assert.equal(records.src.structuralKind, 'top-root-structural');
+  assert.equal(records.src.isKnownTopRoot, true);
+  assert.equal(records.src.isStructuralRoot, true);
+  assert.equal(records.src.isSemanticRoot, false);
+  assert.equal(records['calculogic-validator'].structuralClass, 'repo-top-semantic-root');
+  assert.equal(records['calculogic-validator'].structuralKind, 'semantic-root');
+  assert.equal(records['calculogic-validator'].isKnownTopRoot, true);
+  assert.equal(records['calculogic-validator'].isStructuralRoot, false);
+  assert.equal(records['calculogic-validator'].isSemanticRoot, true);
+  assert.equal(records['src/components'].structuralClass, 'subtree-structural-partition-candidate');
+  assert.equal(records['src/components'].isSubtreePartitionCandidate, true);
 });
