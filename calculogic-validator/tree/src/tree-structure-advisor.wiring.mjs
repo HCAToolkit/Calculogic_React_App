@@ -15,7 +15,10 @@ import { prepareTreeKnownRootsCompatibilityEvidence } from './tree-known-roots-c
 import { prepareTreeStructuralHomeEvidence } from './tree-structural-home-evidence.logic.mjs';
 import { prepareTreeSemanticHomeEvidence } from './tree-semantic-home-evidence.logic.mjs';
 import { prepareTreeFolderKindEvidence } from './tree-folder-kind-evidence.logic.mjs';
-import { classifyTreeOccurrenceRecords } from './tree-occurrence-classification.logic.mjs';
+import {
+  classifyTreeOccurrenceRecords,
+  prepareTreeOccurrenceClassificationReplacementRuntime,
+} from './tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-evidence.logic.mjs';
 import { summarizeTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-summary.logic.mjs';
 import { prepareTreeOccurrenceClassificationShadowReport } from './tree-occurrence-classification-shadow-report.logic.mjs';
@@ -137,9 +140,14 @@ export const prepareTreeStructureAdvisorInputs = (
     treeOccurrenceClassificationShadowReport,
     treeOccurrenceClassificationParitySummary,
   });
+  const treeOccurrenceClassificationReplacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence,
+    treeSemanticHomeEvidence,
+    treeFolderKindEvidence,
+  });
   const treeKnownRootsRuntimeRoute = selectTreeKnownRootsRuntimeRoute({
     requestedMode: treeKnownRootsRuntimeSelection?.requestedMode,
-    replacementRuntime: treeKnownRootsRuntimeSelection?.replacementRuntime,
+    replacementRuntime: treeKnownRootsRuntimeSelection?.replacementRuntime ?? treeOccurrenceClassificationReplacementRuntime,
     runtimeExecutionContract: treeOccurrenceClassificationRuntimeExecutionContract,
   });
 
@@ -165,6 +173,7 @@ export const prepareTreeStructureAdvisorInputs = (
       treeOccurrenceClassificationReplacementRecommendation,
       treeOccurrenceClassificationRuntimeEvaluationPlan,
       treeOccurrenceClassificationRuntimeExecutionContract,
+      treeOccurrenceClassificationReplacementRuntime,
       treeKnownRootsRuntimeRoute,
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({

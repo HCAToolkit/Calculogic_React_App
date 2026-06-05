@@ -36,8 +36,6 @@ const alignedReplacementRuntime = {
     isSemanticRoot: false,
     isSubtreePartitionCandidate: false,
   })),
-  collectUnexpectedTopLevelDirectoryNames: (topLevelDirectoryNames) =>
-    topLevelDirectoryNames.filter((directoryName) => directoryName === 'experiments'),
 };
 
 const legacyClassifyOccurrenceRecords = (occurrenceRecords) => occurrenceRecords.map((record) => ({
@@ -118,6 +116,38 @@ test('tree known-roots runtime routing selects replacement only when explicit, a
   assert.equal(route.replacementRuntime, alignedReplacementRuntime);
 });
 
+
+test('tree known-roots runtime routing returns replacement occurrence records when explicit selection is safe and parity-aligned', () => {
+  const selectedReplacementRuntime = {
+    ...alignedReplacementRuntime,
+    classifyOccurrenceRecords: (records) => records.map((record) => ({
+      ...record,
+      structuralClass: 'repo-top-structural-root',
+      structuralKind: 'top-root-structural',
+      isKnownTopRoot: true,
+      isStructuralRoot: true,
+      isSemanticRoot: false,
+      isSubtreePartitionCandidate: false,
+      replacementTrace: 'selected',
+    })),
+  };
+  const route = selectTreeKnownRootsRuntimeRoute({
+    requestedMode: TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT,
+    replacementRuntime: selectedReplacementRuntime,
+    runtimeExecutionContract: safeRuntimeExecutionContract,
+  });
+
+  const resolved = resolveTreeOccurrenceClassificationRuntime({
+    occurrenceRecords,
+    legacyClassifyOccurrenceRecords,
+    route,
+  });
+
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT);
+  assert.equal(resolved.route.fallbackUsed, false);
+  assert.equal(resolved.records[0].replacementTrace, 'selected');
+});
+
 test('tree known-roots runtime routing preserves legacy occurrence classification on divergent replacement output', () => {
   const divergentReplacementRuntime = {
     ...alignedReplacementRuntime,
@@ -178,11 +208,33 @@ test('tree known-roots runtime routing preserves legacy occurrence classificatio
   });
 
   assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK);
-  assert.equal(resolved.route.fallbackReason, 'replacement-runtime-divergent');
+  assert.equal(resolved.route.fallbackReason, 'replacement-runtime-incomplete');
   assert.deepEqual(resolved.records, legacyClassifyOccurrenceRecords(occurrenceRecords));
 });
 
-test('tree known-roots runtime routing preserves legacy unexpected top-level behavior on divergent replacement output', () => {
+test('tree known-roots runtime routing preserves legacy occurrence classification on replacement length mismatch', () => {
+  const incompleteReplacementRuntime = {
+    ...alignedReplacementRuntime,
+    classifyOccurrenceRecords: () => [],
+  };
+  const route = selectTreeKnownRootsRuntimeRoute({
+    requestedMode: TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT,
+    replacementRuntime: incompleteReplacementRuntime,
+    runtimeExecutionContract: safeRuntimeExecutionContract,
+  });
+
+  const resolved = resolveTreeOccurrenceClassificationRuntime({
+    occurrenceRecords,
+    legacyClassifyOccurrenceRecords,
+    route,
+  });
+
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK);
+  assert.equal(resolved.route.fallbackReason, 'replacement-runtime-incomplete');
+  assert.deepEqual(resolved.records, legacyClassifyOccurrenceRecords(occurrenceRecords));
+});
+
+test('tree known-roots runtime routing preserves legacy unexpected top-level behavior when replacement route is selected', () => {
   const divergentReplacementRuntime = {
     ...alignedReplacementRuntime,
     collectUnexpectedTopLevelDirectoryNames: () => [],
@@ -200,7 +252,7 @@ test('tree known-roots runtime routing preserves legacy unexpected top-level beh
     route,
   });
 
-  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.FALLBACK);
-  assert.equal(resolved.route.fallbackReason, 'replacement-runtime-divergent');
+  assert.equal(resolved.route.activeExecutionMode, TREE_KNOWN_ROOTS_RUNTIME_MODES.REPLACEMENT);
+  assert.equal(resolved.route.fallbackReason, null);
   assert.deepEqual(resolved.unexpectedDirectoryNames, ['experiments']);
 });

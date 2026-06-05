@@ -153,7 +153,7 @@ const collectOwnedSliceBoundaryDriftFindings = (paths) => {
 
 
 const collectFileReasoningInput = (preparedInputs, runtimeRoute) => {
-  const occurrenceSnapshot = preparedInputs?.occurrenceSnapshot;
+  const occurrenceSnapshot = preparedInputs?.structuralAddressSnapshot ?? preparedInputs?.occurrenceSnapshot;
 
   const occurrenceRecords = occurrenceSnapshot?.occurrenceRecords;
 
