@@ -16,7 +16,11 @@ test('suite scoped snapshot helper collects scope roots and root files determini
     const snapshot = collectSuiteScopedSnapshotInputs(fixtureDir, { scope: 'docs' });
 
     assert.equal(snapshot.scope, 'docs');
+    assert.deepEqual(snapshot.includeRoots, ['doc', 'docs']);
+    assert.deepEqual(snapshot.includeRootFiles, ['README.md']);
+    assert.deepEqual(snapshot.inScopePaths, ['doc/README.md', 'README.md']);
     assert.deepEqual(snapshot.selectedPaths, ['doc/README.md', 'README.md']);
+    assert.deepEqual(snapshot.targetDescriptors, []);
     assert.equal(snapshot.targets.length, 0);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
@@ -36,7 +40,14 @@ test('suite scoped snapshot helper applies target filtering after scoped collect
       targets: ['src/a.logic.ts'],
     });
 
+    assert.equal(snapshot.scope, 'app');
     assert.deepEqual(snapshot.selectedPaths, ['src/a.logic.ts']);
+    assert.deepEqual(snapshot.targetDescriptors, [
+      {
+        kind: 'file',
+        relPath: 'src/a.logic.ts',
+      },
+    ]);
     assert.deepEqual(snapshot.targets, ['src/a.logic.ts']);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
