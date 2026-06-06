@@ -1,14 +1,12 @@
 import path from 'node:path';
-import fs from 'node:fs';
 import {
   DEFAULT_VALIDATOR_SCOPE,
   listValidatorScopes,
   getValidatorScopeProfile,
 } from '../../src/core/validator-scopes.logic.mjs';
-import {
-  normalizePath,
-  filterScopedPathsByProfile,
-} from '../../src/core/scoped-target-paths.logic.mjs';
+import { normalizePath } from '../../src/core/scoped-target-paths.logic.mjs';
+import { collectValidatorCandidatePaths } from '../../src/core/validator-candidate-collection.logic.mjs';
+import { createValidatorCandidatePolicyFromValues } from '../../src/core/validator-candidate-policy.logic.mjs';
 import { parseCanonicalName } from './rules/naming-rule-parse-canonical.logic.mjs';
 import {
   getSpecialCaseType,
@@ -30,16 +28,6 @@ import {
 } from './rules/naming-rule-check-role.logic.mjs';
 
 export { parseCanonicalName, getSpecialCaseType, isAllowedSpecialCase };
-
-const isReportableFile = (relativePath, reportableExtensions, reportableRootFiles) => {
-  const extension = path.extname(relativePath);
-  if (reportableExtensions.has(extension)) {
-    return true;
-  }
-
-  const basename = path.basename(relativePath);
-  return reportableRootFiles.has(basename);
-};
 
 const assertPreparedReportableExtensions = (reportableExtensions) => {
   if (reportableExtensions instanceof Set) {
@@ -75,9 +63,6 @@ const assertPreparedNamingRolesRuntime = (namingRolesRuntime) => {
     'Naming runtime requires prepared namingRolesRuntime from wiring/runtime adapter.',
   );
 };
-
-
-
 
 const assertPreparedMissingRolePatternsRuntime = (missingRolePatternsRuntime) => {
   if (Array.isArray(missingRolePatternsRuntime)) {
@@ -193,57 +178,6 @@ const assertPreparedWalkExclusions = (walkExclusions) => {
   );
 };
 
-const sortPaths = (paths) => Array.from(paths).sort((left, right) => left.localeCompare(right));
-
-const collectPathsFromRoot = (rootDirectory, rootRelativePath = '.', options = {}) => {
-  const normalizedRoot = normalizePath(rootRelativePath);
-  const absoluteRoot = path.resolve(rootDirectory, normalizedRoot);
-  if (!fs.existsSync(absoluteRoot)) {
-    return [];
-  }
-
-  const stat = fs.statSync(absoluteRoot);
-  if (!stat.isDirectory()) {
-    return [];
-  }
-
-  const reportableExtensions = assertPreparedReportableExtensions(options.reportableExtensions);
-  const reportableRootFiles = assertPreparedReportableRootFiles(options.reportableRootFiles);
-  const walkExclusions = assertPreparedWalkExclusions(options.walkExclusions);
-  const collected = [];
-
-  const walk = (absoluteDirectoryPath) => {
-    const entries = fs.readdirSync(absoluteDirectoryPath, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const isDotEntry = entry.name.startsWith('.');
-
-      if (entry.isDirectory()) {
-        if (walkExclusions.excludedDirectories.has(entry.name)) {
-          continue;
-        }
-
-        if (isDotEntry && walkExclusions.skipDotDirectories) {
-          continue;
-        }
-
-        walk(path.join(absoluteDirectoryPath, entry.name));
-        continue;
-      }
-
-      const absolutePath = path.join(absoluteDirectoryPath, entry.name);
-      const relativePath = path.relative(rootDirectory, absolutePath);
-      const normalizedPath = normalizePath(relativePath);
-      if (isReportableFile(normalizedPath, reportableExtensions, reportableRootFiles)) {
-        collected.push(normalizedPath);
-      }
-    }
-  };
-
-  walk(absoluteRoot);
-  return collected;
-};
-
 export const listNamingValidatorScopes = () => listValidatorScopes();
 
 export const getScopeProfile = (scope) => getValidatorScopeProfile(scope);
@@ -278,23 +212,20 @@ const detectMissingRoleCandidate = (basename, missingRolePatternsRuntime) => {
 };
 
 export const collectRepositoryPaths = (rootDirectory, options = {}) => {
-  const selectedScope = options.scope ?? DEFAULT_VALIDATOR_SCOPE;
-  const profile = getScopeProfile(selectedScope);
-  if (!profile) {
-    throw new Error(`Invalid scope profile: ${selectedScope}`);
-  }
-
-  const allReportablePaths = collectPathsFromRoot(rootDirectory, '.', {
-    reportableExtensions: options.reportableExtensions,
-    reportableRootFiles: options.reportableRootFiles,
-    walkExclusions: options.walkExclusions,
+  const reportableExtensions = assertPreparedReportableExtensions(options.reportableExtensions);
+  const reportableRootFiles = assertPreparedReportableRootFiles(options.reportableRootFiles);
+  const walkExclusions = assertPreparedWalkExclusions(options.walkExclusions);
+  const candidatePolicy = createValidatorCandidatePolicyFromValues({
+    candidateExtensions: reportableExtensions,
+    candidateRootFiles: reportableRootFiles,
+    walkExclusions,
   });
 
-  if (selectedScope === 'repo') {
-    return sortPaths(new Set(allReportablePaths));
-  }
-
-  return filterScopedPathsByProfile(allReportablePaths, profile);
+  return collectValidatorCandidatePaths(rootDirectory, {
+    scope: options.scope ?? DEFAULT_VALIDATOR_SCOPE,
+    targets: options.targets ?? [],
+    candidatePolicy,
+  }).selectedPaths;
 };
 
 export const classifyPath = (
