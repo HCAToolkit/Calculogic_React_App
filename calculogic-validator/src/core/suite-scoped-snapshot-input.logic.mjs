@@ -23,7 +23,12 @@ const collectPathsFromScopeRoot = (
     return [];
   }
 
-  if (skipSymlinkedCandidateScopeRoots && fs.lstatSync(absoluteRoot).isSymbolicLink()) {
+  const isRepositoryRootScope = path.normalize(scopeRoot) === '.';
+  if (
+    skipSymlinkedCandidateScopeRoots &&
+    !isRepositoryRootScope &&
+    fs.lstatSync(absoluteRoot).isSymbolicLink()
+  ) {
     return [];
   }
 

@@ -263,6 +263,39 @@ test('Naming candidate helper skips symlinked scoped roots to preserve legacy wa
   }
 });
 
+test('Naming candidate helper follows symlinked repository root for repo scope', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'naming-symlink-repo-real-'));
+  const linkParentDir = await fs.mkdtemp(path.join(os.tmpdir(), 'naming-symlink-repo-link-parent-'));
+  const repositoryLink = path.join(linkParentDir, 'repository-link');
+
+  try {
+    await writeFixtureFile(fixtureDir, 'package.json', '{}\n');
+    await writeFixtureFile(fixtureDir, 'src/app.logic.mjs', 'export const app = true;\n');
+    await fs.symlink(fixtureDir, repositoryLink, 'dir');
+
+    const runtimeInputs = prepareNamingRuntimeInputs();
+    const legacyRepoPaths = collectLegacyNamingRepositoryPaths(repositoryLink, {
+      scope: 'repo',
+      reportableExtensions: runtimeInputs.reportableExtensions,
+      reportableRootFiles: runtimeInputs.reportableRootFiles,
+      walkExclusions: runtimeInputs.walkExclusions,
+    });
+    const namingRepoPaths = collectNamingRepositoryPaths(repositoryLink, { scope: 'repo' });
+    const directCandidatePaths = collectValidatorCandidatePaths(repositoryLink, {
+      scope: 'repo',
+      skipSymlinkedCandidateScopeRoots: true,
+      candidatePolicy: createNamingCandidatePolicy(),
+    });
+
+    assert.deepEqual(legacyRepoPaths, ['package.json', 'src/app.logic.mjs']);
+    assert.deepEqual(namingRepoPaths, legacyRepoPaths);
+    assert.deepEqual(directCandidatePaths.selectedPaths, legacyRepoPaths);
+  } finally {
+    await fs.rm(linkParentDir, { recursive: true, force: true });
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('suite-core candidate helper reproduces current Naming target filtering', async () => {
   const fixtureDir = await createCandidateFixture();
 
