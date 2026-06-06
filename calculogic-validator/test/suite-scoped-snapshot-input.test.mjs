@@ -53,3 +53,25 @@ test('suite scoped snapshot helper applies target filtering after scoped collect
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
 });
+
+test('suite scoped snapshot helper keeps existing symlinked scope-root traversal by default', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'suite-scoped-snapshot-symlink-'));
+  const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), 'suite-scoped-snapshot-outside-'));
+
+  try {
+    await fs.writeFile(
+      path.join(outsideDir, 'outside.logic.ts'),
+      'export const outside = true;\n',
+      'utf8',
+    );
+    await fs.symlink(outsideDir, path.join(fixtureDir, 'src'), 'dir');
+
+    const snapshot = collectSuiteScopedSnapshotInputs(fixtureDir, { scope: 'app' });
+
+    assert.deepEqual(snapshot.inScopePaths, ['src/outside.logic.ts']);
+    assert.deepEqual(snapshot.selectedPaths, ['src/outside.logic.ts']);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+    await fs.rm(outsideDir, { recursive: true, force: true });
+  }
+});

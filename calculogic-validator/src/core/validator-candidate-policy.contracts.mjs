@@ -1,6 +1,6 @@
 const normalizeCandidateToken = (value) => String(value ?? '').trim();
 
-const normalizeUniqueSortedStrings = (values, fieldName) => {
+const normalizeUniqueSortedStrings = (values, fieldName, { allowEmpty = false } = {}) => {
   if (!values || typeof values[Symbol.iterator] !== 'function') {
     throw new Error(`Validator candidate policy requires iterable ${fieldName}.`);
   }
@@ -8,8 +8,10 @@ const normalizeUniqueSortedStrings = (values, fieldName) => {
   const normalizedValues = [];
   for (const value of values) {
     const normalizedValue = normalizeCandidateToken(value);
-    if (!normalizedValue) {
-      throw new Error(`Validator candidate policy ${fieldName} entries must be non-empty strings.`);
+    if (!normalizedValue && !allowEmpty) {
+      throw new Error(
+        `Validator candidate policy ${fieldName} entries must be non-empty strings.`,
+      );
     }
 
     normalizedValues.push(normalizedValue);
@@ -30,7 +32,9 @@ export const normalizeValidatorCandidatePolicy = ({
 
   return Object.freeze({
     candidateExtensions: Object.freeze(
-      normalizeUniqueSortedStrings(candidateExtensions ?? [], 'candidateExtensions'),
+      normalizeUniqueSortedStrings(candidateExtensions ?? [], 'candidateExtensions', {
+        allowEmpty: true,
+      }),
     ),
     candidateRootFiles: Object.freeze(
       normalizeUniqueSortedStrings(candidateRootFiles ?? [], 'candidateRootFiles'),

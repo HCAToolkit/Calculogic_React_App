@@ -13,7 +13,6 @@ import {
   parseCanonicalName,
   getSpecialCaseType,
   isAllowedSpecialCase,
-  collectRepositoryPaths as collectRepositoryPathsRuntime,
   classifyPath as classifyPathRuntime,
   runNamingValidator as runNamingValidatorRuntime,
   listNamingValidatorScopes,
@@ -22,11 +21,9 @@ import {
 } from './naming-validator.logic.mjs';
 import { projectNamingSemanticFamilyBridge } from './naming-semantic-family-bridge-projection.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from './naming-semantic-evidence-bridge.logic.mjs';
-import {
-  normalizePath,
-  resolveScopedTargets,
-  filterScopedPathsByTargets,
-} from '../../src/core/scoped-target-paths.logic.mjs';
+import { normalizePath } from '../../src/core/scoped-target-paths.logic.mjs';
+import { collectValidatorCandidatePaths } from '../../src/core/validator-candidate-collection.logic.mjs';
+import { createValidatorCandidatePolicyFromValues } from '../../src/core/validator-candidate-policy.logic.mjs';
 import { DEFAULT_VALIDATOR_SCOPE } from '../../src/core/validator-scopes.logic.mjs';
 
 export const prepareNamingRuntimeInputs = (config) => {
@@ -49,25 +46,54 @@ export const prepareNamingRuntimeInputs = (config) => {
   };
 };
 
+const createNamingCandidatePolicy = ({
+  reportableExtensions,
+  reportableRootFiles,
+  walkExclusions,
+}) =>
+  createValidatorCandidatePolicyFromValues({
+    candidateExtensions: reportableExtensions,
+    candidateRootFiles: reportableRootFiles,
+    walkExclusions,
+  });
+
+const collectNamingCandidatePaths = (repositoryRoot, {
+  scope,
+  targets = [],
+  reportableExtensions,
+  reportableRootFiles,
+  walkExclusions,
+}) =>
+  collectValidatorCandidatePaths(repositoryRoot, {
+    scope,
+    targets,
+    skipSymlinkedCandidateScopeRoots: true,
+    candidatePolicy: createNamingCandidatePolicy({
+      reportableExtensions,
+      reportableRootFiles,
+      walkExclusions,
+    }),
+  });
+
 export const prepareNamingValidatorInputs = (
   repositoryRoot,
   { scope, config, targets } = {},
 ) => {
   const runtimeInputs = prepareNamingRuntimeInputs(config);
   const selectedScope = scope ?? DEFAULT_VALIDATOR_SCOPE;
-  const inScopePaths = collectRepositoryPathsRuntime(repositoryRoot, {
+  const candidatePaths = collectNamingCandidatePaths(repositoryRoot, {
     scope: selectedScope,
+    targets: targets ?? [],
     reportableExtensions: runtimeInputs.reportableExtensions,
     reportableRootFiles: runtimeInputs.reportableRootFiles,
     walkExclusions: runtimeInputs.walkExclusions,
   });
-  const resolvedTargets = resolveScopedTargets(repositoryRoot, targets ?? []);
 
   return {
     ...runtimeInputs,
-    scope: selectedScope,
-    selectedPaths: filterScopedPathsByTargets(repositoryRoot, inScopePaths, resolvedTargets),
-    targets: resolvedTargets.map((target) => target.relPath),
+    scope: candidatePaths.scope,
+    selectedPaths: candidatePaths.selectedPaths,
+    targets: candidatePaths.targets,
   };
 };
 
@@ -85,12 +111,13 @@ export const runNamingValidator = (repositoryRoot, { scope, config, targets } = 
 export const collectRepositoryPaths = (rootDirectory, options = {}) => {
   const runtimeInputs = prepareNamingRuntimeInputs(options.config);
 
-  return collectRepositoryPathsRuntime(rootDirectory, {
-    ...options,
+  return collectNamingCandidatePaths(rootDirectory, {
+    scope: options.scope,
+    targets: options.targets ?? [],
     reportableExtensions: options.reportableExtensions ?? runtimeInputs.reportableExtensions,
     reportableRootFiles: options.reportableRootFiles ?? runtimeInputs.reportableRootFiles,
     walkExclusions: options.walkExclusions ?? runtimeInputs.walkExclusions,
-  });
+  }).selectedPaths;
 };
 
 export const classifyPath = (relativePath, namingRolesRuntime, options = {}) => {
