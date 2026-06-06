@@ -1221,6 +1221,29 @@ test('tree-structure-advisor scope collection follows suite profiles uniformly, 
   }
 });
 
+test('tree-structure-advisor keeps current symlinked scope-root traversal behavior', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-scope-symlink-'));
+  const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-scope-symlink-outside-'));
+
+  try {
+    await fs.mkdir(path.join(fixtureDir, 'test'), { recursive: true });
+    await fs.writeFile(path.join(fixtureDir, 'test', 'inside.test.js'), 'export const inside = true;\n', 'utf8');
+    await fs.writeFile(
+      path.join(outsideDir, 'outside.logic.ts'),
+      'export const outside = true;\n',
+      'utf8',
+    );
+    await fs.symlink(outsideDir, path.join(fixtureDir, 'src'), 'dir');
+
+    const prepared = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'app' });
+
+    assert.deepEqual(prepared.selectedPaths, ['src/outside.logic.ts', 'test/inside.test.js']);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+    await fs.rm(outsideDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor rejects invalid scope deterministically', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-invalid-scope-'));
 
