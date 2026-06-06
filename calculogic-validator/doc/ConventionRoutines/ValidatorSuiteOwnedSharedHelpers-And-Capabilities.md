@@ -69,7 +69,28 @@ Only currently real, discoverable suite-owned surfaces are listed here.
   - slice heuristics that should remain slice-owned interpretation behavior
 - **Reuse boundary type:** runtime boundary reuse (and composition boundary reuse for cross-slice composition)
 
-### 3.3 Entry: suite-core exit policy derivation helper
+### 3.3 Entry: suite-core validator candidate policy and collection helper
+
+- **Owner:** suite-core
+- **Path/area:**
+  - `calculogic-validator/src/core/validator-candidate-policy.contracts.mjs`
+  - `calculogic-validator/src/core/validator-candidate-policy.logic.mjs`
+  - `calculogic-validator/src/core/validator-candidate-collection.logic.mjs`
+- **Concern:** broad validator candidate policy contract and deterministic candidate collection mechanics before slice-owned interpretation.
+- **Reusable capability:**
+  - normalized candidate extension and candidate root-file policy inputs
+  - walk-exclusion and skip-dot-directory inputs
+  - suite scope/profile and target filtering reuse through existing suite-core scoped snapshot helpers
+  - deterministic candidate path sorting and dedupe
+- **When to reuse:**
+  - proving or adopting shared broad candidate collection before a validator slice interprets candidate paths
+  - adapting slice-owned candidate values into a suite-owned candidate collection contract without moving registry authority
+- **When not to reuse:**
+  - deciding what a filename, folder, semantic family, structural home, or candidate path means for a specific slice
+  - moving slice-owned initial policy value authority into suite-core
+- **Reuse boundary type:** contract/helper boundary reuse
+
+### 3.4 Entry: suite-core exit policy derivation helper
 
 - **Owner:** suite-core
 - **Path/area:** `calculogic-validator/src/core/validator-exit-code.logic.mjs`
@@ -86,7 +107,7 @@ Only currently real, discoverable suite-owned surfaces are listed here.
   - experimental policy behavior not yet part of suite exit policy contract
 - **Reuse boundary type:** runtime boundary reuse
 
-### 3.4 Entry: suite-core report meta + source snapshot helpers
+### 3.5 Entry: suite-core report meta + source snapshot helpers
 
 - **Owner:** suite-core
 - **Path/area:**
