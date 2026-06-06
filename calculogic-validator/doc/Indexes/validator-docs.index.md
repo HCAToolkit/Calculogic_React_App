@@ -116,6 +116,9 @@ Authority labels used in this index:
 - `doc/Audits/validator-missing-role-decision-lanes.audit.md`
   **Authority:** audit snapshot. **Intended use:** bounded ownership-first inventory for remaining validator-scope missing-role findings before the next rename tranche.
 
+- `doc/Audits/validator-repeatable-slice-infrastructure.audit.md`
+  **Authority:** audit snapshot. **Intended use:** docs-only audit of repeatable suite-core validator-slice infrastructure, hardening status, registry-worthy metadata, command/report alignment, and recommended first implementation slice under #585.
+
 ## 8) Maintenance note
 
 - When adding a new validator doc, classify it in this index using one of the authority labels above.
