@@ -22,6 +22,7 @@ export const collectValidatorCandidatePaths = (
     scope,
     targets = [],
     candidatePolicy,
+    skipSymlinkedCandidateScopeRoots = false,
   } = {},
 ) => {
   const normalizedPolicy = normalizeValidatorCandidatePolicy(candidatePolicy);
@@ -31,6 +32,7 @@ export const collectValidatorCandidatePaths = (
     targets,
     walkExcludedDirectories: policySets.walkExcludedDirectories,
     skipDotDirectories: policySets.skipDotDirectories,
+    skipSymlinkedCandidateScopeRoots,
   });
   const inScopeCandidatePaths = filterValidatorCandidatePaths(
     scopedSnapshot.inScopePaths,

@@ -229,6 +229,40 @@ test('suite-core candidate helper reproduces current Naming scoped candidate col
   }
 });
 
+test('Naming candidate helper skips symlinked scoped roots to preserve legacy walk behavior', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'naming-symlink-scope-'));
+  const outsideDir = await fs.mkdtemp(path.join(os.tmpdir(), 'naming-symlink-outside-'));
+
+  try {
+    await writeFixtureFile(outsideDir, 'outside.logic.ts', 'export const outside = true;\n');
+    await fs.symlink(outsideDir, path.join(fixtureDir, 'src'), 'dir');
+    await writeFixtureFile(fixtureDir, 'test/inside.test.js', 'export const inside = true;\n');
+
+    const runtimeInputs = prepareNamingRuntimeInputs();
+    const legacyAppPaths = collectLegacyNamingRepositoryPaths(fixtureDir, {
+      scope: 'app',
+      reportableExtensions: runtimeInputs.reportableExtensions,
+      reportableRootFiles: runtimeInputs.reportableRootFiles,
+      walkExclusions: runtimeInputs.walkExclusions,
+    });
+    const namingAppPaths = collectNamingRepositoryPaths(fixtureDir, { scope: 'app' });
+    const directCandidatePaths = collectValidatorCandidatePaths(fixtureDir, {
+      scope: 'app',
+      skipSymlinkedCandidateScopeRoots: true,
+      candidatePolicy: createNamingCandidatePolicy(),
+    });
+
+    assert.deepEqual(legacyAppPaths, ['test/inside.test.js']);
+    assert.deepEqual(namingAppPaths, legacyAppPaths);
+    assert.deepEqual(directCandidatePaths.selectedPaths, legacyAppPaths);
+    assert.equal(namingAppPaths.includes('src/outside.logic.ts'), false);
+    assert.equal(namingAppPaths.some((selectedPath) => selectedPath.startsWith('src/')), false);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+    await fs.rm(outsideDir, { recursive: true, force: true });
+  }
+});
+
 test('suite-core candidate helper reproduces current Naming target filtering', async () => {
   const fixtureDir = await createCandidateFixture();
 

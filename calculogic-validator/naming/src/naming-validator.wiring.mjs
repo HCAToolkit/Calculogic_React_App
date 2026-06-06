@@ -67,6 +67,7 @@ const collectNamingCandidatePaths = (repositoryRoot, {
   collectValidatorCandidatePaths(repositoryRoot, {
     scope,
     targets,
+    skipSymlinkedCandidateScopeRoots: true,
     candidatePolicy: createNamingCandidatePolicy({
       reportableExtensions,
       reportableRootFiles,

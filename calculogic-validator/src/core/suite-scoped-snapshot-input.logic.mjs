@@ -12,10 +12,18 @@ const sortPaths = (paths) => Array.from(paths).sort((left, right) => left.locale
 const collectPathsFromScopeRoot = (
   repositoryRoot,
   scopeRoot,
-  { walkExcludedDirectories = new Set(), skipDotDirectories = true } = {},
+  {
+    walkExcludedDirectories = new Set(),
+    skipDotDirectories = true,
+    skipSymlinkedCandidateScopeRoots = false,
+  } = {},
 ) => {
   const absoluteRoot = path.resolve(repositoryRoot, scopeRoot);
   if (!fs.existsSync(absoluteRoot)) {
+    return [];
+  }
+
+  if (skipSymlinkedCandidateScopeRoots && fs.lstatSync(absoluteRoot).isSymbolicLink()) {
     return [];
   }
 
@@ -81,6 +89,7 @@ export const collectSuiteScopedPaths = (
     scope,
     walkExcludedDirectories = new Set(),
     skipDotDirectories = true,
+    skipSymlinkedCandidateScopeRoots = false,
   } = {},
 ) => {
   const selectedScope = scope ?? DEFAULT_VALIDATOR_SCOPE;
@@ -94,6 +103,7 @@ export const collectSuiteScopedPaths = (
     collectPathsFromScopeRoot(repositoryRoot, scopeRoot, {
       walkExcludedDirectories,
       skipDotDirectories,
+      skipSymlinkedCandidateScopeRoots,
     }),
   );
   const rootFilePaths = collectPathsFromRootFiles(repositoryRoot, profile.includeRootFiles);
@@ -113,12 +123,14 @@ export const collectSuiteScopedSnapshotInputs = (
     targets = [],
     walkExcludedDirectories = new Set(),
     skipDotDirectories = true,
+    skipSymlinkedCandidateScopeRoots = false,
   } = {},
 ) => {
   const scopedCollection = collectSuiteScopedPaths(repositoryRoot, {
     scope,
     walkExcludedDirectories,
     skipDotDirectories,
+    skipSymlinkedCandidateScopeRoots,
   });
   const resolvedTargets = resolveScopedTargets(repositoryRoot, targets);
 
