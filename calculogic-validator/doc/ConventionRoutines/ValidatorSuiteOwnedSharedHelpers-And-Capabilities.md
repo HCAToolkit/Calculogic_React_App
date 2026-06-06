@@ -125,6 +125,29 @@ Only currently real, discoverable suite-owned surfaces are listed here.
   - policy registry canonicalization that belongs in loader/converter layers
 - **Reuse boundary type:** composition boundary reuse
 
+### 3.6 Entry: suite-core validator registry metadata surface
+
+- **Owner:** suite-core
+- **Path/area:** `calculogic-validator/src/core/validator-registry.knowledge.mjs`
+- **Concern:** data-only slice registration metadata for current validator-suite registration surfaces.
+- **Current runtime truth:** registry entries keep `id`, `description`, and `run` as the behavior-driving fields. Metadata is inspectable registration data and does not drive runner dispatch, report construction, package scripts, package bins, exit-code behavior, Naming behavior, Tree behavior, or candidate behavior.
+- **Reusable capability:**
+  - canonical slice identity metadata aligned to the registry id;
+  - report identity metadata aligned to current report entry id/validator id/description;
+  - repo-local npm command, direct script, package-bin availability, and report-capture prefix expectations;
+  - default `validate:all` runner inclusion and direct-runnable/runner-only capability metadata;
+  - bounded bridge metadata for the current Naming semantic-family bridge contribution consumed by Tree;
+  - compatibility expectation metadata for current report-mode and behavior-preserving registration.
+- **When to reuse:**
+  - inspecting current suite-core slice registration surfaces;
+  - adding a future validator slice that needs the same bounded registration facts;
+  - writing shape tests that prove command/report/bin expectations are explicit without changing scripts or bins.
+- **When not to reuse:**
+  - driving runtime runner selection, report shape, exit policy, or package command generation before a separate behavior-migration task explicitly scopes that change;
+  - storing slice-owned semantic interpretation policy, finding policy, Naming taxonomy, Tree placement policy, or candidate value authority in suite-core metadata;
+  - creating a universal plugin architecture or generic shared bucket.
+- **Reuse boundary type:** data-only registration metadata boundary
+
 ## 4) Guardrails
 
 - Do **not** invent shared helpers in this inventory that do not currently exist.

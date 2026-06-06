@@ -355,9 +355,13 @@ A follow-up child issue for validator registry metadata hardening should be acce
 7. No runtime behavior, report shape, exit behavior, package scripts, bins, Naming interpretation, or Tree interpretation changes.
 8. The PR body records exact verification commands and outcomes.
 
-## Later / not worth it yet
+## Implementation note for child issue #588
 
-Not worth doing before registry metadata hardening:
+Current implementation reality after #588: suite-core validator registry entries include bounded data-only metadata for Naming and Tree registration surfaces. This metadata makes current command/report/bin expectations, default `validate:all` inclusion, report-capture prefixes, and the Naming → Tree bridge relationship inspectable without changing runtime dispatch, report shape, exit-code behavior, package scripts, package bins, Naming behavior, Tree behavior, or candidate behavior.
+
+## Later / not worth in this metadata slice
+
+Not worth doing as part of the data-only registry metadata slice:
 
 - adding `calculogic-validate-tree` or changing package bins;
 - changing `calculogic-validate` to support `--target`;
@@ -380,14 +384,14 @@ Potential later slices after registry metadata hardening:
 
 ## Parent #585 recommendation
 
-Parent #585 should remain open after this audit long enough to create the next implementation child for **validator registry metadata hardening**. After that implementation child is accepted or explicitly queued, parent #585 can be summarized with:
+Parent #585 should remain open for human-owner review and manual closure. After child issue #588 is accepted, parent #585 can be summarized with:
 
 - current runtime truth: scope, target, candidate, report-output, report-meta, report-capture, and exit-code mechanics are already sufficiently repeatable for current slices;
-- current implementation reality: validator registry metadata and command/bin/report identity alignment remain under-hardened;
-- staged implementation path: harden registry metadata first, then use that metadata to decide whether command/bin/report-profile alignment is worth a separate child;
+- current implementation reality: validator registry metadata now exposes bounded data-only identity, command/report/bin, runner inclusion, report-capture, bridge, and compatibility expectations for current Naming and Tree registration surfaces;
+- staged implementation path: use the registry metadata to decide whether command/bin/report-profile alignment is worth a separate child;
 - not current runtime truth: no universal plugin architecture, no suite-core ownership of Naming/Tree interpretation policy, no package-consumer invocation model decision, and no report/exit behavior migration.
 
-Use `Refs #586`, `Refs #585`, and `Refs #579` in PR and parent notes. Do not use closing keywords; the human owner should close #586 and #585 manually after review.
+Use `Refs #588`, `Refs #586`, and `Refs #585` in PR and parent notes. Do not use closing keywords; the human owner should close #588, #586, and #585 manually after review.
 
 ## Evidence
 
@@ -436,7 +440,7 @@ Required inspection targets were reviewed across:
 - Root package scripts expose repo-local validator workflows and report capture commands in `package.json`.
 - Validator package exports and bins expose suite-core, registry, scopes, Naming, Tree, full-suite, Naming-only, and health surfaces in `calculogic-validator/package.json`.
 - `calculogic-validator/src/index.mjs` exports runner, registry, and report contract surfaces.
-- `calculogic-validator/src/core/validator-registry.knowledge.mjs` registers only `id`, `description`, and `run`, with id list/get helpers.
+- `calculogic-validator/src/core/validator-registry.knowledge.mjs` now registers behavior-driving `id`, `description`, and `run` fields plus bounded data-only metadata for slice identity, command/report/bin expectations, default runner inclusion, report capture prefixes, bridge relationships, and compatibility expectations; id list/get helpers remain unchanged.
 - `calculogic-validator/src/core/validator-runner.logic.mjs` owns selected-validator resolution, report-entry assembly, runner envelope, and current Naming → Tree staged bridge mechanics.
 - `calculogic-validator/src/core/validator-report.contracts.mjs` documents the current runner report contract and pass-through summary/meta areas.
 - `calculogic-validator/src/core/validator-report-meta.logic.mjs` owns tool-version lookup, stable stringify, sha256, and config digest helpers.

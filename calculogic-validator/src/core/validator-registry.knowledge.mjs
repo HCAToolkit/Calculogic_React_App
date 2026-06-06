@@ -66,11 +66,103 @@ export const VALIDATOR_REGISTRY = [
   {
     id: 'naming',
     description: 'Filename naming validator (report-mode).',
+    metadata: {
+      sliceId: 'naming',
+      report: {
+        entryId: 'naming',
+        validatorId: 'naming',
+        description: 'Filename naming validator (report-mode).',
+        mode: 'report',
+        profileId: 'naming',
+      },
+      commands: {
+        repoLocalNpmScript: 'validate:naming',
+        repoLocalNpmInvocation: 'npm run validate:naming --',
+        directScriptPath: 'calculogic-validator/scripts/validate-naming.host.mjs',
+      },
+      packageBin: {
+        expectedName: 'calculogic-validate-naming',
+        available: true,
+      },
+      runner: {
+        defaultIncludedInValidateAll: true,
+        directRunnable: true,
+        runnerOnly: false,
+        selectionId: 'naming',
+      },
+      bridge: {
+        provides: [
+          {
+            id: 'naming-semantic-family-bridge',
+            consumerValidatorIds: ['tree-structure-advisor'],
+            stagedBy: 'validator-runner',
+          },
+        ],
+        consumes: [],
+      },
+      reportCapture: {
+        profileId: 'naming',
+        scriptPattern: 'report:naming:<scope>',
+        prefixPattern: 'naming-<scope>',
+        scopes: ['repo', 'app', 'docs', 'validator', 'system'],
+      },
+      compatibility: {
+        behaviorPreservingMetadataOnly: true,
+        selectedByRegistryId: true,
+        reportShapeDrivenByRunner: true,
+      },
+    },
     run: runNamingValidatorHook,
   },
   {
     id: 'tree-structure-advisor',
     description: 'Repository tree structure advisory validator (report-only).',
+    metadata: {
+      sliceId: 'tree-structure-advisor',
+      report: {
+        entryId: 'tree-structure-advisor',
+        validatorId: 'tree-structure-advisor',
+        description: 'Repository tree structure advisory validator (report-only).',
+        mode: 'report',
+        profileId: 'tree-structure-advisor',
+      },
+      commands: {
+        repoLocalNpmScript: 'validate:tree',
+        repoLocalNpmInvocation: 'npm run validate:tree --',
+        directScriptPath: 'calculogic-validator/scripts/validate-tree.host.mjs',
+      },
+      packageBin: {
+        expectedName: 'calculogic-validate-tree',
+        available: false,
+      },
+      runner: {
+        defaultIncludedInValidateAll: true,
+        directRunnable: true,
+        runnerOnly: false,
+        selectionId: 'tree-structure-advisor',
+      },
+      bridge: {
+        provides: [],
+        consumes: [
+          {
+            id: 'naming-semantic-family-bridge',
+            providerValidatorId: 'naming',
+            stagedBy: 'validator-runner',
+          },
+        ],
+      },
+      reportCapture: {
+        profileId: 'tree-structure-advisor',
+        scriptPattern: 'report:tree:<scope>',
+        prefixPattern: 'validate-tree-<scope>',
+        scopes: ['repo', 'app', 'docs', 'validator', 'system'],
+      },
+      compatibility: {
+        behaviorPreservingMetadataOnly: true,
+        selectedByRegistryId: true,
+        reportShapeDrivenByRunner: true,
+      },
+    },
     run: runTreeStructureAdvisorHook,
   },
 ];
