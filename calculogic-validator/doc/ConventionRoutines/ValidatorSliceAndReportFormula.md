@@ -4,7 +4,7 @@ Purpose: define the repeatable formula future validator slices use to integrate 
 
 Authority: bounded normative supporting spec. Defer primary runtime behavior to `ValidatorSuite-Contracts-And-Modes.md`, slice-owned canonical specs, and current runtime truth.
 
-Issue context: active child/task issue #591 under parent #590, informed by completed repeatable-slice infrastructure context from #585 / #586 / #588 and PRs #587 / #589.
+Provenance: informed by completed candidate-policy and repeatable validator-slice infrastructure hardening work.
 
 Non-goals for this formula slice:
 
