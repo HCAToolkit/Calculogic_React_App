@@ -60,6 +60,9 @@ Authority labels used in this index:
 - `doc/ValidatorSpecs/cross-cutting/registry-model-and-slice-interaction.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** suite-level registry model/interaction constraints for implementation design and ownership boundaries; defer primary runtime authority to canonical contracts/slice specs.
 
+- `doc/ConventionRoutines/ValidatorSliceAndReportFormula.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** concise normative formula/checklist for validator slice integration, suite-core usage, report behavior, bridge relationships, evidence-vs-policy separation, registry metadata, and command/docs/test expectations; defer primary runtime authority to suite contract + slice specs.
+
 - `doc/ValidatorSpecs/tree-owned/tree-structural-vocabulary-and-root-classification.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** tree-owned structural vocabulary and root-classification modeling contract; supports tree interpretation work without replacing canonical tree runtime authority.
 
