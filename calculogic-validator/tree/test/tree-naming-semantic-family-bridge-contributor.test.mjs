@@ -64,6 +64,30 @@ test('tree naming bridge contributor does not derive semantic-family when naming
   assert.deepEqual(findings, []);
 });
 
+test('tree naming bridge contributor drops incomplete observations instead of re-deriving naming semantics', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({
+    observations: [
+      {
+        path: 'src/features/build/build-surface.logic.ts',
+        semanticName: 'build-surface',
+        familyRoot: 'build',
+      },
+      {
+        path: 'src/shared/build/build-surface.results.ts',
+        semanticName: 'build-surface',
+        familyRoot: 'build',
+      },
+      {
+        path: 'src/tools/build/build-surface.knowledge.ts',
+        semanticName: 'build-surface',
+        familyRoot: 'build',
+      },
+    ],
+  });
+
+  assert.deepEqual(findings, []);
+});
+
 test('tree naming bridge placement model resolves structural home and semantic container separately', () => {
   const placement = toNamingBridgePlacementRecord({
     path: 'calculogic-validator/tree/src/contributors/tree-occurrence.logic.mjs',

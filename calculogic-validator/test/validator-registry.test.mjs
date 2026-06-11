@@ -143,6 +143,21 @@ test('bridge metadata documents current Naming to Tree relationship without driv
   ]);
 });
 
+test('registry metadata keeps Addressing classified outside standalone runnable validator slices', () => {
+  assert.equal(getValidatorById('addressing'), null);
+  assert.equal(getValidatorById('structural-addressing'), null);
+
+  const registeredBridgeIds = VALIDATOR_REGISTRY.flatMap((validator) => [
+    ...validator.metadata.bridge.provides.map((bridge) => bridge.id),
+    ...validator.metadata.bridge.consumes.map((bridge) => bridge.id),
+  ]).sort((left, right) => left.localeCompare(right));
+
+  assert.deepEqual(registeredBridgeIds, [
+    'naming-semantic-family-bridge',
+    'naming-semantic-family-bridge',
+  ]);
+});
+
 test('registry metadata is serializable and only run hooks remain executable functions', () => {
   for (const validator of VALIDATOR_REGISTRY) {
     assert.doesNotThrow(() => JSON.stringify(validator.metadata));
