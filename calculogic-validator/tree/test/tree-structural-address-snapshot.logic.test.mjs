@@ -23,6 +23,9 @@ test('structural-address snapshot returns neutral evidence envelope shape', () =
   assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'code')), false);
   assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'severity')), false);
   assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'placementConfidence')), false);
+  assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'folderKind')), false);
+  assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'structuralHome')), false);
+  assert.equal(snapshot.occurrenceRecords.some((record) => Object.hasOwn(record, 'semanticHome')), false);
 });
 
 test('structural-address snapshot markers preserve deterministic folder/file addressing semantics', () => {

@@ -45,6 +45,18 @@ test('returns addressedTreeSnapshot/tree-codebase/T and preserves source scope t
   assert.equal(result.target, null);
 });
 
+test('addressed tree snapshot remains provider-owned structural evidence without tree policy fields', () => {
+  const result = prepareTreeCodebaseAddressedSnapshot(buildFixtureInput());
+
+  assert.equal(result.occurrenceRecords.some((record) => Object.hasOwn(record, 'code')), false);
+  assert.equal(result.occurrenceRecords.some((record) => Object.hasOwn(record, 'severity')), false);
+  assert.equal(result.occurrenceRecords.some((record) => Object.hasOwn(record, 'summary')), false);
+  assert.equal(result.occurrenceRecords.some((record) => Object.hasOwn(record, 'placementConfidence')), false);
+  assert.equal(result.occurrenceRecords.some((record) => Object.hasOwn(record, 'folderKind')), false);
+  assert.equal(result.occurrenceRecords.some((record) => Object.hasOwn(record, 'structuralHome')), false);
+  assert.equal(result.occurrenceRecords.some((record) => Object.hasOwn(record, 'semanticHome')), false);
+});
+
 test('scope root and descendants receive deterministic address paths', () => {
   const result = prepareTreeCodebaseAddressedSnapshot(buildFixtureInput());
 

@@ -63,6 +63,9 @@ Authority labels used in this index:
 - `doc/ConventionRoutines/ValidatorSliceAndReportFormula.md`
   **Authority:** bounded normative supporting spec. **Intended use:** concise normative formula/checklist for validator slice integration, suite-core usage, report behavior, bridge relationships, evidence-vs-policy separation, registry metadata, and command/docs/test expectations; defer primary runtime authority to suite contract + slice specs.
 
+- `doc/ConventionRoutines/ValidatorBridgeContracts.md`
+  **Authority:** bounded normative supporting spec. **Intended use:** current bridge-contract expectations for Naming -> Tree and Addressing -> Tree ownership boundaries, bridge ids, provider/consumer responsibilities, registry metadata expectations, and no-silent-rederivation tests; defer primary runtime authority to suite contract + slice specs.
+
 - `doc/ValidatorSpecs/tree-owned/tree-structural-vocabulary-and-root-classification.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** tree-owned structural vocabulary and root-classification modeling contract; supports tree interpretation work without replacing canonical tree runtime authority.
 
