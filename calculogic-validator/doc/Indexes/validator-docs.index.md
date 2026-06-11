@@ -122,6 +122,9 @@ Authority labels used in this index:
 - `doc/Audits/validator-repeatable-slice-infrastructure.audit.md`
   **Authority:** audit snapshot. **Intended use:** docs-only audit of repeatable suite-core validator-slice infrastructure, hardening status, registry-worthy metadata, command/report alignment, and recommended first implementation slice under #585.
 
+- `doc/Audits/validator-slice-formula-alignment.audit.md`
+  **Authority:** audit snapshot. **Intended use:** docs-only audit of Naming, Tree, and Structural Addressing / Addressing alignment against the validator slice/report formula, including immediate, near-term, deferred, and not-worth-it-yet follow-up recommendations.
+
 ## 8) Maintenance note
 
 - When adding a new validator doc, classify it in this index using one of the authority labels above.

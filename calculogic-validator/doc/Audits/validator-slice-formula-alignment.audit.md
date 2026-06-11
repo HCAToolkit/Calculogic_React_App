@@ -4,9 +4,9 @@
 
 This audit uses `calculogic-validator/doc/ConventionRoutines/ValidatorSliceAndReportFormula.md` as the rubric for Naming, Tree, and Structural Addressing / Addressing alignment with the validator slice and report formula.
 
-This is an audit/planning slice, not an implementation slice. It records current runtime truth, current implementation reality, merged docs/spec truth, historical issue/PR intent, and future/planning-only intent without changing runtime behavior, report shape, report ids/descriptions, findings, summaries, severities, exit-code behavior, package scripts, package bins, registry loaders, Naming behavior, Tree behavior, Addressing behavior, or candidate behavior.
+This is an audit/planning slice, not an implementation slice. It records current runtime truth, current implementation reality, merged docs/spec truth, historical context, and future/planning-only intent without changing runtime behavior, report shape, report ids/descriptions, findings, summaries, severities, exit-code behavior, package scripts, package bins, registry loaders, Naming behavior, Tree behavior, Addressing behavior, or candidate behavior.
 
-Active child/task issue: #594. Parent issue: #590. Completed formula-doc context: #591 / PR #592. Historical intent was considered from #575, #579, #585, #586 / PR #587, #588 / PR #589, #590, #591 / PR #592, and #594, but current repo reality remains primary evidence.
+Provenance: this audit follows the validator slice/report formula introduced after the completed formula-doc slice and uses current repo reality as primary evidence.
 
 ## Evidence reviewed
 
@@ -107,7 +107,7 @@ Current runtime truth: Naming should remain owner of filename parsing, semantic-
 
 Merged docs/spec truth: the formula expects registry metadata for repeatable integration questions and suite-core ownership of report wrapping mechanics. Naming satisfies the data declaration part and partially satisfies the consumption part.
 
-Historical issue/PR intent: PR #592 provided the formula as a rubric, not a mandate to migrate runtime behavior in this audit slice.
+Historical formula-doc context: the completed formula-doc slice provided the formula as a rubric, not a mandate to migrate runtime behavior in this audit slice.
 
 Future/planning-only intent: registry-driven command/report literal consumption may be useful later, but it should be scoped as an implementation child because it can affect runtime and report behavior.
 
@@ -193,7 +193,7 @@ Current implementation reality: Tree still contains Tree-local structural-addres
 
 Merged docs/spec truth: the formula classifies Addressing as a hybrid shared validator layer plus bridge provider for now and says it should not become standalone until it has independent report value.
 
-Historical issue/PR intent: issue #594 asks only to audit and classify current Addressing reality. It does not authorize Addressing runtime extraction.
+Historical task context: this audit records and classifies current Addressing reality. It does not authorize Addressing runtime extraction.
 
 Future/planning-only intent: Addressing can later become the explicit provider of addressed snapshots through a bridge boundary. That should remain separate from Tree placement reasoning.
 
