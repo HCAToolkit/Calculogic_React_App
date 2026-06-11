@@ -1,3 +1,4 @@
+import { buildDirectValidatorReportEnvelope } from '../../../src/core/validator-direct-report.logic.mjs';
 import { summarizeFindings } from '../naming-validator.host.mjs';
 
 export const buildNamingValidatorReport = ({
@@ -12,16 +13,20 @@ export const buildNamingValidatorReport = ({
   selectedScopeProfile,
   startedAtDate,
   endedAtDate,
+  registryEntry,
 }) => {
   const summary = summarizeFindings(findings);
 
   return {
-    mode: 'report',
-    validatorId: 'naming',
-    toolVersion,
-    ...(toolVersion ? { validatorVersion: toolVersion } : {}),
-    ...(configDigest ? { configDigest } : {}),
-    sourceSnapshot,
+    ...buildDirectValidatorReportEnvelope({
+      registryEntry,
+      fallbackValidatorId: 'naming',
+      toolVersion,
+      configDigest,
+      sourceSnapshot,
+      startedAtDate,
+      endedAtDate,
+    }),
     ...(registry
       ? {
           registryState: registry.registryState,
@@ -29,9 +34,6 @@ export const buildNamingValidatorReport = ({
           registryDigests: registry.registryDigests,
         }
       : {}),
-    startedAt: startedAtDate.toISOString(),
-    endedAt: endedAtDate.toISOString(),
-    durationMs: endedAtDate.getTime() - startedAtDate.getTime(),
     scope,
     totalFilesScanned,
     filters,
