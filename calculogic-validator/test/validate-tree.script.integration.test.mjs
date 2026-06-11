@@ -111,6 +111,102 @@ test('validate-tree prints usage when npm args are not forwarded', () => {
   assert.match(result.stderr, /Usage: npm run validate:tree --/);
 });
 
+
+test('validate-tree help keeps current command usage surface', () => {
+  const result = runValidateTree(repositoryRoot, ['--help']);
+
+  assert.equal(result.status, 0);
+  assert.equal(result.stderr, '');
+  assert.equal(
+    result.stdout,
+    [
+      'Usage: npm run validate:tree -- [--scope=<repo|app|docs|validator|system>] [--target=<path>]... [--config=<path>]',
+      'Scopes:',
+      '  - app: Application-only scan (src/** and test/**).',
+      '  - docs: Documentation-focused scan (doc/docs and root conventional docs: README.md).',
+      '  - repo: Repository-wide scan of all reportable files.',
+      '  - system: System/tooling files scan (root package/tsconfig/eslint/vite files).',
+      '  - validator: Validator-only scan (calculogic-validator/**).',
+      'Default scope: validator default (repo for tree-structure-advisor)',
+      'Validator: tree-structure-advisor',
+      'Examples:',
+      '  ✅ npm run validate:tree -- --scope=repo',
+      '  ✅ npm run validate:tree -- --scope=app --target src/tree',
+      '  ✅ npm run validate:tree -- --target calculogic-validator/tree/src',
+      '  ✅ npm run validate:all -- --validators=tree-structure-advisor --scope=repo',
+      '',
+    ].join('\n'),
+  );
+});
+
+test('validate-tree direct report entry preserves no-finding shape against runner tree selection', () => {
+  const directResult = runValidateTree(repositoryRoot, [
+    '--scope=validator',
+    '--target=calculogic-validator/src/core',
+  ]);
+  const runnerResult = spawnSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      path.resolve(repositoryRoot, 'calculogic-validator/scripts/validate-all.host.mjs'),
+      '--scope=validator',
+      '--validators=tree-structure-advisor',
+      '--target=calculogic-validator/src/core',
+    ],
+    { cwd: repositoryRoot, encoding: 'utf8' },
+  );
+
+  assert.equal(directResult.status, 0);
+  assert.equal(runnerResult.status, 0);
+
+  const directReport = JSON.parse(directResult.stdout);
+  const runnerReport = JSON.parse(runnerResult.stdout);
+
+  assert.equal(directReport.mode, 'report');
+  assert.equal(directReport.validatorId, 'runner');
+  assert.equal(directReport.validators.length, 1);
+  assert.deepEqual(directReport.validators[0], runnerReport.validators[0]);
+  assert.deepEqual(directReport.validators[0].findings, []);
+  assert.deepEqual(directReport.validators[0].counts, { 'advisory-structure': 0 });
+  assert.deepEqual(directReport.validators[0].codeCounts, {});
+});
+
+test('validate-tree direct report entry preserves finding codes severities and summaries against runner tree selection', () => {
+  const args = ['--scope=validator', '--target=calculogic-validator/tree'];
+  const directResult = runValidateTree(repositoryRoot, args);
+  const runnerResult = spawnSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      path.resolve(repositoryRoot, 'calculogic-validator/scripts/validate-all.host.mjs'),
+      '--scope=validator',
+      '--validators=tree-structure-advisor',
+      '--target=calculogic-validator/tree',
+    ],
+    { cwd: repositoryRoot, encoding: 'utf8' },
+  );
+
+  assert.equal(directResult.status, 0);
+  assert.equal(runnerResult.status, 0);
+
+  const directEntry = JSON.parse(directResult.stdout).validators[0];
+  const runnerEntry = JSON.parse(runnerResult.stdout).validators[0];
+  const findingSignature = (finding) => ({
+    code: finding.code,
+    severity: finding.severity,
+    path: finding.path,
+    classification: finding.classification,
+  });
+
+  assert.deepEqual(directEntry.counts, runnerEntry.counts);
+  assert.deepEqual(directEntry.codeCounts, runnerEntry.codeCounts);
+  assert.deepEqual(
+    directEntry.findings.map(findingSignature),
+    runnerEntry.findings.map(findingSignature),
+  );
+  assert.ok(directEntry.findings.length > 0);
+});
+
 test('validate-tree does not expose strict-mode toggling', () => {
   const result = runValidateTree(repositoryRoot, ['--strict']);
 
