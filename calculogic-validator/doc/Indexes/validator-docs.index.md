@@ -128,6 +128,9 @@ Authority labels used in this index:
 - `doc/Audits/validator-slice-formula-alignment.audit.md`
   **Authority:** audit snapshot. **Intended use:** docs-only audit of Naming, Tree, and Structural Addressing / Addressing alignment against the validator slice/report formula, including immediate, near-term, deferred, and not-worth-it-yet follow-up recommendations.
 
+- `doc/Audits/naming-tree-suite-core-usage-alignment.audit.md`
+  **Authority:** audit snapshot. **Intended use:** docs-only audit of current Naming and Tree suite-core usage alignment against the validator slice/report/bridge formula, including classified suite-core mechanics, registry metadata, report/capture, command/bin/package-surface, bridge, deferred Tree reasoning, and deferred Addressing gaps.
+
 ## 8) Maintenance note
 
 - When adding a new validator doc, classify it in this index using one of the authority labels above.
