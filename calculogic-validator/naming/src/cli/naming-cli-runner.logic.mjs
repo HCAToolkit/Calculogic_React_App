@@ -6,6 +6,7 @@ import {
 } from '../../../src/core/validator-report-meta.logic.mjs';
 import { deriveExitCodeFromFindings } from '../../../src/core/validator-exit-code.logic.mjs';
 import { getSourceSnapshot } from '../../../src/core/source-snapshot.logic.mjs';
+import { getValidatorById } from '../../../src/core/validator-registry.knowledge.mjs';
 import {
   writeValidatorReportToStdout,
   setValidatorReportExitCode,
@@ -75,6 +76,7 @@ export const runNamingCli = ({ argv, usageLines, repositoryRoot, npmArgForwardin
     selectedScopeProfile,
     startedAtDate,
     endedAtDate,
+    registryEntry: getValidatorById('naming'),
   });
 
   const effectiveStrictExit = parsed.strict ? true : config?.strictExit === true;

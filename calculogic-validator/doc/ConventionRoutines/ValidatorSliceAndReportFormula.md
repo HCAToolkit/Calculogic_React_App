@@ -124,8 +124,8 @@ Report behavior requirements:
 | Summary | Slice owns summary meaning and summary buckets/counts. |
 | Counts | Slice should expose deterministic counts through `summary.counts` when available. |
 | Meta | Runtime normalized views and filter metadata may appear under `meta`; meta must not become competing policy truth. |
-| Report wrapping | Suite-core owns the runner report envelope and per-validator report-entry wrapping. |
-| Report id/description | Registry metadata should be the stable input for report identity. Existing wrappers may preserve current runtime truth until migrated. |
+| Report wrapping | Suite-core owns the runner report envelope, per-validator report-entry wrapping, and behavior-preserving direct-report envelope mechanics where exact parity tests prove current report shape remains stable. |
+| Report id/description | Registry metadata should be the stable input for report identity. Existing wrappers may preserve current runtime truth until migrated; migrated direct wrappers must preserve current report ids/descriptions unless a scoped behavior delta is explicitly accepted. |
 | Severity behavior | Slice-owned finding policy controls severity; this formula does not change severity behavior. |
 | Exit-code derivation | Suite-core derives exit code from findings and exit policy. Slices do not own suite exit-code mechanics. |
 | Stdout/stderr | CLI wrappers should keep deterministic JSON/report output behavior and route non-report diagnostics intentionally. |
@@ -138,7 +138,7 @@ Checklist:
 
 - [ ] Base runtime result shape is present.
 - [ ] Slice summary meaning remains slice-owned.
-- [ ] Suite-core wrapping remains the report envelope owner.
+- [ ] Suite-core wrapping remains the report envelope owner, including direct-report envelope mechanics where parity has been proven.
 - [ ] Exit-code derivation uses suite-core mechanics.
 - [ ] Metadata is deterministic and not competing policy truth.
 - [ ] Scope, target, and path fields are normalized and stable.
