@@ -138,7 +138,7 @@ Tree may consume addressed evidence, but Addressing does not determine whether a
 
 ### 3.4 Current Addressing classification
 
-Within current implementation reality, Addressing is a hybrid shared validator layer plus bridge provider for now.
+Within current implementation reality, Addressing has a current hybrid shared validator layer plus bridge-provider classification.
 
 Addressing is:
 
@@ -146,10 +146,10 @@ Addressing is:
 - a bridge provider for addressed tree snapshots and pre-reasoning structural evidence;
 - not pure suite-core;
 - not purely Tree-owned;
-- not a standalone runnable validator slice;
-- not registered as a runner-visible validator slice.
+- not currently a standalone runnable validator slice;
+- not currently registered as a runner-visible validator slice.
 
-This classification preserves the staged implementation path: Addressing can later become a more explicit provider boundary only if a scoped issue preserves report behavior, Tree ownership of placement reasoning, and existing package/bin expectations.
+This current non-runnable bridge-provider classification preserves the staged implementation path: any future Addressing runtime handoff or extraction requires a scoped issue that preserves report behavior, Tree ownership of placement reasoning, and existing package/bin expectations.
 
 ### 3.5 No Tree placement transfer rule
 
@@ -181,9 +181,9 @@ Current runner-visible registry metadata declares Naming -> Tree:
 - `tree-structure-advisor.metadata.bridge.consumes[].providerValidatorId = naming`;
 - both sides are staged by `validator-runner`.
 
-Current registry metadata does not register Addressing as a validator slice. That absence is intentional current implementation reality for this bridge-contract task because Addressing is a hybrid shared validator layer plus bridge provider, not a standalone runnable validator slice.
+Current registry metadata does not register Addressing as a validator slice. That absence is intentional current implementation reality for this bridge-contract task because Addressing has a current hybrid shared validator layer plus bridge-provider classification and is not currently a standalone runnable validator slice.
 
-If Addressing later becomes runner-visible, add registry metadata before changing runtime behavior:
+Under the staged implementation path, add registry metadata before any future change that makes Addressing runner-visible:
 
 1. docs/spec alignment;
 2. data-only registry payloads;
@@ -201,4 +201,4 @@ Focused bridge-contract tests should preserve these facts:
 - Tree keeps Naming bridge evidence separate from Tree placement findings and does not emit Naming findings.
 - Tree keeps structural-home and semantic-home placement reasoning distinct.
 - Addressing and Tree addressed snapshots remain neutral evidence envelopes without Tree findings, severity, placement confidence, folder-kind policy, structural-home policy, or semantic-home policy fields.
-- Registry tests preserve that Naming -> Tree is the only current runner-visible bridge and that Addressing remains unregistered as a standalone runnable validator slice.
+- Registry tests preserve that Naming -> Tree is the only current runner-visible bridge and that Addressing remains unregistered under the current non-runnable bridge-provider classification.
