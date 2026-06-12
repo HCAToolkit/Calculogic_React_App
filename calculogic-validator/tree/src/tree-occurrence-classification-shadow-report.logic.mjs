@@ -84,7 +84,7 @@ export const prepareTreeOccurrenceClassificationShadowReport = (input) => {
     occurrenceType: parityRecord?.occurrenceType ?? null,
     currentStructuralClass: parityRecord?.currentStructuralClass ?? null,
     currentStructuralKind: parityRecord?.currentStructuralKind ?? null,
-    currentIsKnownTopRoot: parityRecord?.currentIsKnownTopRoot ?? false,
+    currentIsRepoShapeAllowedTopLevelDirectory: parityRecord?.currentIsRepoShapeAllowedTopLevelDirectory ?? false,
     currentIsStructuralRoot: parityRecord?.currentIsStructuralRoot ?? false,
     currentIsSemanticRoot: parityRecord?.currentIsSemanticRoot ?? false,
     replacementFolderKind: parityRecord?.replacementFolderKind ?? null,

@@ -60,7 +60,7 @@ test('returns deterministic evidence-only records from tree-owned inputs', () =>
   ]);
 });
 
-test('does not emit findings/verdict or known-roots classification fields', () => {
+test('does not emit findings/verdict or retired root-classification fields', () => {
   const result = prepareTreeFolderKindEvidence({
     addressedOccurrenceRecords: [{ addressPath: 'A', parentAddressPath: null, path: 'src', name: 'src', occurrenceType: 'folder' }],
     treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'src', structuralHome: 'src' }] },
@@ -75,7 +75,7 @@ test('does not emit findings/verdict or known-roots classification fields', () =
     'verdict',
     'placementVerdict',
     'advisorDecision',
-    'isKnownTopRoot',
+    'isRepoShapeAllowedTopLevelDirectory',
     'isStructuralRoot',
     'isSemanticRoot',
     'structuralClass',

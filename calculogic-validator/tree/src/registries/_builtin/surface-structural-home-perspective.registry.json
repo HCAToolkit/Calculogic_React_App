@@ -4,7 +4,7 @@
     "runtime": [
       {
         "structuralHome": "src",
-        "relationshipStatus": "current-known-root-aligned",
+        "relationshipStatus": "current-repo-shape-policy-aligned",
         "signalStrength": "strong",
         "rationale": "Runtime artifacts commonly live under source or implementation homes."
       },
@@ -30,7 +30,7 @@
       },
       {
         "structuralHome": "src",
-        "relationshipStatus": "current-known-root-aligned",
+        "relationshipStatus": "current-repo-shape-policy-aligned",
         "signalStrength": "contextual",
         "rationale": "UI-facing implementation may also live under source homes depending on framework structure."
       }
@@ -38,15 +38,15 @@
     "quality": [
       {
         "structuralHome": "test",
-        "relationshipStatus": "current-known-root-aligned",
+        "relationshipStatus": "current-repo-shape-policy-aligned",
         "signalStrength": "strong",
-        "rationale": "Quality-support artifacts align with the current repo's singular test known root."
+        "rationale": "Quality-support artifacts align with the current repo-shape policy's singular test top-level directory."
       }
     ],
     "docs": [
       {
         "structuralHome": "doc",
-        "relationshipStatus": "current-known-root-aligned",
+        "relationshipStatus": "current-repo-shape-policy-aligned",
         "signalStrength": "strong",
         "rationale": "Documentation surfaces align with documentation homes."
       }
@@ -54,7 +54,7 @@
     "tooling": [
       {
         "structuralHome": "scripts",
-        "relationshipStatus": "current-known-root-aligned",
+        "relationshipStatus": "current-repo-shape-policy-aligned",
         "signalStrength": "strong",
         "rationale": "Tooling automation commonly lives under scripts homes."
       }

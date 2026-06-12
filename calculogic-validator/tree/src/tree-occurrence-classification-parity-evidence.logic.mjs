@@ -104,8 +104,8 @@ const toCurrentClassLabel = (record) => {
     return 'semantic-root';
   }
 
-  if (record?.isKnownTopRoot === true) {
-    return 'known-top-root';
+  if (record?.isRepoShapeAllowedTopLevelDirectory === true) {
+    return 'repo-shape-allowed-top-level-directory';
   }
 
   return 'non-root-or-unknown';
@@ -132,7 +132,7 @@ const isTopRootCandidateOccurrence = (occurrenceRecord, currentRecord) => {
     return false;
   }
 
-  if (currentRecord?.isKnownTopRoot === true || currentRecord?.isStructuralRoot === true || currentRecord?.isSemanticRoot === true) {
+  if (currentRecord?.isRepoShapeAllowedTopLevelDirectory === true || currentRecord?.isStructuralRoot === true || currentRecord?.isSemanticRoot === true) {
     return true;
   }
 
@@ -232,7 +232,7 @@ export const prepareTreeOccurrenceClassificationParityEvidence = (input) => {
       occurrenceType: occurrenceRecord?.occurrenceType ?? null,
       currentStructuralClass: currentRecord?.structuralClass ?? null,
       currentStructuralKind: currentRecord?.structuralKind ?? null,
-      currentIsKnownTopRoot: currentRecord?.isKnownTopRoot ?? false,
+      currentIsRepoShapeAllowedTopLevelDirectory: currentRecord?.isRepoShapeAllowedTopLevelDirectory ?? false,
       currentIsStructuralRoot: currentRecord?.isStructuralRoot ?? false,
       currentIsSemanticRoot: currentRecord?.isSemanticRoot ?? false,
       replacementFolderKind,

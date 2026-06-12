@@ -66,7 +66,7 @@ Current boundary note: shipped tree heuristics may ingest naming-derived semanti
 
 1. **Top-level unexpected-folder advisory**
    - Emit info advisory for clearly unusual non-hidden top-level folders outside known repo shape.
-   - Builtin known-root baseline remains bounded/deterministic and includes stable current peers: `bin`, `calculogic-doc-engine`, `calculogic-validator`, `doc`, `docs`, `public`, `scripts`, `src`, `test`, `tools`.
+   - Builtin Tree-owned repo-shape policy remains bounded/deterministic and includes stable current peers: `bin`, `calculogic-doc-engine`, `calculogic-validator`, `doc`, `docs`, `public`, `scripts`, `src`, `test`, `tools`.
 2. **Validator-owned-looking file outside validator tree**
    - Emit info advisory when filename/path signal strongly indicates validator ownership but file is outside `calculogic-validator/**`.
 
@@ -93,7 +93,7 @@ V0.1.7 introduces a suite-core scoped snapshot/input helper boundary and migrate
 - tree wiring consumes the shared scoped snapshot input and still prepares tree-local top-level directory inventory
 - tree runtime remains slice-owned for tree-core findings using prepared tree-core inputs only (`selectedPaths`, `topLevelDirectoryNames`, `targets`) and consumes occurrence-derived file-path reasoning input when `occurrenceSnapshot.occurrenceRecords` is available (bounded fallback to `selectedPaths` when occurrence snapshot is absent/malformed)
 - tree contributor attachment now supports bounded naming-owned semantic-family bridge payloads (`namingSemanticFamilyBridge.observations[]`) for structural advisories while preserving naming ownership of semantic derivation and validity interpretation
-- occurrence-driven file reasoning now carries bounded structural class metadata on occurrence records (`structuralClass`, `structuralKind`, repo-top known-root flags, scoped-root flag, subtree-partition candidate flag) for near-term tree-local interpretation
+- occurrence-driven file reasoning now carries bounded structural class metadata on occurrence records (`structuralClass`, `structuralKind`, repo-shape allowed top-level-directory flags, scoped-root flag, subtree-partition candidate flag) for near-term tree-local interpretation
 - tree-run default contributor selection is owned by a dedicated assembly/wiring module so tree wiring only prepares tree-core inputs
 - shim/content-backed diagnostics are attached from a shim-owned contributor helper that prepares lazy content access (cache + selected-path guard) so tree-core runtime does not require file-content access
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
@@ -101,7 +101,7 @@ V0.1.7 introduces a suite-core scoped snapshot/input helper boundary and migrate
 - Tree runtime now uses prepared replacement evidence for occurrence classification from addressed occurrences, structural-home evidence, semantic-home evidence, and folder-kind evidence.
 - Unexpected top-level folder policy now uses an explicit Tree-owned repo-shape policy boundary; structural-home vocabulary does not automatically allow repo-top folders for `TREE_UNEXPECTED_TOP_LEVEL_FOLDER`.
 - Direct runtime callers that omit replacement-runtime composition still use the explicit Tree-owned repo-shape policy fallback instead of suppressing unexpected top-level folder findings.
-- Unexpected top-level folder details report the full Tree-owned allowed repo-shape policy in `details.knownRoots`, not only the observed allowed root subset.
+- Unexpected top-level folder details report the full Tree-owned allowed repo-shape policy in `details.allowedTopLevelDirectories`, not only the observed allowed top-level directory subset.
 - The former guarded known-roots fallback route is historical context only and is not current runtime truth.
 
 Target behaviors in V0.1.2:
