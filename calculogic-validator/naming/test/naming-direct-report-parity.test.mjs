@@ -38,7 +38,8 @@ const stableCanonicalFinding = {
   path: 'calculogic-validator/src/core/validator-direct-report.logic.mjs',
   classification: 'canonical',
   message: 'Filename is canonical.',
-  ruleRef: 'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#core-filename-grammar',
+  ruleRef:
+    'calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md#core-filename-grammar',
   details: {
     semanticName: 'validator-direct-report',
     role: 'logic',
@@ -176,4 +177,33 @@ test('validate:naming direct stdout remains parseable JSON with no findings pres
   assert.equal(report.scopeSummary.findingsGenerated, 0);
   assert.equal(report.scopeSummary.reportableFilesInScope, 0);
   assert.equal(report.counts.canonical, 0);
+});
+
+test('validate:naming help keeps current command usage surface from registry command metadata', () => {
+  const result = runValidateNaming(['--help']);
+
+  assert.equal(result.status, 0);
+  assert.equal(result.stderr, '');
+  assert.equal(
+    result.stdout,
+    [
+      'Usage: npm run validate:naming -- [--scope=<repo|app|docs|validator|system>] [--target=<path>]... [--config=<path>] [--strict]',
+      'Scopes:',
+      '  - app: Application-only scan (src/** and test/**).',
+      '  - docs: Documentation-focused scan (doc/docs and root conventional docs: README.md).',
+      '  - repo: Repository-wide scan of all reportable files.',
+      '  - system: System/tooling files scan (root package/tsconfig/eslint/vite files).',
+      '  - validator: Validator-only scan (calculogic-validator/**).',
+      'Default scope: repo',
+      'Examples:',
+      '  ✅ npm run validate:naming -- --scope=app',
+      '  ✅ npm run validate:naming -- --scope=app --target src/buildsurface',
+      '  ✅ npm run validate:naming -- --scope=app --target src/buildsurface --target src/shared',
+      '  ✅ npm run validate:all -- --validators=naming --scope=docs',
+      '  ✅ node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=app',
+      '  ✅ node calculogic-validator/bin/calculogic-validate.host.mjs --scope=docs',
+      '  ✅ npm run validate:naming -- --scope=repo --strict',
+      '',
+    ].join('\n'),
+  );
 });
