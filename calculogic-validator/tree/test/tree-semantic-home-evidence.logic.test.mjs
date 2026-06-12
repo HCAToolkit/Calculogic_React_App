@@ -46,7 +46,7 @@ test('returns deterministic evidence-only records joined by path and preserves a
   assert.equal(result.evidenceRecords[0].familySubgroup, 'shell');
 });
 
-test('does not emit finding/verdict/advisor or known-roots classification fields', () => {
+test('does not emit finding/verdict/advisor or retired root-classification fields', () => {
   const result = prepareTreeSemanticHomeEvidence({
     addressedOccurrenceRecords: [
       { addressPath: 'A', parentAddressPath: null, path: 'src/app-shell.logic.ts', name: 'app-shell.logic.ts', occurrenceType: 'file' },
@@ -62,7 +62,7 @@ test('does not emit finding/verdict/advisor or known-roots classification fields
     'verdict',
     'placementVerdict',
     'advisorDecision',
-    'isKnownTopRoot',
+    'isRepoShapeAllowedTopLevelDirectory',
     'isStructuralRoot',
     'isSemanticRoot',
     'structuralClass',

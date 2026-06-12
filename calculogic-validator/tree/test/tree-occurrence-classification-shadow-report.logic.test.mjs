@@ -12,9 +12,9 @@ const baseInput = () => ({
         path: 'src',
         name: 'src',
         occurrenceType: 'folder',
-        currentStructuralClass: 'known-root',
+        currentStructuralClass: 'repo-top-structural-root',
         currentStructuralKind: 'structural',
-        currentIsKnownTopRoot: true,
+        currentIsRepoShapeAllowedTopLevelDirectory: true,
         currentIsStructuralRoot: true,
         currentIsSemanticRoot: false,
         replacementFolderKind: 'structural',
@@ -68,9 +68,9 @@ test('carries current and replacement fields and replacement readiness metadata 
   const result = prepareTreeOccurrenceClassificationShadowReport(baseInput());
   const record = result.shadowRecords[0];
 
-  assert.equal(record.currentStructuralClass, 'known-root');
+  assert.equal(record.currentStructuralClass, 'repo-top-structural-root');
   assert.equal(record.currentStructuralKind, 'structural');
-  assert.equal(record.currentIsKnownTopRoot, true);
+  assert.equal(record.currentIsRepoShapeAllowedTopLevelDirectory, true);
   assert.equal(record.currentIsStructuralRoot, true);
   assert.equal(record.currentIsSemanticRoot, false);
   assert.equal(record.replacementFolderKind, 'structural');

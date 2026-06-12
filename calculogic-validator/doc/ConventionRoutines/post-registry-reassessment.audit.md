@@ -86,7 +86,7 @@ The prior audit’s extraction queue is effectively complete for this scope (no 
 
 - **Suite-owned** boundaries are clean for scope defaults/profiles and exit policy (`src/core` + `src/registries`).
 - **Slice-owned** boundaries are mostly clean in naming (`registry-state.logic.mjs` + runtime converters + wiring).
-- **Tree slice** is also clear for known roots and signal vocabularies, with runtime logic consuming prepared/cached policy artifacts.
+- **Tree slice** is also clear for repo-shape policy and signal vocabularies, with runtime logic consuming prepared/cached policy artifacts.
 
 Assessment: ownership is generally healthy; ROI now is mostly **hardening and explicit contract documentation**, not additional extraction.
 
@@ -100,7 +100,7 @@ Assessment: architecture quality is good; main gap is **cross-slice contract cod
 ### Registry-state vs direct builtin loader usage
 
 - Naming runtime inputs are centralized via `registry-state.logic.mjs` for major extracted surfaces.
-- Some surfaces intentionally remain direct builtin loader consumers (e.g., tree signal/known roots loaders, core scope/exit loaders).
+- Some surfaces intentionally remain direct builtin loader consumers (e.g., tree signal/repo-shape policy loaders, core scope/exit loaders).
 
 Assessment: acceptable and coherent today; document this as intentional “local registry owner” pattern to avoid future accidental divergence.
 

@@ -58,7 +58,7 @@ test('tree occurrence classification marks replacement repo-top structural roots
 
   assert.equal(records.src.structuralClass, 'repo-top-structural-root');
   assert.equal(records.src.structuralKind, 'top-root-structural');
-  assert.equal(records.src.isKnownTopRoot, true);
+  assert.equal(records.src.isRepoShapeAllowedTopLevelDirectory, true);
   assert.equal(records.src.isStructuralRoot, true);
   assert.equal(records.src.isSemanticRoot, false);
 });
@@ -74,7 +74,7 @@ test('tree occurrence classification marks replacement repo-top semantic roots d
 
   assert.equal(records['calculogic-validator'].structuralClass, 'repo-top-semantic-root');
   assert.equal(records['calculogic-validator'].structuralKind, 'semantic-root');
-  assert.equal(records['calculogic-validator'].isKnownTopRoot, true);
+  assert.equal(records['calculogic-validator'].isRepoShapeAllowedTopLevelDirectory, true);
   assert.equal(records['calculogic-validator'].isStructuralRoot, false);
   assert.equal(records['calculogic-validator'].isSemanticRoot, true);
 });
@@ -125,7 +125,7 @@ test('tree occurrence classification keeps unknown cases deterministic and bound
 
   assert.equal(records.experiments.structuralClass, 'unclassified');
   assert.equal(records.experiments.structuralKind, 'unknown');
-  assert.equal(records.experiments.isKnownTopRoot, false);
+  assert.equal(records.experiments.isRepoShapeAllowedTopLevelDirectory, false);
   assert.equal(records.experiments.isSubtreePartitionCandidate, false);
 });
 
@@ -167,12 +167,12 @@ test('tree occurrence classification replacement runtime classifies from prepare
   assert.equal(replacementRuntime.source, 'tree-occurrence-classification-replacement-runtime');
   assert.equal(records.src.structuralClass, 'repo-top-structural-root');
   assert.equal(records.src.structuralKind, 'top-root-structural');
-  assert.equal(records.src.isKnownTopRoot, true);
+  assert.equal(records.src.isRepoShapeAllowedTopLevelDirectory, true);
   assert.equal(records.src.isStructuralRoot, true);
   assert.equal(records.src.isSemanticRoot, false);
   assert.equal(records['calculogic-validator'].structuralClass, 'repo-top-semantic-root');
   assert.equal(records['calculogic-validator'].structuralKind, 'semantic-root');
-  assert.equal(records['calculogic-validator'].isKnownTopRoot, true);
+  assert.equal(records['calculogic-validator'].isRepoShapeAllowedTopLevelDirectory, true);
   assert.equal(records['calculogic-validator'].isStructuralRoot, false);
   assert.equal(records['calculogic-validator'].isSemanticRoot, true);
   assert.equal(records['src/components'].structuralClass, 'subtree-structural-partition-candidate');

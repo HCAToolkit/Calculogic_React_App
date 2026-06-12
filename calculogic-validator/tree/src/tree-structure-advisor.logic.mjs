@@ -74,7 +74,7 @@ const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope, 
     throw new Error('Tree replacement runtime collectUnexpectedTopLevelDirectoryNames() must return an array.');
   }
 
-  const knownRoots = [...ALLOWED_TOP_LEVEL_DIRECTORY_NAMES];
+  const allowedTopLevelDirectories = [...ALLOWED_TOP_LEVEL_DIRECTORY_NAMES];
 
   return unexpectedDirectoryNames
     .sort((left, right) => left.localeCompare(right))
@@ -87,7 +87,7 @@ const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope, 
         'Top-level folder is outside the known project shape for this repository and may indicate structural drift.',
       ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
       details: {
-        knownRoots,
+        allowedTopLevelDirectories,
       },
     }));
 };

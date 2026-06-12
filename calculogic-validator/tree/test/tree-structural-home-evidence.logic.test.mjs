@@ -45,7 +45,7 @@ test('returns evidence-only records using repo-top folder matches and preserves 
   ]);
 });
 
-test('does not emit findings/verdict or known-roots replacement fields', () => {
+test('does not emit findings/verdict or retired root replacement fields', () => {
   const result = prepareTreeStructuralHomeEvidence({
     addressedOccurrenceRecords: [
       { addressPath: 'A', parentAddressPath: null, path: 'src', name: 'src', occurrenceType: 'folder' },
@@ -60,7 +60,7 @@ test('does not emit findings/verdict or known-roots replacement fields', () => {
     'severity',
     'verdict',
     'placementVerdict',
-    'isKnownTopRoot',
+    'isRepoShapeAllowedTopLevelDirectory',
     'isStructuralRoot',
     'isSemanticRoot',
     'structuralClass',

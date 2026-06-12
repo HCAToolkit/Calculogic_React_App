@@ -344,7 +344,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
     assert.equal(structuralHomeEvidenceRecords.some((record) => record.path === 'calculogic-validator/src'), false);
     assert.equal(
       structuralHomeEvidenceRecords.some((record) =>
-        ['findingCode', 'severity', 'placementVerdict', 'confidenceScore', 'report', 'isKnownTopRoot', 'isStructuralRoot', 'isSemanticRoot', 'structuralClass', 'structuralKind'].some((key) => Object.hasOwn(record, key))),
+        ['findingCode', 'severity', 'placementVerdict', 'confidenceScore', 'report', 'isRepoShapeAllowedTopLevelDirectory', 'isStructuralRoot', 'isSemanticRoot', 'structuralClass', 'structuralKind'].some((key) => Object.hasOwn(record, key))),
       false,
     );
     assert.deepEqual(preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords, []);
@@ -420,7 +420,7 @@ test('tree-structure-advisor wiring prepares semantic-home evidence using naming
     assert.equal(
       preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords.some(
         (record) =>
-          ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision', 'isKnownTopRoot', 'isStructuralRoot', 'isSemanticRoot', 'structuralClass', 'structuralKind'].some((key) =>
+          ['finding', 'findingCode', 'severity', 'verdict', 'placementVerdict', 'advisorDecision', 'isRepoShapeAllowedTopLevelDirectory', 'isStructuralRoot', 'isSemanticRoot', 'structuralClass', 'structuralKind'].some((key) =>
             Object.hasOwn(record, key)),
       ),
       false,
@@ -523,11 +523,12 @@ test('tree-structure-advisor runtime fallback preserves unexpected top-level fol
   );
 
   assert.ok(advisory);
-  assert.deepEqual(advisory.details.knownRoots, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
-  assert.equal(advisory.details.knownRoots.includes('doc'), true);
-  assert.equal(advisory.details.knownRoots.includes('calculogic-validator'), true);
-  assert.equal(advisory.details.knownRoots.includes('src'), true);
-  assert.notDeepEqual(advisory.details.knownRoots, ['src']);
+  assert.deepEqual(advisory.details.allowedTopLevelDirectories, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
+  assert.equal(advisory.details.allowedTopLevelDirectories.includes('doc'), true);
+  assert.equal(advisory.details.allowedTopLevelDirectories.includes('calculogic-validator'), true);
+  assert.equal(advisory.details.allowedTopLevelDirectories.includes('src'), true);
+  assert.notDeepEqual(advisory.details.allowedTopLevelDirectories, ['src']);
+  assert.equal(Object.hasOwn(advisory.details, 'knownRoots'), false);
 });
 
 test('tree-structure-advisor replacement root policy comes from bounded structural-home evidence without behavior drift', async () => {
@@ -550,7 +551,7 @@ test('tree-structure-advisor replacement root policy comes from bounded structur
       false,
     );
     assert.ok(advisory);
-    assert.deepEqual(advisory.details.knownRoots, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
+    assert.deepEqual(advisory.details.allowedTopLevelDirectories, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
