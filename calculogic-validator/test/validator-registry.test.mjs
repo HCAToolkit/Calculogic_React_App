@@ -4,11 +4,20 @@ import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { VALIDATOR_REGISTRY, getValidatorById, listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
+import {
+  VALIDATOR_REGISTRY,
+  getValidatorById,
+  listRegisteredValidators,
+} from '../src/core/validator-registry.knowledge.mjs';
 import { runValidatorRunner } from '../src/core/validator-runner.logic.mjs';
+import { getValidatorReportIdentity } from '../src/core/validator-report-identity.logic.mjs';
 
-const rootPackageJson = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
-const validatorPackageJson = JSON.parse(fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const rootPackageJson = JSON.parse(
+  fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
+);
+const validatorPackageJson = JSON.parse(
+  fs.readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+);
 
 const expectedMetadataShapeKeys = [
   'sliceId',
@@ -81,7 +90,10 @@ test('registry metadata command, report, and bin fields match current naming pat
     assert.match(commands.repoLocalNpmScript, /^validate:(?:naming|tree)$/u);
     assert.equal(rootPackageJson.scripts[commands.repoLocalNpmScript]?.startsWith('node '), true);
     assert.equal(commands.repoLocalNpmInvocation, `npm run ${commands.repoLocalNpmScript} --`);
-    assert.match(commands.directScriptPath, /^calculogic-validator\/scripts\/validate-[a-z-]+\.host\.mjs$/u);
+    assert.match(
+      commands.directScriptPath,
+      /^calculogic-validator\/scripts\/validate-[a-z-]+\.host\.mjs$/u,
+    );
     assert.equal(fs.existsSync(path.join(process.cwd(), commands.directScriptPath)), true);
 
     assert.match(report.profileId, /^[a-z][a-z0-9-]*$/u);
@@ -95,16 +107,35 @@ test('registry metadata command, report, and bin fields match current naming pat
       const scriptName = reportCapture.scriptPattern.replace('<scope>', scope);
       const expectedPrefix = reportCapture.prefixPattern.replace('<scope>', scope);
       assert.ok(rootPackageJson.scripts[scriptName], `${scriptName} should exist`);
-      assert.match(rootPackageJson.scripts[scriptName], new RegExp(`--prefix ${expectedPrefix}\\b`, 'u'));
+      assert.match(
+        rootPackageJson.scripts[scriptName],
+        new RegExp(`--prefix ${expectedPrefix}\\b`, 'u'),
+      );
     }
 
     assert.match(packageBin.expectedName, /^calculogic-validate(?:-[a-z]+)?$/u);
-    assert.equal(Boolean(validatorPackageJson.bin?.[packageBin.expectedName]), packageBin.available);
+    assert.equal(
+      Boolean(validatorPackageJson.bin?.[packageBin.expectedName]),
+      packageBin.available,
+    );
+  }
+});
+
+test('report identity helper consumes registry report metadata without changing current identity values', () => {
+  for (const validator of VALIDATOR_REGISTRY) {
+    assert.deepEqual(getValidatorReportIdentity(validator), {
+      id: validator.id,
+      validatorId: validator.id,
+      description: validator.description,
+      mode: 'report',
+    });
   }
 });
 
 test('validate:all/default inclusion metadata matches current runner behavior', async () => {
-  const fixtureRoot = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'validator-registry-default-'));
+  const fixtureRoot = await fsPromises.mkdtemp(
+    path.join(os.tmpdir(), 'validator-registry-default-'),
+  );
 
   try {
     const report = runValidatorRunner(fixtureRoot, { scope: 'repo' });
@@ -116,6 +147,27 @@ test('validate:all/default inclusion metadata matches current runner behavior', 
       report.validators.map((validator) => validator.id),
       defaultIncludedIds,
     );
+  } finally {
+    await fsPromises.rm(fixtureRoot, { recursive: true, force: true });
+  }
+});
+
+test('validate:all report entries preserve registry report identity metadata values', async () => {
+  const fixtureRoot = await fsPromises.mkdtemp(
+    path.join(os.tmpdir(), 'validator-registry-identity-'),
+  );
+
+  try {
+    const report = runValidatorRunner(fixtureRoot, { scope: 'repo' });
+
+    for (const reportEntry of report.validators) {
+      const registryEntry = getValidatorById(reportEntry.id);
+      const identity = getValidatorReportIdentity(registryEntry);
+
+      assert.equal(reportEntry.id, identity.id);
+      assert.equal(reportEntry.validatorId, identity.validatorId);
+      assert.equal(reportEntry.description, identity.description);
+    }
   } finally {
     await fsPromises.rm(fixtureRoot, { recursive: true, force: true });
   }

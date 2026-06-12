@@ -1,3 +1,4 @@
+import { getValidatorReportIdentity } from './validator-report-identity.logic.mjs';
 export const buildDirectValidatorReportEnvelope = ({
   registryEntry,
   fallbackValidatorId,
@@ -7,13 +8,13 @@ export const buildDirectValidatorReportEnvelope = ({
   startedAtDate,
   endedAtDate,
 }) => {
-  const reportMetadata = registryEntry?.metadata?.report ?? {};
-  const validatorId = reportMetadata.validatorId ?? registryEntry?.id ?? fallbackValidatorId;
-  const mode = reportMetadata.mode ?? 'report';
+  const reportIdentity = getValidatorReportIdentity(registryEntry, {
+    validatorId: fallbackValidatorId,
+  });
 
   return {
-    mode,
-    validatorId,
+    mode: reportIdentity.mode,
+    validatorId: reportIdentity.validatorId,
     toolVersion,
     ...(toolVersion ? { validatorVersion: toolVersion } : {}),
     ...(configDigest ? { configDigest } : {}),

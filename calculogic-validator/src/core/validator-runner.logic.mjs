@@ -1,6 +1,7 @@
 import { CALCULOGIC_VALIDATOR_REPORT_VERSION } from './validator-report.contracts.mjs';
 import { VALIDATOR_REGISTRY, getValidatorById } from './validator-registry.knowledge.mjs';
 import { getSourceSnapshot } from './source-snapshot.logic.mjs';
+import { getValidatorReportIdentity } from './validator-report-identity.logic.mjs';
 import { projectNamingSemanticFamilyBridge } from '../../naming/src/naming-validator.host.mjs';
 
 const toValidatorReportEntry = (registryEntry, validatorResult) => {
@@ -10,10 +11,12 @@ const toValidatorReportEntry = (registryEntry, validatorResult) => {
     ? Object.fromEntries(Object.entries(summary).filter(([key]) => key !== 'counts'))
     : {};
 
+  const reportIdentity = getValidatorReportIdentity(registryEntry);
+
   return {
-    id: registryEntry.id,
-    validatorId: registryEntry.id,
-    description: registryEntry.description,
+    id: reportIdentity.id,
+    validatorId: reportIdentity.validatorId,
+    description: reportIdentity.description,
     scope: validatorResult.scope,
     totalFilesScanned: validatorResult.totalFilesScanned,
     ...(counts ? { counts } : {}),
@@ -48,7 +51,9 @@ export const runValidatorRunner = (repositoryRoot, options = {}) => {
   const shouldRunTreeStructureAdvisor = validatorsToRun.some(
     (registryEntry) => registryEntry.id === 'tree-structure-advisor',
   );
-  const shouldIncludeNamingReport = validatorsToRun.some((registryEntry) => registryEntry.id === 'naming');
+  const shouldIncludeNamingReport = validatorsToRun.some(
+    (registryEntry) => registryEntry.id === 'naming',
+  );
   const namingRegistryEntry = getValidatorById('naming');
 
   let stagedNamingResult = null;

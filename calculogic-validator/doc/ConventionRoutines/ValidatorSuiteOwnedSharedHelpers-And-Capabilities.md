@@ -114,11 +114,13 @@ Only currently real, discoverable suite-owned surfaces are listed here.
   - `calculogic-validator/src/core/validator-report-meta.logic.mjs`
   - `calculogic-validator/src/core/source-snapshot.logic.mjs`
   - `calculogic-validator/src/core/validator-direct-report.logic.mjs`
+  - `calculogic-validator/src/core/validator-report-identity.logic.mjs`
 - **Concern:** deterministic shared metadata helpers used in validator report envelopes.
 - **Reusable capability:**
   - tool version lookup and stable hashing/digest helpers for config/report metadata
   - git/filesystem source snapshot metadata capture for report reproducibility context
   - direct validator report envelope mechanics for mode, validator identity, version, config digest, source snapshot, timestamps, and duration
+  - bounded report identity lookup from registry report metadata when parity tests prove current emitted identity fields stay unchanged
 - **When to reuse:**
   - constructing validator or runner report envelopes that require suite-consistent metadata fields
   - constructing direct validator reports that must preserve slice-owned findings and summaries while sharing suite-core envelope mechanics
@@ -133,7 +135,7 @@ Only currently real, discoverable suite-owned surfaces are listed here.
 - **Owner:** suite-core
 - **Path/area:** `calculogic-validator/src/core/validator-registry.knowledge.mjs`
 - **Concern:** data-only slice registration metadata for current validator-suite registration surfaces.
-- **Current runtime truth:** registry entries keep `id`, `description`, and `run` as the runner behavior-driving fields. Registry report metadata may drive behavior-preserving direct report identity fields where parity tests prove the emitted report stays stable. Other metadata remains inspectable registration data and does not drive runner dispatch, package scripts, package bins, exit-code behavior, Naming behavior, Tree behavior, or candidate behavior.
+- **Current runtime truth:** registry entries keep `id`, `description`, and `run` as the runner behavior-driving fields. Registry report metadata may drive behavior-preserving runner/direct report identity fields where parity tests prove the emitted report stays stable. Registry command metadata may drive bounded direct usage text where parity tests prove the command surface stays stable. Other metadata remains inspectable registration data and does not drive runner dispatch, package scripts, package bins, exit-code behavior, Naming behavior, Tree behavior, or candidate behavior.
 - **Reusable capability:**
   - canonical slice identity metadata aligned to the registry id;
   - report identity metadata aligned to current report entry id/validator id/description;
@@ -145,9 +147,11 @@ Only currently real, discoverable suite-owned surfaces are listed here.
   - inspecting current suite-core slice registration surfaces;
   - adding a future validator slice that needs the same bounded registration facts;
   - writing shape tests that prove command/report/bin expectations are explicit without changing scripts or bins;
-  - sourcing direct report identity fields when exact parity coverage proves the current report shape is preserved.
+  - sourcing runner/direct report identity fields when exact parity coverage proves the current report shape is preserved;
+  - sourcing direct command usage text when exact parity coverage proves the command surface is preserved.
 - **When not to reuse:**
   - driving runtime runner selection, broader report shape, exit policy, or package command generation before a separate behavior-migration task explicitly scopes that change;
+  - treating command metadata as authority for Naming or Tree semantic interpretation;
   - storing slice-owned semantic interpretation policy, finding policy, Naming taxonomy, Tree placement policy, or candidate value authority in suite-core metadata;
   - creating a universal plugin architecture or generic shared bucket.
 - **Reuse boundary type:** data-only registration metadata boundary

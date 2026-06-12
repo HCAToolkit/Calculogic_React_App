@@ -4,10 +4,7 @@ import { buildNamingCliUsageLines } from '../naming/src/cli/naming-cli-usage.log
 import { runNamingCli } from '../naming/src/cli/naming-cli-runner.logic.mjs';
 
 const repositoryRoot = resolveRepositoryRoot();
-const usageLines = buildNamingCliUsageLines({
-  commandPrefix: 'npm run validate:naming --',
-  strictExampleCommand: 'npm run validate:naming -- --scope=repo --strict',
-});
+const usageLines = buildNamingCliUsageLines({ validatorId: 'naming' });
 
 const npmArgForwardingMessage = detectNpmArgForwardingFootgun({
   argv: process.argv.slice(2),
