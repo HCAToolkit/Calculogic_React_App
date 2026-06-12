@@ -46,6 +46,60 @@ const EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES = [
   'tools',
 ];
 
+const READY_OCCURRENCE_CLASSIFICATION_EXECUTION_CONTRACT = {
+  source: 'tree-occurrence-classification-runtime-execution-contract',
+  executionMode: 'execution-candidate',
+  executionStatus: 'ready-for-future-execution-contract',
+  requiredGuards: [],
+  summary: {},
+  rationale: 'Test fixture marks prepared replacement classification ready for active execution.',
+};
+
+const READY_OCCURRENCE_CLASSIFICATION_REPLACEMENT_READINESS = {
+  source: 'tree-occurrence-classification-replacement-readiness',
+  replacementDecision: 'candidate-ready',
+  gates: {},
+  summary: {},
+  rationale: 'Test fixture marks replacement readiness as candidate-ready.',
+};
+
+const createReadyClassificationPreparedInputs = ({ topLevelDirectoryNames, classificationsByName }) => {
+  const occurrenceRecords = topLevelDirectoryNames.map((directoryName) => ({
+    path: directoryName,
+    name: directoryName,
+    actualName: directoryName,
+    resolvedPath: directoryName,
+    occurrenceType: 'folder',
+  }));
+
+  return {
+    scope: 'repo',
+    selectedPaths: [],
+    topLevelDirectoryNames,
+    targets: [],
+    occurrenceSnapshot: {
+      scopeRoots: ['.'],
+      occurrenceRecords,
+    },
+    preparedDependencies: {
+      treeOccurrenceClassificationRuntimeExecutionContract: READY_OCCURRENCE_CLASSIFICATION_EXECUTION_CONTRACT,
+      treeOccurrenceClassificationReplacementReadiness: READY_OCCURRENCE_CLASSIFICATION_REPLACEMENT_READINESS,
+      treeOccurrenceClassificationReplacementRuntime: {
+        source: 'test-ready-tree-occurrence-classification-replacement-runtime',
+        classifyOccurrenceRecords: (records = []) => records.map((record) => ({
+          ...record,
+          isRepoTopOccurrence: record.occurrenceType === 'folder' && !record.resolvedPath.includes('/'),
+          isRepoShapeAllowedTopLevelDirectory: classificationsByName.get(record.resolvedPath) ?? false,
+        })),
+        collectUnexpectedTopLevelDirectoryNames: (directoryNames = []) => directoryNames
+          .filter((directoryName) => typeof directoryName === 'string' && directoryName.length > 0)
+          .filter((directoryName) => !EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES.includes(directoryName))
+          .sort((left, right) => left.localeCompare(right)),
+      },
+    },
+  };
+};
+
 const collectExpectedPathsFromScopeProfile = async (fixtureDir, scope) => {
   const profile = getValidatorScopeProfile(scope);
 
@@ -529,6 +583,145 @@ test('tree-structure-advisor runtime fallback preserves unexpected top-level fol
   assert.equal(advisory.details.allowedTopLevelDirectories.includes('src'), true);
   assert.notDeepEqual(advisory.details.allowedTopLevelDirectories, ['src']);
   assert.equal(Object.hasOwn(advisory.details, 'knownRoots'), false);
+});
+
+test('tree-structure-advisor top-level advisory uses ready replacement classification for delta cases', () => {
+  const result = runTreeStructureAdvisorRuntime(createReadyClassificationPreparedInputs({
+    topLevelDirectoryNames: ['doc', 'src'],
+    classificationsByName: new Map([
+      ['doc', false],
+      ['src', true],
+    ]),
+  }));
+
+  const unexpectedTopLevelPaths = result.findings
+    .filter((finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER')
+    .map((finding) => finding.path);
+
+  assert.deepEqual(unexpectedTopLevelPaths, ['doc']);
+  assert.deepEqual(result.findings[0], {
+    code: 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER',
+    severity: 'info',
+    path: 'doc',
+    classification: 'advisory-structure',
+    message: 'Top-level folder is outside the known project shape for this repository and may indicate structural drift.',
+    ruleRef: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
+    details: {
+      allowedTopLevelDirectories: EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES,
+    },
+  });
+});
+
+test('tree-structure-advisor top-level advisory keeps repo-shape policy ahead of structural-home classification', () => {
+  const result = runTreeStructureAdvisorRuntime(createReadyClassificationPreparedInputs({
+    topLevelDirectoryNames: ['data', 'src'],
+    classificationsByName: new Map([
+      ['data', true],
+      ['src', true],
+    ]),
+  }));
+
+  const unexpectedTopLevelPaths = result.findings
+    .filter((finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER')
+    .map((finding) => finding.path);
+
+  assert.deepEqual(unexpectedTopLevelPaths, ['data']);
+  assert.equal(result.findings[0].details.allowedTopLevelDirectories.includes('data'), false);
+});
+
+test('tree-structure-advisor top-level advisory stays stable when fallback and ready classification agree', () => {
+  const replacementReadyResult = runTreeStructureAdvisorRuntime(createReadyClassificationPreparedInputs({
+    topLevelDirectoryNames: ['doc', 'experiments', 'src'],
+    classificationsByName: new Map([
+      ['doc', true],
+      ['experiments', false],
+      ['src', true],
+    ]),
+  }));
+  const fallbackResult = runTreeStructureAdvisorRuntime({
+    scope: 'repo',
+    selectedPaths: [],
+    topLevelDirectoryNames: ['doc', 'experiments', 'src'],
+    targets: [],
+  });
+
+  assert.deepEqual(replacementReadyResult, fallbackResult);
+});
+
+test('tree-structure-advisor top-level advisory falls back when replacement evidence is missing or not ready', () => {
+  const preparedInputs = createReadyClassificationPreparedInputs({
+    topLevelDirectoryNames: ['experiments', 'src'],
+    classificationsByName: new Map([
+      ['experiments', true],
+      ['src', true],
+    ]),
+  });
+
+  const withoutExecutionContract = runTreeStructureAdvisorRuntime({
+    ...preparedInputs,
+    preparedDependencies: {
+      ...preparedInputs.preparedDependencies,
+      treeOccurrenceClassificationRuntimeExecutionContract: undefined,
+    },
+  });
+  const withoutOccurrenceEvidence = runTreeStructureAdvisorRuntime({
+    ...preparedInputs,
+    occurrenceSnapshot: undefined,
+  });
+
+  assert.deepEqual(
+    withoutExecutionContract.findings.map((finding) => `${finding.path}|${finding.code}`),
+    ['experiments|TREE_UNEXPECTED_TOP_LEVEL_FOLDER'],
+  );
+  assert.deepEqual(withoutOccurrenceEvidence, withoutExecutionContract);
+});
+
+test('tree-structure-advisor top-level advisory falls back when ready replacement classification is malformed', () => {
+  const preparedInputs = createReadyClassificationPreparedInputs({
+    topLevelDirectoryNames: ['experiments', 'src'],
+    classificationsByName: new Map([
+      ['experiments', true],
+      ['src', true],
+    ]),
+  });
+  const result = runTreeStructureAdvisorRuntime({
+    ...preparedInputs,
+    preparedDependencies: {
+      ...preparedInputs.preparedDependencies,
+      treeOccurrenceClassificationReplacementRuntime: {
+        source: 'test-malformed-tree-occurrence-classification-replacement-runtime',
+        classifyOccurrenceRecords: () => 'malformed',
+        collectUnexpectedTopLevelDirectoryNames: preparedInputs.preparedDependencies
+          .treeOccurrenceClassificationReplacementRuntime.collectUnexpectedTopLevelDirectoryNames,
+      },
+    },
+  });
+
+  assert.equal(result.findings.length, 1);
+  assert.equal(result.findings[0].path, 'experiments');
+  assert.equal(result.findings[0].code, 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER');
+  assert.equal(result.totalFilesScanned, 0);
+});
+
+test('tree-structure-advisor non-empty structural-home repo-top folder remains unexpected when repo-shape disallows it', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-non-empty-repo-top-policy-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'data'), { recursive: true });
+    await fs.writeFile(path.join(fixtureDir, 'data', 'some-file.logic.mjs'), 'export const data = true\n', 'utf8');
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const dataAdvisory = result.findings.find(
+      (finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER' && finding.path === 'data',
+    );
+
+    assert.ok(dataAdvisory);
+    assert.equal(dataAdvisory.details.allowedTopLevelDirectories.includes('data'), false);
+    assert.deepEqual(dataAdvisory.details.allowedTopLevelDirectories, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
 });
 
 test('tree-structure-advisor replacement root policy comes from bounded structural-home evidence without behavior drift', async () => {

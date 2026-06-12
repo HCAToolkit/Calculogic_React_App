@@ -99,8 +99,10 @@ V0.1.7 introduces a suite-core scoped snapshot/input helper boundary and migrate
 - naming stays on existing local collection/interpretation path in this increment (no naming behavior changes)
 - Tree known-roots registry/runtime dependencies are retired in current runtime truth: `knownTopLevelDirectories` no longer controls unexpected top-level folder behavior, and `topRoots[].kind` no longer controls occurrence classification.
 - Tree runtime now uses prepared replacement evidence for occurrence classification from addressed occurrences, structural-home evidence, semantic-home evidence, and folder-kind evidence.
-- Unexpected top-level folder policy now uses an explicit Tree-owned repo-shape policy boundary; structural-home vocabulary does not automatically allow repo-top folders for `TREE_UNEXPECTED_TOP_LEVEL_FOLDER`.
-- Direct runtime callers that omit replacement-runtime composition still use the explicit Tree-owned repo-shape policy fallback instead of suppressing unexpected top-level folder findings.
+- `TREE_UNEXPECTED_TOP_LEVEL_FOLDER` selection now uses prepared Tree occurrence-classification replacement evidence only when the replacement runtime, execution contract, readiness state, and repo-top folder classification records are ready and well formed.
+- When the prepared replacement route is ready, repo-top folders suppress the advisory only when the Tree-owned repo-shape top-level policy allows the folder and replacement classification does not mark it unexpected; structural-home registration alone does not allow the folder for this advisory.
+- Repo-top folders outside the Tree-owned repo-shape top-level policy still emit the existing advisory with unchanged report/finding shape, even when occurrence classification identifies them as structural homes.
+- Direct runtime callers that omit, mis-shape, or gate-block replacement-runtime composition still use the explicit Tree-owned repo-shape policy fallback instead of suppressing unexpected top-level folder findings.
 - Unexpected top-level folder details report the full Tree-owned allowed repo-shape policy in `details.allowedTopLevelDirectories`, not only the observed allowed top-level directory subset.
 - The former guarded known-roots fallback route is historical context only and is not current runtime truth.
 
