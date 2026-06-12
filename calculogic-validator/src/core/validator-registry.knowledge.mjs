@@ -62,6 +62,159 @@ const runTreeStructureAdvisorHook = (repositoryRoot, options = {}) => {
   };
 };
 
+const REPORT_CAPTURE_DEFAULT_OPTIONS = {
+  captureCommand: 'calculogic-report-capture',
+  json: true,
+  dir: './.reports',
+  keep: 20,
+};
+
+const buildValidatorReportCapturePresets = ({
+  scriptNamespace,
+  profileId,
+  directScriptPath,
+  prefixBase,
+  semanticPolicyOwner,
+  scopes,
+}) =>
+  scopes.map((scope) => ({
+    scriptName: `report:${scriptNamespace}:${scope}`,
+    profileId,
+    commandSurface: 'validator-report-capture',
+    semanticPolicyOwner,
+    capture: {
+      ...REPORT_CAPTURE_DEFAULT_OPTIONS,
+      prefix: `${prefixBase}-${scope}`,
+    },
+    wrappedCommand: {
+      executable: 'node',
+      args: ['--experimental-strip-types', directScriptPath, `--scope=${scope}`],
+    },
+  }));
+
+const namingValidatorSliceReportCapturePresets = [
+  ...buildValidatorReportCapturePresets({
+    scriptNamespace: 'naming',
+    profileId: 'naming',
+    directScriptPath: 'calculogic-validator/scripts/validate-naming.host.mjs',
+    prefixBase: 'naming',
+    semanticPolicyOwner: 'naming',
+    scopes: ['repo', 'app', 'docs'],
+  }),
+  {
+    scriptName: 'report:naming:validator',
+    profileId: 'naming',
+    commandSurface: 'validator-report-capture',
+    semanticPolicyOwner: 'naming',
+    capture: {
+      ...REPORT_CAPTURE_DEFAULT_OPTIONS,
+      prefix: 'naming-validator',
+    },
+    wrappedCommand: {
+      executable: 'node',
+      args: [
+        '--experimental-strip-types',
+        'calculogic-validator/scripts/validate-naming.host.mjs',
+        '--scope=validator',
+      ],
+    },
+  },
+  {
+    scriptName: 'report:naming:validator:entry',
+    profileId: 'naming',
+    commandSurface: 'validator-report-capture',
+    semanticPolicyOwner: 'naming',
+    capture: {
+      ...REPORT_CAPTURE_DEFAULT_OPTIONS,
+      prefix: 'naming-validator-entry',
+    },
+    wrappedCommand: {
+      executable: 'node',
+      args: [
+        '--experimental-strip-types',
+        'calculogic-validator/scripts/validate-naming.host.mjs',
+        '--scope=validator',
+        '--target',
+        'calculogic-validator/bin',
+        '--target',
+        'calculogic-validator/scripts',
+      ],
+    },
+  },
+  ...['naming', 'tree', 'doc'].map((targetName) => ({
+    scriptName: `report:naming:validator:${targetName}`,
+    profileId: 'naming',
+    commandSurface: 'validator-report-capture',
+    semanticPolicyOwner: 'naming',
+    capture: {
+      ...REPORT_CAPTURE_DEFAULT_OPTIONS,
+      prefix: `naming-validator-${targetName}`,
+    },
+    wrappedCommand: {
+      executable: 'node',
+      args: [
+        '--experimental-strip-types',
+        'calculogic-validator/scripts/validate-naming.host.mjs',
+        '--scope=validator',
+        '--target',
+        `calculogic-validator/${targetName}`,
+      ],
+    },
+  })),
+  {
+    scriptName: 'report:naming:system',
+    profileId: 'naming',
+    commandSurface: 'validator-report-capture',
+    semanticPolicyOwner: 'naming',
+    capture: {
+      ...REPORT_CAPTURE_DEFAULT_OPTIONS,
+      prefix: 'naming-system',
+    },
+    wrappedCommand: {
+      executable: 'node',
+      args: [
+        '--experimental-strip-types',
+        'calculogic-validator/scripts/validate-naming.host.mjs',
+        '--scope=system',
+      ],
+    },
+  },
+];
+
+export const VALIDATOR_REPORT_CAPTURE_PRESETS = [
+  ...namingValidatorSliceReportCapturePresets,
+  ...buildValidatorReportCapturePresets({
+    scriptNamespace: 'all',
+    profileId: 'validate-all',
+    directScriptPath: 'calculogic-validator/scripts/validate-all.host.mjs',
+    prefixBase: 'validate-all',
+    semanticPolicyOwner: 'suite-core-runner',
+    scopes: ['repo', 'app', 'docs', 'validator', 'system'],
+  }),
+  ...buildValidatorReportCapturePresets({
+    scriptNamespace: 'tree',
+    profileId: 'tree-structure-advisor',
+    directScriptPath: 'calculogic-validator/scripts/validate-tree.host.mjs',
+    prefixBase: 'validate-tree',
+    semanticPolicyOwner: 'tree',
+    scopes: ['repo', 'app', 'docs', 'validator', 'system'],
+  }),
+  {
+    scriptName: 'report:addressing:get-tree:validator',
+    profileId: 'addressing-get-tree',
+    commandSurface: 'validator-report-capture',
+    semanticPolicyOwner: 'addressing-deferred',
+    capture: {
+      ...REPORT_CAPTURE_DEFAULT_OPTIONS,
+      prefix: 'addressing-get-tree-validator',
+    },
+    wrappedCommand: {
+      executable: 'npm',
+      args: ['run', 'addressing:get-tree', '--', '--scope=validator', '--format=both'],
+    },
+  },
+];
+
 export const VALIDATOR_REGISTRY = [
   {
     id: 'naming',

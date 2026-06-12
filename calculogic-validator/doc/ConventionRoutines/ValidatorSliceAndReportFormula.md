@@ -40,7 +40,7 @@ Every slice/layer MUST declare or intentionally omit each item below.
 | Runner inclusion | Declare whether the slice is included by default in `validate:all`, selected by registry id, runner-only, or omitted from runner dispatch. |
 | Runnable status | Classify as `direct runnable`, `runner-only`, `bridge provider`, or a hybrid status. Do not imply package-bin availability unless it exists. |
 | Package-bin expectation | Record expected bin name and availability. This formula does not recommend package/bin changes by itself. |
-| Report-capture profile | Declare capture profile id, script pattern, prefix pattern, and supported scopes when report capture is expected. |
+| Report-capture profile | Declare capture profile id, script pattern, prefix pattern, and supported scopes when report capture is expected. Suite-core may also keep data-only package-script preset metadata for current capture commands; that metadata records command mechanics and must not become semantic policy. |
 | Compatibility metadata | Record behavior-preserving metadata, registry-selection compatibility, and report-shape ownership expectations. |
 
 Checklist for a new slice:
@@ -129,7 +129,7 @@ Report behavior requirements:
 | Severity behavior | Slice-owned finding policy controls severity; this formula does not change severity behavior. |
 | Exit-code derivation | Suite-core derives exit code from findings and exit policy. Slices do not own suite exit-code mechanics. |
 | Stdout/stderr | CLI wrappers should keep deterministic JSON/report output behavior and route non-report diagnostics intentionally. |
-| Report capture | Capture commands should use the slice's report-capture profile and supported scopes. |
+| Report capture | Capture commands should use the slice's report-capture profile and supported scopes. Report-capture preset metadata may guard package-script alignment and captured-output parity, but it must preserve current report output shape, ids/descriptions, summaries, severities, and exit-code behavior. |
 | Ordering | Slices should sort findings, paths, targets, evidence records, and summary buckets deterministically. |
 | Path normalization | Use suite-core path normalization where applicable; slice output should use stable repo-relative paths. |
 | Scope/target metadata | Scope and target metadata should reflect suite-core scoped input and filters. |
