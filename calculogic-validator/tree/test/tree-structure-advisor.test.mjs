@@ -587,10 +587,10 @@ test('tree-structure-advisor runtime fallback preserves unexpected top-level fol
 
 test('tree-structure-advisor top-level advisory uses ready replacement classification for delta cases', () => {
   const result = runTreeStructureAdvisorRuntime(createReadyClassificationPreparedInputs({
-    topLevelDirectoryNames: ['doc', 'experiments'],
+    topLevelDirectoryNames: ['doc', 'src'],
     classificationsByName: new Map([
       ['doc', false],
-      ['experiments', true],
+      ['src', true],
     ]),
   }));
 
@@ -610,6 +610,23 @@ test('tree-structure-advisor top-level advisory uses ready replacement classific
       allowedTopLevelDirectories: EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES,
     },
   });
+});
+
+test('tree-structure-advisor top-level advisory keeps repo-shape policy ahead of structural-home classification', () => {
+  const result = runTreeStructureAdvisorRuntime(createReadyClassificationPreparedInputs({
+    topLevelDirectoryNames: ['data', 'src'],
+    classificationsByName: new Map([
+      ['data', true],
+      ['src', true],
+    ]),
+  }));
+
+  const unexpectedTopLevelPaths = result.findings
+    .filter((finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER')
+    .map((finding) => finding.path);
+
+  assert.deepEqual(unexpectedTopLevelPaths, ['data']);
+  assert.equal(result.findings[0].details.allowedTopLevelDirectories.includes('data'), false);
 });
 
 test('tree-structure-advisor top-level advisory stays stable when fallback and ready classification agree', () => {
@@ -684,6 +701,27 @@ test('tree-structure-advisor top-level advisory falls back when ready replacemen
   assert.equal(result.findings[0].path, 'experiments');
   assert.equal(result.findings[0].code, 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER');
   assert.equal(result.totalFilesScanned, 0);
+});
+
+test('tree-structure-advisor non-empty structural-home repo-top folder remains unexpected when repo-shape disallows it', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-non-empty-repo-top-policy-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await fs.mkdir(path.join(fixtureDir, 'data'), { recursive: true });
+    await fs.writeFile(path.join(fixtureDir, 'data', 'some-file.logic.mjs'), 'export const data = true\n', 'utf8');
+
+    const result = runTreeStructureAdvisor(fixtureDir, { scope: 'repo' });
+    const dataAdvisory = result.findings.find(
+      (finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER' && finding.path === 'data',
+    );
+
+    assert.ok(dataAdvisory);
+    assert.equal(dataAdvisory.details.allowedTopLevelDirectories.includes('data'), false);
+    assert.deepEqual(dataAdvisory.details.allowedTopLevelDirectories, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
 });
 
 test('tree-structure-advisor replacement root policy comes from bounded structural-home evidence without behavior drift', async () => {

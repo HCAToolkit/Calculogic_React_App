@@ -149,7 +149,10 @@ const collectUnexpectedTopLevelDirectoryNamesFromClassification = ({
   return normalizedTopLevelDirectoryNames
     .filter((directoryName) => {
       const classification = repoTopFolderRecordsByName.get(directoryName);
-      return classification.isRepoShapeAllowedTopLevelDirectory === false;
+      return (
+        !ALLOWED_TOP_LEVEL_DIRECTORY_NAME_SET.has(directoryName) ||
+        classification.isRepoShapeAllowedTopLevelDirectory === false
+      );
     })
     .sort((left, right) => left.localeCompare(right));
 };
