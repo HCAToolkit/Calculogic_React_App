@@ -191,7 +191,8 @@ Recommended focused commands for that child:
 
 - `node --test --experimental-strip-types calculogic-validator/tree/test/tree-structure-advisor.test.mjs`
 - `node --test --experimental-strip-types calculogic-validator/tree/test/tree-occurrence-classification-parity-evidence.logic.test.mjs calculogic-validator/tree/test/tree-occurrence-classification-replacement-readiness.logic.test.mjs calculogic-validator/tree/test/tree-occurrence-classification-replacement-recommendation.logic.test.mjs`
-- `node --test --experimental-strip-types calculogic-validator/test/validator-runner.test.mjs calculogic-validator/test/validator-registry.test.mjs calculogic-validator/test/validator-report-capture*.test.mjs`
+- `node --test --experimental-strip-types calculogic-validator/test/validator-runner.test.mjs calculogic-validator/test/validator-registry.test.mjs`
+- `node --test calculogic-validator/test/report-capture*.test.mjs`
 - `npm run validate:naming -- --scope=validator --target calculogic-validator/tree`
 - `git diff --check`
 
