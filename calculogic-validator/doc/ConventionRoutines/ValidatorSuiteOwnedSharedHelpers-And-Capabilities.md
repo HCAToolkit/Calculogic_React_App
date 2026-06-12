@@ -133,13 +133,16 @@ Only currently real, discoverable suite-owned surfaces are listed here.
 ### 3.6 Entry: suite-core validator registry metadata surface
 
 - **Owner:** suite-core
-- **Path/area:** `calculogic-validator/src/core/validator-registry.knowledge.mjs`
+- **Path/area:**
+  - `calculogic-validator/src/core/validator-registry.knowledge.mjs`
+  - `calculogic-validator/src/core/validator-report-capture-metadata.logic.mjs`
 - **Concern:** data-only slice registration metadata for current validator-suite registration surfaces.
-- **Current runtime truth:** registry entries keep `id`, `description`, and `run` as the runner behavior-driving fields. Registry report metadata may drive behavior-preserving runner/direct report identity fields where parity tests prove the emitted report stays stable. Registry command metadata may drive bounded direct usage text where parity tests prove the command surface stays stable. Other metadata remains inspectable registration data and does not drive runner dispatch, package scripts, package bins, exit-code behavior, Naming behavior, Tree behavior, or candidate behavior.
+- **Current runtime truth:** registry entries keep `id`, `description`, and `run` as the runner behavior-driving fields. Registry report metadata may drive behavior-preserving runner/direct report identity fields where parity tests prove the emitted report stays stable. Registry command metadata may drive bounded direct usage text where parity tests prove the command surface stays stable. Report-capture preset metadata records current package-script capture mechanics and may be read by tests or inspection helpers, but package scripts remain literal current runtime truth until a separately scoped behavior migration changes that. Other metadata remains inspectable registration data and does not drive runner dispatch, package scripts, package bins, exit-code behavior, Naming behavior, Tree behavior, or candidate behavior.
 - **Reusable capability:**
   - canonical slice identity metadata aligned to the registry id;
   - report identity metadata aligned to current report entry id/validator id/description;
   - repo-local npm command, direct script, package-bin availability, and report-capture prefix expectations;
+  - report-capture package-script presets for current Naming, Tree, validate-all, and explicitly deferred Addressing capture surfaces;
   - default `validate:all` runner inclusion and direct-runnable/runner-only capability metadata;
   - bounded bridge metadata for the current Naming semantic-family bridge contribution consumed by Tree;
   - compatibility expectation metadata for current report-mode and behavior-preserving registration.
@@ -147,11 +150,13 @@ Only currently real, discoverable suite-owned surfaces are listed here.
   - inspecting current suite-core slice registration surfaces;
   - adding a future validator slice that needs the same bounded registration facts;
   - writing shape tests that prove command/report/bin expectations are explicit without changing scripts or bins;
+  - writing report-capture preset tests that compare registry-backed metadata to literal package scripts and representative emitted reports;
   - sourcing runner/direct report identity fields when exact parity coverage proves the current report shape is preserved;
   - sourcing direct command usage text when exact parity coverage proves the command surface is preserved.
 - **When not to reuse:**
   - driving runtime runner selection, broader report shape, exit policy, or package command generation before a separate behavior-migration task explicitly scopes that change;
   - treating command metadata as authority for Naming or Tree semantic interpretation;
+  - treating report-capture metadata as semantic policy or as authority for finding ids, summaries, severities, Naming interpretation, Tree reasoning, Addressing behavior, or report output shape;
   - storing slice-owned semantic interpretation policy, finding policy, Naming taxonomy, Tree placement policy, or candidate value authority in suite-core metadata;
   - creating a universal plugin architecture or generic shared bucket.
 - **Reuse boundary type:** data-only registration metadata boundary
