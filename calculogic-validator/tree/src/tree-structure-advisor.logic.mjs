@@ -48,31 +48,134 @@ const createNeutralReplacementRuntime = () => ({
   },
 });
 
+const isReplacementRuntime = (replacementRuntime) => (
+  replacementRuntime &&
+  typeof replacementRuntime === 'object' &&
+  !Array.isArray(replacementRuntime) &&
+  typeof replacementRuntime.classifyOccurrenceRecords === 'function' &&
+  typeof replacementRuntime.collectUnexpectedTopLevelDirectoryNames === 'function'
+);
+
 const resolveReplacementRuntime = (replacementRuntime) => {
-  if (
-    replacementRuntime &&
-    typeof replacementRuntime === 'object' &&
-    !Array.isArray(replacementRuntime) &&
-    typeof replacementRuntime.classifyOccurrenceRecords === 'function' &&
-    typeof replacementRuntime.collectUnexpectedTopLevelDirectoryNames === 'function'
-  ) {
+  if (isReplacementRuntime(replacementRuntime)) {
     return replacementRuntime;
   }
 
   return createNeutralReplacementRuntime();
 };
 
-const collectTopLevelUnexpectedFolderFindings = (topLevelDirectoryNames, scope, replacementRuntime) => {
-  if ((scope ?? 'repo') !== 'repo') {
-    return [];
+const isRuntimeExecutionReadyForReplacementRoute = (preparedDependencies = {}) => {
+  const runtimeExecutionContract = preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract;
+  const replacementReadiness = preparedDependencies.treeOccurrenceClassificationReplacementReadiness;
+
+  return (
+    runtimeExecutionContract &&
+    typeof runtimeExecutionContract === 'object' &&
+    !Array.isArray(runtimeExecutionContract) &&
+    runtimeExecutionContract.executionMode === 'execution-candidate' &&
+    runtimeExecutionContract.executionStatus === 'ready-for-future-execution-contract' &&
+    replacementReadiness &&
+    typeof replacementReadiness === 'object' &&
+    !Array.isArray(replacementReadiness) &&
+    replacementReadiness.replacementDecision === 'candidate-ready'
+  );
+};
+
+const isClassifiedRepoTopFolderRecord = (record) => (
+  record &&
+  typeof record === 'object' &&
+  !Array.isArray(record) &&
+  record.occurrenceType === 'folder' &&
+  record.isRepoTopOccurrence === true &&
+  typeof record.resolvedPath === 'string' &&
+  record.resolvedPath.length > 0 &&
+  !record.resolvedPath.includes('/') &&
+  typeof record.isRepoShapeAllowedTopLevelDirectory === 'boolean'
+);
+
+const collectUnexpectedTopLevelDirectoryNamesFromClassification = ({
+  topLevelDirectoryNames,
+  preparedInputs,
+  replacementRuntime,
+  preparedDependencies,
+}) => {
+  if (
+    !Array.isArray(topLevelDirectoryNames) ||
+    !isReplacementRuntime(replacementRuntime) ||
+    !isRuntimeExecutionReadyForReplacementRoute(preparedDependencies)
+  ) {
+    return null;
   }
 
+  const occurrenceSnapshot = preparedInputs.structuralAddressSnapshot ?? preparedInputs.occurrenceSnapshot;
+  const occurrenceRecords = occurrenceSnapshot?.occurrenceRecords;
+
+  if (!Array.isArray(occurrenceRecords)) {
+    return null;
+  }
+
+  let classifiedOccurrenceRecords;
+  try {
+    classifiedOccurrenceRecords = replacementRuntime.classifyOccurrenceRecords(occurrenceRecords);
+  } catch {
+    return null;
+  }
+
+  if (!Array.isArray(classifiedOccurrenceRecords)) {
+    return null;
+  }
+
+  const repoTopFolderRecordsByName = new Map();
+  for (const record of classifiedOccurrenceRecords) {
+    if (!isClassifiedRepoTopFolderRecord(record)) {
+      continue;
+    }
+
+    if (repoTopFolderRecordsByName.has(record.resolvedPath)) {
+      continue;
+    }
+
+    repoTopFolderRecordsByName.set(record.resolvedPath, record);
+  }
+
+  const normalizedTopLevelDirectoryNames = topLevelDirectoryNames
+    .filter((directoryName) => typeof directoryName === 'string' && directoryName.length > 0)
+    .sort((left, right) => left.localeCompare(right));
+
+  if (normalizedTopLevelDirectoryNames.some((directoryName) => !repoTopFolderRecordsByName.has(directoryName))) {
+    return null;
+  }
+
+  return normalizedTopLevelDirectoryNames
+    .filter((directoryName) => {
+      const classification = repoTopFolderRecordsByName.get(directoryName);
+      return classification.isRepoShapeAllowedTopLevelDirectory === false;
+    })
+    .sort((left, right) => left.localeCompare(right));
+};
+
+const collectFallbackUnexpectedTopLevelDirectoryNames = (topLevelDirectoryNames, replacementRuntime) => {
   const runtime = resolveReplacementRuntime(replacementRuntime);
   const unexpectedDirectoryNames = runtime.collectUnexpectedTopLevelDirectoryNames(topLevelDirectoryNames);
 
   if (!Array.isArray(unexpectedDirectoryNames)) {
     throw new Error('Tree replacement runtime collectUnexpectedTopLevelDirectoryNames() must return an array.');
   }
+
+  return unexpectedDirectoryNames;
+};
+
+const collectTopLevelUnexpectedFolderFindings = (preparedInputs, replacementRuntime) => {
+  if ((preparedInputs.scope ?? 'repo') !== 'repo') {
+    return [];
+  }
+
+  const unexpectedDirectoryNames = collectUnexpectedTopLevelDirectoryNamesFromClassification({
+    topLevelDirectoryNames: preparedInputs.topLevelDirectoryNames,
+    preparedInputs,
+    replacementRuntime,
+    preparedDependencies: preparedInputs.preparedDependencies,
+  }) ?? collectFallbackUnexpectedTopLevelDirectoryNames(preparedInputs.topLevelDirectoryNames, replacementRuntime);
 
   const allowedTopLevelDirectories = [...ALLOWED_TOP_LEVEL_DIRECTORY_NAMES];
 
@@ -180,10 +283,20 @@ const collectFileReasoningInput = (preparedInputs, replacementRuntime) => {
 
   if (Array.isArray(occurrenceRecords)) {
     const runtime = resolveReplacementRuntime(replacementRuntime);
-    const classifiedOccurrenceRecords = runtime.classifyOccurrenceRecords(occurrenceRecords);
+    let classifiedOccurrenceRecords;
+
+    try {
+      classifiedOccurrenceRecords = runtime.classifyOccurrenceRecords(occurrenceRecords);
+    } catch {
+      classifiedOccurrenceRecords = null;
+    }
 
     if (!Array.isArray(classifiedOccurrenceRecords)) {
-      throw new Error('Tree replacement runtime classifyOccurrenceRecords() must return an array.');
+      return {
+        source: 'selectedPaths-fallback',
+        fileRecords: [],
+        resolvedFilePaths: preparedInputs.selectedPaths,
+      };
     }
 
     const fileRecords = classifiedOccurrenceRecords.filter(
@@ -280,7 +393,7 @@ export const runTreeStructureAdvisor = (preparedInputs = {}) => {
   const selectedPathsForReasoning = fileReasoningInput.resolvedFilePaths;
 
   const findings = [
-    ...collectTopLevelUnexpectedFolderFindings(prepared.topLevelDirectoryNames, prepared.scope, replacementRuntime),
+    ...collectTopLevelUnexpectedFolderFindings(prepared, replacementRuntime),
     ...collectValidatorOwnedOutsideTreeFindings(selectedPathsForReasoning),
     ...collectOwnedSliceBoundaryDriftFindings(selectedPathsForReasoning),
     ...collectContributorFindings(prepared),
