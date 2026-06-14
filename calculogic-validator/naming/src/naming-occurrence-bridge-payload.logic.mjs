@@ -102,6 +102,30 @@ const toMissingIdentityDiagnostic = ({ semanticObservation, reason }) => ({
   semanticName: toOptionalNonEmptyString(semanticObservation.semanticName) ?? null,
 });
 
+const toInvalidAddressedNamespaceDiagnostics = ({ addressProfileId, addressedSnapshotId }) => {
+  const diagnostics = [];
+
+  if (!addressProfileId) {
+    diagnostics.push({
+      diagnosticType: 'invalid-addressed-namespace',
+      reason: 'missing-address-profile-id',
+      addressProfileId: null,
+      addressedSnapshotId: addressedSnapshotId ?? null,
+    });
+  }
+
+  if (!addressedSnapshotId) {
+    diagnostics.push({
+      diagnosticType: 'invalid-addressed-namespace',
+      reason: 'missing-addressed-snapshot-id',
+      addressProfileId: addressProfileId ?? null,
+      addressedSnapshotId: null,
+    });
+  }
+
+  return diagnostics;
+};
+
 export const createNamingOccurrenceBridgePayload = ({
   namingSemanticFamilyBridge = {},
   addressedOccurrenceNamespace = {},
@@ -116,46 +140,49 @@ export const createNamingOccurrenceBridgePayload = ({
   const occurrenceByPath = buildOccurrenceByPath(addressedOccurrenceNamespace.occurrenceRecords);
 
   const observations = [];
-  const diagnostics = [];
+  const diagnostics = toInvalidAddressedNamespaceDiagnostics({ addressProfileId, addressedSnapshotId });
+  const hasValidAddressedNamespace = diagnostics.length === 0;
 
-  for (const semanticObservation of sourceObservations) {
-    if (!semanticObservation || typeof semanticObservation !== 'object' || Array.isArray(semanticObservation)) {
-      continue;
+  if (hasValidAddressedNamespace) {
+    for (const semanticObservation of sourceObservations) {
+      if (!semanticObservation || typeof semanticObservation !== 'object' || Array.isArray(semanticObservation)) {
+        continue;
+      }
+
+      const pathKey = toPathKey(semanticObservation.repoRelativePath) ?? toPathKey(semanticObservation.path);
+      if (!pathKey) {
+        diagnostics.push(toMissingIdentityDiagnostic({ semanticObservation, reason: 'missing-path-key' }));
+        continue;
+      }
+
+      const occurrenceRecord = occurrenceByPath.get(pathKey);
+      if (!occurrenceRecord) {
+        diagnostics.push(toMissingIdentityDiagnostic({ semanticObservation, reason: 'unmatched-occurrence-record' }));
+        continue;
+      }
+
+      const observation = toAddressAttachedObservation({
+        semanticObservation,
+        occurrenceRecord,
+        addressProfileId,
+        addressedSnapshotId,
+      });
+
+      if (!observation) {
+        diagnostics.push(toMissingIdentityDiagnostic({ semanticObservation, reason: 'incomplete-occurrence-identity' }));
+        continue;
+      }
+
+      observations.push(observation);
     }
-
-    const pathKey = toPathKey(semanticObservation.repoRelativePath) ?? toPathKey(semanticObservation.path);
-    if (!pathKey) {
-      diagnostics.push(toMissingIdentityDiagnostic({ semanticObservation, reason: 'missing-path-key' }));
-      continue;
-    }
-
-    const occurrenceRecord = occurrenceByPath.get(pathKey);
-    if (!occurrenceRecord) {
-      diagnostics.push(toMissingIdentityDiagnostic({ semanticObservation, reason: 'unmatched-occurrence-record' }));
-      continue;
-    }
-
-    const observation = toAddressAttachedObservation({
-      semanticObservation,
-      occurrenceRecord,
-      addressProfileId,
-      addressedSnapshotId,
-    });
-
-    if (!observation) {
-      diagnostics.push(toMissingIdentityDiagnostic({ semanticObservation, reason: 'incomplete-occurrence-identity' }));
-      continue;
-    }
-
-    observations.push(observation);
   }
 
   return {
     bridgeContractVersion: BRIDGE_CONTRACT_VERSION,
     bridgeSource: BRIDGE_SOURCE,
     bridgeProducerId: BRIDGE_PRODUCER_ID,
-    ...(addressProfileId ? { addressProfileId } : {}),
-    ...(addressedSnapshotId ? { addressedSnapshotId } : {}),
+    addressProfileId: addressProfileId ?? null,
+    addressedSnapshotId: addressedSnapshotId ?? null,
     ...(sourceReportRef !== undefined ? { sourceReportRef } : {}),
     ...(sourceSnapshotRef !== undefined ? { sourceSnapshotRef } : {}),
     compatibility: {
@@ -163,9 +190,16 @@ export const createNamingOccurrenceBridgePayload = ({
       temporaryCompatibilityPathField: 'path',
       temporaryDebugAddressPathField: 'addressPath',
       addressAttachedObservationsOmitMissingIdentity: true,
+      addressedNamespaceValid: hasValidAddressedNamespace,
+      invalidAddressedNamespaceDiagnosticCount: diagnostics.filter(
+        (diagnostic) => diagnostic.diagnosticType === 'invalid-addressed-namespace',
+      ).length,
       sourceObservationCount: sourceObservations.length,
       addressAttachedObservationCount: observations.length,
-      missingIdentityDiagnosticCount: diagnostics.length,
+      missingIdentityDiagnosticCount: diagnostics.filter(
+        (diagnostic) => diagnostic.diagnosticType === 'missing-occurrence-identity',
+      ).length,
+      totalDiagnosticCount: diagnostics.length,
     },
     observations: observations.sort((left, right) =>
       left.addressProfileId.localeCompare(right.addressProfileId) ||

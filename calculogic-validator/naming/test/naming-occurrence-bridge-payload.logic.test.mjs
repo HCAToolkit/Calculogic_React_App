@@ -40,6 +40,89 @@ test('createNamingOccurrenceBridgePayload creates a versioned Naming bridge enve
   assert.deepEqual(result.sourceSnapshotRef, { snapshotId: 'source-snapshot-001' });
   assert.deepEqual(result.observations, []);
   assert.equal(result.compatibility.pathKeyedSemanticPayloadPreserved, true);
+  assert.equal(result.compatibility.addressedNamespaceValid, true);
+  assert.equal(result.compatibility.invalidAddressedNamespaceDiagnosticCount, 0);
+  assert.equal(result.addressProfileId, 'tree-codebase');
+  assert.equal(result.addressedSnapshotId, 'snapshot-001');
+});
+
+
+test('createNamingOccurrenceBridgePayload reports missing addressProfileId as an invalid namespace', () => {
+  const result = createNamingOccurrenceBridgePayload({
+    namingSemanticFamilyBridge: {
+      observations: [{ path: 'src/app.logic.mjs', semanticName: 'app', semanticFamily: 'app', familyRoot: 'app' }],
+    },
+    addressedOccurrenceNamespace: {
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceRecords: [{ occurrenceAddress: 'A.1', addressPath: 'A.1', path: 'src/app.logic.mjs', occurrenceType: 'file' }],
+    },
+  });
+
+  assert.equal(result.addressProfileId, null);
+  assert.equal(result.addressedSnapshotId, 'snapshot-001');
+  assert.deepEqual(result.observations, []);
+  assert.equal(result.compatibility.addressedNamespaceValid, false);
+  assert.equal(result.compatibility.invalidAddressedNamespaceDiagnosticCount, 1);
+  assert.equal(result.compatibility.missingIdentityDiagnosticCount, 0);
+  assert.equal(result.compatibility.totalDiagnosticCount, 1);
+  assert.deepEqual(result.diagnostics, [
+    {
+      diagnosticType: 'invalid-addressed-namespace',
+      reason: 'missing-address-profile-id',
+      addressProfileId: null,
+      addressedSnapshotId: 'snapshot-001',
+    },
+  ]);
+});
+
+test('createNamingOccurrenceBridgePayload reports missing addressedSnapshotId as an invalid namespace', () => {
+  const result = createNamingOccurrenceBridgePayload({
+    namingSemanticFamilyBridge: {
+      observations: [{ path: 'src/app.logic.mjs', semanticName: 'app', semanticFamily: 'app', familyRoot: 'app' }],
+    },
+    addressedOccurrenceNamespace: {
+      addressProfileId: 'tree-codebase',
+      occurrenceRecords: [{ occurrenceAddress: 'A.1', addressPath: 'A.1', path: 'src/app.logic.mjs', occurrenceType: 'file' }],
+    },
+  });
+
+  assert.equal(result.addressProfileId, 'tree-codebase');
+  assert.equal(result.addressedSnapshotId, null);
+  assert.deepEqual(result.observations, []);
+  assert.equal(result.compatibility.addressedNamespaceValid, false);
+  assert.equal(result.compatibility.invalidAddressedNamespaceDiagnosticCount, 1);
+  assert.equal(result.compatibility.totalDiagnosticCount, 1);
+  assert.deepEqual(result.diagnostics, [
+    {
+      diagnosticType: 'invalid-addressed-namespace',
+      reason: 'missing-addressed-snapshot-id',
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: null,
+    },
+  ]);
+});
+
+test('createNamingOccurrenceBridgePayload reports both missing namespace IDs and keeps observations empty', () => {
+  const result = createNamingOccurrenceBridgePayload({
+    namingSemanticFamilyBridge: {
+      observations: [{ path: 'src/app.logic.mjs', semanticName: 'app', semanticFamily: 'app', familyRoot: 'app' }],
+    },
+    addressedOccurrenceNamespace: {
+      occurrenceRecords: [{ occurrenceAddress: 'A.1', addressPath: 'A.1', path: 'src/app.logic.mjs', occurrenceType: 'file' }],
+    },
+  });
+
+  assert.equal(result.addressProfileId, null);
+  assert.equal(result.addressedSnapshotId, null);
+  assert.deepEqual(result.observations, []);
+  assert.equal(result.compatibility.addressedNamespaceValid, false);
+  assert.equal(result.compatibility.invalidAddressedNamespaceDiagnosticCount, 2);
+  assert.equal(result.compatibility.missingIdentityDiagnosticCount, 0);
+  assert.equal(result.compatibility.totalDiagnosticCount, 2);
+  assert.deepEqual(result.diagnostics.map((diagnostic) => diagnostic.reason), [
+    'missing-address-profile-id',
+    'missing-addressed-snapshot-id',
+  ]);
 });
 
 test('createNamingOccurrenceBridgePayload attaches full occurrence identity and preserves Naming semantic payloads', () => {
@@ -108,6 +191,7 @@ test('createNamingOccurrenceBridgePayload makes missing or unmatched occurrence 
   assert.deepEqual(result.observations, []);
   assert.equal(result.compatibility.addressAttachedObservationsOmitMissingIdentity, true);
   assert.equal(result.compatibility.missingIdentityDiagnosticCount, 2);
+  assert.equal(result.compatibility.totalDiagnosticCount, 2);
   assert.deepEqual(result.diagnostics.map((diagnostic) => diagnostic.reason), [
     'unmatched-occurrence-record',
     'incomplete-occurrence-identity',
