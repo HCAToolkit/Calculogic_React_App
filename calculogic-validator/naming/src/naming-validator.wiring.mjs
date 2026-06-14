@@ -20,6 +20,7 @@ import {
   summarizeFindings as summarizeFindingsRuntime,
 } from './naming-validator.logic.mjs';
 import { projectNamingSemanticFamilyBridge } from './naming-semantic-family-bridge-projection.logic.mjs';
+import { createNamingOccurrenceBridgePayload } from './naming-occurrence-bridge-payload.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from './naming-semantic-evidence-bridge.logic.mjs';
 import { normalizePath } from '../../src/core/scoped-target-paths.logic.mjs';
 import { collectValidatorCandidatePaths } from '../../src/core/validator-candidate-collection.logic.mjs';
@@ -97,14 +98,27 @@ export const prepareNamingValidatorInputs = (
   };
 };
 
-export const runNamingValidator = (repositoryRoot, { scope, config, targets } = {}) => {
+export const projectNamingOccurrenceBridge = (namingRuntimeOrReportOutput = {}, options = {}) =>
+  createNamingOccurrenceBridgePayload({
+    namingSemanticFamilyBridge: options.namingSemanticFamilyBridge ??
+      projectNamingSemanticFamilyBridge(namingRuntimeOrReportOutput),
+    addressedOccurrenceNamespace: options.addressedOccurrenceNamespace,
+    sourceReportRef: options.sourceReportRef,
+    sourceSnapshotRef: options.sourceSnapshotRef,
+  });
+
+export const runNamingValidator = (repositoryRoot, { scope, config, targets, addressedOccurrenceNamespace } = {}) => {
   const preparedInputs = prepareNamingValidatorInputs(repositoryRoot, { scope, config, targets });
 
   const result = runNamingValidatorRuntime(preparedInputs);
+  const namingOccurrenceBridge = addressedOccurrenceNamespace !== undefined
+    ? projectNamingOccurrenceBridge(result, { addressedOccurrenceNamespace })
+    : undefined;
 
   return {
     ...result,
     registry: preparedInputs.registry,
+    ...(namingOccurrenceBridge ? { namingOccurrenceBridge } : {}),
   };
 };
 
@@ -145,5 +159,6 @@ export {
   listNamingValidatorScopes,
   getScopeProfile,
   projectNamingSemanticFamilyBridge,
+  createNamingOccurrenceBridgePayload,
   prepareNamingSemanticEvidenceBridge,
 };

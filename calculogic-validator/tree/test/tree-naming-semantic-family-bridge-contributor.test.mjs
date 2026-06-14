@@ -1389,3 +1389,60 @@ test('tree naming bridge contributor keeps local-first routing deterministic whe
   assert.deepEqual(firstScatter, secondScatter);
   assert.equal(firstScatter.length, 1);
 });
+
+test('tree naming bridge contributor keeps current path-keyed join and ignores occurrence bridge sibling payload', () => {
+  const stagedBridgeTransport = {
+    observations: [
+      {
+        path: 'src/shared/build/build-surface.logic.ts',
+        semanticName: 'build-surface',
+        familyRoot: 'build',
+        semanticFamily: 'build-surface',
+      },
+      {
+        path: 'src/features/build/build-surface.results.ts',
+        semanticName: 'build-surface',
+        familyRoot: 'build',
+        semanticFamily: 'build-surface',
+      },
+      {
+        path: 'src/features/build/build-surface.knowledge.ts',
+        semanticName: 'build-surface',
+        familyRoot: 'build',
+        semanticFamily: 'build-surface',
+      },
+      {
+        path: 'src/features/build/build-surface.build.tsx',
+        semanticName: 'build-surface',
+        familyRoot: 'build',
+        semanticFamily: 'build-surface',
+      },
+    ],
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'Z.9',
+          repoRelativePath: 'different/address-keyed-only.logic.ts',
+          path: 'different/address-keyed-only.logic.ts',
+          semanticName: 'address-keyed-only',
+          familyRoot: 'address',
+          semanticFamily: 'address-keyed-only',
+        },
+      ],
+    },
+  };
+
+  const findings = collectNamingSemanticFamilyBridgeFindings(stagedBridgeTransport);
+
+  assert.deepEqual(
+    findings.map((finding) => finding.code).sort((left, right) => left.localeCompare(right)),
+    ['TREE_FAMILY_SCATTERED'],
+  );
+  assert.equal(
+    findings.some((finding) => JSON.stringify(finding).includes('address-keyed-only')),
+    false,
+  );
+});
