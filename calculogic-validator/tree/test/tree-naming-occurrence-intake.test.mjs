@@ -226,6 +226,8 @@ const addressBridge = {
       familyRoot: 'shared',
       semanticFamily: 'shared-runtime',
       familySubgroup: 'runtime',
+      ambiguityFlags: ['family-boundary-heuristic', 'family-boundary-heuristic', ''],
+      splitFamilyFlags: ['split-family-root', 'split-family-root'],
     },
   ],
 };
@@ -245,6 +247,8 @@ test('Tree address join produces explicit prepared evidence for a valid full tup
     occurrenceAddress: 'A.1',
   });
   assert.equal(prepared.joinedEvidence[0].namingObservation.semanticFamily, 'shared-runtime');
+  assert.deepEqual(prepared.joinedEvidence[0].namingObservation.ambiguityFlags, ['family-boundary-heuristic']);
+  assert.deepEqual(prepared.joinedEvidence[0].namingObservation.splitFamilyFlags, ['split-family-root']);
   assert.equal(prepared.joinedEvidence[0].occurrenceRecord.path, 'src/alpha/shared.logic.ts');
 });
 
@@ -328,7 +332,8 @@ test('Tree address join skips mismatched profile snapshot and address tuples exp
       addressedOccurrenceNamespace,
     });
 
-    assert.equal(prepared.status, 'joined-with-skips');
+    assert.equal(prepared.status, 'no-joined-evidence');
+    assert.equal(prepared.usedForCurrentTreeJoins, false);
     assert.equal(prepared.joinedEvidence.length, 0);
     assert.equal(prepared.skippedJoins[0].reason, 'no-matching-occurrence-record-identity-tuple');
   }
@@ -373,4 +378,58 @@ test('Tree address join does not re-derive Naming semantics from filenames when 
   assert.equal(prepared.joinedEvidence[0].namingObservation.semanticFamily, null);
   assert.equal(prepared.joinedEvidence[0].namingObservation.familyRoot, null);
   assert.equal(prepared.joinedEvidence[0].namingObservation.familySubgroup, null);
+});
+
+
+test('Tree address join reports empty bridge without marking joins used', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: { bridgeContractVersion: 'naming-occurrence-bridge.v1', observations: [] },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'empty');
+  assert.equal(prepared.usedForCurrentTreeJoins, false);
+  assert.deepEqual(prepared.joinedEvidence, []);
+  assert.deepEqual(prepared.skippedJoins, []);
+});
+
+test('Tree address join reports no joined evidence when observations have no matching occurrence records', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [{ ...addressBridge.observations[0], occurrenceAddress: 'A.404' }],
+    },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'no-joined-evidence');
+  assert.equal(prepared.usedForCurrentTreeJoins, false);
+  assert.equal(prepared.joinedEvidence.length, 0);
+  assert.deepEqual(prepared.skippedJoins.map((join) => join.reason), [
+    'no-matching-occurrence-record-identity-tuple',
+  ]);
+});
+
+test('Tree address join reports all-skipped observations without marking joins used', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [
+        { ...addressBridge.observations[0], occurrenceAddress: 'A.404' },
+        { ...addressBridge.observations[0], occurrenceAddress: 'A.405' },
+      ],
+    },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'no-joined-evidence');
+  assert.equal(prepared.usedForCurrentTreeJoins, false);
+  assert.equal(prepared.joinedEvidence.length, 0);
+  assert.deepEqual(
+    prepared.skippedJoins.map((join) => [join.identityTuple.occurrenceAddress, join.reason]),
+    [
+      ['A.404', 'no-matching-occurrence-record-identity-tuple'],
+      ['A.405', 'no-matching-occurrence-record-identity-tuple'],
+    ],
+  );
 });

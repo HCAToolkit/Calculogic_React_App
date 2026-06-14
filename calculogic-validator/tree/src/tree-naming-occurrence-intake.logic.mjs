@@ -4,6 +4,11 @@ const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && 
 
 const toNonEmptyString = (value) => (typeof value === 'string' && value.length > 0 ? value : null);
 
+const toSortedUniqueStringFlags = (flags) =>
+  Array.from(
+    new Set((Array.isArray(flags) ? flags : []).filter((flag) => typeof flag === 'string' && flag.length > 0)),
+  ).sort((left, right) => left.localeCompare(right));
+
 const toPayloadFromTransport = ({ namingOccurrenceBridge, namingSemanticFamilyBridge } = {}) => {
   if (namingOccurrenceBridge !== undefined) {
     return namingOccurrenceBridge;
@@ -180,6 +185,8 @@ const toCleanObservationEvidence = (observation) => ({
   familyRoot: observation.familyRoot ?? null,
   semanticFamily: observation.semanticFamily ?? null,
   familySubgroup: observation.familySubgroup ?? null,
+  ambiguityFlags: toSortedUniqueStringFlags(observation.ambiguityFlags),
+  splitFamilyFlags: toSortedUniqueStringFlags(observation.splitFamilyFlags),
 });
 
 const toOccurrenceEvidence = (occurrenceRecord, identityTuple) => ({
@@ -199,6 +206,28 @@ const sortJoinEntries = (entries) =>
     (left.reason ?? '').localeCompare(right.reason ?? ''),
   );
 
+const toIntakeDiagnosticSkippedJoins = (observations) =>
+  observations.map((observation) => {
+    const identityTuple = normalizeObservationIdentityTuple(observation);
+
+    return {
+      reason: identityTuple ? 'source-intake-diagnostics-present' : 'invalid-observation-identity-tuple',
+      identityTuple,
+    };
+  });
+
+const toJoinStatus = ({ joinedEvidence, skippedJoins, observationCount }) => {
+  if (joinedEvidence.length > 0) {
+    return skippedJoins.length > 0 ? 'joined-with-skips' : 'joined';
+  }
+
+  if (observationCount === 0) {
+    return 'empty';
+  }
+
+  return 'no-joined-evidence';
+};
+
 export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
   namingOccurrenceBridge,
   namingSemanticFamilyBridge,
@@ -213,6 +242,8 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
   const diagnostics = [];
   const joinedEvidence = [];
   const skippedJoins = [];
+  const payload = toPayloadFromTransport({ namingOccurrenceBridge, namingSemanticFamilyBridge });
+  const observations = Array.isArray(payload?.observations) ? payload.observations : [];
 
   if (!addressProfileId) {
     diagnostics.push({ reason: 'missing-addressed-occurrence-namespace-addressProfileId' });
@@ -241,9 +272,23 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
   diagnostics.push(...intake.diagnostics.map((diagnostic) => ({ source: intake.boundary, ...diagnostic })));
 
   if (!intake.recognized || intake.diagnostics.length > 0 || diagnostics.length > 0) {
+    skippedJoins.push(...toIntakeDiagnosticSkippedJoins(observations));
+
     return {
       boundary: 'tree-naming-occurrence-address-join',
-      status: 'skipped-with-diagnostics',
+      status: observations.length === 0 ? 'empty' : 'skipped-with-diagnostics',
+      usedForCurrentTreeJoins: false,
+      identityTupleFields: IDENTITY_TUPLE_FIELDS,
+      joinedEvidence,
+      skippedJoins: sortJoinEntries(skippedJoins),
+      diagnostics,
+    };
+  }
+
+  if (observations.length === 0) {
+    return {
+      boundary: 'tree-naming-occurrence-address-join',
+      status: 'empty',
       usedForCurrentTreeJoins: false,
       identityTupleFields: IDENTITY_TUPLE_FIELDS,
       joinedEvidence,
@@ -269,8 +314,6 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
     occurrenceRecordsByTuple.set(key, { occurrenceRecord, identityTuple });
   }
 
-  const payload = toPayloadFromTransport({ namingOccurrenceBridge, namingSemanticFamilyBridge });
-  const observations = Array.isArray(payload?.observations) ? payload.observations : [];
   const observationTupleCounts = new Map();
   for (const observation of observations) {
     const identityTuple = normalizeObservationIdentityTuple(observation);
@@ -314,8 +357,8 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
 
   return {
     boundary: 'tree-naming-occurrence-address-join',
-    status: diagnostics.length > 0 || skippedJoins.length > 0 ? 'joined-with-skips' : 'joined',
-    usedForCurrentTreeJoins: true,
+    status: toJoinStatus({ joinedEvidence, skippedJoins, observationCount: observations.length }),
+    usedForCurrentTreeJoins: joinedEvidence.length > 0,
     identityTupleFields: IDENTITY_TUPLE_FIELDS,
     joinedEvidence: sortJoinEntries(joinedEvidence),
     skippedJoins: sortJoinEntries(skippedJoins),
