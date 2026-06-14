@@ -9,6 +9,7 @@ export const collectDefaultTreeStructureAdvisorContributors = ({
   repositoryRoot,
   selectedPaths,
   namingSemanticFamilyBridge,
+  preparedAddressKeyedJoinEvidence,
 }) => [
   attachTreeShimDiagnosticsContributor({
     repositoryRoot,
@@ -16,5 +17,6 @@ export const collectDefaultTreeStructureAdvisorContributors = ({
   }),
   attachTreeNamingSemanticFamilyBridgeContributor({
     namingSemanticFamilyBridge,
+    preparedAddressKeyedJoinEvidence,
   }),
 ].filter(Boolean);
