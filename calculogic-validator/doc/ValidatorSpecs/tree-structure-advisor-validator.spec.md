@@ -111,6 +111,12 @@ Bounded consumable naming bridge surfaces include:
 
 Tree advisor does **not** re-own naming validity judgments. Naming validity remains owned by naming conventions/specs and the naming validator slice.
 
+### Naming occurrence bridge intake boundary (Status: Current implementation reality)
+
+Tree has a neutral intake boundary for a staged sibling `namingOccurrenceBridge` payload when that payload is explicitly supplied to Tree wiring or attached beside the path-keyed semantic-family bridge payload in tests/helper transport. The boundary recognizes only future address-keyed join identity tuples made from `addressProfileId` + `addressedSnapshotId` + `occurrenceAddress`; it preserves or summarizes Naming-originated bridge diagnostics and compatibility diagnostic counts; and it records that the payload is future evidence only and is not used for current Tree joins, findings, placement reasoning, scatter/cluster logic, drift/advisory logic, structural-home reasoning, semantic-home reasoning, or folder-kind interpretation.
+
+Current runner transport passes the path-keyed `namingSemanticFamilyBridge` to Tree and does not supply a runnable address-keyed Tree join input. Therefore the occurrence bridge intake is a guardrail/helper boundary only in this slice. Current Tree behavior remains path-keyed through the semantic-family bridge, and Tree must not re-derive Naming semantic-family interpretation from filenames or from occurrence bridge observations.
+
 ### Naming-bridge folder-kind interpretation + placement model (Status: Bounded modeling note)
 
 Classification: Informative
