@@ -25,6 +25,7 @@ import { recommendTreeOccurrenceClassificationReplacement } from './tree-occurre
 import { planTreeOccurrenceClassificationRuntimeEvaluation } from './tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeExecutionContract } from './tree-occurrence-classification-runtime-execution-contract.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
+import { prepareTreeNamingOccurrenceBridgeIntake } from './tree-naming-occurrence-intake.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-registry.logic.mjs';
 import { getBuiltinTreeRepoShapePolicy } from './registries/tree-repo-shape-policy-registry.logic.mjs';
@@ -52,7 +53,7 @@ const collectTopLevelDirectoryNames = (repositoryRoot) =>
 
 export const prepareTreeStructureAdvisorInputs = (
   repositoryRoot,
-  { scope, targets, namingSemanticFamilyBridge } = {},
+  { scope, targets, namingSemanticFamilyBridge, namingOccurrenceBridge } = {},
 ) => {
   const scopedSnapshotInputs = collectSuiteScopedSnapshotInputs(repositoryRoot, {
     scope,
@@ -82,6 +83,10 @@ export const prepareTreeStructureAdvisorInputs = (
   const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
     ? prepareNamingSemanticEvidenceBridge(namingSemanticFamilyBridge)
     : { observations: [] };
+  const treeNamingOccurrenceBridgeIntake = prepareTreeNamingOccurrenceBridgeIntake({
+    namingOccurrenceBridge,
+    namingSemanticFamilyBridge,
+  });
 
   const treeStructuralHomeEvidence = prepareTreeStructuralHomeEvidence({
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
@@ -162,6 +167,7 @@ export const prepareTreeStructureAdvisorInputs = (
       treeOccurrenceClassificationRuntimeEvaluationPlan,
       treeOccurrenceClassificationRuntimeExecutionContract,
       treeOccurrenceClassificationReplacementRuntime,
+      treeNamingOccurrenceBridgeIntake,
     },
     findingContributors: collectDefaultTreeStructureAdvisorContributors({
       repositoryRoot,
@@ -171,11 +177,12 @@ export const prepareTreeStructureAdvisorInputs = (
   };
 };
 
-export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets, namingSemanticFamilyBridge } = {}) => {
+export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets, namingSemanticFamilyBridge, namingOccurrenceBridge } = {}) => {
   const preparedInputs = prepareTreeStructureAdvisorInputs(repositoryRoot, {
     scope,
     targets,
     namingSemanticFamilyBridge,
+    namingOccurrenceBridge,
   });
   return runTreeStructureAdvisorRuntime(preparedInputs);
 };
