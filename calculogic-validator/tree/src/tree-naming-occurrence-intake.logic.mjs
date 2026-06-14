@@ -171,6 +171,8 @@ const normalizeOccurrenceRecordIdentityTuple = ({ occurrenceRecord, addressProfi
   };
 };
 
+const normalizeStringFlags = (flags) => (Array.isArray(flags) ? flags.filter((flag) => typeof flag === 'string') : []);
+
 const toCleanObservationEvidence = (observation) => ({
   addressProfileId: observation.addressProfileId,
   addressedSnapshotId: observation.addressedSnapshotId,
@@ -180,6 +182,8 @@ const toCleanObservationEvidence = (observation) => ({
   familyRoot: observation.familyRoot ?? null,
   semanticFamily: observation.semanticFamily ?? null,
   familySubgroup: observation.familySubgroup ?? null,
+  ambiguityFlags: normalizeStringFlags(observation.ambiguityFlags),
+  splitFamilyFlags: normalizeStringFlags(observation.splitFamilyFlags),
 });
 
 const toOccurrenceEvidence = (occurrenceRecord, identityTuple) => ({
@@ -312,10 +316,16 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
     });
   }
 
+  const status = diagnostics.length > 0 || skippedJoins.length > 0
+    ? 'joined-with-skips'
+    : joinedEvidence.length > 0
+      ? 'joined'
+      : 'no-joined-evidence';
+
   return {
     boundary: 'tree-naming-occurrence-address-join',
-    status: diagnostics.length > 0 || skippedJoins.length > 0 ? 'joined-with-skips' : 'joined',
-    usedForCurrentTreeJoins: diagnostics.length === 0 && joinedEvidence.length > 0,
+    status,
+    usedForCurrentTreeJoins: status === 'joined' && joinedEvidence.length > 0,
     identityTupleFields: IDENTITY_TUPLE_FIELDS,
     joinedEvidence: sortJoinEntries(joinedEvidence),
     skippedJoins: sortJoinEntries(skippedJoins),

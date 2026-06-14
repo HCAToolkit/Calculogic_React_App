@@ -248,6 +248,32 @@ test('Tree address join produces explicit prepared evidence for a valid full tup
   assert.equal(prepared.joinedEvidence[0].occurrenceRecord.path, 'src/alpha/shared.logic.ts');
 });
 
+test('Tree address join preserves Naming-owned ambiguity and split-family flags as string arrays', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [
+        {
+          ...addressBridge.observations[0],
+          ambiguityFlags: ['multiple-family-candidates', 42, null, 'case-variant-candidate'],
+          splitFamilyFlags: ['split-across-surfaces', false, 'role-gap'],
+        },
+      ],
+    },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'joined');
+  assert.deepEqual(prepared.joinedEvidence[0].namingObservation.ambiguityFlags, [
+    'multiple-family-candidates',
+    'case-variant-candidate',
+  ]);
+  assert.deepEqual(prepared.joinedEvidence[0].namingObservation.splitFamilyFlags, [
+    'split-across-surfaces',
+    'role-gap',
+  ]);
+});
+
 test('Tree address join disambiguates duplicate same-family observations by full tuple', () => {
   const duplicateSameFamilyBridge = {
     bridgeContractVersion: 'naming-occurrence-bridge.v1',
@@ -290,6 +316,22 @@ test('Tree address join disambiguates duplicate same-family observations by full
       ['A.2', 'src/beta/shared.logic.ts'],
     ],
   );
+});
+
+test('Tree address join reports valid empty bridge input as explicit no-evidence state', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [],
+    },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'no-joined-evidence');
+  assert.equal(prepared.usedForCurrentTreeJoins, false);
+  assert.deepEqual(prepared.joinedEvidence, []);
+  assert.deepEqual(prepared.skippedJoins, []);
+  assert.deepEqual(prepared.diagnostics, []);
 });
 
 for (const [fieldName, expectedReason] of [
