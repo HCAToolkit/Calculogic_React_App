@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { prepareTreeNamingOccurrenceBridgeIntake } from '../src/tree-naming-occurrence-intake.logic.mjs';
+import {
+  prepareTreeNamingOccurrenceAddressJoinEvidence,
+  prepareTreeNamingOccurrenceBridgeIntake,
+} from '../src/tree-naming-occurrence-intake.logic.mjs';
 import { collectNamingSemanticFamilyBridgeFindings } from '../src/contributors/tree-naming-semantic-family-bridge-contributor.logic.mjs';
 
 const pathKeyedSemanticBridge = {
@@ -184,4 +187,230 @@ test('Tree occurrence bridge intake preserves Naming invalid namespace diagnosti
   assert.equal(JSON.stringify(intake.diagnostics).includes('missing-address-profile-id'), true);
   assert.equal(JSON.stringify(intake.diagnostics).includes('missing-addressed-snapshot-id'), true);
   assert.deepEqual(withNamingDiagnostics, findingCodes(pathKeyedSemanticBridge));
+});
+
+
+const addressedOccurrenceNamespace = {
+  addressProfileId: 'tree-codebase',
+  addressedSnapshotId: 'snapshot-001',
+  occurrenceRecords: [
+    {
+      occurrenceAddress: 'A.1',
+      addressPath: 'A.1',
+      path: 'src/alpha/shared.logic.ts',
+      resolvedPath: 'src/alpha/shared.logic.ts',
+      name: 'shared.logic.ts',
+      occurrenceType: 'file',
+    },
+    {
+      occurrenceAddress: 'A.2',
+      addressPath: 'A.2',
+      path: 'src/beta/shared.logic.ts',
+      resolvedPath: 'src/beta/shared.logic.ts',
+      name: 'shared.logic.ts',
+      occurrenceType: 'file',
+    },
+  ],
+};
+
+const addressBridge = {
+  bridgeContractVersion: 'naming-occurrence-bridge.v1',
+  observations: [
+    {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceAddress: 'A.1',
+      repoRelativePath: 'src/alpha/shared.logic.ts',
+      path: 'src/alpha/shared.logic.ts',
+      semanticName: 'shared',
+      familyRoot: 'shared',
+      semanticFamily: 'shared-runtime',
+      familySubgroup: 'runtime',
+    },
+  ],
+};
+
+test('Tree address join produces explicit prepared evidence for a valid full tuple', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: addressBridge,
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'joined');
+  assert.equal(prepared.usedForCurrentTreeJoins, true);
+  assert.equal(prepared.joinedEvidence.length, 1);
+  assert.deepEqual(prepared.joinedEvidence[0].identityTuple, {
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.1',
+  });
+  assert.equal(prepared.joinedEvidence[0].namingObservation.semanticFamily, 'shared-runtime');
+  assert.equal(prepared.joinedEvidence[0].occurrenceRecord.path, 'src/alpha/shared.logic.ts');
+});
+
+test('Tree address join disambiguates duplicate same-family observations by full tuple', () => {
+  const duplicateSameFamilyBridge = {
+    bridgeContractVersion: 'naming-occurrence-bridge.v1',
+    observations: [
+      {
+        addressProfileId: 'tree-codebase',
+        addressedSnapshotId: 'snapshot-001',
+        occurrenceAddress: 'A.2',
+        repoRelativePath: 'src/beta/shared.logic.ts',
+        path: 'src/beta/shared.logic.ts',
+        semanticName: 'shared',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-runtime',
+        familySubgroup: 'runtime',
+      },
+      {
+        addressProfileId: 'tree-codebase',
+        addressedSnapshotId: 'snapshot-001',
+        occurrenceAddress: 'A.1',
+        repoRelativePath: 'src/alpha/shared.logic.ts',
+        path: 'src/alpha/shared.logic.ts',
+        semanticName: 'shared',
+        familyRoot: 'shared',
+        semanticFamily: 'shared-runtime',
+        familySubgroup: 'runtime',
+      },
+    ],
+  };
+
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: duplicateSameFamilyBridge,
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'joined');
+  assert.deepEqual(
+    prepared.joinedEvidence.map((entry) => [entry.identityTuple.occurrenceAddress, entry.occurrenceRecord.path]),
+    [
+      ['A.1', 'src/alpha/shared.logic.ts'],
+      ['A.2', 'src/beta/shared.logic.ts'],
+    ],
+  );
+});
+
+for (const [fieldName, expectedReason] of [
+  ['addressProfileId', 'invalid-observation-identity-tuple'],
+  ['addressedSnapshotId', 'invalid-observation-identity-tuple'],
+  ['occurrenceAddress', 'invalid-observation-identity-tuple'],
+]) {
+  test(`Tree address join skips when Naming observation is missing ${fieldName}`, () => {
+    const observation = { ...addressBridge.observations[0] };
+    delete observation[fieldName];
+    const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+      namingOccurrenceBridge: { bridgeContractVersion: 'naming-occurrence-bridge.v1', observations: [observation] },
+      addressedOccurrenceNamespace,
+    });
+
+    assert.equal(prepared.status, 'skipped-with-diagnostics');
+    assert.equal(prepared.joinedEvidence.length, 0);
+    assert.equal(
+      prepared.diagnostics.some((diagnostic) => diagnostic.reason === expectedReason),
+      true,
+    );
+  });
+}
+
+test('Tree address join skips mismatched profile snapshot and address tuples explicitly', () => {
+  for (const patch of [
+    { addressProfileId: 'other-profile' },
+    { addressedSnapshotId: 'snapshot-999' },
+    { occurrenceAddress: 'A.999' },
+  ]) {
+    const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+      namingOccurrenceBridge: {
+        bridgeContractVersion: 'naming-occurrence-bridge.v1',
+        observations: [{ ...addressBridge.observations[0], ...patch }],
+      },
+      addressedOccurrenceNamespace,
+    });
+
+    assert.equal(prepared.status, 'joined-with-skips');
+    assert.equal(prepared.joinedEvidence.length, 0);
+    assert.equal(prepared.skippedJoins[0].reason, 'no-matching-occurrence-record-identity-tuple');
+  }
+});
+
+test('Tree address join does not produce clean joins for diagnostic-bearing occurrence bridge intake', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      ...addressBridge,
+      diagnostics: [{ diagnosticType: 'invalid-addressed-namespace', reason: 'missing-address-profile-id' }],
+    },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'skipped-with-diagnostics');
+  assert.equal(prepared.joinedEvidence.length, 0);
+  assert.equal(
+    prepared.diagnostics.some((diagnostic) => diagnostic.reason === 'source-naming-diagnostics-present'),
+    true,
+  );
+});
+
+
+test('Tree address join does not re-derive Naming semantics from filenames when bridge semantic fields are absent', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.1',
+          repoRelativePath: 'src/alpha/shared.logic.ts',
+          path: 'src/alpha/shared.logic.ts',
+        },
+      ],
+    },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'joined');
+  assert.equal(prepared.joinedEvidence[0].namingObservation.semanticFamily, null);
+  assert.equal(prepared.joinedEvidence[0].namingObservation.familyRoot, null);
+  assert.equal(prepared.joinedEvidence[0].namingObservation.familySubgroup, null);
+});
+
+test('Tree address join treats malformed occurrence bridge observations as diagnostic skipped state, not clean empty', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: { not: 'an-array' },
+    },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'skipped-with-diagnostics');
+  assert.equal(prepared.usedForCurrentTreeJoins, false);
+  assert.deepEqual(prepared.joinedEvidence, []);
+  assert.equal(
+    prepared.diagnostics.some((diagnostic) => diagnostic.reason === 'observations-not-array'),
+    true,
+  );
+});
+
+test('Tree address join exposes malformed occurrence records even when another record matches', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: addressBridge,
+    addressedOccurrenceNamespace: {
+      ...addressedOccurrenceNamespace,
+      occurrenceRecords: [
+        { path: 'src/malformed/missing-address.logic.ts', occurrenceType: 'file' },
+        ...addressedOccurrenceNamespace.occurrenceRecords,
+      ],
+    },
+  });
+
+  assert.notEqual(prepared.status, 'joined');
+  assert.equal(prepared.status, 'joined-with-skips');
+  assert.equal(prepared.usedForCurrentTreeJoins, false);
+  assert.equal(prepared.joinedEvidence.length, 1);
+  assert.equal(
+    prepared.diagnostics.some((diagnostic) => diagnostic.reason === 'invalid-occurrence-record-identity-tuple'),
+    true,
+  );
 });
