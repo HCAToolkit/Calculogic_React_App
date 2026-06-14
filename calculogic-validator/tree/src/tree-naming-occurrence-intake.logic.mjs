@@ -16,6 +16,48 @@ const toPayloadFromTransport = ({ namingOccurrenceBridge, namingSemanticFamilyBr
   return undefined;
 };
 
+const normalizeSourceDiagnostic = (diagnostic) => {
+  if (!isPlainObject(diagnostic)) {
+    return { source: 'namingOccurrenceBridge.diagnostics', diagnostic };
+  }
+
+  return {
+    source: 'namingOccurrenceBridge.diagnostics',
+    ...diagnostic,
+  };
+};
+
+const collectNamingPayloadDiagnostics = (payload) => {
+  const diagnostics = [];
+
+  if (Array.isArray(payload.diagnostics) && payload.diagnostics.length > 0) {
+    diagnostics.push({
+      reason: 'source-naming-diagnostics-present',
+      diagnosticCount: payload.diagnostics.length,
+      diagnostics: payload.diagnostics.map(normalizeSourceDiagnostic),
+    });
+  }
+
+  if (isPlainObject(payload.compatibility)) {
+    const compatibility = payload.compatibility;
+    const compatibilityDiagnosticCounts = Object.fromEntries(
+      Object.entries(compatibility)
+        .filter(([key, value]) => key.endsWith('DiagnosticCount') && Number.isInteger(value) && value > 0)
+        .sort(([left], [right]) => left.localeCompare(right)),
+    );
+
+    if (compatibility.addressedNamespaceValid === false || Object.keys(compatibilityDiagnosticCounts).length > 0) {
+      diagnostics.push({
+        reason: 'source-naming-compatibility-diagnostics-present',
+        addressedNamespaceValid: compatibility.addressedNamespaceValid ?? null,
+        diagnosticCounts: compatibilityDiagnosticCounts,
+      });
+    }
+  }
+
+  return diagnostics;
+};
+
 const normalizeObservationIdentityTuple = (observation) => {
   if (!isPlainObject(observation)) {
     return null;
@@ -72,6 +114,8 @@ export const prepareTreeNamingOccurrenceBridgeIntake = ({
       expectedBridgeContractVersion: BRIDGE_CONTRACT_VERSION,
     });
   }
+
+  diagnostics.push(...collectNamingPayloadDiagnostics(payload));
 
   const observations = Array.isArray(payload.observations) ? payload.observations : [];
   if (!Array.isArray(payload.observations)) {
