@@ -383,6 +383,14 @@ Prepared bridge projection (small explicit surface):
 
 This bridge is an intentionally narrow projection for advisory consumption. It is not a generic "pass the full naming report to tree" contract.
 
+Additive occurrence bridge staging path (current implementation reality):
+
+- naming can produce a versioned `naming-occurrence-bridge.v1` payload when a caller supplies an addressed occurrence namespace
+- the occurrence bridge is produced from the existing path-keyed semantic-family projection and address-attaches observations only when namespace identifiers and matching occurrence identity are present
+- missing or invalid namespace state remains visible through occurrence bridge diagnostics and produces empty address-attached observations for invalid namespace input
+- the occurrence bridge preserves the current path-keyed compatibility field and does not carry tree-owned conclusion fields such as semantic-home, structural-home, folder-kind, placement, scatter, cluster, or drift conclusions
+- tree consumption remains on the current path-keyed semantic-family bridge until a separate tree consumption slice changes that behavior
+
 Current runner production path (shipped behavior):
 
 - the shared suite runner stages naming before tree whenever tree is selected in the run
