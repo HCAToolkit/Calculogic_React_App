@@ -1695,3 +1695,125 @@ test('tree-structure-advisor wiring composes shim contributor with lazy staged c
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
 });
+
+const createCleanPreparedAddressKeyedJoinEvidence = (semanticFamily) => ({
+  boundary: 'tree-naming-occurrence-address-join',
+  status: 'joined',
+  usedForCurrentTreeJoins: true,
+  identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+  diagnostics: [],
+  skippedJoins: [],
+  joinedEvidence: [
+    ['A.1', 'src/shared/build'],
+    ['A.2', 'src/features/build'],
+    ['A.3', 'src/features/build'],
+    ['A.4', 'src/features/build'],
+  ].map(([occurrenceAddress, directoryPath], index) => ({
+    evidenceType: 'tree-prepared-naming-occurrence-address-join',
+    identityTuple: {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceAddress,
+    },
+    namingObservation: {
+      path: `stale/${semanticFamily}-${index}.logic.ts`,
+      semanticName: semanticFamily,
+      familyRoot: semanticFamily.split('-')[0],
+      semanticFamily,
+    },
+    occurrenceRecord: {
+      occurrenceAddress,
+      path: `${directoryPath}/${semanticFamily}-${index}.logic.ts`,
+      resolvedPath: `${directoryPath}/${semanticFamily}-${index}.logic.ts`,
+    },
+  })),
+});
+
+const createPathKeyedFamilyBridge = (semanticFamily) => ({
+  observations: [
+    `src/shared/build/${semanticFamily}.logic.ts`,
+    `src/features/build/${semanticFamily}.results.ts`,
+    `src/features/build/${semanticFamily}.knowledge.ts`,
+    `src/features/build/${semanticFamily}.build.tsx`,
+  ].map((pathValue) => ({
+    path: pathValue,
+    semanticName: semanticFamily,
+    familyRoot: semanticFamily.split('-')[0],
+    semanticFamily,
+  })),
+});
+
+const scatteredFamilyFindings = (result) =>
+  result.findings
+    .filter((finding) => finding.code === 'TREE_FAMILY_SCATTERED')
+    .map((finding) => finding.details.semanticFamily)
+    .sort((left, right) => left.localeCompare(right));
+
+test('tree structure advisor wiring forwards prepared address-keyed semantic-family evidence to default contributors', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-keyed-contributor-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const namingSemanticFamilyBridge = createPathKeyedFamilyBridge('path-keyed');
+    const preparedAddressKeyedJoinEvidence = createCleanPreparedAddressKeyedJoinEvidence('address-keyed');
+
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, {
+      scope: 'repo',
+      namingSemanticFamilyBridge,
+      preparedAddressKeyedJoinEvidence,
+    });
+    const preparedResult = runTreeStructureAdvisorRuntime(preparedInputs);
+    const runResult = runTreeStructureAdvisor(fixtureDir, {
+      scope: 'repo',
+      namingSemanticFamilyBridge,
+      preparedAddressKeyedJoinEvidence,
+    });
+
+    assert.deepEqual(scatteredFamilyFindings(preparedResult), ['address-keyed']);
+    assert.deepEqual(scatteredFamilyFindings(runResult), ['address-keyed']);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree structure advisor wiring preserves path-keyed fallback when prepared address evidence is absent or not clean', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-keyed-fallback-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const namingSemanticFamilyBridge = createPathKeyedFamilyBridge('path-keyed');
+    const cleanPreparedAddressKeyedJoinEvidence = createCleanPreparedAddressKeyedJoinEvidence('address-keyed');
+    const notCleanPreparedAddressKeyedJoinEvidence = {
+      ...cleanPreparedAddressKeyedJoinEvidence,
+      status: 'joined-with-skips',
+      usedForCurrentTreeJoins: false,
+      skippedJoins: [
+        {
+          reason: 'no-matching-occurrence-record-identity-tuple',
+          identityTuple: {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'Z.9',
+          },
+        },
+      ],
+    };
+
+    const absentResult = runTreeStructureAdvisor(fixtureDir, {
+      scope: 'repo',
+      namingSemanticFamilyBridge,
+    });
+    const notCleanResult = runTreeStructureAdvisor(fixtureDir, {
+      scope: 'repo',
+      namingSemanticFamilyBridge,
+      preparedAddressKeyedJoinEvidence: notCleanPreparedAddressKeyedJoinEvidence,
+    });
+
+    assert.deepEqual(scatteredFamilyFindings(absentResult), ['path-keyed']);
+    assert.deepEqual(scatteredFamilyFindings(notCleanResult), ['path-keyed']);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});

@@ -987,8 +987,51 @@ const collectSharedRootFamilyScatterAcrossLanesFindings = (familySharedSpineAnal
       });
   });
 
-export const collectNamingSemanticFamilyBridgeFindings = (bridgePayload) => {
-  const namingSemanticFamilyBridge = prepareNamingSemanticFamilyBridge(bridgePayload);
+const isCleanAddressKeyedJoinEvidence = (preparedAddressKeyedJoinEvidence) =>
+  preparedAddressKeyedJoinEvidence &&
+  typeof preparedAddressKeyedJoinEvidence === 'object' &&
+  !Array.isArray(preparedAddressKeyedJoinEvidence) &&
+  preparedAddressKeyedJoinEvidence.status === 'joined' &&
+  preparedAddressKeyedJoinEvidence.usedForCurrentTreeJoins === true &&
+  Array.isArray(preparedAddressKeyedJoinEvidence.joinedEvidence) &&
+  preparedAddressKeyedJoinEvidence.joinedEvidence.length > 0 &&
+  Array.isArray(preparedAddressKeyedJoinEvidence.diagnostics) &&
+  preparedAddressKeyedJoinEvidence.diagnostics.length === 0 &&
+  Array.isArray(preparedAddressKeyedJoinEvidence.skippedJoins) &&
+  preparedAddressKeyedJoinEvidence.skippedJoins.length === 0;
+
+const toAddressKeyedBridgePayload = (preparedAddressKeyedJoinEvidence) => ({
+  observations: preparedAddressKeyedJoinEvidence.joinedEvidence.map((joinEntry) => ({
+    path: joinEntry.occurrenceRecord?.path ?? joinEntry.occurrenceRecord?.resolvedPath ?? joinEntry.namingObservation?.path,
+    semanticName: joinEntry.namingObservation?.semanticName,
+    familyRoot: joinEntry.namingObservation?.familyRoot,
+    semanticFamily: joinEntry.namingObservation?.semanticFamily,
+    ...(typeof joinEntry.namingObservation?.familySubgroup === 'string' && joinEntry.namingObservation.familySubgroup.length > 0
+      ? { familySubgroup: joinEntry.namingObservation.familySubgroup }
+      : {}),
+    ...(Array.isArray(joinEntry.namingObservation?.ambiguityFlags)
+      ? { ambiguityFlags: joinEntry.namingObservation.ambiguityFlags }
+      : {}),
+    ...(Array.isArray(joinEntry.namingObservation?.splitFamilyFlags)
+      ? { splitFamilyFlags: joinEntry.namingObservation.splitFamilyFlags }
+      : {}),
+  })),
+});
+
+const selectNamingSemanticFamilyBridgePayload = ({ bridgePayload, preparedAddressKeyedJoinEvidence } = {}) => {
+  if (isCleanAddressKeyedJoinEvidence(preparedAddressKeyedJoinEvidence)) {
+    const addressKeyedBridgePayload = toAddressKeyedBridgePayload(preparedAddressKeyedJoinEvidence);
+    if (prepareNamingSemanticFamilyBridge(addressKeyedBridgePayload).observations.length > 0) {
+      return addressKeyedBridgePayload;
+    }
+  }
+
+  return bridgePayload;
+};
+
+export const collectNamingSemanticFamilyBridgeFindings = (bridgePayload, { preparedAddressKeyedJoinEvidence } = {}) => {
+  const selectedBridgePayload = selectNamingSemanticFamilyBridgePayload({ bridgePayload, preparedAddressKeyedJoinEvidence });
+  const namingSemanticFamilyBridge = prepareNamingSemanticFamilyBridge(selectedBridgePayload);
   const observations = namingSemanticFamilyBridge.observations;
 
   if (observations.length === 0) {

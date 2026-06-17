@@ -53,7 +53,7 @@ const collectTopLevelDirectoryNames = (repositoryRoot) =>
 
 export const prepareTreeStructureAdvisorInputs = (
   repositoryRoot,
-  { scope, targets, namingSemanticFamilyBridge, namingOccurrenceBridge } = {},
+  { scope, targets, namingSemanticFamilyBridge, namingOccurrenceBridge, preparedAddressKeyedJoinEvidence } = {},
 ) => {
   const scopedSnapshotInputs = collectSuiteScopedSnapshotInputs(repositoryRoot, {
     scope,
@@ -173,16 +173,21 @@ export const prepareTreeStructureAdvisorInputs = (
       repositoryRoot,
       selectedPaths,
       namingSemanticFamilyBridge,
+      preparedAddressKeyedJoinEvidence,
     }),
   };
 };
 
-export const runTreeStructureAdvisor = (repositoryRoot, { scope, targets, namingSemanticFamilyBridge, namingOccurrenceBridge } = {}) => {
+export const runTreeStructureAdvisor = (
+  repositoryRoot,
+  { scope, targets, namingSemanticFamilyBridge, namingOccurrenceBridge, preparedAddressKeyedJoinEvidence } = {},
+) => {
   const preparedInputs = prepareTreeStructureAdvisorInputs(repositoryRoot, {
     scope,
     targets,
     namingSemanticFamilyBridge,
     namingOccurrenceBridge,
+    preparedAddressKeyedJoinEvidence,
   });
   return runTreeStructureAdvisorRuntime(preparedInputs);
 };

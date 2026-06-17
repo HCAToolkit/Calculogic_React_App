@@ -1446,3 +1446,228 @@ test('tree naming bridge contributor keeps current path-keyed join and ignores o
     false,
   );
 });
+
+const cleanAddressJoinEvidence = (joinedEvidence) => ({
+  boundary: 'tree-naming-occurrence-address-join',
+  status: 'joined',
+  usedForCurrentTreeJoins: true,
+  identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+  joinedEvidence,
+  skippedJoins: [],
+  diagnostics: [],
+});
+
+const addressJoinEntry = ({ occurrenceAddress, path, semanticName, familyRoot, semanticFamily, familySubgroup }) => ({
+  evidenceType: 'tree-prepared-naming-occurrence-address-join',
+  identityTuple: {
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress,
+  },
+  namingObservation: {
+    path: `stale/${semanticName}.logic.ts`,
+    semanticName,
+    familyRoot,
+    semanticFamily,
+    ...(familySubgroup ? { familySubgroup } : {}),
+  },
+  occurrenceRecord: {
+    path,
+    resolvedPath: path,
+    occurrenceAddress,
+  },
+});
+
+const pathKeyedFallbackBridge = {
+  observations: [
+    {
+      path: 'src/shared/build/path-keyed.logic.ts',
+      semanticName: 'path-keyed',
+      familyRoot: 'path',
+      semanticFamily: 'path-keyed',
+    },
+    {
+      path: 'src/features/build/path-keyed.results.ts',
+      semanticName: 'path-keyed',
+      familyRoot: 'path',
+      semanticFamily: 'path-keyed',
+    },
+    {
+      path: 'src/features/build/path-keyed.knowledge.ts',
+      semanticName: 'path-keyed',
+      familyRoot: 'path',
+      semanticFamily: 'path-keyed',
+    },
+    {
+      path: 'src/features/build/path-keyed.build.tsx',
+      semanticName: 'path-keyed',
+      familyRoot: 'path',
+      semanticFamily: 'path-keyed',
+    },
+  ],
+};
+
+const addressKeyedScatterEvidence = cleanAddressJoinEvidence([
+  addressJoinEntry({
+    occurrenceAddress: 'A.1',
+    path: 'src/shared/build/address-keyed.logic.ts',
+    semanticName: 'address-keyed',
+    familyRoot: 'address',
+    semanticFamily: 'address-keyed',
+  }),
+  addressJoinEntry({
+    occurrenceAddress: 'A.2',
+    path: 'src/features/build/address-keyed.results.ts',
+    semanticName: 'address-keyed',
+    familyRoot: 'address',
+    semanticFamily: 'address-keyed',
+  }),
+  addressJoinEntry({
+    occurrenceAddress: 'A.3',
+    path: 'src/features/build/address-keyed.knowledge.ts',
+    semanticName: 'address-keyed',
+    familyRoot: 'address',
+    semanticFamily: 'address-keyed',
+  }),
+  addressJoinEntry({
+    occurrenceAddress: 'A.4',
+    path: 'src/features/build/address-keyed.build.tsx',
+    semanticName: 'address-keyed',
+    familyRoot: 'address',
+    semanticFamily: 'address-keyed',
+  }),
+]);
+
+const findingFamilies = (findings) =>
+  findings.map((finding) => finding.details?.semanticFamily).filter(Boolean).sort((left, right) => left.localeCompare(right));
+
+test('tree naming bridge contributor prefers clean address-keyed joined evidence over path-keyed bridge evidence', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings(pathKeyedFallbackBridge, {
+    preparedAddressKeyedJoinEvidence: addressKeyedScatterEvidence,
+  });
+
+  assert.deepEqual(findingFamilies(findings), ['address-keyed']);
+  assert.equal(JSON.stringify(findings).includes('path-keyed'), false);
+});
+
+test('tree naming bridge contributor keeps path-keyed bridge behavior when address-keyed evidence is absent', () => {
+  const baseline = collectNamingSemanticFamilyBridgeFindings(pathKeyedFallbackBridge);
+  const absent = collectNamingSemanticFamilyBridgeFindings(pathKeyedFallbackBridge, {
+    preparedAddressKeyedJoinEvidence: undefined,
+  });
+
+  assert.deepEqual(absent, baseline);
+  assert.deepEqual(findingFamilies(absent), ['path-keyed']);
+});
+
+test('tree naming bridge contributor falls back when address-keyed evidence has diagnostics', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings(pathKeyedFallbackBridge, {
+    preparedAddressKeyedJoinEvidence: {
+      ...addressKeyedScatterEvidence,
+      status: 'skipped-with-diagnostics',
+      usedForCurrentTreeJoins: false,
+      diagnostics: [{ reason: 'addressed-occurrence-records-not-array' }],
+    },
+  });
+
+  assert.deepEqual(findingFamilies(findings), ['path-keyed']);
+});
+
+test('tree naming bridge contributor falls back when address-keyed evidence has no joined evidence', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings(pathKeyedFallbackBridge, {
+    preparedAddressKeyedJoinEvidence: {
+      ...addressKeyedScatterEvidence,
+      status: 'no-joined-evidence',
+      usedForCurrentTreeJoins: false,
+      joinedEvidence: [],
+    },
+  });
+
+  assert.deepEqual(findingFamilies(findings), ['path-keyed']);
+});
+
+test('tree naming bridge contributor falls back when address-keyed evidence has skipped mismatched joins', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings(pathKeyedFallbackBridge, {
+    preparedAddressKeyedJoinEvidence: {
+      ...addressKeyedScatterEvidence,
+      status: 'joined-with-skips',
+      usedForCurrentTreeJoins: false,
+      skippedJoins: [
+        {
+          reason: 'no-matching-occurrence-record-identity-tuple',
+          identityTuple: {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'Z.9',
+          },
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(findingFamilies(findings), ['path-keyed']);
+});
+
+test('tree naming bridge contributor does not re-derive semantic family from filename when address evidence lacks naming semantic fields', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence([
+      {
+        ...addressJoinEntry({
+          occurrenceAddress: 'A.1',
+          path: 'src/shared/build/filename-derived.logic.ts',
+          semanticName: 'filename-derived',
+          familyRoot: 'filename',
+          semanticFamily: 'filename-derived',
+        }),
+        namingObservation: {
+          path: 'src/shared/build/filename-derived.logic.ts',
+        },
+      },
+    ]),
+  });
+
+  assert.deepEqual(findings, []);
+});
+
+test('tree naming bridge contributor distinguishes duplicate same-family occurrences by occurrence address', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence([
+      addressJoinEntry({
+        occurrenceAddress: 'A.1',
+        path: 'src/shared/build/duplicate-family.logic.ts',
+        semanticName: 'duplicate-family',
+        familyRoot: 'duplicate',
+        semanticFamily: 'duplicate-family',
+      }),
+      addressJoinEntry({
+        occurrenceAddress: 'A.2',
+        path: 'src/features/build/duplicate-family.results.ts',
+        semanticName: 'duplicate-family',
+        familyRoot: 'duplicate',
+        semanticFamily: 'duplicate-family',
+      }),
+      addressJoinEntry({
+        occurrenceAddress: 'A.3',
+        path: 'src/features/build/duplicate-family.knowledge.ts',
+        semanticName: 'duplicate-family',
+        familyRoot: 'duplicate',
+        semanticFamily: 'duplicate-family',
+      }),
+      addressJoinEntry({
+        occurrenceAddress: 'A.4',
+        path: 'src/features/build/duplicate-family.build.tsx',
+        semanticName: 'duplicate-family',
+        familyRoot: 'duplicate',
+        semanticFamily: 'duplicate-family',
+      }),
+    ]),
+  });
+
+  assert.deepEqual(findingFamilies(findings), ['duplicate-family']);
+  assert.deepEqual(findings[0].details.observedPaths, [
+    'src/features/build/duplicate-family.build.tsx',
+    'src/features/build/duplicate-family.knowledge.ts',
+    'src/features/build/duplicate-family.results.ts',
+    'src/shared/build/duplicate-family.logic.ts',
+  ]);
+});
