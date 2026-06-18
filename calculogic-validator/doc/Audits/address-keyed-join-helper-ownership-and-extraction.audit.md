@@ -6,7 +6,7 @@ This audit implements issue #642 as the parent roadmap's Slice 8 planning pass f
 
 Recommendation:
 
-1. Keep Tree-specific join qualification, fallback selection, contributor input adaptation, advisor orchestration, diagnostic shaping for Tree status, and Tree finding interpretation Tree-owned.
+1. Keep Tree-specific join qualification, fallback selection, contributor policy, advisor orchestration, diagnostic shaping for Tree status, and Tree finding interpretation Tree-owned. Keep the current contributor input adapter Tree-owned while it exists, but treat it as a temporary migration surface rather than a permanent architectural requirement.
 2. Treat occurrence namespace preparation and addressed occurrence record production as the strongest candidate for a future Addressing-owned provider surface, because the current Tree occurrence and structural-address snapshots are already functioning as a Tree-local Addressing provider.
 3. Move nothing into suite-core now. Suite-core should continue to own runner staging and neutral transport only. It should not own address profile semantics, snapshot identity, Naming semantic projection, Tree join statuses, or contributor policy.
 4. Do not perform broad extraction until a narrowly scoped follow-up issue is approved and a second real consumer or concrete Addressing-provider migration pressure exists.
@@ -63,7 +63,7 @@ Documented target direction: issue #618 states Addressing should own occurrence 
 | address-keyed join tuple matching | Tree today | `prepareTreeNamingOccurrenceAddressJoinEvidence(...)` indexes occurrence records and Naming observations by tuple | Keep Tree-owned now; possible neutral micro-helper only after second consumer | Matching mechanics are partly neutral, but current helper also shapes Tree statuses and diagnostics. |
 | clean-join qualification | Tree | contributor predicate gates address-keyed evidence before findings | Tree | Clean enough for Tree findings is Tree policy. |
 | fallback selection | Tree | contributor falls back to path-keyed bridge when address-keyed route is absent/unclean | Tree | Evidence-route choice controls Tree advisory behavior. |
-| contributor input adaptation | Tree | joined evidence is converted back into a semantic-family bridge-shaped payload for existing contributor analysis | Tree | Adaptation is temporary Tree migration mechanics for Tree findings. |
+| contributor input adaptation | Tree | joined evidence is converted back into a semantic-family bridge-shaped payload for existing contributor analysis | Tree-owned while present; removable migration surface | Adaptation is temporary Tree migration mechanics for Tree findings. Retirement of the adapter does not transfer contributor policy, fallback policy, or readiness/status semantics to Addressing or suite-core. |
 | advisor orchestration | Tree | Tree wiring assembles snapshots, evidence, registries, replacement runtime, contributors | Tree, with suite-core inputs | Tree owns orchestration of Tree reasoning; suite-core only supplies scoped snapshot inputs. |
 | diagnostic shaping for Tree join statuses | Tree | statuses include `absent`, `skipped-with-diagnostics`, `joined-with-skips`, `joined`, and `usedForCurrentTreeJoins` | Tree | These statuses express Tree readiness and policy, not neutral transport. |
 | deterministic sorting | mixed local mechanics | Naming sorts observations; Tree sorts tuples/join entries; structural-addressing sorts siblings | Keep local unless duplicated across real consumers with identical semantics | Sorting keys are domain-specific today. Suite-core extraction would be premature. |
@@ -137,11 +137,12 @@ Direct comparison: Option E wins now because it preserves deterministic organiza
 
 Recommended model:
 
-1. **Tree-owned now and long term:** clean-join qualification, fallback selection, contributor input adaptation, Tree bridge intake statuses, `usedForCurrentTreeJoins`, Tree diagnostic readiness, Tree advisor orchestration, and Tree findings.
-2. **Naming-owned now and long term:** semantic-family projection and occurrence bridge observation production. Naming should continue to preserve semantic payload and attach occurrence identity only when an addressed namespace is supplied.
-3. **Addressing-owned candidate:** occurrence namespace preparation, addressed snapshot identity, address profile semantics, occurrence address generation, lineage/depth/containment identity, and provider rules for addressed occurrence records.
-4. **Suite-core-owned only:** runner orchestration, staging, target/scope transport, report-envelope mechanics, source metadata, and opaque payload transport.
-5. **No suite-core extraction now:** tuple validation, deterministic tuple sorting, and envelope normalization should remain local until there is more than one real consumer and a helper can be proven not to encode profile, snapshot, Naming, or Tree semantics.
+1. **Tree-owned policy now and long term:** clean-join qualification, fallback selection, Tree bridge intake/readiness status semantics, `usedForCurrentTreeJoins`, contributor policy, advisor orchestration, diagnostics, and Tree findings.
+2. **Tree-owned migration mechanics while present:** contributor input adaptation from joined occurrence evidence into the existing semantic-family contributor shape. This adapter may be removed after direct address-keyed consumption and fallback retirement are separately proven; retirement does not transfer Tree policy responsibilities to Addressing or suite-core.
+3. **Naming-owned now and long term:** semantic-family projection and occurrence bridge observation production. Naming should continue to preserve semantic payload and attach occurrence identity only when an addressed namespace is supplied.
+4. **Addressing-owned candidate:** occurrence namespace preparation, addressed snapshot identity, address profile semantics, occurrence address generation, lineage/depth/containment identity, and provider rules for addressed occurrence records.
+5. **Suite-core-owned only:** runner orchestration, staging, target/scope transport, report-envelope mechanics, source metadata, and opaque payload transport.
+6. **No suite-core extraction now:** tuple validation, deterministic tuple sorting, and envelope normalization should remain local until there is more than one real consumer and a helper can be proven not to encode profile, snapshot, Naming, or Tree semantics.
 
 ## 9. Explicit keep-as-is decisions
 
