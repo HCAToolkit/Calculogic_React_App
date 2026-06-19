@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This audit is a docs-only Slice 1 contract-planning artifact for Addressing-backed Naming bridge enrichment and later Tree consumption. It answers the minimum safe contract question from current repo reality: the only resolved minimum-safe implementation contract is the current Addressing-backed identity/join tuple, while additional occurrence/nesting context remains candidate enrichment that requires a normative bridge spec update before implementation. Any later enrichment must preserve Addressing-owned occurrence identity and leave all folder, home, placement, scatter/cluster, confidence, severity, diagnostic, and finding interpretation fully Tree-owned.
+This audit is a docs-only Slice 1 contract-planning artifact for Addressing-backed Naming bridge enrichment and later Tree consumption. It answers the minimum safe contract question from current repo reality: the only resolved minimum-safe implementation contract is the current Addressing-backed identity/join tuple, while additional occurrence/nesting and Naming semantic context remains candidate enrichment that requires a Naming-owned bridge-contract/spec update before implementation. This audit does not resolve the exact bridge payload shape, required/optional status, or implementation eligibility for deferred enrichment fields. Any later enrichment must preserve Addressing-owned occurrence identity and leave all folder, home, placement, scatter/cluster, confidence, severity, diagnostic, and finding interpretation fully Tree-owned.
 
 ## Parent / issue context
 
@@ -19,7 +19,7 @@ Current runtime truth has three separate surfaces:
 2. Naming projects semantic-family observations from canonical naming findings and can build a versioned occurrence bridge by attaching Addressing identity to those semantic observations by path.
 3. Tree has a staged Naming occurrence bridge intake and address-keyed join helper, but current Tree contributor behavior only uses clean prepared address-keyed evidence as a safer source for the existing path-keyed semantic-family contributor shape; otherwise it falls back to the current path-keyed bridge.
 
-This means the resolved minimum contract should be limited to the current additive identity/join surface, not a runtime policy migration. Candidate enrichment fields must first be added to the relevant bridge spec/contract, keep Addressing identity stable, keep Naming folder-agnostic, and let Tree decide later whether enriched bridge evidence is clean, usable, diagnostic-only, or ignored.
+This means the resolved minimum contract should be limited to the current additive identity/join surface, not a runtime policy migration. Candidate enrichment fields must first be decided and shaped in the relevant Naming-owned bridge spec/contract, keep Addressing identity stable, keep Naming folder-agnostic, and let Tree decide later whether enriched bridge evidence is clean, usable, diagnostic-only, or ignored.
 
 ## Current Addressing / structural-addressing surfaces
 
@@ -174,7 +174,7 @@ Resolved minimum-safe fields for current implementation:
 Candidate / unresolved fields for later contract work:
 
 - `parentAddressPath`, `depth`, and `orderIndex` remain future enrichment candidates and require a normative bridge spec/contract update before implementation.
-- `semanticTokens`, `role`, role-like fields, and bounded `disambiguationNotes` remain Naming-owned candidates and require a later Naming-owned contract slice to document exact shape before implementation.
+- `semanticTokens`, `role`, role-like fields, and bounded `disambiguationNotes` remain deferred Naming-owned enrichment candidates and require a later Naming-owned contract slice to document exact field shape, required/optional status, ownership, and implementation eligibility before runtime addition.
 - Context partition keys are future enrichment candidates and require a normative bridge spec/contract update before implementation; if later approved, they must be explicitly labeled semantic-evidence partitions, not Tree structural homes.
 
 Unresolved for later issue:
@@ -202,14 +202,14 @@ Unresolved for later issue:
 | `siblingContextKey` | Defer or allow only as opaque neutral key. | Safer if Addressing provides it; Naming-computed sibling semantics risk Tree ownership blur. |
 | `subtreeContextKey` | Defer or allow only as opaque neutral key. | Subtree interpretation should remain Addressing/Tree-owned. |
 | `semanticName` | Allow; existing Naming-owned field. | Naming-owned. |
-| `semanticTokens` | Allow optional. | Naming-owned token interpretation; should be deterministic and non-policy. |
+| `semanticTokens` | Defer as a Naming-owned semantic bridge candidate unless a later Naming-owned bridge-contract/spec update documents exact field shape, required/optional status, ownership, and implementation eligibility. | Naming-owned token interpretation; should be deterministic and non-policy if later approved. |
 | `familyRoot` | Allow; existing Naming-owned field. | Naming-owned. |
 | `semanticFamily` | Allow; existing Naming-owned field. | Naming-owned. |
 | `familySubgroup` | Allow optional; existing field. | Naming-owned. |
-| `role` | Defer as a Naming-owned candidate unless a later Naming-owned bridge slice documents the exact source, normalization, and payload shape. | Naming-owned, but current bridge does not carry it. |
+| `role` | Defer as a Naming-owned candidate unless a later Naming-owned bridge-contract/spec update documents the exact source, normalization, payload shape, required/optional status, and implementation eligibility. | Naming-owned, but current bridge does not carry it. |
 | `ambiguityFlags` | Allow; existing Naming-owned field. | Diagnostic/semantic qualifier only. |
 | `splitFamilyFlags` | Allow; existing Naming-owned field. | Diagnostic/semantic qualifier only. |
-| `disambiguationNotes` | Allow bounded diagnostic notes only. | Naming-owned notes; must not prescribe Tree findings. |
+| `disambiguationNotes` | Defer as a Naming-owned diagnostic/semantic candidate unless a later Naming-owned bridge-contract/spec update documents exact field shape, required/optional status, ownership, and implementation eligibility. | Naming-owned notes; must not prescribe Tree findings if later approved. |
 | `evidenceStrength` / `evidenceLimit notes` | Defer or allow as diagnostic-only. | Avoid creating Tree confidence policy inside Naming. |
 
 ## Neutral occurrence context Naming may consume
@@ -302,7 +302,14 @@ Runtime behavior must remain unchanged.
 
 ## Recommended next issue
 
-Recommended next issue: update the relevant Naming-owned bridge spec/contract for enriched occurrence bridge production before implementing runtime fields. That issue should define the exact payload shape, required/optional status, diagnostics, and compatibility behavior for any candidate fields such as `parentAddressPath`, `depth`, `orderIndex`, `semanticTokens`, `role`, role-like fields, and partition keys while preserving the existing path-keyed compatibility payload. Runtime enrichment and Tree consumption policy should remain separate follow-up slices.
+Recommended next issue: begin with a bounded Naming-owned bridge-contract/spec update before implementing runtime fields. That next issue should:
+
+1. update or refine the normative Naming bridge contract/spec;
+2. decide which candidate enrichment fields are allowed;
+3. define each allowed field's exact payload shape, ownership, and required/optional status;
+4. only then permit additive runtime bridge enrichment work.
+
+Candidate fields such as `parentAddressPath`, `depth`, `orderIndex`, `semanticTokens`, `role`, role-like fields, and partition keys must not be directly added from this audit alone. Runtime enrichment and Tree consumption policy should remain separate follow-up slices.
 
 ## Verification
 
