@@ -140,6 +140,9 @@ Authority labels used in this index:
 - `doc/Audits/address-keyed-join-helper-ownership-and-extraction.audit.md`
   **Authority:** audit snapshot. **Intended use:** Slice 8 ownership and extraction audit for address-keyed Naming-to-Tree join helpers, including Tree policy boundaries, Addressing-provider candidacy, suite-core non-extraction decisions, and narrowly scoped follow-up guidance.
 
+- `doc/Audits/addressing-backed-naming-tree-bridge-enrichment-surfaces.audit.md`
+  **Authority:** audit snapshot. **Intended use:** Slice 1 docs-only audit and contract-planning artifact for Addressing-backed Naming bridge enrichment and later Tree consumption, including current Addressing, Naming bridge, Tree intake/join surfaces, neutral context allowances, ownership boundaries, unresolved contract questions, and recommended follow-up.
+
 ## 8) Maintenance note
 
 - When adding a new validator doc, classify it in this index using one of the authority labels above.
