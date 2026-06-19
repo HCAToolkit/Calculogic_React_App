@@ -220,7 +220,7 @@ Verification run for this audit:
 
 - `git diff --check`
 - `git diff -- calculogic-validator/doc calculogic-validator/src/core calculogic-validator/naming calculogic-validator/tree calculogic-validator/structural-addressing`
-- `npm run validate:naming -- --scope=validator --target calculogic-validator/doc/Audits/address-keyed-join-helper-ownership-and-extraction.audit.md`
+- `npm run validate:naming -- --scope=validator --target calculogic-validator/doc/Audits/address-keyed-join-helper-ownership-and-extraction.audit.md --target calculogic-validator/doc/Indexes/validator-docs.index.md`
 - `npm run validate:tree -- --scope=validator --target calculogic-validator/doc`
 
-Runtime source change confirmation: no runtime source files were changed; the only intended repository change is this audit artifact.
+Runtime source change confirmation: no runtime source files were changed; the only intended repository changes are the audit artifact and the validator docs index entry.
