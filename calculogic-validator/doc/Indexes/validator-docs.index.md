@@ -137,6 +137,9 @@ Authority labels used in this index:
 - `doc/Audits/naming-tree-suite-core-usage-alignment.audit.md`
   **Authority:** audit snapshot. **Intended use:** docs-only audit of current Naming and Tree suite-core usage alignment against the validator slice/report/bridge formula, including classified suite-core mechanics, registry metadata, report/capture, command/bin/package-surface, bridge, deferred Tree reasoning, and deferred Addressing gaps.
 
+- `doc/Audits/address-keyed-join-helper-ownership-and-extraction.audit.md`
+  **Authority:** audit snapshot. **Intended use:** Slice 8 ownership and extraction audit for address-keyed Naming-to-Tree join helpers, including Tree policy boundaries, Addressing-provider candidacy, suite-core non-extraction decisions, and narrowly scoped follow-up guidance.
+
 ## 8) Maintenance note
 
 - When adding a new validator doc, classify it in this index using one of the authority labels above.
