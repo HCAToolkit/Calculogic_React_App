@@ -170,7 +170,7 @@ test('projectNamingOccurrenceBridge preserves existing Naming disambiguation evi
     roleLikeSemanticTokens: ['host'],
   });
   assert.deepEqual(occurrenceBridge.occurrenceContextEnrichment.enrichedObservations[0].disambiguationNotes, [
-    { noteType: 'role-like-folder-token', token: 'host' },
-    { noteType: 'role-like-semantic-token', token: 'host' },
+    { code: 'role-like-folder-token', message: 'Role-like folder token: host', source: 'naming' },
+    { code: 'role-like-semantic-token', message: 'Role-like semantic token: host', source: 'naming' },
   ]);
 });

@@ -238,6 +238,15 @@ const deferredOrRejectedEnrichmentFields = [
   'semanticTokens',
   'role',
   'evidenceStrength',
+  'noteType',
+  'token',
+  'detail',
+  'severity',
+  'confidence',
+  'finding',
+  'structuralHome',
+  'semanticHome',
+  'placement',
 ];
 
 const collectObjectKeys = (value) => {
@@ -269,8 +278,14 @@ test('createNamingOccurrenceBridgePayload emits explicitly versioned additive en
             roleLikeSemanticTokens: ['wiring', 'host'],
           },
           evidenceLimitNotes: [
-            { noteType: 'naming-source-bounded', detail: 'canonical-finding-only' },
-            { noteType: 'naming-source-bounded', detail: 'canonical-finding-only' },
+            { code: 'z-limit', message: 'Z limit', source: 'naming' },
+            { code: 'naming-source-bounded', message: 'Canonical finding only', source: 'naming' },
+            { code: 'naming-source-bounded', message: 'Canonical finding only', source: 'naming' },
+            { noteType: 'legacy-limit-note', detail: 'Legacy deterministic detail' },
+            { noteType: 'legacy-empty-detail' },
+            { code: 'tree-policy', message: 'Tree policy conclusion', source: 'tree' },
+            { noteType: 'badLegacy', detail: 'invalid code' },
+            { severity: 'warning', confidence: 'high', detail: 'must not emit' },
           ],
         },
       ],
@@ -327,11 +342,16 @@ test('createNamingOccurrenceBridgePayload emits explicitly versioned additive en
       occurrenceDepth: 2,
       occurrenceOrderIndex: 7,
       disambiguationNotes: [
-        { noteType: 'role-like-folder-token', token: 'host' },
-        { noteType: 'role-like-semantic-token', token: 'host' },
-        { noteType: 'role-like-semantic-token', token: 'wiring' },
+        { code: 'role-like-folder-token', message: 'Role-like folder token: host', source: 'naming' },
+        { code: 'role-like-semantic-token', message: 'Role-like semantic token: host', source: 'naming' },
+        { code: 'role-like-semantic-token', message: 'Role-like semantic token: wiring', source: 'naming' },
       ],
-      evidenceLimitNotes: [{ noteType: 'naming-source-bounded', detail: 'canonical-finding-only' }],
+      evidenceLimitNotes: [
+        { code: 'legacy-empty-detail', message: 'legacy-empty-detail', source: 'naming' },
+        { code: 'legacy-limit-note', message: 'Legacy deterministic detail', source: 'naming' },
+        { code: 'naming-source-bounded', message: 'Canonical finding only', source: 'naming' },
+        { code: 'z-limit', message: 'Z limit', source: 'naming' },
+      ],
     },
   ]);
 

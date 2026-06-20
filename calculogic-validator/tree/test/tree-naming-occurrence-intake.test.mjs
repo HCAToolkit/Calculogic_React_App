@@ -471,7 +471,7 @@ test('Tree v1 intake ignores versioned Naming enrichment sidecar and preserves p
           parentOccurrenceAddress: 'O',
           occurrenceDepth: 2,
           occurrenceOrderIndex: 1,
-          disambiguationNotes: [{ noteType: 'role-like-folder-token', token: 'host' }],
+          disambiguationNotes: [{ code: 'role-like-folder-token', message: 'Role-like folder token: host', source: 'naming' }],
         },
       ],
     },

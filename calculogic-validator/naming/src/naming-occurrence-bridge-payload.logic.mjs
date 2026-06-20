@@ -126,36 +126,89 @@ const toAddressAttachedObservation = ({
 };
 
 
+const isKebabCaseString = (value) =>
+  typeof value === 'string' && /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u.test(value);
+
+const sortContractNotes = (notes) =>
+  Array.from(
+    new Map(
+      notes
+        .filter(
+          (note) =>
+            isPlainObject(note) &&
+            isKebabCaseString(note.code) &&
+            toOptionalNonEmptyString(note.message) &&
+            note.source === 'naming',
+        )
+        .map((note) => [
+          `${note.code}\u0000${note.message}\u0000${note.source}`,
+          { code: note.code, message: note.message, source: 'naming' },
+        ]),
+    ).values(),
+  ).sort(
+    (left, right) =>
+      left.code.localeCompare(right.code) ||
+      left.message.localeCompare(right.message) ||
+      left.source.localeCompare(right.source),
+  );
+
+const toDisambiguationNotes = (disambiguation) => {
+  if (!isPlainObject(disambiguation)) {
+    return [];
+  }
+
+  const roleLikeFolderTokens = toSortedUniqueStrings(disambiguation.roleLikeFolderTokens);
+  const roleLikeSemanticTokens = toSortedUniqueStrings(disambiguation.roleLikeSemanticTokens);
+
+  return sortContractNotes([
+    ...(roleLikeFolderTokens?.map((token) => ({
+      code: 'role-like-folder-token',
+      message: `Role-like folder token: ${token}`,
+      source: 'naming',
+    })) ?? []),
+    ...(roleLikeSemanticTokens?.map((token) => ({
+      code: 'role-like-semantic-token',
+      message: `Role-like semantic token: ${token}`,
+      source: 'naming',
+    })) ?? []),
+  ]);
+};
+
+const toEvidenceLimitNote = (note) => {
+  if (!isPlainObject(note)) {
+    return null;
+  }
+
+  if (isKebabCaseString(note.code) && toOptionalNonEmptyString(note.message) && note.source === 'naming') {
+    return { code: note.code, message: note.message, source: 'naming' };
+  }
+
+  if (isKebabCaseString(note.noteType)) {
+    const detail = toOptionalNonEmptyString(note.detail);
+    return {
+      code: note.noteType,
+      message: detail ?? note.noteType,
+      source: 'naming',
+    };
+  }
+
+  return null;
+};
+
 const toNamingMetadataNotes = (semanticObservation) => {
   const notes = {};
+  const disambiguationNotes = toDisambiguationNotes(semanticObservation.disambiguation);
 
-  if (isPlainObject(semanticObservation.disambiguation)) {
-    const roleLikeFolderTokens = toSortedUniqueStrings(semanticObservation.disambiguation.roleLikeFolderTokens);
-    const roleLikeSemanticTokens = toSortedUniqueStrings(semanticObservation.disambiguation.roleLikeSemanticTokens);
-    const disambiguationNotes = [
-      ...(roleLikeFolderTokens?.map((token) => ({ noteType: 'role-like-folder-token', token })) ?? []),
-      ...(roleLikeSemanticTokens?.map((token) => ({ noteType: 'role-like-semantic-token', token })) ?? []),
-    ].sort((left, right) => left.noteType.localeCompare(right.noteType) || left.token.localeCompare(right.token));
-
-    if (disambiguationNotes.length > 0) {
-      notes.disambiguationNotes = disambiguationNotes;
-    }
+  if (disambiguationNotes.length > 0) {
+    notes.disambiguationNotes = disambiguationNotes;
   }
 
   const evidenceLimitNotes = Array.isArray(semanticObservation.evidenceLimitNotes)
-    ? semanticObservation.evidenceLimitNotes
-        .filter((note) => isPlainObject(note) && toOptionalNonEmptyString(note.noteType))
-        .map((note) => ({
-          noteType: note.noteType,
-          ...(toOptionalNonEmptyString(note.detail) ? { detail: note.detail } : {}),
-        }))
-        .sort((left, right) => left.noteType.localeCompare(right.noteType) || (left.detail ?? '').localeCompare(right.detail ?? ''))
+    ? sortContractNotes(semanticObservation.evidenceLimitNotes.map(toEvidenceLimitNote).filter(Boolean))
     : [];
 
   if (evidenceLimitNotes.length > 0) {
-    notes.evidenceLimitNotes = Array.from(
-      new Map(evidenceLimitNotes.map((note) => [`${note.noteType}\u0000${note.detail ?? ''}`, note])).values(),
-    );
+    notes.evidenceLimitNotes = evidenceLimitNotes;
   }
 
   return notes;
