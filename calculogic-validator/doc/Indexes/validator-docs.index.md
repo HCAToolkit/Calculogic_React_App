@@ -58,7 +58,7 @@ Authority labels used in this index:
   **Authority:** bounded normative supporting spec. **Intended use:** active documentation-first semantic-family modeling tranche for naming interpretation; runtime behavior remains governed by canonical authorities unless implemented.
 
 - `doc/ValidatorSpecs/cross-cutting/naming-bridge-occurrence-identity-contract.spec.md`
-  **Authority:** bounded normative supporting spec. **Intended use:** cross-cutting bridge occurrence identity and enrichment eligibility contract for envelope shape, identity tuple, approved/deferred/rejected future fields, ownership boundaries, versioning, and migration/fallback rules; read before the Naming-owned bridge observation rules.
+  **Authority:** bounded normative supporting spec. **Intended use:** cross-cutting bridge occurrence identity and enrichment eligibility contract for envelope shape, identity tuple, existing optional v1 context/compatibility fields, approved/deferred/rejected future fields, ownership boundaries, versioning, and migration/fallback rules; read before the Naming-owned bridge observation rules.
 
 - `doc/ValidatorSpecs/naming-owned/naming-address-attached-bridge-observation-rules.spec.md`
   **Authority:** bounded normative supporting spec. **Intended use:** Naming-owned address-attached bridge observation rules for attaching semantic observations to occurrence identity without emitting Tree conclusions; not current runtime truth.

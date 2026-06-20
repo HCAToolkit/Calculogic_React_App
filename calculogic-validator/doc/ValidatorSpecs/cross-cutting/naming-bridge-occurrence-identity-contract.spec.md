@@ -1,6 +1,6 @@
 # Naming Bridge Occurrence Identity Contract
 
-- **Classification:** Normative for the Naming occurrence bridge identity, field-eligibility, enrichment, versioning, and migration contract; descriptive only where explicitly labeled as **current runtime truth**.
+- **Classification:** Normative for the Naming occurrence bridge identity, field-eligibility, existing v1 context/compatibility, enrichment, versioning, and migration contract; descriptive only where explicitly labeled as **current runtime truth**.
 - **Applies to:** Cross-slice occurrence identity used by Addressing, Naming bridge observations, Tree evidence joins, and suite-core neutral transport.
 - **Status:** Contract/specification decision slice only for issue #651; no runtime behavior is changed by this artifact.
 - **Issue context:** Refs #651 and Refs #647. Earlier identity baseline: Refs #621, Refs #618, and Slice 1 audit #648 / PR #649.
@@ -30,7 +30,8 @@ Current runtime truth from the issue #648 / PR #649 audit:
 - `path` and `repoRelativePath` remain compatibility/source-trace fields, not the preferred durable join identity.
 - `addressPath` remains a compatibility/debug mirror unless it is explicitly equal to `occurrenceAddress`; it must not become a second competing occurrence identity.
 - Current Naming bridge semantic evidence includes existing Naming-owned semantic fields such as `semanticName`, `familyRoot`, `semanticFamily`, optional `familySubgroup`, optional sorted `ambiguityFlags`, and optional sorted `splitFamilyFlags`.
-- The bridge does not currently emit enriched context partition fields such as `parentAddressPath`, `depth`, `orderIndex`, `lineageKey`, `contextPartitionKey`, `siblingContextKey`, `subtreeContextKey`, `semanticTokens`, `role`, `role-like fields`, `disambiguationNotes`, `evidenceStrength`, or `evidenceLimitNotes` merely because they may be useful.
+- `occurrenceType` is existing optional v1 neutral occurrence-context / compatibility evidence when the addressed occurrence record supplies it. It remains Addressing-owned occurrence-type data; Naming may echo it, and valid v1 observations containing it remain valid.
+- The bridge does not currently emit new enriched context partition fields such as `parentAddressPath`, `depth`, `orderIndex`, `lineageKey`, `contextPartitionKey`, `siblingContextKey`, `subtreeContextKey`, `semanticTokens`, `role`, `role-like fields`, `disambiguationNotes`, `evidenceStrength`, or `evidenceLimitNotes` merely because they may be useful.
 - Tree staged intake and address-keyed join preparation may inspect the v1 bridge, but current Tree contributor behavior preserves fallback to path-keyed semantic-family evidence unless address-keyed evidence is clean and usable under Tree-owned policy.
 
 ## 3. Canonical occurrence identity contract
@@ -73,14 +74,17 @@ Explicit identity distinction:
 
 ### 4.2 Future enriched version decision
 
-Approved enrichment fields in this spec require a future explicit version named `naming-occurrence-bridge.v2` unless a later contract slice intentionally chooses a separately named additive sidecar. The default path is an additive v2 bridge payload, not mutation of v1 semantics.
+`occurrenceType` does not require a bridge version bump because it is existing optional v1 neutral occurrence-context / compatibility evidence when supplied by the addressed occurrence record. Valid v1 observations containing optional `occurrenceType` must not be stripped, rejected, or treated as unsupported enrichment.
 
-The v2 bridge may keep the same top-level envelope fields as v1 and add an explicitly versioned observation enrichment block or direct observation fields. A later implementation slice must choose the concrete serialization route before runtime emission. Until that slice lands, approved fields below are contract-approved but **not current runtime truth**.
+New approved enrichment fields in this spec require a future explicit version named `naming-occurrence-bridge.v2` unless a later contract slice intentionally chooses a separately named additive sidecar. The default path is an additive v2 bridge payload, not mutation of v1 semantics.
+
+The v2 bridge may keep the same top-level envelope fields as v1 and add an explicitly versioned observation enrichment block or direct observation fields for genuinely new approved fields that valid v1 observations do not already emit. A later implementation slice must choose the concrete serialization route before runtime emission. Until that slice lands, new approved fields below are contract-approved but **not current runtime truth**.
 
 ### 4.3 Version handling and unknown fields
 
 Version handling rules:
 
+- v1 consumers must continue accepting optional `occurrenceType` as existing v1 context/compatibility evidence when present; it is not unknown enrichment and not unsupported enrichment.
 - v1 consumers may ignore unknown enrichment fields only if those fields are not needed to validate identity and do not change v1 semantics.
 - Consumers that interpret v2 enrichment need an explicit v2-aware intake path or an explicitly documented sidecar intake path.
 - Unsupported bridge versions must be handled as unsupported future evidence, not as invalid identity by default.
@@ -101,7 +105,15 @@ Version handling rules:
 
 Suite-core owns only runner orchestration, staging, target/scope transport, source metadata, report-envelope mechanics, and neutral opaque payload transport.
 
-## 6. Field eligibility table for future enriched bridge versions
+## 6. Field eligibility table for existing v1 fields and future enriched bridge versions
+
+### 6.1 Existing optional v1 context/compatibility field
+
+| Field | Classification | Owner | Source of truth | Value shape | Required / optional | Null / absence behavior | Normalization and deterministic-order requirements | Identity status | Tree-consumption limitation | Versioning rule |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `occurrenceType` | existing optional v1 neutral occurrence-context / compatibility evidence | Addressing | Addressed occurrence record occurrence-type data supplied in current v1 observation production | non-empty string from the Addressing-owned vocabulary when supplied | Optional in v1 because existing production includes it only when available | Omit when unavailable; do not invent `unknown`; invalid values affect only this optional context field unless they break identity validation elsewhere | Preserve source spelling from the approved Addressing vocabulary; no mapping to Tree `folderKind`; no sorting role | Not part of the canonical durable observation identity tuple `addressProfileId + addressedSnapshotId + occurrenceAddress` | Tree may consume only as occurrence kind evidence; it is not Tree folderKind, structural-home policy, semantic-home policy, placement policy, confidence, severity, diagnostics, or findings | Retaining or documenting `occurrenceType` does not require `naming-occurrence-bridge.v2`; valid v1 observations containing it remain valid and must not be stripped, rejected, or treated as unsupported enrichment |
+
+### 6.2 Candidate table for genuinely new future enrichment fields
 
 Decision standard: approve only fields with a clear current source, a narrow semantic purpose, a deterministic representation, and a concrete need for the first enriched Naming bridge version. Defer fields that require a new vocabulary, an opaque grouping strategy, a separate role/token model, unclear source authority, or likely Tree-policy leakage. Reject fields that would encode Tree placement, folder/home interpretation, severity, confidence policy, or findings.
 
@@ -110,7 +122,6 @@ Decision standard: approve only fields with a clear current source, a narrow sem
 | `parentAddressPath` | approved for a future enriched bridge version | Addressing | Addressed occurrence record from the active `addressProfileId` / `addressedSnapshotId` namespace | `parentOccurrenceAddress` | string occurrence address in the same namespace as `occurrenceAddress`, or `null` for namespace roots | Optional | Omit when the source record does not provide parent identity; use `null` only for an addressed root whose source explicitly has no parent | Must equal the Addressing-owned parent occurrence identity in the same validated `addressProfileId` / `addressedSnapshotId` namespace; no Naming inference; stable string; no sorting role | neutral context / parent-reference identity evidence | Tree may later consume only as neutral evidence after Tree validates the canonical observation tuple and applies Tree-owned join policy; Tree must not infer folder kind, structural home, semantic home, placement, confidence, severity, diagnostics, or findings from Naming emission alone | n/a | n/a |
 | `depth` | approved for a future enriched bridge version | Addressing | Addressed occurrence record | `occurrenceDepth` | non-negative integer rooted at `0` in the addressed snapshot namespace | Optional | Omit when unavailable; do not use `null`; invalid negative/non-integer values invalidate only the enrichment field, not the identity tuple | Numeric integer; producer must not bucket, band, or semantically label depth | neutral context | Tree may consume only as neutral nesting evidence; Tree owns any placement or scatter/cluster interpretation | n/a | n/a |
 | `orderIndex` | approved for a future enriched bridge version | Addressing | Addressed occurrence record deterministic traversal output | `occurrenceOrderIndex` | non-negative integer stable for the addressed snapshot traversal | Optional | Omit when unavailable; do not use `null`; invalid negative/non-integer values invalidate only the enrichment field, not the identity tuple | Numeric integer; represents Addressing traversal order only; consumers must not treat it as identity | neutral context / diagnostic metadata | Tree may use only for deterministic ordering or evidence review, not placement quality, severity, or confidence | n/a | n/a |
-| `occurrenceType` | approved for a future enriched bridge version | Addressing | Addressed occurrence record occurrence-type vocabulary | `occurrenceType` | non-empty string from the Addressing-owned vocabulary, currently expected to include values such as `file` or `folder` | Optional when available | Omit when unavailable; do not invent `unknown`; invalid values are unsupported enrichment unless they break identity validation elsewhere | Preserve source spelling from the approved Addressing vocabulary; no Mapping to Tree `folderKind` | neutral context / compatibility | Tree may consume only as occurrence kind evidence; it must not be treated as Tree folder-kind policy | n/a | n/a |
 | `lineageKey` | deferred | Addressing, with Naming allowed to reference only after source is defined | No approved current source for bridge payload use | n/a | n/a | n/a | n/a | n/a | neutral context candidate | Tree must not consume a Naming-computed lineage key as structural-home or semantic-home evidence | Addressing must define an opaque, deterministic lineage/grouping key source and collision semantics, or the bridge must choose `parentOccurrenceAddress` instead | n/a |
 | `contextPartitionKey` | deferred | Naming if semantic-evidence partitioning; Addressing if opaque occurrence partitioning | No approved current source or grouping strategy | n/a | n/a | n/a | n/a | n/a | semantic evidence partition candidate | Tree must not treat it as folder/home/placement policy | A later Naming-owned contract must define the partition purpose, stable algorithm, collision behavior, and proof it is folder-agnostic and not Tree policy | n/a |
 | `siblingContextKey` | deferred | Addressing preferred; Naming only if it can prove neutral evidence partitioning | No approved current source or grouping strategy | n/a | n/a | n/a | n/a | n/a | neutral context candidate | Tree must not treat it as sibling placement quality or folder-kind evidence | Addressing must define sibling identity/group semantics, or a later Naming contract must define an opaque source-backed key without Tree-policy leakage | n/a |
@@ -122,7 +133,9 @@ Decision standard: approve only fields with a clear current source, a narrow sem
 | `evidenceStrength` | rejected for bridge payload use | Tree, if strength/confidence is ever interpreted; Naming may own only source facts | Tree confidence/severity policy, not a Naming bridge field | n/a | n/a | n/a | n/a | n/a | rejected Tree-policy/confidence candidate | Tree must not receive Naming-authored strength as bridge policy | n/a | It would encode confidence/strength policy and blur Tree-owned clean/usable evidence assessment, confidence, severity, and findings. |
 | `evidenceLimitNotes` | approved for a future enriched bridge version | Naming | Naming-owned bridge production and source limitation diagnostics | `evidenceLimitNotes` | array of objects, each `{ "code": "<non-empty-kebab-case-string>", "message": "<short deterministic string>", "source": "naming" }`; no severity/confidence/verdict fields | Optional | Omit when there are no limits; empty array is allowed only when a producer intentionally serializes empty containers; `null` is not allowed | Sort by `code`, then `message`, then `source`; remove exact duplicates; messages must be deterministic and not environment-specific | diagnostic metadata | Tree may consume only as source-limit evidence or diagnostics; Tree owns fallback and finding policy | n/a | n/a |
 
-Approved first enriched bridge set: `parentOccurrenceAddress`, `occurrenceDepth`, `occurrenceOrderIndex`, `occurrenceType`, `disambiguationNotes`, and `evidenceLimitNotes`.
+Existing optional v1 context/compatibility set: `occurrenceType`.
+
+Approved first enriched bridge set: `parentOccurrenceAddress`, `occurrenceDepth`, `occurrenceOrderIndex`, `disambiguationNotes`, and `evidenceLimitNotes`.
 
 Deferred set: `lineageKey`, `contextPartitionKey`, `siblingContextKey`, `subtreeContextKey`, `semanticTokens`, `role`, and `role-like fields`.
 
@@ -169,7 +182,7 @@ Path fallback is current implementation reality and must not be removed in this 
 | Structural-addressing `addressPath` | Candidate compatibility/debug alias and possible initial source for `occurrenceAddress`; must be interpreted inside profile/snapshot namespace. |
 | Structural-addressing `profileId` | Candidate source for contract field `addressProfileId`; this spec uses the bridge field name `addressProfileId` for clarity. |
 | Structural-addressing `snapshotOutputId` | Related to `addressedSnapshotId`, but not identical by contract until a later slice decides whether output id is sufficient or an instance/source id is required. |
-| Structural-addressing `occurrenceType` | Approved future bridge enrichment field when available; it remains neutral occurrence kind evidence, not Tree folder-kind policy. |
+| Current Naming bridge `occurrenceType` / structural-addressing `occurrenceType` | Existing optional v1 neutral occurrence-context / compatibility evidence when the addressed occurrence record supplies it. It remains Addressing-owned occurrence-type data that Naming may echo; it is not part of the canonical durable observation identity tuple, is not Tree folder-kind policy, remains valid in v1, and does not require a bridge version bump. |
 | Structural-addressing `depth` | Approved future bridge enrichment source for `occurrenceDepth`; it remains neutral context evidence. |
 | Structural-addressing `orderIndex` | Approved future bridge enrichment source for `occurrenceOrderIndex`; it remains deterministic ordering/diagnostic evidence, not identity. |
 | Current Naming bridge `path` observations | Current runtime truth and temporary compatibility alias. Future bridge observations should preserve `repoRelativePath` / `path` compatibility during migration. |
@@ -212,6 +225,6 @@ This spec does not:
 
 ## 12. Recommended next implementation child
 
-Recommended next implementation child: define and test a data-only, explicitly versioned `naming-occurrence-bridge.v2` payload or additive sidecar that preserves v1 identity and path/source-trace compatibility while carrying only the approved first enriched bridge set: `parentOccurrenceAddress`, `occurrenceDepth`, `occurrenceOrderIndex`, `occurrenceType`, `disambiguationNotes`, and `evidenceLimitNotes`.
+Recommended next implementation child: define and test a data-only, explicitly versioned `naming-occurrence-bridge.v2` payload or additive sidecar that preserves v1 identity, optional v1 `occurrenceType`, and path/source-trace compatibility while carrying only the genuinely new approved first enriched bridge set: `parentOccurrenceAddress`, `occurrenceDepth`, `occurrenceOrderIndex`, `disambiguationNotes`, and `evidenceLimitNotes`.
 
 That child should still avoid Tree reasoning expansion. It should include focused tests for payload shape, version handling, unsupported-enrichment diagnostics, and explicit fallback behavior without removing the current path-based consumer path.
