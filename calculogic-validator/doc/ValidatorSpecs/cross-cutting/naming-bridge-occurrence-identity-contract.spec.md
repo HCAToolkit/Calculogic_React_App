@@ -80,6 +80,10 @@ New approved enrichment fields in this spec require a future explicit version na
 
 The v2 bridge may keep the same top-level envelope fields as v1 and add an explicitly versioned observation enrichment block or direct observation fields for genuinely new approved fields that valid v1 observations do not already emit. A later implementation slice must choose the concrete serialization route before runtime emission. Until that slice lands, new approved fields below are contract-approved but **not current runtime truth**.
 
+Future v2 enrichment is additive to the current Naming semantic observation payload. Any future `naming-occurrence-bridge.v2` payload, or any additive sidecar strategy, must preserve the existing Naming-owned semantic observation fields and semantics, including at minimum `semanticName`, `familyRoot`, `semanticFamily`, `familySubgroup` when present, `ambiguityFlags` when present, `splitFamilyFlags` when present, existing Naming disambiguation evidence when present, existing path/source-trace compatibility fields, and optional existing v1 `occurrenceType` behavior when available. Future enrichment adds neutral occurrence context, approved Naming metadata, or versioned diagnostics around that semantic evidence; it must not replace, flatten, omit, or downgrade the current semantic interpretation.
+
+A sidecar approach must either preserve direct linkage to the complete current semantic observation payload or define an explicit deterministic association that leaves the existing semantic payload intact. Tree must still receive Naming semantic evidence plus any approved enrichment; Tree must not be forced to reconstruct semantic-family interpretation from raw names, paths, or enrichment fields.
+
 ### 4.3 Version handling and unknown fields
 
 Version handling rules:
@@ -100,7 +104,7 @@ Version handling rules:
 | --- | --- | --- | --- | --- |
 | Occurrence identity | Owns `occurrenceAddress`, address profile semantics, address grammar, addressed snapshot/provider output rules, and parent/child/sibling identity facts. | References identity to attach observations; does not define address grammar. | Consumes identity for tuple matching and join preparation; does not define Naming semantics. | Transports identity neutrally; does not own semantics. |
 | Neutral occurrence context | Owns neutral lineage/depth/containment facts, parent/child/sibling identity facts, and deterministic occurrence ordering. | May copy approved neutral context as evidence when sourced from Addressing and shaped by this spec. | May consume neutral context only as evidence under Tree-owned qualification policy. | May stage opaque payloads without semantic ownership. |
-| Semantic interpretation | Does not own Naming semantics. | Owns semantic-name, family-root, semantic-family, family-subgroup, token interpretation, role interpretation, ambiguity flags, split-family flags, disambiguation interpretation, bridge observation production, and approved semantic-evidence partitioning representation. | Consumes Naming evidence for Tree-owned interpretation after joining. | May report metadata without semantic ownership. |
+| Semantic interpretation | Does not own Naming semantics. | Owns semantic-name, family-root, semantic-family, family-subgroup, token interpretation, role interpretation, ambiguity flags, split-family flags, disambiguation interpretation, bridge observation production, preservation of current semantic observation payloads, and approved semantic-evidence partitioning representation. | Consumes Naming semantic evidence plus approved enrichment for Tree-owned structural interpretation after joining; does not reconstruct Naming semantic-family interpretation from raw names, paths, or enrichment fields. | May report metadata without semantic ownership. |
 | Tree conclusions | Does not own Tree placement conclusions. | Must not emit Tree conclusions. | Owns folder-kind interpretation, structural-home interpretation, semantic-home interpretation, placement reasoning, scatter/cluster reasoning, confidence, severity, findings, fallback selection, join diagnostics, and clean/usable evidence assessment. | May transport/report metadata without owning Tree conclusions. |
 
 Suite-core owns only runner orchestration, staging, target/scope transport, source metadata, report-envelope mechanics, and neutral opaque payload transport.
@@ -169,6 +173,8 @@ Future implementation slices must follow this migration rule:
 4. Fallback diagnostics should make it clear when Tree used path compatibility instead of address identity.
 5. Tree must not silently re-derive Naming semantic-family interpretation when Naming evidence is missing. Missing Naming evidence should remain missing, bounded, or diagnostic according to Tree-owned consumer policy.
 6. Future v2 enrichment does not by itself authorize provider swaps, Tree consumption changes, fallback removal, helper extraction, CLI changes, report-envelope changes, or runtime bridge production.
+7. Future v2 or sidecar migration must preserve the existing Naming-owned semantic observation payload, existing path/source-trace compatibility fields, and optional existing v1 `occurrenceType` behavior when available. It must not create an identity-and-enrichment-only payload that drops semantic evidence Tree currently consumes.
+8. Tree must continue receiving Naming semantic evidence plus any approved enrichment; it must not be forced to reconstruct semantic-family interpretation from raw names, paths, neutral occurrence context, or diagnostic metadata.
 
 Path fallback is current implementation reality and must not be removed in this contract slice.
 
@@ -205,7 +211,7 @@ The following questions remain explicit follow-up work and are not resolved by r
 This spec does not:
 
 - change runtime behavior;
-- change Naming bridge payloads;
+- change current v1 Naming bridge payload production;
 - change Tree join behavior;
 - add enriched fields to runtime outputs;
 - rename `addressPath` in runtime code;
@@ -225,6 +231,8 @@ This spec does not:
 
 ## 12. Recommended next implementation child
 
-Recommended next implementation child: define and test a data-only, explicitly versioned `naming-occurrence-bridge.v2` payload or additive sidecar that preserves v1 identity, optional v1 `occurrenceType`, and path/source-trace compatibility while carrying only the genuinely new approved first enriched bridge set: `parentOccurrenceAddress`, `occurrenceDepth`, `occurrenceOrderIndex`, `disambiguationNotes`, and `evidenceLimitNotes`.
+Recommended next implementation child: define and test a data-only, explicitly versioned `naming-occurrence-bridge.v2` payload or additive sidecar that preserves v1 identity, the complete current Naming-owned semantic observation payload, optional v1 `occurrenceType`, and path/source-trace compatibility while carrying only the genuinely new approved first enriched bridge set: `parentOccurrenceAddress`, `occurrenceDepth`, `occurrenceOrderIndex`, `disambiguationNotes`, and `evidenceLimitNotes`.
 
-That child should still avoid Tree reasoning expansion. It should include focused tests for payload shape, version handling, unsupported-enrichment diagnostics, and explicit fallback behavior without removing the current path-based consumer path.
+The preserved semantic payload must include at minimum `semanticName`, `familyRoot`, `semanticFamily`, `familySubgroup` when present, `ambiguityFlags` when present, `splitFamilyFlags` when present, and existing Naming disambiguation evidence when present. A sidecar child must define direct linkage or deterministic association to the complete current semantic observation payload and must leave that payload intact.
+
+That child should still avoid Tree reasoning expansion. It should include focused tests for payload shape, semantic-payload preservation, version handling, unsupported-enrichment diagnostics, and explicit fallback behavior without removing the current path-based consumer path.
