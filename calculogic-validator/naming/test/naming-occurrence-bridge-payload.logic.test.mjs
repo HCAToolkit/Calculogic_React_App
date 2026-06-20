@@ -229,3 +229,202 @@ test('createNamingOccurrenceBridgePayload does not emit Tree-owned conclusion fi
     }
   }
 });
+
+const deferredOrRejectedEnrichmentFields = [
+  'lineageKey',
+  'contextPartitionKey',
+  'siblingContextKey',
+  'subtreeContextKey',
+  'semanticTokens',
+  'role',
+  'evidenceStrength',
+];
+
+const collectObjectKeys = (value) => {
+  if (!value || typeof value !== 'object') {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(collectObjectKeys);
+  }
+
+  return [
+    ...Object.keys(value),
+    ...Object.values(value).flatMap(collectObjectKeys),
+  ];
+};
+
+test('createNamingOccurrenceBridgePayload emits explicitly versioned additive enrichment sidecar without changing v1 observations', () => {
+  const result = createNamingOccurrenceBridgePayload({
+    namingSemanticFamilyBridge: {
+      observations: [
+        {
+          path: 'src/host/app.logic.mjs',
+          semanticName: 'app',
+          semanticFamily: 'app',
+          familyRoot: 'app',
+          disambiguation: {
+            roleLikeFolderTokens: ['host', 'host'],
+            roleLikeSemanticTokens: ['wiring', 'host'],
+          },
+          evidenceLimitNotes: [
+            { noteType: 'naming-source-bounded', detail: 'canonical-finding-only' },
+            { noteType: 'naming-source-bounded', detail: 'canonical-finding-only' },
+          ],
+        },
+      ],
+    },
+    addressedOccurrenceNamespace: {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceRecords: [
+        {
+          occurrenceAddress: 'A.1.1',
+          addressPath: 'A.1.1',
+          parentAddressPath: 'A.1',
+          path: 'src/host/app.logic.mjs',
+          occurrenceType: 'file',
+          depth: 2,
+          orderIndex: 7,
+        },
+      ],
+    },
+  });
+
+  assert.equal(result.bridgeContractVersion, 'naming-occurrence-bridge.v1');
+  assert.equal(result.compatibility.enrichmentSidecarVersion, 'naming-occurrence-bridge-enrichment.v1');
+  assert.equal(result.occurrenceContextEnrichment.enrichmentContractVersion, 'naming-occurrence-bridge-enrichment.v1');
+  assert.deepEqual(result.occurrenceContextEnrichment.identityTupleFields, [
+    'addressProfileId',
+    'addressedSnapshotId',
+    'occurrenceAddress',
+  ]);
+  assert.deepEqual(result.observations, [
+    {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceAddress: 'A.1.1',
+      repoRelativePath: 'src/host/app.logic.mjs',
+      path: 'src/host/app.logic.mjs',
+      addressPath: 'A.1.1',
+      occurrenceType: 'file',
+      semanticName: 'app',
+      semanticFamily: 'app',
+      familyRoot: 'app',
+      disambiguation: {
+        roleLikeFolderTokens: ['host'],
+        roleLikeSemanticTokens: ['host', 'wiring'],
+      },
+    },
+  ]);
+  assert.deepEqual(result.occurrenceContextEnrichment.enrichedObservations, [
+    {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceAddress: 'A.1.1',
+      parentOccurrenceAddress: 'A.1',
+      occurrenceDepth: 2,
+      occurrenceOrderIndex: 7,
+      disambiguationNotes: [
+        { noteType: 'role-like-folder-token', token: 'host' },
+        { noteType: 'role-like-semantic-token', token: 'host' },
+        { noteType: 'role-like-semantic-token', token: 'wiring' },
+      ],
+      evidenceLimitNotes: [{ noteType: 'naming-source-bounded', detail: 'canonical-finding-only' }],
+    },
+  ]);
+
+  const emittedEnrichmentKeys = collectObjectKeys(result.occurrenceContextEnrichment);
+  for (const field of deferredOrRejectedEnrichmentFields) {
+    assert.equal(emittedEnrichmentKeys.includes(field), false, `${field} must not be emitted`);
+  }
+});
+
+test('createNamingOccurrenceBridgePayload omits invalid or unavailable enrichment fields while preserving occurrence identity', () => {
+  const result = createNamingOccurrenceBridgePayload({
+    namingSemanticFamilyBridge: {
+      observations: [
+        { path: 'src/root.logic.mjs', semanticName: 'root', semanticFamily: 'root', familyRoot: 'root' },
+        { path: 'src/child.logic.mjs', semanticName: 'child', semanticFamily: 'child', familyRoot: 'child' },
+      ],
+    },
+    addressedOccurrenceNamespace: {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceRecords: [
+        {
+          occurrenceAddress: 'A',
+          addressPath: 'A',
+          parentAddressPath: null,
+          path: 'src/root.logic.mjs',
+          depth: 0,
+          orderIndex: 0,
+        },
+        {
+          occurrenceAddress: 'A.1',
+          addressPath: 'A.1',
+          path: 'src/child.logic.mjs',
+          depth: -1,
+          orderIndex: 1.5,
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(result.occurrenceContextEnrichment.enrichedObservations, [
+    {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceAddress: 'A',
+      parentOccurrenceAddress: null,
+      occurrenceDepth: 0,
+      occurrenceOrderIndex: 0,
+    },
+  ]);
+  assert.deepEqual(
+    result.observations.map(({ addressProfileId, addressedSnapshotId, occurrenceAddress }) => ({
+      addressProfileId,
+      addressedSnapshotId,
+      occurrenceAddress,
+    })),
+    [
+      { addressProfileId: 'tree-codebase', addressedSnapshotId: 'snapshot-001', occurrenceAddress: 'A' },
+      { addressProfileId: 'tree-codebase', addressedSnapshotId: 'snapshot-001', occurrenceAddress: 'A.1' },
+    ],
+  );
+});
+
+test('createNamingOccurrenceBridgePayload keeps same-family nested observations distinct by occurrence identity', () => {
+  const result = createNamingOccurrenceBridgePayload({
+    namingSemanticFamilyBridge: {
+      observations: [
+        { path: 'src/alpha/shared.logic.mjs', semanticName: 'shared', semanticFamily: 'shared-runtime', familyRoot: 'shared' },
+        { path: 'src/alpha/nested/shared.logic.mjs', semanticName: 'shared', semanticFamily: 'shared-runtime', familyRoot: 'shared' },
+      ],
+    },
+    addressedOccurrenceNamespace: {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceRecords: [
+        { occurrenceAddress: 'A.1', addressPath: 'A.1', path: 'src/alpha/shared.logic.mjs', parentAddressPath: 'A', depth: 2, orderIndex: 3 },
+        { occurrenceAddress: 'A.1.1', addressPath: 'A.1.1', path: 'src/alpha/nested/shared.logic.mjs', parentAddressPath: 'A.1', depth: 3, orderIndex: 4 },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    result.occurrenceContextEnrichment.enrichedObservations.map((observation) => [
+      observation.occurrenceAddress,
+      observation.parentOccurrenceAddress,
+      observation.occurrenceDepth,
+      observation.occurrenceOrderIndex,
+    ]),
+    [
+      ['A.1', 'A', 2, 3],
+      ['A.1.1', 'A.1', 3, 4],
+    ],
+  );
+  assert.equal(new Set(result.observations.map((observation) => observation.semanticFamily)).size, 1);
+  assert.equal(new Set(result.observations.map((observation) => observation.occurrenceAddress)).size, 2);
+});

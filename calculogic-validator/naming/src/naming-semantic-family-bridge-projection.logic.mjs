@@ -3,6 +3,23 @@ const toSortedUniqueStringFlags = (flags) =>
     new Set(flags.filter((flag) => typeof flag === 'string' && flag.length > 0)),
   ).sort((left, right) => left.localeCompare(right));
 
+const toDisambiguationPayload = (disambiguation) => {
+  if (!disambiguation || typeof disambiguation !== 'object' || Array.isArray(disambiguation)) {
+    return null;
+  }
+
+  const payload = {
+    ...(Array.isArray(disambiguation.roleLikeFolderTokens)
+      ? { roleLikeFolderTokens: toSortedUniqueStringFlags(disambiguation.roleLikeFolderTokens) }
+      : {}),
+    ...(Array.isArray(disambiguation.roleLikeSemanticTokens)
+      ? { roleLikeSemanticTokens: toSortedUniqueStringFlags(disambiguation.roleLikeSemanticTokens) }
+      : {}),
+  };
+
+  return Object.keys(payload).length > 0 ? payload : null;
+};
+
 const toBridgeObservationFromFinding = (finding) => {
   if (!finding || typeof finding !== 'object' || Array.isArray(finding)) {
     return null;
@@ -45,6 +62,9 @@ const toBridgeObservationFromFinding = (finding) => {
       : {}),
     ...(Array.isArray(details.splitFamilyFlags)
       ? { splitFamilyFlags: toSortedUniqueStringFlags(details.splitFamilyFlags) }
+      : {}),
+    ...(toDisambiguationPayload(details.disambiguation)
+      ? { disambiguation: toDisambiguationPayload(details.disambiguation) }
       : {}),
   };
 };

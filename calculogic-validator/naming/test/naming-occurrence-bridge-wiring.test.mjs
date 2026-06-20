@@ -130,3 +130,47 @@ test('runNamingValidator stages occurrence bridge only when an addressed namespa
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 });
+
+test('projectNamingOccurrenceBridge preserves existing Naming disambiguation evidence when present', () => {
+  const runtimeOutput = {
+    findings: [
+      {
+        path: 'src/host/app-host.logic.mjs',
+        classification: 'canonical',
+        details: {
+          semanticName: 'app-host',
+          familyRoot: 'app',
+          semanticFamily: 'app-host',
+          disambiguation: {
+            roleLikeFolderTokens: ['host'],
+            roleLikeSemanticTokens: ['host'],
+          },
+        },
+      },
+    ],
+  };
+
+  const occurrenceBridge = projectNamingOccurrenceBridge(runtimeOutput, {
+    addressedOccurrenceNamespace: {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceRecords: [
+        {
+          repoRelativePath: 'src/host/app-host.logic.mjs',
+          path: 'src/host/app-host.logic.mjs',
+          occurrenceAddress: 'A.2',
+          addressPath: 'A.2',
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(occurrenceBridge.observations[0].disambiguation, {
+    roleLikeFolderTokens: ['host'],
+    roleLikeSemanticTokens: ['host'],
+  });
+  assert.deepEqual(occurrenceBridge.occurrenceContextEnrichment.enrichedObservations[0].disambiguationNotes, [
+    { noteType: 'role-like-folder-token', token: 'host' },
+    { noteType: 'role-like-semantic-token', token: 'host' },
+  ]);
+});
