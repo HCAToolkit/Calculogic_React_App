@@ -251,6 +251,7 @@ Tree later consumption should:
 
 - Continue to validate the identity tuple before using enriched evidence.
 - Treat enriched Naming bridge fields as evidence, not policy.
+- Keep tuple matching, address-keyed join preparation, join qualification, clean/usable evidence assessment, fallback selection, path-keyed compatibility fallback, and join diagnostics Tree-owned as current implementation reality.
 - Keep clean/usable evidence qualification Tree-owned.
 - Keep fallback behavior Tree-owned until a later issue explicitly changes it.
 - Preserve diagnostics for unsupported versions, malformed observations, ambiguous tuples, skipped joins, and empty evidence.
@@ -263,13 +264,15 @@ Tree needs from the enriched bridge later:
 - Optional context partition keys that explain how Naming grouped semantic evidence without making folder/home/placement claims.
 - Explicit diagnostics/compatibility metadata so Tree can decide whether evidence is clean, degraded, or fallback-only.
 
+Shared addressed-evidence join helper extraction remains deferred. It may be reconsidered only after at least one additional real consumer proves that the same neutral join mechanic is genuinely shared and can be extracted without Tree policy, Naming semantics, reporting policy, fallback policy, or diagnostics leaking into it. Until then, Tree retains current join mechanics; Addressing provides neutral occurrence/address evidence; Naming may consume approved neutral occurrence facts.
+
 ## Ownership matrix
 
 | Area | Owns | Must not own |
 | --- | --- | --- |
-| Addressing | occurrence identity; address profile semantics; addressed snapshot semantics; lineage/depth/containment identity; parent/child/sibling traversal mechanics; deterministic occurrence ordering; neutral addressed evidence join mechanics when extracted; neutral provider/bridge output rules | Naming semantic interpretation; Tree folder/home/placement findings |
+| Addressing | occurrence identity; address profile semantics; address grammar; addressed snapshot/provider output rules; lineage identity; depth identity; containment identity; parent/child/sibling identity facts; deterministic occurrence ordering | Naming semantic interpretation; Tree tuple matching; Tree address-keyed join preparation; Tree join qualification; Tree clean/usable evidence assessment; Tree fallback selection; Tree path-keyed compatibility fallback; Tree join diagnostics; Tree folder/home/placement findings |
 | Naming | semantic-name interpretation; semantic-token interpretation; family-root interpretation; semantic-family interpretation; family-subgroup interpretation; role parse interpretation; ambiguity flags; split-family flags; Naming bridge observation production; partitioning Naming semantic evidence by neutral occurrence/nesting context | folder kind; structural home; semantic home; placement judgment; scatter/cluster judgment; whole-placement confidence; Tree advisory severity; Tree findings |
-| Tree | bridge consumption policy; clean/usable evidence qualification; fallback behavior; folder-kind interpretation; structural-home interpretation; semantic-home interpretation; placement reasoning; scatter/cluster reasoning; whole-placement confidence; diagnostics and findings | Addressing occurrence identity/profile semantics; Naming semantic-name/family derivation |
+| Tree | bridge consumption policy; tuple matching; address-keyed join preparation; join qualification; clean/usable evidence assessment; fallback selection; path-keyed compatibility fallback; join diagnostics; folder-kind interpretation; structural-home interpretation; semantic-home interpretation; placement reasoning; scatter/cluster reasoning; whole-placement confidence; findings | Addressing occurrence identity/profile semantics; Naming semantic-name/family derivation |
 | Suite-core | runner orchestration; staging; target/scope transport; source metadata; report envelope mechanics; neutral opaque payload transport | Addressing semantics; Naming semantics; Tree policy/finding interpretation |
 
 ## Deferred / non-goal boundaries
@@ -309,7 +312,7 @@ Recommended next issue: begin with a bounded Naming-owned bridge-contract/spec u
 3. define each allowed field's exact payload shape, ownership, and required/optional status;
 4. only then permit additive runtime bridge enrichment work.
 
-Candidate fields such as `parentAddressPath`, `depth`, `orderIndex`, `semanticTokens`, `role`, role-like fields, and partition keys must not be directly added from this audit alone. Runtime enrichment and Tree consumption policy should remain separate follow-up slices.
+Candidate fields such as `parentAddressPath`, `depth`, `orderIndex`, `semanticTokens`, `role`, role-like fields, and partition keys must not be directly added from this audit alone. The next issue must leave current Tree tuple matching, address-keyed join preparation, join qualification, fallback selection, path-keyed compatibility fallback, and join diagnostics in place. It must not extract join helpers into Addressing, move Tree fallback policy into Addressing, or change current Tree join behavior. Runtime enrichment and Tree consumption policy should remain separate follow-up slices.
 
 ## Verification
 
