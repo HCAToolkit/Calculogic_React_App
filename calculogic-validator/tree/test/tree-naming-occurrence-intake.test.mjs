@@ -961,3 +961,47 @@ test('Tree enrichment keeps no-authoritative-parent-alias compatibility while re
     evidenceLimitNotes: [{ code: 'no-parent-authority', message: 'No parent authority.', source: 'naming' }],
   });
 });
+
+test('Tree enrichment rejects numeric-leading disambiguation note codes field-locally', () => {
+  const prepared = prepareFieldLocalCase({
+    ...baseA2EnrichmentRecord,
+    disambiguationNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+    evidenceLimitNotes: [{ code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' }],
+  });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'disambiguationNotes'), 1);
+  assert.deepEqual(enrichment.addressingContext, {
+    parentOccurrenceAddress: 'A',
+    occurrenceDepth: 2,
+    occurrenceOrderIndex: 5,
+  });
+  assert.equal(Object.hasOwn(enrichment.namingMetadata, 'disambiguationNotes'), false);
+  assert.deepEqual(enrichment.namingMetadata.evidenceLimitNotes, [
+    { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+  ]);
+});
+
+test('Tree enrichment rejects numeric-leading evidence limit note codes field-locally', () => {
+  const prepared = prepareFieldLocalCase({
+    ...baseA2EnrichmentRecord,
+    disambiguationNotes: [
+      { code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' },
+      { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+    ],
+    evidenceLimitNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+  });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'evidenceLimitNotes'), 1);
+  assert.deepEqual(enrichment.addressingContext, {
+    parentOccurrenceAddress: 'A',
+    occurrenceDepth: 2,
+    occurrenceOrderIndex: 5,
+  });
+  assert.deepEqual(enrichment.namingMetadata.disambiguationNotes, [
+    { code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' },
+    { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+  ]);
+  assert.equal(Object.hasOwn(enrichment.namingMetadata, 'evidenceLimitNotes'), false);
+});

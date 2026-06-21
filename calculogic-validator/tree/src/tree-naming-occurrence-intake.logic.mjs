@@ -167,7 +167,7 @@ const isNonNegativeInteger = (value) => Number.isInteger(value) && value >= 0;
 const isContractValidNamingNote = (note) =>
   isPlainObject(note) &&
   typeof note.code === 'string' &&
-  /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(note.code) &&
+  /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(note.code) &&
   typeof note.message === 'string' &&
   note.message.length > 0 &&
   note.source === 'naming';
