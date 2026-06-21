@@ -1050,3 +1050,80 @@ test('Tree enrichment canonicalizes evidence limit notes and keeps sibling inval
     { code: 'source-limit', message: 'Zulu source.', source: 'naming' },
   ]);
 });
+
+test('Tree enrichment skips empty wrapper when only invalid occurrenceDepth remains', () => {
+  const prepared = prepareFieldLocalCase({
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.2',
+    occurrenceDepth: -1,
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceDepth'), 1);
+  assert.equal(prepared.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+  assert.equal(prepared.status, 'joined');
+  assert.equal(prepared.usedForCurrentTreeJoins, true);
+});
+
+test('Tree enrichment skips empty wrapper when only malformed disambiguationNotes remain', () => {
+  const prepared = prepareFieldLocalCase({
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.2',
+    disambiguationNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'disambiguationNotes'), 1);
+  assert.equal(prepared.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+});
+
+test('Tree enrichment skips empty wrapper for multiple invalid optional fields while retaining diagnostics', () => {
+  const prepared = prepareFieldLocalCase({
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.2',
+    occurrenceDepth: -1,
+    occurrenceOrderIndex: 1.5,
+    parentOccurrenceAddress: '',
+    evidenceLimitNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+  });
+
+  assert.equal(prepared.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+  assert.deepEqual(
+    prepared.enrichmentDiagnostics.map((diagnostic) => [diagnostic.reason, diagnostic.fieldName]),
+    [
+      ['invalid-enrichment-field', 'evidenceLimitNotes'],
+      ['invalid-enrichment-field', 'occurrenceDepth'],
+      ['invalid-enrichment-field', 'occurrenceOrderIndex'],
+      ['invalid-enrichment-field', 'parentOccurrenceAddress'],
+    ],
+  );
+});
+
+test('Tree enrichment keeps partial valid metadata when sibling field validation empties addressing context', () => {
+  const prepared = prepareFieldLocalCase({
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.2',
+    occurrenceDepth: -1,
+    evidenceLimitNotes: [{ code: 'source-limit', message: 'Source is bounded.', source: 'naming' }],
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceDepth'), 1);
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.addressingContext, {});
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.namingMetadata, {
+    evidenceLimitNotes: [{ code: 'source-limit', message: 'Source is bounded.', source: 'naming' }],
+  });
+});
+
+test('Tree enrichment absent sidecar remains unchanged without empty attachment or enrichment diagnostics', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: addressBridge,
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'joined');
+  assert.equal(prepared.usedForCurrentTreeJoins, true);
+  assert.equal(Object.hasOwn(prepared.joinedEvidence[0], 'occurrenceContextEnrichment'), false);
+  assert.deepEqual(prepared.enrichmentDiagnostics, []);
+});

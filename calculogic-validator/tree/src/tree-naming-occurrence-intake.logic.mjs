@@ -339,9 +339,13 @@ const normalizeEnrichmentRecord = ({ record, identityTuple, occurrenceRecord, en
   const namingMetadata = {};
   for (const fieldName of ['disambiguationNotes', 'evidenceLimitNotes']) {
     const notes = normalizeContractNotes({ value: record[fieldName], fieldName, identityTuple, enrichmentDiagnostics });
-    if (notes !== undefined) {
+    if (notes !== undefined && notes.length > 0) {
       namingMetadata[fieldName] = notes;
     }
+  }
+
+  if (Object.keys(addressingContext).length === 0 && Object.keys(namingMetadata).length === 0) {
+    return null;
   }
 
   return {
@@ -408,7 +412,8 @@ const sortJoinEntries = (entries) =>
     (left.identityTuple?.addressProfileId ?? '').localeCompare(right.identityTuple?.addressProfileId ?? '') ||
     (left.identityTuple?.addressedSnapshotId ?? '').localeCompare(right.identityTuple?.addressedSnapshotId ?? '') ||
     (left.identityTuple?.occurrenceAddress ?? '').localeCompare(right.identityTuple?.occurrenceAddress ?? '') ||
-    (left.reason ?? '').localeCompare(right.reason ?? ''),
+    (left.reason ?? '').localeCompare(right.reason ?? '') ||
+    (left.fieldName ?? '').localeCompare(right.fieldName ?? ''),
   );
 
 export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
