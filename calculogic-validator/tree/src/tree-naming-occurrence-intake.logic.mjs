@@ -1,4 +1,5 @@
 const BRIDGE_CONTRACT_VERSION = 'naming-occurrence-bridge.v1';
+const ENRICHMENT_CONTRACT_VERSION = 'naming-occurrence-bridge-enrichment.v1';
 
 const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
@@ -151,6 +152,138 @@ const IDENTITY_TUPLE_FIELDS = ['addressProfileId', 'addressedSnapshotId', 'occur
 
 const toIdentityTupleKey = ({ addressProfileId, addressedSnapshotId, occurrenceAddress }) =>
   `${addressProfileId}\u0000${addressedSnapshotId}\u0000${occurrenceAddress}`;
+
+const toSafeIdentityTupleDiagnostic = (identityTuple) =>
+  identityTuple
+    ? {
+        addressProfileId: identityTuple.addressProfileId ?? null,
+        addressedSnapshotId: identityTuple.addressedSnapshotId ?? null,
+        occurrenceAddress: identityTuple.occurrenceAddress ?? null,
+      }
+    : null;
+
+const isNonNegativeInteger = (value) => Number.isInteger(value) && value >= 0;
+
+const isContractValidNamingNote = (note) =>
+  isPlainObject(note) &&
+  typeof note.code === 'string' &&
+  /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(note.code) &&
+  typeof note.message === 'string' &&
+  note.message.length > 0 &&
+  note.source === 'naming';
+
+const normalizeContractNotes = ({ value, fieldName, identityTuple, enrichmentDiagnostics }) => {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (!Array.isArray(value) || value.some((note) => !isContractValidNamingNote(note))) {
+    enrichmentDiagnostics.push({
+      reason: 'invalid-enrichment-field',
+      fieldName,
+      identityTuple: toSafeIdentityTupleDiagnostic(identityTuple),
+    });
+    return null;
+  }
+
+  return value.map((note) => ({ code: note.code, message: note.message, source: note.source }));
+};
+
+const validateEnrichmentEnvelope = (payload) => {
+  const sidecar = payload?.occurrenceContextEnrichment;
+  if (sidecar === undefined) {
+    return { status: 'absent', records: [], diagnostics: [] };
+  }
+
+  if (!isPlainObject(sidecar)) {
+    return {
+      status: 'malformed',
+      records: [],
+      diagnostics: [{ reason: 'malformed-enrichment-sidecar', fieldName: 'occurrenceContextEnrichment' }],
+    };
+  }
+
+  const diagnostics = [];
+  if (sidecar.enrichmentContractVersion !== ENRICHMENT_CONTRACT_VERSION) {
+    diagnostics.push({
+      reason: 'unsupported-enrichment-sidecar-version',
+      enrichmentContractVersion: sidecar.enrichmentContractVersion ?? null,
+      expectedEnrichmentContractVersion: ENRICHMENT_CONTRACT_VERSION,
+    });
+  }
+
+  if (
+    !Array.isArray(sidecar.identityTupleFields) ||
+    sidecar.identityTupleFields.length !== IDENTITY_TUPLE_FIELDS.length ||
+    sidecar.identityTupleFields.some((field, index) => field !== IDENTITY_TUPLE_FIELDS[index])
+  ) {
+    diagnostics.push({
+      reason: 'malformed-enrichment-sidecar',
+      fieldName: 'identityTupleFields',
+      expectedIdentityTupleFields: IDENTITY_TUPLE_FIELDS,
+    });
+  }
+
+  if (!Array.isArray(sidecar.enrichedObservations)) {
+    diagnostics.push({ reason: 'malformed-enrichment-sidecar', fieldName: 'enrichedObservations' });
+  }
+
+  if (diagnostics.length > 0) {
+    return { status: 'invalid', records: [], diagnostics };
+  }
+
+  return { status: 'recognized', records: sidecar.enrichedObservations, diagnostics };
+};
+
+const normalizeEnrichmentRecord = ({ record, identityTuple, enrichmentDiagnostics }) => {
+  const addressingContext = {};
+  if (record.parentOccurrenceAddress !== undefined) {
+    if (record.parentOccurrenceAddress === null) {
+      addressingContext.parentOccurrenceAddress = null;
+    } else if (typeof record.parentOccurrenceAddress === 'string' && record.parentOccurrenceAddress.length > 0) {
+      addressingContext.parentOccurrenceAddress = record.parentOccurrenceAddress;
+    } else {
+      enrichmentDiagnostics.push({
+        reason: 'invalid-enrichment-field',
+        fieldName: 'parentOccurrenceAddress',
+        identityTuple: toSafeIdentityTupleDiagnostic(identityTuple),
+      });
+      return null;
+    }
+  }
+
+  for (const fieldName of ['occurrenceDepth', 'occurrenceOrderIndex']) {
+    if (record[fieldName] !== undefined) {
+      if (!isNonNegativeInteger(record[fieldName])) {
+        enrichmentDiagnostics.push({
+          reason: 'invalid-enrichment-field',
+          fieldName,
+          identityTuple: toSafeIdentityTupleDiagnostic(identityTuple),
+        });
+        return null;
+      }
+      addressingContext[fieldName] = record[fieldName];
+    }
+  }
+
+  const namingMetadata = {};
+  for (const fieldName of ['disambiguationNotes', 'evidenceLimitNotes']) {
+    const notes = normalizeContractNotes({ value: record[fieldName], fieldName, identityTuple, enrichmentDiagnostics });
+    if (notes === null) {
+      return null;
+    }
+    if (notes !== undefined) {
+      namingMetadata[fieldName] = notes;
+    }
+  }
+
+  return {
+    evidenceType: 'tree-local-naming-occurrence-context-enrichment',
+    sourceIdentityTuple: { ...identityTuple },
+    addressingContext,
+    namingMetadata,
+  };
+};
 
 const normalizeOccurrenceRecordIdentityTuple = ({ occurrenceRecord, addressProfileId, addressedSnapshotId }) => {
   if (!isPlainObject(occurrenceRecord)) {
@@ -316,6 +449,52 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
     });
   }
 
+  const joinedEvidenceByTuple = new Map(joinedEvidence.map((entry) => [toIdentityTupleKey(entry.identityTuple), entry]));
+  const enrichmentDiagnostics = [];
+  const enrichmentEnvelope = validateEnrichmentEnvelope(payload);
+  enrichmentDiagnostics.push(...enrichmentEnvelope.diagnostics);
+
+  if (enrichmentEnvelope.status === 'recognized') {
+    const enrichmentTupleCounts = new Map();
+    for (const record of enrichmentEnvelope.records) {
+      const identityTuple = normalizeObservationIdentityTuple(record);
+      if (identityTuple) {
+        const key = toIdentityTupleKey(identityTuple);
+        enrichmentTupleCounts.set(key, (enrichmentTupleCounts.get(key) ?? 0) + 1);
+      }
+    }
+
+    for (const record of enrichmentEnvelope.records) {
+      if (!isPlainObject(record)) {
+        enrichmentDiagnostics.push({ reason: 'invalid-enrichment-identity-tuple', identityTuple: null });
+        continue;
+      }
+
+      const identityTuple = normalizeObservationIdentityTuple(record);
+      if (!identityTuple) {
+        enrichmentDiagnostics.push({ reason: 'invalid-enrichment-identity-tuple', identityTuple: null });
+        continue;
+      }
+
+      const key = toIdentityTupleKey(identityTuple);
+      if ((enrichmentTupleCounts.get(key) ?? 0) > 1) {
+        enrichmentDiagnostics.push({ reason: 'duplicate-enrichment-identity-tuple', identityTuple });
+        continue;
+      }
+
+      const joinedEntry = joinedEvidenceByTuple.get(key);
+      if (!joinedEntry) {
+        enrichmentDiagnostics.push({ reason: 'unmatched-enrichment-identity-tuple', identityTuple });
+        continue;
+      }
+
+      const occurrenceContextEnrichment = normalizeEnrichmentRecord({ record, identityTuple, enrichmentDiagnostics });
+      if (occurrenceContextEnrichment) {
+        joinedEntry.occurrenceContextEnrichment = occurrenceContextEnrichment;
+      }
+    }
+  }
+
   const status = diagnostics.length > 0 || skippedJoins.length > 0
     ? 'joined-with-skips'
     : joinedEvidence.length > 0
@@ -330,5 +509,6 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
     joinedEvidence: sortJoinEntries(joinedEvidence),
     skippedJoins: sortJoinEntries(skippedJoins),
     diagnostics,
+    enrichmentDiagnostics: sortJoinEntries(enrichmentDiagnostics),
   };
 };
