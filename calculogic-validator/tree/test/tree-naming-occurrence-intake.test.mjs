@@ -820,3 +820,144 @@ test('Tree enrichment field-local omission on one same-family occurrence does no
     ],
   );
 });
+
+test('Tree enrichment preserves explicit root parent null as authoritative during parent comparison', () => {
+  const rootNamespace = {
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceRecords: [
+      {
+        occurrenceAddress: 'R',
+        addressPath: 'R',
+        parentOccurrenceAddress: null,
+        path: 'src/root.logic.ts',
+        resolvedPath: 'src/root.logic.ts',
+        name: 'root.logic.ts',
+        occurrenceType: 'file',
+      },
+    ],
+  };
+  const rootObservation = {
+    ...addressBridge.observations[0],
+    occurrenceAddress: 'R',
+    path: 'src/root.logic.ts',
+  };
+
+  const conflicting = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [rootObservation],
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'R',
+            parentOccurrenceAddress: 'B',
+            evidenceLimitNotes: [{ code: 'root-context', message: 'Root context.', source: 'naming' }],
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace: rootNamespace,
+  });
+
+  assert.equal(conflicting.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+  assert.deepEqual(conflicting.enrichmentDiagnostics, [
+    {
+      reason: 'authoritative-enrichment-context-mismatch',
+      fieldName: 'parentOccurrenceAddress',
+      identityTuple: {
+        addressProfileId: 'tree-codebase',
+        addressedSnapshotId: 'snapshot-001',
+        occurrenceAddress: 'R',
+      },
+    },
+  ]);
+
+  const matching = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [rootObservation],
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'R',
+            parentOccurrenceAddress: null,
+            evidenceLimitNotes: [{ code: 'root-context', message: 'Root context.', source: 'naming' }],
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace: rootNamespace,
+  });
+
+  assert.deepEqual(matching.enrichmentDiagnostics, []);
+  assert.deepEqual(matching.joinedEvidence[0].occurrenceContextEnrichment.addressingContext, {
+    parentOccurrenceAddress: null,
+  });
+  assert.deepEqual(matching.joinedEvidence[0].occurrenceContextEnrichment.namingMetadata, {
+    evidenceLimitNotes: [{ code: 'root-context', message: 'Root context.', source: 'naming' }],
+  });
+});
+
+test('Tree enrichment keeps no-authoritative-parent-alias compatibility while retaining invalid field-local behavior', () => {
+  const noParentAliasNamespace = {
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceRecords: [
+      {
+        occurrenceAddress: 'N',
+        addressPath: 'N',
+        path: 'src/no-parent-alias.logic.ts',
+        resolvedPath: 'src/no-parent-alias.logic.ts',
+        name: 'no-parent-alias.logic.ts',
+        occurrenceType: 'file',
+      },
+    ],
+  };
+
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [
+        {
+          ...addressBridge.observations[0],
+          occurrenceAddress: 'N',
+          path: 'src/no-parent-alias.logic.ts',
+        },
+      ],
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'N',
+            parentOccurrenceAddress: 'B',
+            occurrenceDepth: -1,
+            occurrenceOrderIndex: 2,
+            evidenceLimitNotes: [{ code: 'no-parent-authority', message: 'No parent authority.', source: 'naming' }],
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace: noParentAliasNamespace,
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceDepth'), 1);
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.addressingContext, {
+    parentOccurrenceAddress: 'B',
+    occurrenceOrderIndex: 2,
+  });
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.namingMetadata, {
+    evidenceLimitNotes: [{ code: 'no-parent-authority', message: 'No parent authority.', source: 'naming' }],
+  });
+});

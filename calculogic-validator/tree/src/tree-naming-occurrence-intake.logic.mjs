@@ -255,7 +255,7 @@ const firstPresentValue = (object, propertyNames) => {
   }
 
   for (const propertyName of propertyNames) {
-    if (hasOwn(object, propertyName)) {
+    if (hasOwn(object, propertyName) && object[propertyName] !== undefined) {
       return object[propertyName];
     }
   }
@@ -369,6 +369,8 @@ const toCleanObservationEvidence = (observation) => ({
   splitFamilyFlags: normalizeStringFlags(observation.splitFamilyFlags),
 });
 
+const firstDefinedAliasValue = (object, propertyNames) => firstPresentValue(object, propertyNames);
+
 const toOccurrenceEvidence = (occurrenceRecord, identityTuple) => ({
   ...identityTuple,
   resolvedPath: occurrenceRecord.resolvedPath ?? occurrenceRecord.path ?? null,
@@ -376,12 +378,12 @@ const toOccurrenceEvidence = (occurrenceRecord, identityTuple) => ({
   name: occurrenceRecord.name ?? occurrenceRecord.actualName ?? null,
   occurrenceType: occurrenceRecord.occurrenceType ?? null,
   addressPath: occurrenceRecord.addressPath ?? occurrenceRecord.occurrenceAddress ?? null,
-  parentOccurrenceAddress: occurrenceRecord.parentOccurrenceAddress ?? occurrenceRecord.parentAddressPath,
-  parentAddressPath: occurrenceRecord.parentAddressPath ?? occurrenceRecord.parentOccurrenceAddress,
-  occurrenceDepth: occurrenceRecord.occurrenceDepth ?? occurrenceRecord.depth,
-  depth: occurrenceRecord.depth ?? occurrenceRecord.occurrenceDepth,
-  occurrenceOrderIndex: occurrenceRecord.occurrenceOrderIndex ?? occurrenceRecord.orderIndex,
-  orderIndex: occurrenceRecord.orderIndex ?? occurrenceRecord.occurrenceOrderIndex,
+  parentOccurrenceAddress: firstDefinedAliasValue(occurrenceRecord, ['parentOccurrenceAddress', 'parentAddressPath']),
+  parentAddressPath: firstDefinedAliasValue(occurrenceRecord, ['parentAddressPath', 'parentOccurrenceAddress']),
+  occurrenceDepth: firstDefinedAliasValue(occurrenceRecord, ['occurrenceDepth', 'depth']),
+  depth: firstDefinedAliasValue(occurrenceRecord, ['depth', 'occurrenceDepth']),
+  occurrenceOrderIndex: firstDefinedAliasValue(occurrenceRecord, ['occurrenceOrderIndex', 'orderIndex']),
+  orderIndex: firstDefinedAliasValue(occurrenceRecord, ['orderIndex', 'occurrenceOrderIndex']),
 });
 
 const sortJoinEntries = (entries) =>
