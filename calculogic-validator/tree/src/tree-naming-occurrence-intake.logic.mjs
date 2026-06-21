@@ -235,6 +235,72 @@ const validateEnrichmentEnvelope = (payload) => {
   return { status: 'recognized', records: sidecar.enrichedObservations, diagnostics };
 };
 
+
+const toAuthoritativeOccurrenceContext = (occurrenceRecord) => ({
+  parentOccurrenceAddress:
+    occurrenceRecord.parentOccurrenceAddress !== undefined
+      ? occurrenceRecord.parentOccurrenceAddress
+      : occurrenceRecord.parentAddressPath,
+  occurrenceDepth: occurrenceRecord.occurrenceDepth !== undefined ? occurrenceRecord.occurrenceDepth : occurrenceRecord.depth,
+  occurrenceOrderIndex:
+    occurrenceRecord.occurrenceOrderIndex !== undefined ? occurrenceRecord.occurrenceOrderIndex : occurrenceRecord.orderIndex,
+});
+
+const pushContextMismatchDiagnostic = ({ enrichmentDiagnostics, identityTuple, fieldName, sidecarValue, authoritativeOccurrenceValue }) => {
+  enrichmentDiagnostics.push({
+    reason: 'enrichment-context-mismatch',
+    identityTuple: toSafeIdentityTupleDiagnostic(identityTuple),
+    fieldName,
+    sidecarValue,
+    authoritativeOccurrenceValue,
+  });
+};
+
+const validateEnrichmentContextAgainstOccurrence = ({ record, identityTuple, occurrenceRecord, enrichmentDiagnostics }) => {
+  const authoritativeContext = toAuthoritativeOccurrenceContext(occurrenceRecord);
+
+  if (
+    record.parentOccurrenceAddress !== undefined &&
+    record.parentOccurrenceAddress !== authoritativeContext.parentOccurrenceAddress
+  ) {
+    pushContextMismatchDiagnostic({
+      enrichmentDiagnostics,
+      identityTuple,
+      fieldName: 'parentOccurrenceAddress',
+      sidecarValue: record.parentOccurrenceAddress,
+      authoritativeOccurrenceValue: authoritativeContext.parentOccurrenceAddress,
+    });
+    return false;
+  }
+
+  if (record.occurrenceDepth !== undefined && record.occurrenceDepth !== authoritativeContext.occurrenceDepth) {
+    pushContextMismatchDiagnostic({
+      enrichmentDiagnostics,
+      identityTuple,
+      fieldName: 'occurrenceDepth',
+      sidecarValue: record.occurrenceDepth,
+      authoritativeOccurrenceValue: authoritativeContext.occurrenceDepth,
+    });
+    return false;
+  }
+
+  if (
+    record.occurrenceOrderIndex !== undefined &&
+    record.occurrenceOrderIndex !== authoritativeContext.occurrenceOrderIndex
+  ) {
+    pushContextMismatchDiagnostic({
+      enrichmentDiagnostics,
+      identityTuple,
+      fieldName: 'occurrenceOrderIndex',
+      sidecarValue: record.occurrenceOrderIndex,
+      authoritativeOccurrenceValue: authoritativeContext.occurrenceOrderIndex,
+    });
+    return false;
+  }
+
+  return true;
+};
+
 const normalizeEnrichmentRecord = ({ record, identityTuple, enrichmentDiagnostics }) => {
   const addressingContext = {};
   if (record.parentOccurrenceAddress !== undefined) {
@@ -326,6 +392,9 @@ const toOccurrenceEvidence = (occurrenceRecord, identityTuple) => ({
   name: occurrenceRecord.name ?? occurrenceRecord.actualName ?? null,
   occurrenceType: occurrenceRecord.occurrenceType ?? null,
   addressPath: occurrenceRecord.addressPath ?? occurrenceRecord.occurrenceAddress ?? null,
+  parentAddressPath: occurrenceRecord.parentAddressPath ?? occurrenceRecord.parentOccurrenceAddress ?? null,
+  depth: occurrenceRecord.depth ?? occurrenceRecord.occurrenceDepth ?? null,
+  orderIndex: occurrenceRecord.orderIndex ?? occurrenceRecord.occurrenceOrderIndex ?? null,
 });
 
 const sortJoinEntries = (entries) =>
@@ -489,9 +558,16 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
       }
 
       const occurrenceContextEnrichment = normalizeEnrichmentRecord({ record, identityTuple, enrichmentDiagnostics });
-      if (occurrenceContextEnrichment) {
-        joinedEntry.occurrenceContextEnrichment = occurrenceContextEnrichment;
+      if (!occurrenceContextEnrichment) {
+        continue;
       }
+
+      const occurrenceRecord = joinedEntry.occurrenceRecord;
+      if (!validateEnrichmentContextAgainstOccurrence({ record, identityTuple, occurrenceRecord, enrichmentDiagnostics })) {
+        continue;
+      }
+
+      joinedEntry.occurrenceContextEnrichment = occurrenceContextEnrichment;
     }
   }
 

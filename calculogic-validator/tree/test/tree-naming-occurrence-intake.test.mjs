@@ -201,6 +201,9 @@ const addressedOccurrenceNamespace = {
       resolvedPath: 'src/alpha/shared.logic.ts',
       name: 'shared.logic.ts',
       occurrenceType: 'file',
+      parentAddressPath: null,
+      depth: 0,
+      orderIndex: 0,
     },
     {
       occurrenceAddress: 'A.2',
@@ -209,6 +212,9 @@ const addressedOccurrenceNamespace = {
       resolvedPath: 'src/beta/shared.logic.ts',
       name: 'shared.logic.ts',
       occurrenceType: 'file',
+      parentAddressPath: 'A',
+      depth: 1,
+      orderIndex: 1,
     },
   ],
 };
@@ -469,7 +475,7 @@ test('Tree v1 intake ignores versioned Naming enrichment sidecar and preserves p
           addressedSnapshotId: 'snapshot-001',
           occurrenceAddress: 'O.1',
           parentOccurrenceAddress: 'O',
-          occurrenceDepth: 2,
+          occurrenceDepth: 1,
           occurrenceOrderIndex: 1,
           disambiguationNotes: [{ code: 'role-like-folder-token', message: 'Role-like folder token: host', source: 'naming' }],
         },
@@ -559,7 +565,7 @@ test('Tree enrichment sidecar keeps same-family nested occurrences isolated by c
           addressedSnapshotId: 'snapshot-001',
           occurrenceAddress: 'A.2',
           parentOccurrenceAddress: 'A',
-          occurrenceDepth: 2,
+          occurrenceDepth: 1,
           occurrenceOrderIndex: 1,
         },
         {
@@ -567,7 +573,7 @@ test('Tree enrichment sidecar keeps same-family nested occurrences isolated by c
           addressedSnapshotId: 'snapshot-001',
           occurrenceAddress: 'A.1',
           parentOccurrenceAddress: null,
-          occurrenceDepth: 1,
+          occurrenceDepth: 0,
           occurrenceOrderIndex: 0,
         },
       ],
@@ -587,8 +593,8 @@ test('Tree enrichment sidecar keeps same-family nested occurrences isolated by c
       entry.occurrenceContextEnrichment.addressingContext,
     ]),
     [
-      ['A.1', 'shared-runtime', { parentOccurrenceAddress: null, occurrenceDepth: 1, occurrenceOrderIndex: 0 }],
-      ['A.2', 'shared-runtime', { parentOccurrenceAddress: 'A', occurrenceDepth: 2, occurrenceOrderIndex: 1 }],
+      ['A.1', 'shared-runtime', { parentOccurrenceAddress: null, occurrenceDepth: 0, occurrenceOrderIndex: 0 }],
+      ['A.2', 'shared-runtime', { parentOccurrenceAddress: 'A', occurrenceDepth: 1, occurrenceOrderIndex: 1 }],
     ],
   );
 });
@@ -617,4 +623,142 @@ test('Tree enrichment sidecar failures are isolated from v1 joins and path-keyed
       findingCodes(pathKeyedSemanticBridge),
     );
   }
+});
+
+test('Tree enrichment context mismatch rejects entire record and naming notes for parent depth and order', () => {
+  for (const { fieldName, sidecarPatch, authoritativeOccurrenceValue, sidecarValue } of [
+    { fieldName: 'parentOccurrenceAddress', sidecarPatch: { parentOccurrenceAddress: 'Z' }, authoritativeOccurrenceValue: null, sidecarValue: 'Z' },
+    { fieldName: 'occurrenceDepth', sidecarPatch: { occurrenceDepth: 1 }, authoritativeOccurrenceValue: 0, sidecarValue: 1 },
+    { fieldName: 'occurrenceOrderIndex', sidecarPatch: { occurrenceOrderIndex: 7 }, authoritativeOccurrenceValue: 0, sidecarValue: 7 },
+  ]) {
+    const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+      namingOccurrenceBridge: {
+        ...addressBridge,
+        occurrenceContextEnrichment: {
+          enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+          identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+          enrichedObservations: [
+            {
+              addressProfileId: 'tree-codebase',
+              addressedSnapshotId: 'snapshot-001',
+              occurrenceAddress: 'A.1',
+              parentOccurrenceAddress: null,
+              occurrenceDepth: 0,
+              occurrenceOrderIndex: 0,
+              disambiguationNotes: [{ code: 'should-not-attach', message: 'Should not attach.', source: 'naming' }],
+              evidenceLimitNotes: [{ code: 'should-not-attach', message: 'Should not attach.', source: 'naming' }],
+              ...sidecarPatch,
+            },
+          ],
+        },
+      },
+      addressedOccurrenceNamespace,
+    });
+
+    assert.equal(prepared.status, 'joined');
+    assert.equal(prepared.usedForCurrentTreeJoins, true);
+    assert.equal(prepared.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+    assert.deepEqual(prepared.enrichmentDiagnostics, [
+      {
+        reason: 'enrichment-context-mismatch',
+        identityTuple: {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.1',
+        },
+        fieldName,
+        sidecarValue,
+        authoritativeOccurrenceValue,
+      },
+    ]);
+  }
+});
+
+test('Tree enrichment accepts root null parent only when authoritative parent is null', () => {
+  const acceptedRoot = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      ...addressBridge,
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'A.1',
+            parentOccurrenceAddress: null,
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace,
+  });
+  const rejectedNested = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [{ ...addressBridge.observations[0], occurrenceAddress: 'A.2' }],
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'A.2',
+            parentOccurrenceAddress: null,
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(acceptedRoot.joinedEvidence[0].occurrenceContextEnrichment.addressingContext.parentOccurrenceAddress, null);
+  assert.equal(rejectedNested.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+  assert.equal(rejectedNested.enrichmentDiagnostics[0].reason, 'enrichment-context-mismatch');
+  assert.equal(rejectedNested.enrichmentDiagnostics[0].fieldName, 'parentOccurrenceAddress');
+});
+
+test('Tree enrichment permits omitted neutral fields and isolates mismatch to one same-family tuple', () => {
+  const sameFamilyBridge = {
+    bridgeContractVersion: 'naming-occurrence-bridge.v1',
+    observations: [
+      { ...addressBridge.observations[0], occurrenceAddress: 'A.1', path: 'src/alpha/shared.logic.ts' },
+      { ...addressBridge.observations[0], occurrenceAddress: 'A.2', path: 'src/beta/shared.logic.ts' },
+    ],
+    occurrenceContextEnrichment: {
+      enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+      identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+      enrichedObservations: [
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.1',
+          occurrenceDepth: 0,
+        },
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.2',
+          parentOccurrenceAddress: 'wrong-parent',
+          occurrenceDepth: 1,
+          occurrenceOrderIndex: 1,
+        },
+      ],
+    },
+  };
+
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: sameFamilyBridge,
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.joinedEvidence[0].identityTuple.occurrenceAddress, 'A.1');
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.addressingContext, { occurrenceDepth: 0 });
+  assert.equal(prepared.joinedEvidence[1].identityTuple.occurrenceAddress, 'A.2');
+  assert.equal(prepared.joinedEvidence[1].occurrenceContextEnrichment, undefined);
+  assert.equal(prepared.enrichmentDiagnostics.length, 1);
+  assert.equal(prepared.enrichmentDiagnostics[0].reason, 'enrichment-context-mismatch');
+  assert.equal(prepared.enrichmentDiagnostics[0].identityTuple.occurrenceAddress, 'A.2');
+  assert.deepEqual(findingCodes({ ...pathKeyedSemanticBridge, namingOccurrenceBridge: sameFamilyBridge }), findingCodes(pathKeyedSemanticBridge));
 });
