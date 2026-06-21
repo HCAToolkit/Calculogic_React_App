@@ -1000,8 +1000,53 @@ test('Tree enrichment rejects numeric-leading evidence limit note codes field-lo
     occurrenceOrderIndex: 5,
   });
   assert.deepEqual(enrichment.namingMetadata.disambiguationNotes, [
-    { code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' },
     { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+    { code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' },
   ]);
   assert.equal(Object.hasOwn(enrichment.namingMetadata, 'evidenceLimitNotes'), false);
+});
+
+test('Tree enrichment canonicalizes disambiguation notes by removing duplicates and sorting by code then message', () => {
+  const prepared = prepareFieldLocalCase({
+    ...baseA2EnrichmentRecord,
+    disambiguationNotes: [
+      { code: 'role-warning', message: 'Zulu message.', source: 'naming' },
+      { code: 'a1-warning', message: 'Middle message.', source: 'naming' },
+      { code: 'role-warning', message: 'Alpha message.', source: 'naming' },
+      { code: 'a1-warning', message: 'Middle message.', source: 'naming' },
+    ],
+  });
+
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.namingMetadata.disambiguationNotes, [
+    { code: 'a1-warning', message: 'Middle message.', source: 'naming' },
+    { code: 'role-warning', message: 'Alpha message.', source: 'naming' },
+    { code: 'role-warning', message: 'Zulu message.', source: 'naming' },
+  ]);
+});
+
+test('Tree enrichment canonicalizes evidence limit notes and keeps sibling invalid-note behavior field-local', () => {
+  const prepared = prepareFieldLocalCase({
+    ...baseA2EnrichmentRecord,
+    disambiguationNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+    evidenceLimitNotes: [
+      { code: 'source-limit', message: 'Zulu source.', source: 'naming' },
+      { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+      { code: 'source-limit', message: 'Alpha source.', source: 'naming' },
+      { code: 'source-limit', message: 'Alpha source.', source: 'naming' },
+    ],
+  });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'disambiguationNotes'), 1);
+  assert.deepEqual(enrichment.addressingContext, {
+    parentOccurrenceAddress: 'A',
+    occurrenceDepth: 2,
+    occurrenceOrderIndex: 5,
+  });
+  assert.equal(Object.hasOwn(enrichment.namingMetadata, 'disambiguationNotes'), false);
+  assert.deepEqual(enrichment.namingMetadata.evidenceLimitNotes, [
+    { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+    { code: 'source-limit', message: 'Alpha source.', source: 'naming' },
+    { code: 'source-limit', message: 'Zulu source.', source: 'naming' },
+  ]);
 });

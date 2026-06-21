@@ -188,6 +188,16 @@ const pushAuthoritativeContextMismatchDiagnostic = ({ enrichmentDiagnostics, fie
   });
 };
 
+const toNoteKey = (note) => `${note.code}\u0000${note.message}\u0000${note.source}`;
+
+const sortContractNotes = (notes) =>
+  notes.sort(
+    (left, right) =>
+      left.code.localeCompare(right.code) ||
+      left.message.localeCompare(right.message) ||
+      left.source.localeCompare(right.source),
+  );
+
 const normalizeContractNotes = ({ value, fieldName, identityTuple, enrichmentDiagnostics }) => {
   if (value === undefined) {
     return undefined;
@@ -198,7 +208,14 @@ const normalizeContractNotes = ({ value, fieldName, identityTuple, enrichmentDia
     return undefined;
   }
 
-  return value.map((note) => ({ code: note.code, message: note.message, source: note.source }));
+  const notesByKey = new Map(
+    value.map((note) => {
+      const normalizedNote = { code: note.code, message: note.message, source: note.source };
+      return [toNoteKey(normalizedNote), normalizedNote];
+    }),
+  );
+
+  return sortContractNotes([...notesByKey.values()]);
 };
 
 const validateEnrichmentEnvelope = (payload) => {
