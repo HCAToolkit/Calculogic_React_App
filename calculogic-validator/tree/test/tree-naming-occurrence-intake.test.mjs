@@ -487,3 +487,643 @@ test('Tree v1 intake ignores versioned Naming enrichment sidecar and preserves p
   assert.equal(intake.usedForCurrentTreeJoins, false);
   assert.deepEqual(withEnrichment, findingCodes(pathKeyedSemanticBridge));
 });
+
+test('Tree address join attaches valid enrichment to exact occurrence tuple without changing join readiness', () => {
+  const bridge = {
+    ...addressBridge,
+    occurrenceContextEnrichment: {
+      enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+      identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+      enrichedObservations: [
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.1',
+          parentOccurrenceAddress: null,
+          occurrenceDepth: 0,
+          occurrenceOrderIndex: 0,
+          disambiguationNotes: [{ code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' }],
+          evidenceLimitNotes: [{ code: 'limited-context', message: 'Limited deterministic context.', source: 'naming' }],
+        },
+      ],
+    },
+  };
+
+  const withoutEnrichment = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: addressBridge,
+    addressedOccurrenceNamespace,
+  });
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: bridge,
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, withoutEnrichment.status);
+  assert.equal(prepared.usedForCurrentTreeJoins, withoutEnrichment.usedForCurrentTreeJoins);
+  assert.deepEqual(prepared.diagnostics, withoutEnrichment.diagnostics);
+  assert.deepEqual(prepared.skippedJoins, withoutEnrichment.skippedJoins);
+  assert.deepEqual(prepared.enrichmentDiagnostics, []);
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment, {
+    evidenceType: 'tree-local-naming-occurrence-context-enrichment',
+    sourceIdentityTuple: {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceAddress: 'A.1',
+    },
+    addressingContext: {
+      parentOccurrenceAddress: null,
+      occurrenceDepth: 0,
+      occurrenceOrderIndex: 0,
+    },
+    namingMetadata: {
+      disambiguationNotes: [{ code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' }],
+      evidenceLimitNotes: [{ code: 'limited-context', message: 'Limited deterministic context.', source: 'naming' }],
+    },
+  });
+  assert.equal(prepared.joinedEvidence[0].namingObservation.semanticFamily, 'shared-runtime');
+});
+
+test('Tree enrichment sidecar keeps same-family nested occurrences isolated by canonical tuple', () => {
+  const sameFamilyBridge = {
+    bridgeContractVersion: 'naming-occurrence-bridge.v1',
+    observations: [
+      { ...addressBridge.observations[0], occurrenceAddress: 'A.1', path: 'src/alpha/shared.logic.ts' },
+      { ...addressBridge.observations[0], occurrenceAddress: 'A.2', path: 'src/beta/shared.logic.ts' },
+    ],
+    occurrenceContextEnrichment: {
+      enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+      identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+      enrichedObservations: [
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.2',
+          parentOccurrenceAddress: 'A',
+          occurrenceDepth: 2,
+          occurrenceOrderIndex: 1,
+        },
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.1',
+          parentOccurrenceAddress: null,
+          occurrenceDepth: 1,
+          occurrenceOrderIndex: 0,
+        },
+      ],
+    },
+  };
+
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: sameFamilyBridge,
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'joined');
+  assert.deepEqual(
+    prepared.joinedEvidence.map((entry) => [
+      entry.identityTuple.occurrenceAddress,
+      entry.namingObservation.semanticFamily,
+      entry.occurrenceContextEnrichment.addressingContext,
+    ]),
+    [
+      ['A.1', 'shared-runtime', { parentOccurrenceAddress: null, occurrenceDepth: 1, occurrenceOrderIndex: 0 }],
+      ['A.2', 'shared-runtime', { parentOccurrenceAddress: 'A', occurrenceDepth: 2, occurrenceOrderIndex: 1 }],
+    ],
+  );
+});
+
+test('Tree enrichment sidecar failures are isolated from v1 joins and path-keyed fallback', () => {
+  const cases = [
+    { occurrenceContextEnrichment: { enrichmentContractVersion: 'other', identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'], enrichedObservations: [] }, reason: 'unsupported-enrichment-sidecar-version' },
+    { occurrenceContextEnrichment: { enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1', identityTupleFields: ['addressedSnapshotId', 'addressProfileId', 'occurrenceAddress'], enrichedObservations: [] }, reason: 'malformed-enrichment-sidecar' },
+    { occurrenceContextEnrichment: { enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1', identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'], enrichedObservations: [{ addressProfileId: '', addressedSnapshotId: 'snapshot-001', occurrenceAddress: 'A.1' }] }, reason: 'invalid-enrichment-identity-tuple' },
+    { occurrenceContextEnrichment: { enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1', identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'], enrichedObservations: [{ addressProfileId: 'tree-codebase', addressedSnapshotId: 'snapshot-001', occurrenceAddress: 'A.1' }, { addressProfileId: 'tree-codebase', addressedSnapshotId: 'snapshot-001', occurrenceAddress: 'A.1' }] }, reason: 'duplicate-enrichment-identity-tuple' },
+    { occurrenceContextEnrichment: { enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1', identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'], enrichedObservations: [{ addressProfileId: 'tree-codebase', addressedSnapshotId: 'snapshot-001', occurrenceAddress: 'A.999' }] }, reason: 'unmatched-enrichment-identity-tuple' },
+    { occurrenceContextEnrichment: { enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1', identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'], enrichedObservations: [{ addressProfileId: 'tree-codebase', addressedSnapshotId: 'snapshot-001', occurrenceAddress: 'A.1', occurrenceDepth: -1 }] }, reason: 'invalid-enrichment-field' },
+  ];
+
+  for (const { occurrenceContextEnrichment, reason } of cases) {
+    const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+      namingOccurrenceBridge: { ...addressBridge, occurrenceContextEnrichment },
+      addressedOccurrenceNamespace,
+    });
+    assert.equal(prepared.status, 'joined');
+    assert.equal(prepared.usedForCurrentTreeJoins, true);
+    assert.equal(prepared.joinedEvidence.length, 1);
+    assert.equal(prepared.enrichmentDiagnostics.some((diagnostic) => diagnostic.reason === reason), true);
+    assert.deepEqual(
+      findingCodes({ ...pathKeyedSemanticBridge, namingOccurrenceBridge: { ...addressBridge, occurrenceContextEnrichment } }),
+      findingCodes(pathKeyedSemanticBridge),
+    );
+  }
+});
+
+const authoritativeOccurrenceNamespace = {
+  addressProfileId: 'tree-codebase',
+  addressedSnapshotId: 'snapshot-001',
+  occurrenceRecords: [
+    {
+      occurrenceAddress: 'A.1',
+      addressPath: 'A.1',
+      parentAddressPath: null,
+      depth: 1,
+      orderIndex: 0,
+      path: 'src/alpha/shared.logic.ts',
+      resolvedPath: 'src/alpha/shared.logic.ts',
+      name: 'shared.logic.ts',
+      occurrenceType: 'file',
+    },
+    {
+      occurrenceAddress: 'A.2',
+      addressPath: 'A.2',
+      parentAddressPath: 'A',
+      depth: 2,
+      orderIndex: 5,
+      path: 'src/beta/shared.logic.ts',
+      resolvedPath: 'src/beta/shared.logic.ts',
+      name: 'shared.logic.ts',
+      occurrenceType: 'file',
+    },
+  ],
+};
+
+const sameFamilyTwoObservationBridge = {
+  bridgeContractVersion: 'naming-occurrence-bridge.v1',
+  observations: [
+    { ...addressBridge.observations[0], occurrenceAddress: 'A.1', path: 'src/alpha/shared.logic.ts' },
+    { ...addressBridge.observations[0], occurrenceAddress: 'A.2', path: 'src/beta/shared.logic.ts' },
+  ],
+};
+
+const enrichedBridgeForFieldLocalCase = (record) => ({
+  ...sameFamilyTwoObservationBridge,
+  observations: [sameFamilyTwoObservationBridge.observations.find((observation) => observation.occurrenceAddress === record.occurrenceAddress)],
+  occurrenceContextEnrichment: {
+    enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+    identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+    enrichedObservations: [record],
+  },
+});
+
+const baseA2EnrichmentRecord = {
+  addressProfileId: 'tree-codebase',
+  addressedSnapshotId: 'snapshot-001',
+  occurrenceAddress: 'A.2',
+  parentOccurrenceAddress: 'A',
+  occurrenceDepth: 2,
+  occurrenceOrderIndex: 5,
+  disambiguationNotes: [{ code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' }],
+  evidenceLimitNotes: [{ code: 'source-limit', message: 'Source is bounded.', source: 'naming' }],
+};
+
+const prepareFieldLocalCase = (record) => prepareTreeNamingOccurrenceAddressJoinEvidence({
+  namingOccurrenceBridge: enrichedBridgeForFieldLocalCase(record),
+  addressedOccurrenceNamespace: authoritativeOccurrenceNamespace,
+});
+
+const fieldDiagnosticCount = (prepared, fieldName) =>
+  prepared.enrichmentDiagnostics.filter(
+    (diagnostic) => diagnostic.reason === 'invalid-enrichment-field' && diagnostic.fieldName === fieldName,
+  ).length;
+
+test('Tree enrichment omits invalid negative occurrenceDepth while preserving valid sibling fields', () => {
+  const prepared = prepareFieldLocalCase({ ...baseA2EnrichmentRecord, occurrenceDepth: -1 });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceDepth'), 1);
+  assert.deepEqual(enrichment.addressingContext, { parentOccurrenceAddress: 'A', occurrenceOrderIndex: 5 });
+  assert.deepEqual(enrichment.namingMetadata.evidenceLimitNotes, baseA2EnrichmentRecord.evidenceLimitNotes);
+  assert.deepEqual(enrichment.namingMetadata.disambiguationNotes, baseA2EnrichmentRecord.disambiguationNotes);
+});
+
+test('Tree enrichment omits non-integer occurrenceOrderIndex while preserving valid sibling fields', () => {
+  const prepared = prepareFieldLocalCase({ ...baseA2EnrichmentRecord, occurrenceOrderIndex: 1.5 });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceOrderIndex'), 1);
+  assert.deepEqual(enrichment.addressingContext, { parentOccurrenceAddress: 'A', occurrenceDepth: 2 });
+  assert.deepEqual(enrichment.namingMetadata.evidenceLimitNotes, baseA2EnrichmentRecord.evidenceLimitNotes);
+  assert.deepEqual(enrichment.namingMetadata.disambiguationNotes, baseA2EnrichmentRecord.disambiguationNotes);
+});
+
+test('Tree enrichment omits malformed parentOccurrenceAddress while preserving valid sibling fields', () => {
+  const prepared = prepareFieldLocalCase({ ...baseA2EnrichmentRecord, parentOccurrenceAddress: '' });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'parentOccurrenceAddress'), 1);
+  assert.deepEqual(enrichment.addressingContext, { occurrenceDepth: 2, occurrenceOrderIndex: 5 });
+  assert.deepEqual(enrichment.namingMetadata.evidenceLimitNotes, baseA2EnrichmentRecord.evidenceLimitNotes);
+  assert.deepEqual(enrichment.namingMetadata.disambiguationNotes, baseA2EnrichmentRecord.disambiguationNotes);
+});
+
+test('Tree enrichment omits malformed disambiguationNotes while preserving neutral context and evidence limits', () => {
+  const prepared = prepareFieldLocalCase({ ...baseA2EnrichmentRecord, disambiguationNotes: [{ code: 'bad', message: '', source: 'naming' }] });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'disambiguationNotes'), 1);
+  assert.deepEqual(enrichment.addressingContext, { parentOccurrenceAddress: 'A', occurrenceDepth: 2, occurrenceOrderIndex: 5 });
+  assert.equal(Object.hasOwn(enrichment.namingMetadata, 'disambiguationNotes'), false);
+  assert.deepEqual(enrichment.namingMetadata.evidenceLimitNotes, baseA2EnrichmentRecord.evidenceLimitNotes);
+});
+
+test('Tree enrichment omits malformed evidenceLimitNotes while preserving neutral context and disambiguation notes', () => {
+  const prepared = prepareFieldLocalCase({ ...baseA2EnrichmentRecord, evidenceLimitNotes: [{ code: 'source-limit', message: 'Source is bounded.', source: 'tree' }] });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'evidenceLimitNotes'), 1);
+  assert.deepEqual(enrichment.addressingContext, { parentOccurrenceAddress: 'A', occurrenceDepth: 2, occurrenceOrderIndex: 5 });
+  assert.deepEqual(enrichment.namingMetadata.disambiguationNotes, baseA2EnrichmentRecord.disambiguationNotes);
+  assert.equal(Object.hasOwn(enrichment.namingMetadata, 'evidenceLimitNotes'), false);
+});
+
+test('Tree enrichment invalid field diagnostics identify tuple and field deterministically', () => {
+  const prepared = prepareFieldLocalCase({ ...baseA2EnrichmentRecord, occurrenceDepth: 1.5 });
+
+  assert.deepEqual(prepared.enrichmentDiagnostics, [
+    {
+      reason: 'invalid-enrichment-field',
+      fieldName: 'occurrenceDepth',
+      identityTuple: {
+        addressProfileId: 'tree-codebase',
+        addressedSnapshotId: 'snapshot-001',
+        occurrenceAddress: 'A.2',
+      },
+    },
+  ]);
+});
+
+test('Tree enrichment rejects whole record when valid parent depth or order conflicts with authoritative occurrence context', () => {
+  for (const conflictingField of [
+    { parentOccurrenceAddress: 'B' },
+    { occurrenceDepth: 3 },
+    { occurrenceOrderIndex: 6 },
+  ]) {
+    const prepared = prepareFieldLocalCase({ ...baseA2EnrichmentRecord, ...conflictingField });
+
+    assert.equal(prepared.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+    assert.equal(
+      prepared.enrichmentDiagnostics.some((diagnostic) => diagnostic.reason === 'authoritative-enrichment-context-mismatch'),
+      true,
+    );
+  }
+});
+
+test('Tree enrichment field-local omission on one same-family occurrence does not affect another tuple', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      ...sameFamilyTwoObservationBridge,
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            ...baseA2EnrichmentRecord,
+            occurrenceDepth: -1,
+          },
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'A.1',
+            parentOccurrenceAddress: null,
+            occurrenceDepth: 1,
+            occurrenceOrderIndex: 0,
+            evidenceLimitNotes: [{ code: 'alpha-limit', message: 'Alpha bounded.', source: 'naming' }],
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace: authoritativeOccurrenceNamespace,
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceDepth'), 1);
+  assert.deepEqual(
+    prepared.joinedEvidence.map((entry) => [
+      entry.identityTuple.occurrenceAddress,
+      entry.occurrenceContextEnrichment.addressingContext,
+      entry.occurrenceContextEnrichment.namingMetadata,
+    ]),
+    [
+      [
+        'A.1',
+        { parentOccurrenceAddress: null, occurrenceDepth: 1, occurrenceOrderIndex: 0 },
+        { evidenceLimitNotes: [{ code: 'alpha-limit', message: 'Alpha bounded.', source: 'naming' }] },
+      ],
+      [
+        'A.2',
+        { parentOccurrenceAddress: 'A', occurrenceOrderIndex: 5 },
+        {
+          disambiguationNotes: baseA2EnrichmentRecord.disambiguationNotes,
+          evidenceLimitNotes: baseA2EnrichmentRecord.evidenceLimitNotes,
+        },
+      ],
+    ],
+  );
+});
+
+test('Tree enrichment preserves explicit root parent null as authoritative during parent comparison', () => {
+  const rootNamespace = {
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceRecords: [
+      {
+        occurrenceAddress: 'R',
+        addressPath: 'R',
+        parentOccurrenceAddress: null,
+        path: 'src/root.logic.ts',
+        resolvedPath: 'src/root.logic.ts',
+        name: 'root.logic.ts',
+        occurrenceType: 'file',
+      },
+    ],
+  };
+  const rootObservation = {
+    ...addressBridge.observations[0],
+    occurrenceAddress: 'R',
+    path: 'src/root.logic.ts',
+  };
+
+  const conflicting = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [rootObservation],
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'R',
+            parentOccurrenceAddress: 'B',
+            evidenceLimitNotes: [{ code: 'root-context', message: 'Root context.', source: 'naming' }],
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace: rootNamespace,
+  });
+
+  assert.equal(conflicting.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+  assert.deepEqual(conflicting.enrichmentDiagnostics, [
+    {
+      reason: 'authoritative-enrichment-context-mismatch',
+      fieldName: 'parentOccurrenceAddress',
+      identityTuple: {
+        addressProfileId: 'tree-codebase',
+        addressedSnapshotId: 'snapshot-001',
+        occurrenceAddress: 'R',
+      },
+    },
+  ]);
+
+  const matching = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [rootObservation],
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'R',
+            parentOccurrenceAddress: null,
+            evidenceLimitNotes: [{ code: 'root-context', message: 'Root context.', source: 'naming' }],
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace: rootNamespace,
+  });
+
+  assert.deepEqual(matching.enrichmentDiagnostics, []);
+  assert.deepEqual(matching.joinedEvidence[0].occurrenceContextEnrichment.addressingContext, {
+    parentOccurrenceAddress: null,
+  });
+  assert.deepEqual(matching.joinedEvidence[0].occurrenceContextEnrichment.namingMetadata, {
+    evidenceLimitNotes: [{ code: 'root-context', message: 'Root context.', source: 'naming' }],
+  });
+});
+
+test('Tree enrichment keeps no-authoritative-parent-alias compatibility while retaining invalid field-local behavior', () => {
+  const noParentAliasNamespace = {
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceRecords: [
+      {
+        occurrenceAddress: 'N',
+        addressPath: 'N',
+        path: 'src/no-parent-alias.logic.ts',
+        resolvedPath: 'src/no-parent-alias.logic.ts',
+        name: 'no-parent-alias.logic.ts',
+        occurrenceType: 'file',
+      },
+    ],
+  };
+
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: {
+      bridgeContractVersion: 'naming-occurrence-bridge.v1',
+      observations: [
+        {
+          ...addressBridge.observations[0],
+          occurrenceAddress: 'N',
+          path: 'src/no-parent-alias.logic.ts',
+        },
+      ],
+      occurrenceContextEnrichment: {
+        enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+        identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+        enrichedObservations: [
+          {
+            addressProfileId: 'tree-codebase',
+            addressedSnapshotId: 'snapshot-001',
+            occurrenceAddress: 'N',
+            parentOccurrenceAddress: 'B',
+            occurrenceDepth: -1,
+            occurrenceOrderIndex: 2,
+            evidenceLimitNotes: [{ code: 'no-parent-authority', message: 'No parent authority.', source: 'naming' }],
+          },
+        ],
+      },
+    },
+    addressedOccurrenceNamespace: noParentAliasNamespace,
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceDepth'), 1);
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.addressingContext, {
+    parentOccurrenceAddress: 'B',
+    occurrenceOrderIndex: 2,
+  });
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.namingMetadata, {
+    evidenceLimitNotes: [{ code: 'no-parent-authority', message: 'No parent authority.', source: 'naming' }],
+  });
+});
+
+test('Tree enrichment rejects numeric-leading disambiguation note codes field-locally', () => {
+  const prepared = prepareFieldLocalCase({
+    ...baseA2EnrichmentRecord,
+    disambiguationNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+    evidenceLimitNotes: [{ code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' }],
+  });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'disambiguationNotes'), 1);
+  assert.deepEqual(enrichment.addressingContext, {
+    parentOccurrenceAddress: 'A',
+    occurrenceDepth: 2,
+    occurrenceOrderIndex: 5,
+  });
+  assert.equal(Object.hasOwn(enrichment.namingMetadata, 'disambiguationNotes'), false);
+  assert.deepEqual(enrichment.namingMetadata.evidenceLimitNotes, [
+    { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+  ]);
+});
+
+test('Tree enrichment rejects numeric-leading evidence limit note codes field-locally', () => {
+  const prepared = prepareFieldLocalCase({
+    ...baseA2EnrichmentRecord,
+    disambiguationNotes: [
+      { code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' },
+      { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+    ],
+    evidenceLimitNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+  });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'evidenceLimitNotes'), 1);
+  assert.deepEqual(enrichment.addressingContext, {
+    parentOccurrenceAddress: 'A',
+    occurrenceDepth: 2,
+    occurrenceOrderIndex: 5,
+  });
+  assert.deepEqual(enrichment.namingMetadata.disambiguationNotes, [
+    { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+    { code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' },
+  ]);
+  assert.equal(Object.hasOwn(enrichment.namingMetadata, 'evidenceLimitNotes'), false);
+});
+
+test('Tree enrichment canonicalizes disambiguation notes by removing duplicates and sorting by code then message', () => {
+  const prepared = prepareFieldLocalCase({
+    ...baseA2EnrichmentRecord,
+    disambiguationNotes: [
+      { code: 'role-warning', message: 'Zulu message.', source: 'naming' },
+      { code: 'a1-warning', message: 'Middle message.', source: 'naming' },
+      { code: 'role-warning', message: 'Alpha message.', source: 'naming' },
+      { code: 'a1-warning', message: 'Middle message.', source: 'naming' },
+    ],
+  });
+
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.namingMetadata.disambiguationNotes, [
+    { code: 'a1-warning', message: 'Middle message.', source: 'naming' },
+    { code: 'role-warning', message: 'Alpha message.', source: 'naming' },
+    { code: 'role-warning', message: 'Zulu message.', source: 'naming' },
+  ]);
+});
+
+test('Tree enrichment canonicalizes evidence limit notes and keeps sibling invalid-note behavior field-local', () => {
+  const prepared = prepareFieldLocalCase({
+    ...baseA2EnrichmentRecord,
+    disambiguationNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+    evidenceLimitNotes: [
+      { code: 'source-limit', message: 'Zulu source.', source: 'naming' },
+      { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+      { code: 'source-limit', message: 'Alpha source.', source: 'naming' },
+      { code: 'source-limit', message: 'Alpha source.', source: 'naming' },
+    ],
+  });
+  const enrichment = prepared.joinedEvidence[0].occurrenceContextEnrichment;
+
+  assert.equal(fieldDiagnosticCount(prepared, 'disambiguationNotes'), 1);
+  assert.deepEqual(enrichment.addressingContext, {
+    parentOccurrenceAddress: 'A',
+    occurrenceDepth: 2,
+    occurrenceOrderIndex: 5,
+  });
+  assert.equal(Object.hasOwn(enrichment.namingMetadata, 'disambiguationNotes'), false);
+  assert.deepEqual(enrichment.namingMetadata.evidenceLimitNotes, [
+    { code: 'a1-warning', message: 'Letter-leading code with digit.', source: 'naming' },
+    { code: 'source-limit', message: 'Alpha source.', source: 'naming' },
+    { code: 'source-limit', message: 'Zulu source.', source: 'naming' },
+  ]);
+});
+
+test('Tree enrichment skips empty wrapper when only invalid occurrenceDepth remains', () => {
+  const prepared = prepareFieldLocalCase({
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.2',
+    occurrenceDepth: -1,
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceDepth'), 1);
+  assert.equal(prepared.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+  assert.equal(prepared.status, 'joined');
+  assert.equal(prepared.usedForCurrentTreeJoins, true);
+});
+
+test('Tree enrichment skips empty wrapper when only malformed disambiguationNotes remain', () => {
+  const prepared = prepareFieldLocalCase({
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.2',
+    disambiguationNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'disambiguationNotes'), 1);
+  assert.equal(prepared.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+});
+
+test('Tree enrichment skips empty wrapper for multiple invalid optional fields while retaining diagnostics', () => {
+  const prepared = prepareFieldLocalCase({
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.2',
+    occurrenceDepth: -1,
+    occurrenceOrderIndex: 1.5,
+    parentOccurrenceAddress: '',
+    evidenceLimitNotes: [{ code: '1-warning', message: 'Numeric-leading code.', source: 'naming' }],
+  });
+
+  assert.equal(prepared.joinedEvidence[0].occurrenceContextEnrichment, undefined);
+  assert.deepEqual(
+    prepared.enrichmentDiagnostics.map((diagnostic) => [diagnostic.reason, diagnostic.fieldName]),
+    [
+      ['invalid-enrichment-field', 'evidenceLimitNotes'],
+      ['invalid-enrichment-field', 'occurrenceDepth'],
+      ['invalid-enrichment-field', 'occurrenceOrderIndex'],
+      ['invalid-enrichment-field', 'parentOccurrenceAddress'],
+    ],
+  );
+});
+
+test('Tree enrichment keeps partial valid metadata when sibling field validation empties addressing context', () => {
+  const prepared = prepareFieldLocalCase({
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.2',
+    occurrenceDepth: -1,
+    evidenceLimitNotes: [{ code: 'source-limit', message: 'Source is bounded.', source: 'naming' }],
+  });
+
+  assert.equal(fieldDiagnosticCount(prepared, 'occurrenceDepth'), 1);
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.addressingContext, {});
+  assert.deepEqual(prepared.joinedEvidence[0].occurrenceContextEnrichment.namingMetadata, {
+    evidenceLimitNotes: [{ code: 'source-limit', message: 'Source is bounded.', source: 'naming' }],
+  });
+});
+
+test('Tree enrichment absent sidecar remains unchanged without empty attachment or enrichment diagnostics', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: addressBridge,
+    addressedOccurrenceNamespace,
+  });
+
+  assert.equal(prepared.status, 'joined');
+  assert.equal(prepared.usedForCurrentTreeJoins, true);
+  assert.equal(Object.hasOwn(prepared.joinedEvidence[0], 'occurrenceContextEnrichment'), false);
+  assert.deepEqual(prepared.enrichmentDiagnostics, []);
+});
