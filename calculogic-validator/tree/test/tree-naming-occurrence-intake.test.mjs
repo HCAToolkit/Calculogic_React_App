@@ -456,3 +456,34 @@ test('Tree address join exposes malformed occurrence records even when another r
     true,
   );
 });
+
+test('Tree v1 intake ignores versioned Naming enrichment sidecar and preserves path fallback findings', () => {
+  const enrichedOccurrenceBridge = {
+    ...occurrenceBridge,
+    occurrenceContextEnrichment: {
+      enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+      identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+      enrichedObservations: [
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'O.1',
+          parentOccurrenceAddress: 'O',
+          occurrenceDepth: 2,
+          occurrenceOrderIndex: 1,
+          disambiguationNotes: [{ code: 'role-like-folder-token', message: 'Role-like folder token: host', source: 'naming' }],
+        },
+      ],
+    },
+  };
+
+  const intake = prepareTreeNamingOccurrenceBridgeIntake({ namingOccurrenceBridge: enrichedOccurrenceBridge });
+  const withEnrichment = findingCodes({
+    ...pathKeyedSemanticBridge,
+    namingOccurrenceBridge: enrichedOccurrenceBridge,
+  });
+
+  assert.equal(intake.status, 'recognized-future-evidence-only');
+  assert.equal(intake.usedForCurrentTreeJoins, false);
+  assert.deepEqual(withEnrichment, findingCodes(pathKeyedSemanticBridge));
+});

@@ -1,4 +1,5 @@
 const BRIDGE_CONTRACT_VERSION = 'naming-occurrence-bridge.v1';
+const ENRICHMENT_SIDECAR_VERSION = 'naming-occurrence-bridge-enrichment.v1';
 const BRIDGE_SOURCE = 'calculogic-validator/naming';
 const BRIDGE_PRODUCER_ID = 'naming-semantic-family-occurrence-bridge';
 
@@ -9,12 +10,25 @@ const NAMING_SEMANTIC_FIELDS = [
   'familySubgroup',
   'ambiguityFlags',
   'splitFamilyFlags',
+  'disambiguation',
 ];
 
 const toOptionalNonEmptyString = (value) => (typeof value === 'string' && value.length > 0 ? value : null);
 
 const cloneStringArray = (value) =>
   Array.isArray(value) ? value.filter((item) => typeof item === 'string' && item.length > 0) : null;
+
+const toSortedUniqueStrings = (value) =>
+  Array.isArray(value)
+    ? Array.from(new Set(value.filter((item) => typeof item === 'string' && item.length > 0))).sort((left, right) =>
+        left.localeCompare(right),
+      )
+    : null;
+
+const toOptionalNonNegativeInteger = (value) =>
+  Number.isInteger(value) && value >= 0 ? value : null;
+
+const isPlainObject = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
 const toPathKey = (value) => toOptionalNonEmptyString(value);
 
@@ -45,6 +59,23 @@ const copyNamingSemanticPayload = (observation) => {
       const clonedFlags = cloneStringArray(observation[field]);
       if (clonedFlags) {
         payload[field] = clonedFlags;
+      }
+      continue;
+    }
+
+    if (field === 'disambiguation') {
+      if (isPlainObject(observation.disambiguation)) {
+        payload.disambiguation = {
+          ...(toSortedUniqueStrings(observation.disambiguation.roleLikeFolderTokens)
+            ? { roleLikeFolderTokens: toSortedUniqueStrings(observation.disambiguation.roleLikeFolderTokens) }
+            : {}),
+          ...(toSortedUniqueStrings(observation.disambiguation.roleLikeSemanticTokens)
+            ? { roleLikeSemanticTokens: toSortedUniqueStrings(observation.disambiguation.roleLikeSemanticTokens) }
+            : {}),
+        };
+        if (Object.keys(payload.disambiguation).length === 0) {
+          delete payload.disambiguation;
+        }
       }
       continue;
     }
@@ -94,6 +125,129 @@ const toAddressAttachedObservation = ({
   };
 };
 
+
+const isKebabCaseString = (value) =>
+  typeof value === 'string' && /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u.test(value);
+
+const sortContractNotes = (notes) =>
+  Array.from(
+    new Map(
+      notes
+        .filter(
+          (note) =>
+            isPlainObject(note) &&
+            isKebabCaseString(note.code) &&
+            toOptionalNonEmptyString(note.message) &&
+            note.source === 'naming',
+        )
+        .map((note) => [
+          `${note.code}\u0000${note.message}\u0000${note.source}`,
+          { code: note.code, message: note.message, source: 'naming' },
+        ]),
+    ).values(),
+  ).sort(
+    (left, right) =>
+      left.code.localeCompare(right.code) ||
+      left.message.localeCompare(right.message) ||
+      left.source.localeCompare(right.source),
+  );
+
+const toDisambiguationNotes = (disambiguation) => {
+  if (!isPlainObject(disambiguation)) {
+    return [];
+  }
+
+  const roleLikeFolderTokens = toSortedUniqueStrings(disambiguation.roleLikeFolderTokens);
+  const roleLikeSemanticTokens = toSortedUniqueStrings(disambiguation.roleLikeSemanticTokens);
+
+  return sortContractNotes([
+    ...(roleLikeFolderTokens?.map((token) => ({
+      code: 'role-like-folder-token',
+      message: `Role-like folder token: ${token}`,
+      source: 'naming',
+    })) ?? []),
+    ...(roleLikeSemanticTokens?.map((token) => ({
+      code: 'role-like-semantic-token',
+      message: `Role-like semantic token: ${token}`,
+      source: 'naming',
+    })) ?? []),
+  ]);
+};
+
+const toEvidenceLimitNote = (note) => {
+  if (!isPlainObject(note)) {
+    return null;
+  }
+
+  if (isKebabCaseString(note.code) && toOptionalNonEmptyString(note.message) && note.source === 'naming') {
+    return { code: note.code, message: note.message, source: 'naming' };
+  }
+
+  if (isKebabCaseString(note.noteType)) {
+    const detail = toOptionalNonEmptyString(note.detail);
+    return {
+      code: note.noteType,
+      message: detail ?? note.noteType,
+      source: 'naming',
+    };
+  }
+
+  return null;
+};
+
+const toNamingMetadataNotes = (semanticObservation) => {
+  const notes = {};
+  const disambiguationNotes = toDisambiguationNotes(semanticObservation.disambiguation);
+
+  if (disambiguationNotes.length > 0) {
+    notes.disambiguationNotes = disambiguationNotes;
+  }
+
+  const evidenceLimitNotes = Array.isArray(semanticObservation.evidenceLimitNotes)
+    ? sortContractNotes(semanticObservation.evidenceLimitNotes.map(toEvidenceLimitNote).filter(Boolean))
+    : [];
+
+  if (evidenceLimitNotes.length > 0) {
+    notes.evidenceLimitNotes = evidenceLimitNotes;
+  }
+
+  return notes;
+};
+
+const toEnrichmentRecord = ({ observation, semanticObservation, occurrenceRecord }) => {
+  const enrichment = {
+    addressProfileId: observation.addressProfileId,
+    addressedSnapshotId: observation.addressedSnapshotId,
+    occurrenceAddress: observation.occurrenceAddress,
+  };
+
+  const parentOccurrenceAddressSource = occurrenceRecord.parentOccurrenceAddress ?? occurrenceRecord.parentAddressPath;
+  if (parentOccurrenceAddressSource === null) {
+    enrichment.parentOccurrenceAddress = null;
+  } else {
+    const parentOccurrenceAddress = toOptionalNonEmptyString(parentOccurrenceAddressSource);
+    if (parentOccurrenceAddress) {
+      enrichment.parentOccurrenceAddress = parentOccurrenceAddress;
+    }
+  }
+
+  const occurrenceDepth = toOptionalNonNegativeInteger(occurrenceRecord.occurrenceDepth ?? occurrenceRecord.depth);
+  if (occurrenceDepth !== null) {
+    enrichment.occurrenceDepth = occurrenceDepth;
+  }
+
+  const occurrenceOrderIndex = toOptionalNonNegativeInteger(
+    occurrenceRecord.occurrenceOrderIndex ?? occurrenceRecord.orderIndex,
+  );
+  if (occurrenceOrderIndex !== null) {
+    enrichment.occurrenceOrderIndex = occurrenceOrderIndex;
+  }
+
+  Object.assign(enrichment, toNamingMetadataNotes(semanticObservation));
+
+  return Object.keys(enrichment).length > 3 ? enrichment : null;
+};
+
 const toMissingIdentityDiagnostic = ({ semanticObservation, reason }) => ({
   diagnosticType: 'missing-occurrence-identity',
   reason,
@@ -140,6 +294,7 @@ export const createNamingOccurrenceBridgePayload = ({
   const occurrenceByPath = buildOccurrenceByPath(addressedOccurrenceNamespace.occurrenceRecords);
 
   const observations = [];
+  const enrichedObservations = [];
   const diagnostics = toInvalidAddressedNamespaceDiagnostics({ addressProfileId, addressedSnapshotId });
   const hasValidAddressedNamespace = diagnostics.length === 0;
 
@@ -174,6 +329,11 @@ export const createNamingOccurrenceBridgePayload = ({
       }
 
       observations.push(observation);
+
+      const enrichedObservation = toEnrichmentRecord({ observation, semanticObservation, occurrenceRecord });
+      if (enrichedObservation) {
+        enrichedObservations.push(enrichedObservation);
+      }
     }
   }
 
@@ -200,6 +360,8 @@ export const createNamingOccurrenceBridgePayload = ({
         (diagnostic) => diagnostic.diagnosticType === 'missing-occurrence-identity',
       ).length,
       totalDiagnosticCount: diagnostics.length,
+      enrichmentSidecarVersion: ENRICHMENT_SIDECAR_VERSION,
+      enrichmentObservationCount: enrichedObservations.length,
     },
     observations: observations.sort((left, right) =>
       left.addressProfileId.localeCompare(right.addressProfileId) ||
@@ -207,6 +369,20 @@ export const createNamingOccurrenceBridgePayload = ({
       left.occurrenceAddress.localeCompare(right.occurrenceAddress) ||
       left.repoRelativePath.localeCompare(right.repoRelativePath),
     ),
+    ...(enrichedObservations.length > 0
+      ? {
+          occurrenceContextEnrichment: {
+            enrichmentContractVersion: ENRICHMENT_SIDECAR_VERSION,
+            identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+            // Sidecar route preserves v1 payload semantics while keeping enrichment safely ignorable by Tree v1 intake.
+            enrichedObservations: enrichedObservations.sort((left, right) =>
+              left.addressProfileId.localeCompare(right.addressProfileId) ||
+              left.addressedSnapshotId.localeCompare(right.addressedSnapshotId) ||
+              left.occurrenceAddress.localeCompare(right.occurrenceAddress),
+            ),
+          },
+        }
+      : {}),
     ...(diagnostics.length > 0 ? { diagnostics } : {}),
   };
 };

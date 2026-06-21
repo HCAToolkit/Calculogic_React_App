@@ -3,6 +3,30 @@ const toSortedUniqueStringFlags = (flags) =>
     new Set(flags.filter((flag) => typeof flag === 'string' && flag.length > 0)),
   ).sort((left, right) => left.localeCompare(right));
 
+const cloneEvidenceLimitNotes = (evidenceLimitNotes) =>
+  Array.isArray(evidenceLimitNotes)
+    ? evidenceLimitNotes
+        .filter((note) => note && typeof note === 'object' && !Array.isArray(note))
+        .map((note) => ({ ...note }))
+    : null;
+
+const toDisambiguationPayload = (disambiguation) => {
+  if (!disambiguation || typeof disambiguation !== 'object' || Array.isArray(disambiguation)) {
+    return null;
+  }
+
+  const payload = {
+    ...(Array.isArray(disambiguation.roleLikeFolderTokens)
+      ? { roleLikeFolderTokens: toSortedUniqueStringFlags(disambiguation.roleLikeFolderTokens) }
+      : {}),
+    ...(Array.isArray(disambiguation.roleLikeSemanticTokens)
+      ? { roleLikeSemanticTokens: toSortedUniqueStringFlags(disambiguation.roleLikeSemanticTokens) }
+      : {}),
+  };
+
+  return Object.keys(payload).length > 0 ? payload : null;
+};
+
 const toBridgeObservationFromFinding = (finding) => {
   if (!finding || typeof finding !== 'object' || Array.isArray(finding)) {
     return null;
@@ -32,6 +56,9 @@ const toBridgeObservationFromFinding = (finding) => {
     return null;
   }
 
+  const disambiguationPayload = toDisambiguationPayload(details.disambiguation);
+  const evidenceLimitNotes = cloneEvidenceLimitNotes(details.evidenceLimitNotes);
+
   return {
     path: finding.path,
     semanticName: details.semanticName,
@@ -46,6 +73,8 @@ const toBridgeObservationFromFinding = (finding) => {
     ...(Array.isArray(details.splitFamilyFlags)
       ? { splitFamilyFlags: toSortedUniqueStringFlags(details.splitFamilyFlags) }
       : {}),
+    ...(disambiguationPayload ? { disambiguation: disambiguationPayload } : {}),
+    ...(evidenceLimitNotes ? { evidenceLimitNotes } : {}),
   };
 };
 
