@@ -126,6 +126,7 @@ test('runNamingValidator stages occurrence bridge only when an addressed namespa
 
     assert.equal(withNamespace.namingOccurrenceBridge.bridgeContractVersion, 'naming-occurrence-bridge.v1');
     assert.equal(withNamespace.namingOccurrenceBridge.observations.length, 1);
+    assert.equal(Object.hasOwn(withNamespace.namingOccurrenceBridge, 'occurrenceContextEnrichment'), false);
   } finally {
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
@@ -173,4 +174,54 @@ test('projectNamingOccurrenceBridge preserves existing Naming disambiguation evi
     { code: 'role-like-folder-token', message: 'Role-like folder token: host', source: 'naming' },
     { code: 'role-like-semantic-token', message: 'Role-like semantic token: host', source: 'naming' },
   ]);
+});
+
+
+test('projectNamingOccurrenceBridge forwards evidenceLimitNotes from canonical findings through normal projection', () => {
+  const runtimeOutput = {
+    findings: [
+      {
+        path: 'src/limited-source.logic.mjs',
+        classification: 'canonical',
+        details: {
+          semanticName: 'limited-source',
+          familyRoot: 'limited',
+          semanticFamily: 'limited-source',
+          evidenceLimitNotes: [
+            { code: 'z-limit', message: 'Z limit', source: 'naming' },
+            { code: 'source-limit', message: 'Source limit', source: 'naming' },
+            { code: 'source-limit', message: 'Source limit', source: 'naming' },
+          ],
+        },
+      },
+    ],
+  };
+
+  const projectedBridge = projectNamingSemanticFamilyBridge(runtimeOutput);
+  assert.deepEqual(projectedBridge.observations[0].evidenceLimitNotes, [
+    { code: 'z-limit', message: 'Z limit', source: 'naming' },
+    { code: 'source-limit', message: 'Source limit', source: 'naming' },
+    { code: 'source-limit', message: 'Source limit', source: 'naming' },
+  ]);
+
+  const occurrenceBridge = projectNamingOccurrenceBridge(runtimeOutput, {
+    addressedOccurrenceNamespace: {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceRecords: [
+        {
+          repoRelativePath: 'src/limited-source.logic.mjs',
+          path: 'src/limited-source.logic.mjs',
+          occurrenceAddress: 'A.3',
+          addressPath: 'A.3',
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(occurrenceBridge.occurrenceContextEnrichment.enrichedObservations[0].evidenceLimitNotes, [
+    { code: 'source-limit', message: 'Source limit', source: 'naming' },
+    { code: 'z-limit', message: 'Z limit', source: 'naming' },
+  ]);
+  assert.equal(Object.hasOwn(occurrenceBridge.observations[0], 'evidenceLimitNotes'), false);
 });
