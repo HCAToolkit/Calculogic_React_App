@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import {
   prepareTreeNamingOccurrenceAddressJoinEvidence,
   prepareTreeNamingOccurrenceBridgeIntake,
+  prepareTreeSemanticHomeEvidenceInputFromJoinedOccurrence,
 } from '../src/tree-naming-occurrence-intake.logic.mjs';
 import { collectNamingSemanticFamilyBridgeFindings } from '../src/contributors/tree-naming-semantic-family-bridge-contributor.logic.mjs';
 
@@ -1126,4 +1127,115 @@ test('Tree enrichment absent sidecar remains unchanged without empty attachment 
   assert.equal(prepared.usedForCurrentTreeJoins, true);
   assert.equal(Object.hasOwn(prepared.joinedEvidence[0], 'occurrenceContextEnrichment'), false);
   assert.deepEqual(prepared.enrichmentDiagnostics, []);
+});
+
+
+test('Tree prepared semantic-home input retains tuple, Naming observation, context, and metadata', () => {
+  const bridge = {
+    ...addressBridge,
+    observations: [{ ...addressBridge.observations[0], role: 'logic', ambiguity: { status: 'none' } }],
+    occurrenceContextEnrichment: {
+      enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+      identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+      enrichedObservations: [
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.1',
+          parentOccurrenceAddress: null,
+          occurrenceDepth: 0,
+          occurrenceOrderIndex: 0,
+          disambiguationNotes: [{ code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' }],
+          evidenceLimitNotes: [{ code: 'limited-context', message: 'Limited deterministic context.', source: 'naming' }],
+        },
+      ],
+    },
+  };
+
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: bridge,
+    addressedOccurrenceNamespace,
+  });
+  const joinedEntry = prepared.joinedEvidence[0];
+
+  assert.deepEqual(joinedEntry.preparedSemanticHomeEvidence, {
+    sourceIdentityTuple: {
+      addressProfileId: 'tree-codebase',
+      addressedSnapshotId: 'snapshot-001',
+      occurrenceAddress: 'A.1',
+    },
+    namingObservation: joinedEntry.namingObservation,
+    addressingContext: {
+      parentOccurrenceAddress: null,
+      occurrenceDepth: 0,
+      occurrenceOrderIndex: 0,
+    },
+    namingMetadata: {
+      disambiguationNotes: [{ code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' }],
+      evidenceLimitNotes: [{ code: 'limited-context', message: 'Limited deterministic context.', source: 'naming' }],
+    },
+  });
+  assert.equal(joinedEntry.preparedSemanticHomeEvidence.namingObservation.role, 'logic');
+  assert.deepEqual(joinedEntry.preparedSemanticHomeEvidence.namingObservation.ambiguity, { status: 'none' });
+});
+
+test('Tree prepared semantic-home input keeps same-family occurrences distinct without metadata leakage', () => {
+  const sameFamilyBridge = {
+    bridgeContractVersion: 'naming-occurrence-bridge.v1',
+    observations: [
+      { ...addressBridge.observations[0], occurrenceAddress: 'A.1', path: 'src/alpha/shared.logic.ts' },
+      { ...addressBridge.observations[0], occurrenceAddress: 'A.2', path: 'src/beta/shared.logic.ts' },
+    ],
+    occurrenceContextEnrichment: {
+      enrichmentContractVersion: 'naming-occurrence-bridge-enrichment.v1',
+      identityTupleFields: ['addressProfileId', 'addressedSnapshotId', 'occurrenceAddress'],
+      enrichedObservations: [
+        {
+          addressProfileId: 'tree-codebase',
+          addressedSnapshotId: 'snapshot-001',
+          occurrenceAddress: 'A.2',
+          parentOccurrenceAddress: 'A',
+          occurrenceDepth: 2,
+          occurrenceOrderIndex: 1,
+          disambiguationNotes: [{ code: 'beta-context', message: 'Beta context only.', source: 'naming' }],
+        },
+      ],
+    },
+  };
+
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: sameFamilyBridge,
+    addressedOccurrenceNamespace,
+  });
+
+  assert.deepEqual(
+    prepared.joinedEvidence.map((entry) => [
+      entry.preparedSemanticHomeEvidence.sourceIdentityTuple.occurrenceAddress,
+      entry.preparedSemanticHomeEvidence.namingObservation.semanticFamily,
+      entry.preparedSemanticHomeEvidence.addressingContext.parentOccurrenceAddress,
+      entry.preparedSemanticHomeEvidence.namingMetadata?.disambiguationNotes?.[0]?.code ?? null,
+    ]),
+    [
+      ['A.1', 'shared-runtime', undefined, null],
+      ['A.2', 'shared-runtime', 'A', 'beta-context'],
+    ],
+  );
+});
+
+test('Tree prepared semantic-home input falls back to v1 joined observation when enrichment is absent', () => {
+  const prepared = prepareTreeNamingOccurrenceAddressJoinEvidence({
+    namingOccurrenceBridge: addressBridge,
+    addressedOccurrenceNamespace,
+  });
+  const preparedSemanticHomeEvidence = prepared.joinedEvidence[0].preparedSemanticHomeEvidence;
+
+  assert.deepEqual(preparedSemanticHomeEvidence.sourceIdentityTuple, prepared.joinedEvidence[0].identityTuple);
+  assert.deepEqual(preparedSemanticHomeEvidence.namingObservation, prepared.joinedEvidence[0].namingObservation);
+  assert.equal(preparedSemanticHomeEvidence.addressingContext.path, 'src/alpha/shared.logic.ts');
+  assert.equal(Object.hasOwn(preparedSemanticHomeEvidence, 'namingMetadata'), false);
+});
+
+test('Tree prepared semantic-home helper rejects malformed joined entries without synthesizing Naming semantics', () => {
+  assert.equal(prepareTreeSemanticHomeEvidenceInputFromJoinedOccurrence(null), null);
+  assert.equal(prepareTreeSemanticHomeEvidenceInputFromJoinedOccurrence({ identityTuple: { occurrenceAddress: 'A.1' } }), null);
 });

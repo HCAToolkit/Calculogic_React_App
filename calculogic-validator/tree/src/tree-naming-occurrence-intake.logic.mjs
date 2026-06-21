@@ -386,6 +386,9 @@ const toCleanObservationEvidence = (observation) => ({
   familyRoot: observation.familyRoot ?? null,
   semanticFamily: observation.semanticFamily ?? null,
   familySubgroup: observation.familySubgroup ?? null,
+  role: observation.role ?? null,
+  semanticRole: observation.semanticRole ?? null,
+  ambiguity: observation.ambiguity ?? null,
   ambiguityFlags: normalizeStringFlags(observation.ambiguityFlags),
   splitFamilyFlags: normalizeStringFlags(observation.splitFamilyFlags),
 });
@@ -406,6 +409,68 @@ const toOccurrenceEvidence = (occurrenceRecord, identityTuple) => ({
   occurrenceOrderIndex: firstDefinedAliasValue(occurrenceRecord, ['occurrenceOrderIndex', 'orderIndex']),
   orderIndex: firstDefinedAliasValue(occurrenceRecord, ['orderIndex', 'occurrenceOrderIndex']),
 });
+
+
+const toPreparedAddressingContext = (joinedOccurrenceEntry) => {
+  const enrichedAddressingContext = joinedOccurrenceEntry.occurrenceContextEnrichment?.addressingContext;
+  if (isPlainObject(enrichedAddressingContext) && Object.keys(enrichedAddressingContext).length > 0) {
+    return { ...enrichedAddressingContext };
+  }
+
+  const occurrenceRecord = joinedOccurrenceEntry.occurrenceRecord;
+  if (!isPlainObject(occurrenceRecord)) {
+    return undefined;
+  }
+
+  const addressingContext = {};
+  for (const fieldName of [
+    'resolvedPath',
+    'path',
+    'name',
+    'occurrenceType',
+    'addressPath',
+    'parentOccurrenceAddress',
+    'parentAddressPath',
+    'occurrenceDepth',
+    'depth',
+    'occurrenceOrderIndex',
+    'orderIndex',
+  ]) {
+    if (occurrenceRecord[fieldName] !== undefined) {
+      addressingContext[fieldName] = occurrenceRecord[fieldName];
+    }
+  }
+
+  return Object.keys(addressingContext).length > 0 ? addressingContext : undefined;
+};
+
+export const prepareTreeSemanticHomeEvidenceInputFromJoinedOccurrence = (joinedOccurrenceEntry) => {
+  if (!isPlainObject(joinedOccurrenceEntry)) {
+    return null;
+  }
+
+  const sourceIdentityTuple = joinedOccurrenceEntry.identityTuple ?? joinedOccurrenceEntry.sourceIdentityTuple;
+  if (!isPlainObject(sourceIdentityTuple) || !isPlainObject(joinedOccurrenceEntry.namingObservation)) {
+    return null;
+  }
+
+  const prepared = {
+    sourceIdentityTuple: { ...sourceIdentityTuple },
+    namingObservation: { ...joinedOccurrenceEntry.namingObservation },
+  };
+
+  const addressingContext = toPreparedAddressingContext(joinedOccurrenceEntry);
+  if (addressingContext) {
+    prepared.addressingContext = addressingContext;
+  }
+
+  const namingMetadata = joinedOccurrenceEntry.occurrenceContextEnrichment?.namingMetadata;
+  if (isPlainObject(namingMetadata) && Object.keys(namingMetadata).length > 0) {
+    prepared.namingMetadata = { ...namingMetadata };
+  }
+
+  return prepared;
+};
 
 const sortJoinEntries = (entries) =>
   entries.sort((left, right) =>
@@ -521,12 +586,14 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
       continue;
     }
 
-    joinedEvidence.push({
+    const joinedEntry = {
       evidenceType: 'tree-prepared-naming-occurrence-address-join',
       identityTuple,
       namingObservation: toCleanObservationEvidence(observation),
       occurrenceRecord: toOccurrenceEvidence(occurrenceEntry.occurrenceRecord, occurrenceEntry.identityTuple),
-    });
+    };
+    joinedEntry.preparedSemanticHomeEvidence = prepareTreeSemanticHomeEvidenceInputFromJoinedOccurrence(joinedEntry);
+    joinedEvidence.push(joinedEntry);
   }
 
   const joinedEvidenceByTuple = new Map(joinedEvidence.map((entry) => [toIdentityTupleKey(entry.identityTuple), entry]));
@@ -576,6 +643,7 @@ export const prepareTreeNamingOccurrenceAddressJoinEvidence = ({
       });
       if (occurrenceContextEnrichment) {
         joinedEntry.occurrenceContextEnrichment = occurrenceContextEnrichment;
+        joinedEntry.preparedSemanticHomeEvidence = prepareTreeSemanticHomeEvidenceInputFromJoinedOccurrence(joinedEntry);
       }
     }
   }
