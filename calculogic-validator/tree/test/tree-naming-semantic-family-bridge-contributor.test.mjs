@@ -1478,6 +1478,52 @@ const addressJoinEntry = ({ occurrenceAddress, path, semanticName, familyRoot, s
   },
 });
 
+const addressJoinEntryWithPreparedEvidence = ({
+  occurrenceAddress,
+  path,
+  semanticName = 'qualified-family',
+  familyRoot = 'qualified',
+  semanticFamily = 'qualified-family',
+  occurrenceType = 'file',
+  addressPath = occurrenceAddress,
+  parentOccurrenceAddress = 'A',
+  occurrenceDepth = 2,
+  occurrenceOrderIndex = 0,
+  disambiguationNotes,
+  evidenceLimitNotes,
+}) => {
+  const joinedEntry = addressJoinEntry({ occurrenceAddress, path, semanticName, familyRoot, semanticFamily });
+  joinedEntry.occurrenceRecord = {
+    ...joinedEntry.occurrenceRecord,
+    name: path.split('/').at(-1),
+    occurrenceType,
+    addressPath,
+    parentOccurrenceAddress,
+    occurrenceDepth,
+    occurrenceOrderIndex,
+  };
+  joinedEntry.preparedSemanticHomeEvidence = {
+    sourceIdentityTuple: { ...joinedEntry.identityTuple },
+    namingObservation: { ...joinedEntry.namingObservation },
+    addressingContext: {
+      path,
+      resolvedPath: path,
+      name: joinedEntry.occurrenceRecord.name,
+      occurrenceType,
+      addressPath,
+      parentOccurrenceAddress,
+      occurrenceDepth,
+      occurrenceOrderIndex,
+    },
+    namingMetadata: {
+      ...(disambiguationNotes ? { disambiguationNotes } : {}),
+      ...(evidenceLimitNotes ? { evidenceLimitNotes } : {}),
+    },
+  };
+
+  return joinedEntry;
+};
+
 const pathKeyedFallbackBridge = {
   observations: [
     {
@@ -1670,4 +1716,179 @@ test('tree naming bridge contributor distinguishes duplicate same-family occurre
     'src/features/build/duplicate-family.results.ts',
     'src/shared/build/duplicate-family.logic.ts',
   ]);
+});
+
+test('tree naming bridge contributor carries prepared occurrence-local evidence into advisory details without policy changes', () => {
+  const disambiguationNotes = [{ code: 'role-like-folder-token', message: 'Role-like folder token.', source: 'naming' }];
+  const evidenceLimitNotes = [{ code: 'limited-context', message: 'Limited deterministic context.', source: 'naming' }];
+  const baseline = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence([
+      addressJoinEntry({
+        occurrenceAddress: 'A.1',
+        path: 'src/shared/build/qualified-family.logic.ts',
+        semanticName: 'qualified-family',
+        familyRoot: 'qualified',
+        semanticFamily: 'qualified-family',
+      }),
+      addressJoinEntry({
+        occurrenceAddress: 'A.2',
+        path: 'src/features/build/qualified-family.results.ts',
+        semanticName: 'qualified-family',
+        familyRoot: 'qualified',
+        semanticFamily: 'qualified-family',
+      }),
+      addressJoinEntry({
+        occurrenceAddress: 'A.3',
+        path: 'src/features/build/qualified-family.knowledge.ts',
+        semanticName: 'qualified-family',
+        familyRoot: 'qualified',
+        semanticFamily: 'qualified-family',
+      }),
+      addressJoinEntry({
+        occurrenceAddress: 'A.4',
+        path: 'src/features/build/qualified-family.build.tsx',
+        semanticName: 'qualified-family',
+        familyRoot: 'qualified',
+        semanticFamily: 'qualified-family',
+      }),
+    ]),
+  });
+  const findings = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence([
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.1',
+        path: 'src/shared/build/qualified-family.logic.ts',
+        occurrenceOrderIndex: 1,
+        disambiguationNotes,
+        evidenceLimitNotes,
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.2',
+        path: 'src/features/build/qualified-family.results.ts',
+        occurrenceOrderIndex: 2,
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.3',
+        path: 'src/features/build/qualified-family.knowledge.ts',
+        occurrenceOrderIndex: 3,
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.4',
+        path: 'src/features/build/qualified-family.build.tsx',
+        occurrenceOrderIndex: 4,
+      }),
+    ]),
+  });
+
+  assert.deepEqual(
+    findings.map(({ details, ...finding }) => ({ ...finding, details: { ...details, semanticHomeEvidence: undefined } })),
+    baseline.map(({ details, ...finding }) => ({ ...finding, details: { ...details, semanticHomeEvidence: undefined } })),
+  );
+  const occurrence = findings[0].details.semanticHomeEvidence.occurrences[0];
+  assert.deepEqual(occurrence.sourceIdentityTuple, {
+    addressProfileId: 'tree-codebase',
+    addressedSnapshotId: 'snapshot-001',
+    occurrenceAddress: 'A.1',
+  });
+  assert.equal(occurrence.path, 'src/shared/build/qualified-family.logic.ts');
+  assert.equal(occurrence.occurrenceType, 'file');
+  assert.equal(occurrence.addressPath, 'A.1');
+  assert.equal(occurrence.parentOccurrenceAddress, 'A');
+  assert.equal(occurrence.occurrenceDepth, 2);
+  assert.equal(occurrence.occurrenceOrderIndex, 1);
+  assert.equal(occurrence.qualification, 'disambiguation-noted-and-evidence-limited');
+  assert.deepEqual(occurrence.disambiguationNotes, disambiguationNotes);
+  assert.deepEqual(occurrence.evidenceLimitNotes, evidenceLimitNotes);
+});
+
+test('tree naming bridge contributor derives each descriptive qualification label from Naming note presence', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence([
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.1',
+        path: 'src/shared/build/qualification-family.logic.ts',
+        semanticName: 'qualification-family',
+        familyRoot: 'qualification',
+        semanticFamily: 'qualification-family',
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.2',
+        path: 'src/features/build/qualification-family.results.ts',
+        semanticName: 'qualification-family',
+        familyRoot: 'qualification',
+        semanticFamily: 'qualification-family',
+        disambiguationNotes: [{ code: 'disambiguated', message: 'Disambiguated.', source: 'naming' }],
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.3',
+        path: 'src/features/build/qualification-family.knowledge.ts',
+        semanticName: 'qualification-family',
+        familyRoot: 'qualification',
+        semanticFamily: 'qualification-family',
+        evidenceLimitNotes: [{ code: 'limited', message: 'Limited.', source: 'naming' }],
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.4',
+        path: 'src/features/build/qualification-family.build.tsx',
+        semanticName: 'qualification-family',
+        familyRoot: 'qualification',
+        semanticFamily: 'qualification-family',
+        disambiguationNotes: [{ code: 'disambiguated', message: 'Disambiguated.', source: 'naming' }],
+        evidenceLimitNotes: [{ code: 'limited', message: 'Limited.', source: 'naming' }],
+      }),
+    ]),
+  });
+
+  assert.deepEqual(
+    findings[0].details.semanticHomeEvidence.occurrences.map((occurrence) => occurrence.qualification),
+    [
+      'no-explicit-naming-qualification',
+      'disambiguation-noted',
+      'evidence-limited',
+      'disambiguation-noted-and-evidence-limited',
+    ],
+  );
+});
+
+test('tree naming bridge contributor keeps same-family occurrence metadata isolated by address', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence([
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.1',
+        path: 'src/shared/build/isolated-family.logic.ts',
+        semanticName: 'isolated-family',
+        familyRoot: 'isolated',
+        semanticFamily: 'isolated-family',
+        disambiguationNotes: [{ code: 'first-only', message: 'First only.', source: 'naming' }],
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.2',
+        path: 'src/features/build/isolated-family.results.ts',
+        semanticName: 'isolated-family',
+        familyRoot: 'isolated',
+        semanticFamily: 'isolated-family',
+        evidenceLimitNotes: [{ code: 'second-only', message: 'Second only.', source: 'naming' }],
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.3',
+        path: 'src/features/build/isolated-family.knowledge.ts',
+        semanticName: 'isolated-family',
+        familyRoot: 'isolated',
+        semanticFamily: 'isolated-family',
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.4',
+        path: 'src/features/build/isolated-family.build.tsx',
+        semanticName: 'isolated-family',
+        familyRoot: 'isolated',
+        semanticFamily: 'isolated-family',
+      }),
+    ]),
+  });
+
+  const occurrences = findings[0].details.semanticHomeEvidence.occurrences;
+  assert.deepEqual(occurrences[0].disambiguationNotes.map((note) => note.code), ['first-only']);
+  assert.deepEqual(occurrences[0].evidenceLimitNotes, []);
+  assert.deepEqual(occurrences[1].disambiguationNotes, []);
+  assert.deepEqual(occurrences[1].evidenceLimitNotes.map((note) => note.code), ['second-only']);
 });
