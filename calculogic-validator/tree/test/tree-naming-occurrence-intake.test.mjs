@@ -1166,6 +1166,11 @@ test('Tree prepared semantic-home input retains tuple, Naming observation, conte
     },
     namingObservation: joinedEntry.namingObservation,
     addressingContext: {
+      resolvedPath: 'src/alpha/shared.logic.ts',
+      path: 'src/alpha/shared.logic.ts',
+      name: 'shared.logic.ts',
+      occurrenceType: 'file',
+      addressPath: 'A.1',
       parentOccurrenceAddress: null,
       occurrenceDepth: 0,
       occurrenceOrderIndex: 0,
@@ -1212,12 +1217,15 @@ test('Tree prepared semantic-home input keeps same-family occurrences distinct w
     prepared.joinedEvidence.map((entry) => [
       entry.preparedSemanticHomeEvidence.sourceIdentityTuple.occurrenceAddress,
       entry.preparedSemanticHomeEvidence.namingObservation.semanticFamily,
+      entry.preparedSemanticHomeEvidence.addressingContext.path,
+      entry.preparedSemanticHomeEvidence.addressingContext.addressPath,
       entry.preparedSemanticHomeEvidence.addressingContext.parentOccurrenceAddress,
+      entry.preparedSemanticHomeEvidence.addressingContext.occurrenceDepth,
       entry.preparedSemanticHomeEvidence.namingMetadata?.disambiguationNotes?.[0]?.code ?? null,
     ]),
     [
-      ['A.1', 'shared-runtime', undefined, null],
-      ['A.2', 'shared-runtime', 'A', 'beta-context'],
+      ['A.1', 'shared-runtime', 'src/alpha/shared.logic.ts', 'A.1', undefined, undefined, null],
+      ['A.2', 'shared-runtime', 'src/beta/shared.logic.ts', 'A.2', 'A', 2, 'beta-context'],
     ],
   );
 });

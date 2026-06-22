@@ -412,33 +412,32 @@ const toOccurrenceEvidence = (occurrenceRecord, identityTuple) => ({
 
 
 const toPreparedAddressingContext = (joinedOccurrenceEntry) => {
+  const occurrenceRecord = joinedOccurrenceEntry.occurrenceRecord;
+  const addressingContext = {};
+
+  if (isPlainObject(occurrenceRecord)) {
+    for (const fieldName of [
+      'resolvedPath',
+      'path',
+      'name',
+      'occurrenceType',
+      'addressPath',
+      'parentOccurrenceAddress',
+      'parentAddressPath',
+      'occurrenceDepth',
+      'depth',
+      'occurrenceOrderIndex',
+      'orderIndex',
+    ]) {
+      if (occurrenceRecord[fieldName] !== undefined) {
+        addressingContext[fieldName] = occurrenceRecord[fieldName];
+      }
+    }
+  }
+
   const enrichedAddressingContext = joinedOccurrenceEntry.occurrenceContextEnrichment?.addressingContext;
   if (isPlainObject(enrichedAddressingContext) && Object.keys(enrichedAddressingContext).length > 0) {
-    return { ...enrichedAddressingContext };
-  }
-
-  const occurrenceRecord = joinedOccurrenceEntry.occurrenceRecord;
-  if (!isPlainObject(occurrenceRecord)) {
-    return undefined;
-  }
-
-  const addressingContext = {};
-  for (const fieldName of [
-    'resolvedPath',
-    'path',
-    'name',
-    'occurrenceType',
-    'addressPath',
-    'parentOccurrenceAddress',
-    'parentAddressPath',
-    'occurrenceDepth',
-    'depth',
-    'occurrenceOrderIndex',
-    'orderIndex',
-  ]) {
-    if (occurrenceRecord[fieldName] !== undefined) {
-      addressingContext[fieldName] = occurrenceRecord[fieldName];
-    }
+    Object.assign(addressingContext, enrichedAddressingContext);
   }
 
   return Object.keys(addressingContext).length > 0 ? addressingContext : undefined;
