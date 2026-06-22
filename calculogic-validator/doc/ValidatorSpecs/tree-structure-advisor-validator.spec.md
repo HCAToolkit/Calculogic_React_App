@@ -802,6 +802,7 @@ Deferred candidates above are a documentation menu only. They are not current ru
   - `findingContributors` (array of contributor callbacks)
 - Tree core does **not** require `getFileContent(relativePath)`.
 - Current tree runtime does **not** consume tree-specific config surfaces. The dedicated CLI may accept `--config=<path>` through shared suite runner plumbing, but current tree behavior only validates/normalizes the shared config shape and exposes `configDigest` at the runner envelope when config is supplied.
+- Valid occurrence-local semantic-family advisory evidence may include Tree-owned `treeStructuralContext` facts (`structuralRootKind`, `ownershipLane`, `surfaceKind`, `ancestorKinds`, `directParentKind`, `containerLocalHome`, `registryTier`) derived from addressed occurrence location only; these facts are neutral structural context and are not placement, coherence, bridge-allowance, severity, confidence, or finding-emission judgments.
 - Current tree runtime does **not** emit tree addresses or move proposals. Naming bridge payload is consumed as contributor input and is not re-emitted as a raw payload surface.
 
 ### Composition ownership

@@ -1808,6 +1808,101 @@ test('tree naming bridge contributor carries prepared occurrence-local evidence 
   assert.deepEqual(occurrence.evidenceLimitNotes, evidenceLimitNotes);
 });
 
+test('tree naming bridge contributor exposes neutral structural context for prepared occurrence evidence categories', () => {
+  const findings = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence([
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.1',
+        path: 'calculogic-validator/naming/src/registries/_builtin/roles.registry.json',
+        semanticName: 'structural-context-family',
+        familyRoot: 'structural',
+        semanticFamily: 'structural-context-family',
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.2',
+        path: 'calculogic-validator/tree/src/contributors/tree-naming-semantic-family-bridge-contributor.logic.mjs',
+        semanticName: 'structural-context-family',
+        familyRoot: 'structural',
+        semanticFamily: 'structural-context-family',
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.3',
+        path: 'calculogic-validator/src/core/validator-scopes.logic.mjs',
+        semanticName: 'structural-context-family',
+        familyRoot: 'structural',
+        semanticFamily: 'structural-context-family',
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.4',
+        path: 'calculogic-validator/tree/test/tree-naming-occurrence-intake.test.mjs',
+        semanticName: 'structural-context-family',
+        familyRoot: 'structural',
+        semanticFamily: 'structural-context-family',
+      }),
+      addressJoinEntryWithPreparedEvidence({
+        occurrenceAddress: 'A.5',
+        path: 'calculogic-validator/doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md',
+        semanticName: 'structural-context-family',
+        familyRoot: 'structural',
+        semanticFamily: 'structural-context-family',
+      }),
+    ]),
+  });
+
+  const occurrencesByAddress = new Map(
+    findings[0].details.semanticHomeEvidence.occurrences.map((occurrence) => [
+      occurrence.sourceIdentityTuple.occurrenceAddress,
+      occurrence,
+    ]),
+  );
+
+  assert.deepEqual(occurrencesByAddress.get('A.1').treeStructuralContext, {
+    structuralRootKind: 'source',
+    ownershipLane: 'naming',
+    surfaceKind: 'registry',
+    ancestorKinds: ['src', 'registries', '_builtin'],
+    directParentKind: '_builtin',
+    containerLocalHome: 'registries',
+    registryTier: 'built-in',
+  });
+  assert.deepEqual(occurrencesByAddress.get('A.2').treeStructuralContext, {
+    structuralRootKind: 'source',
+    ownershipLane: 'tree',
+    surfaceKind: 'contributor',
+    ancestorKinds: ['src', 'contributors'],
+    directParentKind: 'contributors',
+    containerLocalHome: 'contributors',
+    registryTier: 'none',
+  });
+  assert.deepEqual(occurrencesByAddress.get('A.3').treeStructuralContext, {
+    structuralRootKind: 'suite-core',
+    ownershipLane: 'suite-core',
+    surfaceKind: 'runtime-source',
+    ancestorKinds: ['src', 'core'],
+    directParentKind: 'core',
+    containerLocalHome: 'core',
+    registryTier: 'none',
+  });
+  assert.deepEqual(occurrencesByAddress.get('A.4').treeStructuralContext, {
+    structuralRootKind: 'test',
+    ownershipLane: 'tree',
+    surfaceKind: 'test',
+    ancestorKinds: ['test'],
+    directParentKind: 'test',
+    containerLocalHome: 'calculogic-validator',
+    registryTier: 'none',
+  });
+  assert.deepEqual(occurrencesByAddress.get('A.5').treeStructuralContext, {
+    structuralRootKind: 'documentation',
+    ownershipLane: 'documentation',
+    surfaceKind: 'documentation',
+    ancestorKinds: ['doc', 'ValidatorSpecs'],
+    directParentKind: 'ValidatorSpecs',
+    containerLocalHome: 'calculogic-validator',
+    registryTier: 'none',
+  });
+});
+
 test('tree naming bridge contributor derives each descriptive qualification label from Naming note presence', () => {
   const findings = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
     preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence([

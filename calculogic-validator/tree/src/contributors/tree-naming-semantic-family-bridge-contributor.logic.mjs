@@ -44,6 +44,140 @@ const SHARED_ROOT_LANE_INTERPRETATION = Object.freeze({
   BROADER_SPREAD_SUPPRESSED: 'broader-spread-suppressed',
 });
 
+
+const TREE_KNOWN_STRUCTURAL_ANCESTOR_SET = new Set([
+  'src',
+  'registries',
+  '_builtin',
+  'contributors',
+  'test',
+  'doc',
+  'docs',
+  'ValidatorSpecs',
+  'core',
+  'bin',
+  'scripts',
+  'tools',
+]);
+
+const toStructuralContextPathSegments = (candidatePath) =>
+  typeof candidatePath === 'string' && candidatePath.length > 0 ? candidatePath.split('/').filter(Boolean) : [];
+
+const toStructuralRootKind = (segments) => {
+  if (segments[0] === 'calculogic-validator' && segments[1] === 'src' && segments[2] === 'core') {
+    return 'suite-core';
+  }
+  if (segments.includes('test')) {
+    return 'test';
+  }
+  if (segments.includes('doc') || segments.includes('docs')) {
+    return 'documentation';
+  }
+  if (segments.includes('scripts') || segments.includes('tools') || segments.includes('bin')) {
+    return 'tooling';
+  }
+  if (segments.includes('src')) {
+    return 'source';
+  }
+  return segments.length > 0 ? 'other' : 'unknown';
+};
+
+const toOwnershipLane = (segments, structuralRootKind) => {
+  if (structuralRootKind === 'suite-core') {
+    return 'suite-core';
+  }
+  if (structuralRootKind === 'documentation') {
+    return 'documentation';
+  }
+  if (structuralRootKind === 'tooling') {
+    return 'tooling';
+  }
+  if (segments.includes('naming')) {
+    return 'naming';
+  }
+  if (segments.includes('tree')) {
+    return 'tree';
+  }
+  return 'unknown';
+};
+
+const toSurfaceKind = (segments, structuralRootKind) => {
+  if (segments.includes('registries')) {
+    return 'registry';
+  }
+  if (segments.includes('contributors')) {
+    return 'contributor';
+  }
+  if (structuralRootKind === 'test') {
+    return 'test';
+  }
+  if (structuralRootKind === 'documentation') {
+    return 'documentation';
+  }
+  if (segments.includes('bin')) {
+    return 'cli';
+  }
+  if (segments.includes('scripts') || segments.includes('tools')) {
+    return 'tool';
+  }
+  if (segments.some((segment) => segment === 'config' || segment === 'configs' || segment === '.github')) {
+    return 'configuration';
+  }
+  if (structuralRootKind === 'source' || structuralRootKind === 'suite-core') {
+    return 'runtime-source';
+  }
+  return 'unknown';
+};
+
+const toRegistryTier = (segments, surfaceKind) => {
+  if (surfaceKind !== 'registry') {
+    return 'none';
+  }
+  if (segments.includes('_builtin')) {
+    return 'built-in';
+  }
+  if (segments.includes('registries')) {
+    return 'custom';
+  }
+  return 'unknown';
+};
+
+export const deriveTreeStructuralContextForOccurrenceEvidence = (preparedSemanticHomeEvidence) => {
+  if (!preparedSemanticHomeEvidence || typeof preparedSemanticHomeEvidence !== 'object' || Array.isArray(preparedSemanticHomeEvidence)) {
+    return null;
+  }
+
+  const addressingContext =
+    preparedSemanticHomeEvidence.addressingContext &&
+    typeof preparedSemanticHomeEvidence.addressingContext === 'object' &&
+    !Array.isArray(preparedSemanticHomeEvidence.addressingContext)
+      ? preparedSemanticHomeEvidence.addressingContext
+      : {};
+  const segments = toStructuralContextPathSegments(addressingContext.path ?? addressingContext.resolvedPath);
+  if (segments.length === 0) {
+    return null;
+  }
+
+  const structuralRootKind = toStructuralRootKind(segments);
+  const ownershipLane = toOwnershipLane(segments, structuralRootKind);
+  const surfaceKind = toSurfaceKind(segments, structuralRootKind);
+  const ancestorKinds = segments.slice(0, -1).filter((segment) => TREE_KNOWN_STRUCTURAL_ANCESTOR_SET.has(segment));
+  const directParentKind = ancestorKinds.at(-1) ?? 'unknown';
+  const srcIndex = segments.indexOf('src');
+  const containerLocalHome = srcIndex >= 0 ? segments[srcIndex + 1] ?? '.' : segments[0] ?? '.';
+  const registryTier = toRegistryTier(segments, surfaceKind);
+
+  return {
+    structuralRootKind,
+    ownershipLane,
+    surfaceKind,
+    ancestorKinds,
+    directParentKind,
+    containerLocalHome,
+    registryTier,
+  };
+};
+
 const toSortedUnique = (values) => Array.from(new Set(values)).sort((left, right) => left.localeCompare(right));
 
 const toSortedUniqueStringFlags = (flags) =>
@@ -491,6 +625,7 @@ const toNormalizedSemanticHomeOccurrenceEvidence = (preparedSemanticHomeEvidence
   const evidenceLimitNotes = Array.isArray(namingMetadata.evidenceLimitNotes)
     ? namingMetadata.evidenceLimitNotes
     : [];
+  const treeStructuralContext = deriveTreeStructuralContextForOccurrenceEvidence(preparedSemanticHomeEvidence);
   const occurrenceEvidence = {
     sourceIdentityTuple: { ...preparedSemanticHomeEvidence.sourceIdentityTuple },
     path: addressingContext.path ?? null,
@@ -504,6 +639,7 @@ const toNormalizedSemanticHomeOccurrenceEvidence = (preparedSemanticHomeEvidence
     qualification: toNamingQualificationLabel({ disambiguationNotes, evidenceLimitNotes }),
     disambiguationNotes,
     evidenceLimitNotes,
+    ...(treeStructuralContext ? { treeStructuralContext } : {}),
   };
 
   return occurrenceEvidence;
