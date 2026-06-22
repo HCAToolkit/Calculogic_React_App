@@ -1489,13 +1489,16 @@ const addressJoinEntryWithPreparedEvidence = ({
   parentOccurrenceAddress = 'A',
   occurrenceDepth = 2,
   occurrenceOrderIndex = 0,
+  resolvedPath = path,
+  name = path.split('/').at(-1),
   disambiguationNotes,
   evidenceLimitNotes,
 }) => {
   const joinedEntry = addressJoinEntry({ occurrenceAddress, path, semanticName, familyRoot, semanticFamily });
   joinedEntry.occurrenceRecord = {
     ...joinedEntry.occurrenceRecord,
-    name: path.split('/').at(-1),
+    name,
+    resolvedPath,
     occurrenceType,
     addressPath,
     parentOccurrenceAddress,
@@ -1507,8 +1510,8 @@ const addressJoinEntryWithPreparedEvidence = ({
     namingObservation: { ...joinedEntry.namingObservation },
     addressingContext: {
       path,
-      resolvedPath: path,
-      name: joinedEntry.occurrenceRecord.name,
+      resolvedPath,
+      name,
       occurrenceType,
       addressPath,
       parentOccurrenceAddress,
@@ -1758,6 +1761,8 @@ test('tree naming bridge contributor carries prepared occurrence-local evidence 
       addressJoinEntryWithPreparedEvidence({
         occurrenceAddress: 'A.1',
         path: 'src/shared/build/qualified-family.logic.ts',
+        resolvedPath: 'workspace/src/shared/build/qualified-family.logic.ts',
+        name: 'qualified-family-addressed.logic.ts',
         occurrenceOrderIndex: 1,
         disambiguationNotes,
         evidenceLimitNotes,
@@ -1791,6 +1796,8 @@ test('tree naming bridge contributor carries prepared occurrence-local evidence 
     occurrenceAddress: 'A.1',
   });
   assert.equal(occurrence.path, 'src/shared/build/qualified-family.logic.ts');
+  assert.equal(occurrence.resolvedPath, 'workspace/src/shared/build/qualified-family.logic.ts');
+  assert.equal(occurrence.name, 'qualified-family-addressed.logic.ts');
   assert.equal(occurrence.occurrenceType, 'file');
   assert.equal(occurrence.addressPath, 'A.1');
   assert.equal(occurrence.parentOccurrenceAddress, 'A');
@@ -1891,4 +1898,65 @@ test('tree naming bridge contributor keeps same-family occurrence metadata isola
   assert.deepEqual(occurrences[0].evidenceLimitNotes, []);
   assert.deepEqual(occurrences[1].disambiguationNotes, []);
   assert.deepEqual(occurrences[1].evidenceLimitNotes.map((note) => note.code), ['second-only']);
+});
+
+test('tree shared-root lane advisory scopes semantic-home evidence to its observed path set', () => {
+  const semanticFields = {
+    semanticName: 'lane-scope-family',
+    familyRoot: 'lane',
+    semanticFamily: 'lane-scope-family',
+  };
+  const sharedRootJoinEntries = [
+    {
+      occurrenceAddress: 'A.1',
+      path: 'src/shared/build/lane-scope-family.logic.ts',
+      occurrenceOrderIndex: 1,
+    },
+    {
+      occurrenceAddress: 'A.2',
+      path: 'src/shared/docs/lane-scope-family.docs.ts',
+      occurrenceOrderIndex: 2,
+    },
+    {
+      occurrenceAddress: 'A.3',
+      path: 'src/shared/logic/lane-scope-family.results.ts',
+      occurrenceOrderIndex: 3,
+    },
+    {
+      occurrenceAddress: 'A.4',
+      path: 'src/features/build/lane-scope-family.build.tsx',
+      occurrenceOrderIndex: 4,
+    },
+  ];
+  const baselineFinding = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence(
+      sharedRootJoinEntries.map((entry) => addressJoinEntry({ ...semanticFields, ...entry })),
+    ),
+  }).find((finding) => finding.code === 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES');
+  const finding = collectNamingSemanticFamilyBridgeFindings({ observations: [] }, {
+    preparedAddressKeyedJoinEvidence: cleanAddressJoinEvidence(
+      sharedRootJoinEntries.map((entry) => addressJoinEntryWithPreparedEvidence({ ...semanticFields, ...entry })),
+    ),
+  }).find((candidateFinding) => candidateFinding.code === 'TREE_SHARED_FAMILY_SCATTERED_ACROSS_LANES');
+
+  assert.equal(finding.code, baselineFinding.code);
+  assert.equal(finding.severity, baselineFinding.severity);
+  assert.equal(finding.classification, baselineFinding.classification);
+  assert.equal(finding.path, baselineFinding.path);
+  assert.deepEqual(finding.details.observedPaths, baselineFinding.details.observedPaths);
+  assert.deepEqual(finding.details.observedPaths, [
+    'src/shared/build/lane-scope-family.logic.ts',
+    'src/shared/docs/lane-scope-family.docs.ts',
+    'src/shared/logic/lane-scope-family.results.ts',
+  ]);
+  assert.deepEqual(
+    finding.details.semanticHomeEvidence.occurrences.map((occurrence) => occurrence.path),
+    finding.details.observedPaths,
+  );
+  assert.equal(
+    finding.details.semanticHomeEvidence.occurrences.some(
+      (occurrence) => occurrence.path === 'src/features/build/lane-scope-family.build.tsx',
+    ),
+    false,
+  );
 });

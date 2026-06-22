@@ -493,7 +493,9 @@ const toNormalizedSemanticHomeOccurrenceEvidence = (preparedSemanticHomeEvidence
     : [];
   const occurrenceEvidence = {
     sourceIdentityTuple: { ...preparedSemanticHomeEvidence.sourceIdentityTuple },
-    path: addressingContext.path ?? addressingContext.resolvedPath ?? preparedSemanticHomeEvidence.namingObservation?.path ?? null,
+    path: addressingContext.path ?? null,
+    resolvedPath: addressingContext.resolvedPath ?? null,
+    name: addressingContext.name ?? null,
     occurrenceType: addressingContext.occurrenceType ?? null,
     addressPath: addressingContext.addressPath ?? null,
     parentOccurrenceAddress: addressingContext.parentOccurrenceAddress ?? addressingContext.parentAddressPath ?? null,
@@ -797,7 +799,8 @@ const toFamilyBroaderSpreadInterpretation = (familyAnalysis) => {
   };
 };
 
-const toSharedRootLaneObservation = (observation) => {
+const toSharedRootLaneObservation = (familyEntry) => {
+  const { observation } = familyEntry;
   for (const sharedRoot of SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS) {
     const sharedRootPrefix = `${sharedRoot}/`;
     if (!observation.path.startsWith(sharedRootPrefix)) {
@@ -815,6 +818,7 @@ const toSharedRootLaneObservation = (observation) => {
       lanePartition,
       path: observation.path,
       semanticFamily: observation.semanticFamily,
+      familyEntry,
     };
   }
 
@@ -1015,7 +1019,7 @@ const collectFamilySubgroupOpportunityFindings = (familySharedSpineAnalysisEntri
 const collectSharedRootFamilyScatterAcrossLanesFindings = (familySharedSpineAnalysisEntries) =>
   familySharedSpineAnalysisEntries.flatMap(({ familyAnalysis, broaderSpreadInterpretation }) => {
     const sharedFamilyObservations = familyAnalysis.familyEntries
-      .map(({ observation }) => toSharedRootLaneObservation(observation))
+      .map((familyEntry) => toSharedRootLaneObservation(familyEntry))
       .filter(Boolean);
     const observationsBySharedRoot = new Map();
 
@@ -1065,7 +1069,7 @@ const collectSharedRootFamilyScatterAcrossLanesFindings = (familySharedSpineAnal
               localFirstInterpretation,
               broaderSpreadInterpretation,
               sharedRootLaneInterpretation,
-              ...toSemanticHomeEvidenceDetails(familyAnalysis.familyEntries),
+              ...toSemanticHomeEvidenceDetails(sharedRootObservations.map(({ familyEntry }) => familyEntry)),
               familySharedSpineRouting: {
                 model: 'shared-local-first-family-interpretation',
                 sharedRootOutcome: sharedRootLaneInterpretation.classification,
