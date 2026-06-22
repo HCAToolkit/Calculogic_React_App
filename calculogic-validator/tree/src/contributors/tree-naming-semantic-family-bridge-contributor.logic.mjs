@@ -411,7 +411,7 @@ const toNormalizedBridgeObservation = (observation) => {
     }
   }
 
-  return {
+  const normalizedObservation = {
     path: observation.path,
     semanticName: observation.semanticName,
     familyRoot: observation.familyRoot,
@@ -426,6 +426,100 @@ const toNormalizedBridgeObservation = (observation) => {
       ? { splitFamilyFlags: toSortedUniqueStringFlags(observation.splitFamilyFlags) }
       : {}),
   };
+
+  const semanticHomeEvidence = toNormalizedSemanticHomeOccurrenceEvidence(observation.preparedSemanticHomeEvidence);
+  if (semanticHomeEvidence) {
+    normalizedObservation.semanticHomeEvidence = semanticHomeEvidence;
+  }
+
+  return normalizedObservation;
+};
+
+const toSourceIdentityTupleSortKey = (sourceIdentityTuple = {}) =>
+  [
+    sourceIdentityTuple.addressProfileId ?? '',
+    sourceIdentityTuple.addressedSnapshotId ?? '',
+    sourceIdentityTuple.occurrenceAddress ?? '',
+  ].join('\u0000');
+
+const toNamingQualificationLabel = ({ disambiguationNotes, evidenceLimitNotes }) => {
+  const hasDisambiguationNotes = Array.isArray(disambiguationNotes) && disambiguationNotes.length > 0;
+  const hasEvidenceLimitNotes = Array.isArray(evidenceLimitNotes) && evidenceLimitNotes.length > 0;
+
+  if (hasDisambiguationNotes && hasEvidenceLimitNotes) {
+    return 'disambiguation-noted-and-evidence-limited';
+  }
+
+  if (hasDisambiguationNotes) {
+    return 'disambiguation-noted';
+  }
+
+  if (hasEvidenceLimitNotes) {
+    return 'evidence-limited';
+  }
+
+  return 'no-explicit-naming-qualification';
+};
+
+const toNormalizedSemanticHomeOccurrenceEvidence = (preparedSemanticHomeEvidence) => {
+  if (
+    !preparedSemanticHomeEvidence ||
+    typeof preparedSemanticHomeEvidence !== 'object' ||
+    Array.isArray(preparedSemanticHomeEvidence) ||
+    !preparedSemanticHomeEvidence.sourceIdentityTuple ||
+    typeof preparedSemanticHomeEvidence.sourceIdentityTuple !== 'object' ||
+    Array.isArray(preparedSemanticHomeEvidence.sourceIdentityTuple)
+  ) {
+    return null;
+  }
+
+  const addressingContext =
+    preparedSemanticHomeEvidence.addressingContext &&
+    typeof preparedSemanticHomeEvidence.addressingContext === 'object' &&
+    !Array.isArray(preparedSemanticHomeEvidence.addressingContext)
+      ? preparedSemanticHomeEvidence.addressingContext
+      : {};
+  const namingMetadata =
+    preparedSemanticHomeEvidence.namingMetadata &&
+    typeof preparedSemanticHomeEvidence.namingMetadata === 'object' &&
+    !Array.isArray(preparedSemanticHomeEvidence.namingMetadata)
+      ? preparedSemanticHomeEvidence.namingMetadata
+      : {};
+  const disambiguationNotes = Array.isArray(namingMetadata.disambiguationNotes)
+    ? namingMetadata.disambiguationNotes
+    : [];
+  const evidenceLimitNotes = Array.isArray(namingMetadata.evidenceLimitNotes)
+    ? namingMetadata.evidenceLimitNotes
+    : [];
+  const occurrenceEvidence = {
+    sourceIdentityTuple: { ...preparedSemanticHomeEvidence.sourceIdentityTuple },
+    path: addressingContext.path ?? null,
+    resolvedPath: addressingContext.resolvedPath ?? null,
+    name: addressingContext.name ?? null,
+    occurrenceType: addressingContext.occurrenceType ?? null,
+    addressPath: addressingContext.addressPath ?? null,
+    parentOccurrenceAddress: addressingContext.parentOccurrenceAddress ?? addressingContext.parentAddressPath ?? null,
+    occurrenceDepth: addressingContext.occurrenceDepth ?? addressingContext.depth ?? null,
+    occurrenceOrderIndex: addressingContext.occurrenceOrderIndex ?? addressingContext.orderIndex ?? null,
+    qualification: toNamingQualificationLabel({ disambiguationNotes, evidenceLimitNotes }),
+    disambiguationNotes,
+    evidenceLimitNotes,
+  };
+
+  return occurrenceEvidence;
+};
+
+const toSemanticHomeEvidenceDetails = (familyEntries) => {
+  const occurrences = familyEntries
+    .map(({ observation }) => observation.semanticHomeEvidence)
+    .filter(Boolean)
+    .sort((left, right) =>
+      toSourceIdentityTupleSortKey(left.sourceIdentityTuple).localeCompare(toSourceIdentityTupleSortKey(right.sourceIdentityTuple)) ||
+      (left.addressPath ?? '').localeCompare(right.addressPath ?? '') ||
+      (left.path ?? '').localeCompare(right.path ?? ''),
+    );
+
+  return occurrences.length > 0 ? { semanticHomeEvidence: { occurrences } } : {};
 };
 
 export const prepareNamingSemanticFamilyBridge = (bridgePayload) => {
@@ -705,7 +799,8 @@ const toFamilyBroaderSpreadInterpretation = (familyAnalysis) => {
   };
 };
 
-const toSharedRootLaneObservation = (observation) => {
+const toSharedRootLaneObservation = (familyEntry) => {
+  const { observation } = familyEntry;
   for (const sharedRoot of SHARED_ROOT_SEMANTIC_GROUPING_SUPPORTED_ROOTS) {
     const sharedRootPrefix = `${sharedRoot}/`;
     if (!observation.path.startsWith(sharedRootPrefix)) {
@@ -723,6 +818,7 @@ const toSharedRootLaneObservation = (observation) => {
       lanePartition,
       path: observation.path,
       semanticFamily: observation.semanticFamily,
+      familyEntry,
     };
   }
 
@@ -838,6 +934,7 @@ const collectFamilyScatterFindings = (familySharedSpineAnalysisEntries) =>
             observedStructuralRootKinds: toSortedUnique(familyAnalysis.placements.map((placement) => placement.structuralRootKind)),
             localFirstInterpretation: familyAnalysis.localFirstInterpretation,
             broaderSpreadInterpretation,
+            ...toSemanticHomeEvidenceDetails(familyAnalysis.familyEntries),
             allowedCrossContainerPatterns: {
               structuralRootPairings: ALLOWED_STRUCTURAL_ROOT_PAIRINGS,
               canonicalDocAuthorityRuntimePairing: 'calculogic-validator/doc/** <-> calculogic-validator/<semantic-container>/**',
@@ -874,6 +971,7 @@ const collectFamilyClusterFindings = (familySharedSpineAnalysisEntries) =>
             observedCount: familyAnalysis.sortedPaths.length,
             observedPaths: familyAnalysis.sortedPaths,
             localFirstInterpretation: familyAnalysis.localFirstInterpretation,
+            ...toSemanticHomeEvidenceDetails(familyAnalysis.familyEntries),
             threshold: {
               minFamilyFilesForClusterObservation: FAMILY_CLUSTER_INFO_MIN_FILES,
             },
@@ -906,6 +1004,7 @@ const collectFamilySubgroupOpportunityFindings = (familySharedSpineAnalysisEntri
             observedContainerLocalHomes: familyAnalysis.observedContainerLocalHomes,
             lowerLevelGroupingSignalPresent: familyAnalysis.lowerLevelGroupingSignalPresent,
             localFirstInterpretation: familyAnalysis.localFirstInterpretation,
+            ...toSemanticHomeEvidenceDetails(familyAnalysis.familyEntries),
             thresholds: {
               minFilesInContainer: FAMILY_SUBGROUP_OPPORTUNITY_MIN_FILES_IN_CONTAINER,
               minDistinctContainerLocalHomes: FAMILY_SUBGROUP_OPPORTUNITY_MIN_DISTINCT_CONTAINER_LOCAL_HOMES,
@@ -920,7 +1019,7 @@ const collectFamilySubgroupOpportunityFindings = (familySharedSpineAnalysisEntri
 const collectSharedRootFamilyScatterAcrossLanesFindings = (familySharedSpineAnalysisEntries) =>
   familySharedSpineAnalysisEntries.flatMap(({ familyAnalysis, broaderSpreadInterpretation }) => {
     const sharedFamilyObservations = familyAnalysis.familyEntries
-      .map(({ observation }) => toSharedRootLaneObservation(observation))
+      .map((familyEntry) => toSharedRootLaneObservation(familyEntry))
       .filter(Boolean);
     const observationsBySharedRoot = new Map();
 
@@ -970,6 +1069,7 @@ const collectSharedRootFamilyScatterAcrossLanesFindings = (familySharedSpineAnal
               localFirstInterpretation,
               broaderSpreadInterpretation,
               sharedRootLaneInterpretation,
+              ...toSemanticHomeEvidenceDetails(sharedRootObservations.map(({ familyEntry }) => familyEntry)),
               familySharedSpineRouting: {
                 model: 'shared-local-first-family-interpretation',
                 sharedRootOutcome: sharedRootLaneInterpretation.classification,
@@ -1014,6 +1114,9 @@ const toAddressKeyedBridgePayload = (preparedAddressKeyedJoinEvidence) => ({
       : {}),
     ...(Array.isArray(joinEntry.namingObservation?.splitFamilyFlags)
       ? { splitFamilyFlags: joinEntry.namingObservation.splitFamilyFlags }
+      : {}),
+    ...(joinEntry.preparedSemanticHomeEvidence
+      ? { preparedSemanticHomeEvidence: joinEntry.preparedSemanticHomeEvidence }
       : {}),
   })),
 });
