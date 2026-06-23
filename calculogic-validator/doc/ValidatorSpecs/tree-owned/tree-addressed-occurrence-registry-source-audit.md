@@ -217,15 +217,74 @@ Current implementation reality: this is the closest registered surface-to-home p
 
 9. **Contributor-local literals are unsafe because they bypass registry change control.** A literal such as `src`, `tree`, `registries`, `_builtin`, or "next segment after `src`" can be path evidence, but it is not structural truth unless a Tree registry or registry-backed helper interprets it. Literal parsing would create drift between current runtime truth, registered policy, and future extraction paths.
 
-## 7. Recommended next seam
+## 7. Repository-Top Home Partition and Downstream Classification
 
-Recommended follow-up shape: **add a narrow registry-backed resolver for an already-defined structural concept**.
+This section audits the repository-top-only partition requested by #668 update. The partition applies only to actual repository-top folder occurrences. Descendants such as `calculogic-validator/tree` and `calculogic-validator/tree/src` are not repository-top homes and must not be classified by reusing the repository-top-home rule.
 
-Exact seam: add a loader/resolver for `calculogic-validator/tree/src/registries/_builtin/surface-structural-home-perspective.registry.json` that returns a narrow, evidence-only surface-to-structural-home interpretation for addressed folder occurrences.
+### 7.1 Current behavior answers
+
+1. **How does Tree currently identify a repository-top folder?**
+   - `prepareTreeOccurrenceSnapshot` and `prepareTreeStructuralAddressSnapshot` preserve occurrence records with `resolvedPath`/`path`, depth, lineage, and occurrence type. The replacement classification runtime treats an occurrence as repo-top when its `resolvedPath` is a non-empty string with no `/` segment separator. It also requires `occurrenceType === 'folder'` before applying repo-top structural/semantic root classification.
+2. **How does the structural-homes registry currently affect that folder?**
+   - `prepareTreeStructuralHomeEvidence` builds a lookup from `structuralHomes[]` and emits structural-home evidence only when a folder occurrence path is itself a single repo-top token matching that registry. Therefore `src`, `doc`, `scripts`, `calculogic-validator`, and `calculogic-doc-engine` all currently produce structural-home evidence when present as repo-top folder occurrence paths because all five are in `structural-homes.registry.json` today.
+3. **How does current semantic-home evidence classify repository-top folders, if at all?**
+   - `prepareTreeSemanticHomeEvidence` does not have a Tree-owned semantic repository-top-home registry. It only joins addressed occurrence records to Naming-prepared semantic evidence by path/type. A repo-top folder can become semantic in the replacement runtime only if semantic-home evidence is supplied for that same occurrence and folder-kind evidence resolves to `semantic` or semantic-home lookup succeeds. There is no current default rule that turns every non-structural allowed repo-top folder into a semantic repo-top home.
+4. **What happens today when a repository-top folder matches neither structural nor semantic classification?**
+   - `prepareTreeFolderKindEvidence` emits `unspecified` when neither structural-home nor semantic-home evidence exists and the folder-kind registry supports `unspecified`. The replacement classification runtime then returns `structuralClass: unclassified`, `structuralKind: unknown`, `isRepoShapeAllowedTopLevelDirectory: false`, `isStructuralRoot: false`, and `isSemanticRoot: false` for that repo-top occurrence. Separately, unexpected-top-level collection uses `repo-shape-policy.registry.json`, so an allowed repo-top folder can be omitted from unexpected-folder findings even if classification remains unknown.
+5. **Are `calculogic-validator` and `calculogic-doc-engine` currently producing incorrect structural-home evidence?**
+   - Yes, under the intended repository-top partition in this update. Current runtime truth treats both as structural because they are present in `structural-homes.registry.json` and `prepareTreeStructuralHomeEvidence` consumes that registry directly for repo-top matches. The corrected target architecture is that they are allowed semantic repository-top homes, not structural repository-top homes.
+6. **What downstream consumers use structural-home evidence?**
+   - `prepareTreeFolderKindEvidence` consumes it to derive `folderKind: structural`; `prepareTreeOccurrenceClassificationReplacementRuntime` consumes structural-home and folder-kind evidence to derive repo-top structural-root metadata; parity, shadow, readiness, recommendation, evaluation-plan, and execution-contract helpers consume the prepared replacement evidence; the Tree runtime can use the replacement route for unexpected top-level folder selection only when readiness/execution gates are satisfied.
+7. **Would removing the two entries cause them to become semantic correctly, become unspecified, disappear from classification, or change finding behavior?**
+   - Removing only `calculogic-validator` and `calculogic-doc-engine` from `structural-homes.registry.json` would stop structural-home evidence for those repo-top folders. It would not make them semantic by itself because no Tree-owned semantic repo-top-home registry/resolver currently supplies semantic-home evidence for them. They would most likely become `unspecified`/`unclassified` in occurrence classification unless Naming-prepared semantic evidence happened to be supplied for those exact folder occurrences. Because `repo-shape-policy.registry.json` still allows both names, unexpected top-level folder finding behavior should remain allowed/suppressed for those folders, but prepared classification would lose the intended semantic identity.
+8. **How do folder-kind evidence and occurrence-classification replacement handle structural, semantic, and unspecified repo-top homes?**
+   - Structural repo-top homes: structural-home evidence wins first in `prepareTreeFolderKindEvidence`, producing `folderKind: structural`; replacement classification emits `repo-top-structural-root`, `top-root-structural`, `isRepoShapeAllowedTopLevelDirectory: true`, and `isStructuralRoot: true`.
+   - Semantic repo-top homes: semantic-home evidence can produce `folderKind: semantic` only when structural-home evidence is absent for the same path; replacement classification emits `repo-top-semantic-root`, `semantic-root`, `isRepoShapeAllowedTopLevelDirectory: true`, and `isSemanticRoot: true`.
+   - Unspecified repo-top homes: folder-kind evidence emits `unspecified` when no stronger evidence exists; replacement classification currently returns `unclassified`/`unknown` with repo-shape allowed flag false in the classification payload, while the unexpected-folder policy remains governed by repo-shape policy.
+9. **Are lower-level folders safely distinguished from repo-top homes?**
+   - Yes in the audited helpers. `prepareTreeStructuralHomeEvidence` only accepts paths without `/`, and replacement classification only applies repo-top root classification when `resolvedPath` has no `/`. Current tests assert that `calculogic-validator/tree` is a scoped root but not a repo-top occurrence and remains `unclassified`; tests also cover `calculogic-validator/tree/src` as a descendant occurrence in snapshots.
+10. **Does any current logic accidentally classify descendants as repository-top homes, structural homes, semantic homes, or unspecified homes incorrectly?**
+    - The registry-backed structural-home helper and replacement classification route do not classify descendants as repo-top homes. Descendants may receive other replacement metadata, such as subtree partition candidate classification for names like `components`, but that is separate from repository-top home classification. The risky area remains helper-local contributor policy, not the registry-backed repo-top route.
+
+### 7.2 Repo-top partition inventory table
+
+| Repo-top category | Source of truth | Example | Current runtime behavior | Intended behavior | Downstream consumers | Follow-up needed |
+|---|---|---|---|---|---|---|
+| structural repository-top home | `structural-homes.registry.json` via `prepareTreeStructuralHomeEvidence`, plus repo-top check in occurrence classification | `src`, `doc`, `scripts` | Produces structural-home evidence; folder-kind evidence becomes `structural`; replacement classification emits `repo-top-structural-root`. `doc` and `scripts` are structural by current registry membership, while repo-shape separately says they are allowed at repo top. | Remain structural repo-top homes only if the structural registry intentionally defines them as structural; repo-shape allowance remains separate. | Folder-kind evidence; occurrence-classification replacement; parity/shadow/readiness helpers; gated unexpected-top-level replacement route. | No broad change for these examples in this audit; future semantic partition work should confirm each retained structural entry. |
+| semantic repository-top home | Missing Tree-owned semantic repo-top source today; only possible indirectly through Naming-prepared semantic-home evidence joined by `prepareTreeSemanticHomeEvidence` | `calculogic-validator`, `calculogic-doc-engine` | Currently structural because both names are in `structural-homes.registry.json`; they do not become semantic by default. | Allowed at repo top by repo-shape policy, semantic as repository-top homes, not structural. | Same replacement evidence consumers once a semantic source exists; repo-shape policy continues to control allowed top-level status. | Required: define a Tree-owned semantic repo-top-home registry/resolver before retiring these names from structural homes. |
+| unspecified repository-top fallback | `folder-kinds.registry.json` supports `unspecified`; `prepareTreeFolderKindEvidence` emits it when neither structural nor semantic evidence exists | A safe unknown repo-top folder in prepared evidence; if structural entries were removed without semantic replacement, `calculogic-validator` and `calculogic-doc-engine` would fall here in classification | Current replacement classification maps unspecified repo-top evidence to `unclassified`/`unknown`; unexpected-folder findings are still determined by repo-shape policy. | Fallback only when structural or semantic classification cannot be safely established; should not normally occur for known allowed repo-top homes. | Occurrence-classification replacement and parity/readiness helpers. | Add semantic source first so known semantic repo-top homes do not degrade to unspecified. |
+| non-repository-top descendant | Addressed occurrence `resolvedPath`/lineage/depth from snapshot; repo-top classification requires no `/` in `resolvedPath` | `calculogic-validator/tree`, `calculogic-validator/tree/src` | Not repo-top; no structural-home evidence from repo-top registry; replacement classification leaves `calculogic-validator/tree` unclassified in scoped-root tests, and treats descendants separately from repo-top homes. | Continue to be descendants, not independent repository-top homes; no reuse of repo-top-home rule below repository top. | Snapshot/address evidence consumers; replacement classification for non-root metadata only. | No registry change; future adapters must preserve the repo-top guard. |
+
+### 7.3 Repo-shape policy boundary
+
+`repo-shape-policy.registry.json` is not a structural-home registry. It answers whether a folder name is allowed at repository top level for unexpected-top-level folder behavior. Structural-home classification answers whether an allowed repo-top folder is structurally defined. Semantic-home classification must answer whether an allowed repo-top folder is a semantic repository-top home. `unspecified` remains a fallback when neither structural nor semantic classification is established.
+
+Therefore an allowed folder may be:
+
+```text
+allowed at repo top
++ semantic
++ not structural
+```
+
+`calculogic-validator` and `calculogic-doc-engine` are the required target examples of that state. The audit finds that current runtime does not yet have the semantic repo-top source needed to make that state true after structural registry retirement.
+
+## 8. Recommended next seam
+
+Recommended follow-up shape: **define a Tree-owned semantic repository-top-home registry or resolver before retiring overloaded structural entries**.
+
+Exact registry and runtime seam to change:
+
+- add a narrow Tree-owned missing registry concept, `calculogic-validator/tree/src/registries/_builtin/semantic-repository-top-homes.registry.json`, that can classify allowed semantic repo-top package/workspace homes such as `calculogic-validator` and `calculogic-doc-engine`;
+- extend the existing registry-backed occurrence-classification preparation route in `calculogic-validator/tree/src/tree-structure-advisor.wiring.mjs` with a new adjacent Tree-owned semantic repo-top evidence helper before `prepareTreeFolderKindEvidence`, so folder-kind evidence can emit `semantic` for those repo-top occurrences before `prepareTreeOccurrenceClassificationReplacementRuntime` consumes the evidence;
+- only after that semantic source is active, separately retire `calculogic-validator` and `calculogic-doc-engine` from `structural-homes.registry.json` so they do not fall into `unspecified`.
+
+This is intentionally not a broad "implement structural context" issue. It is a partition-correction seam for repository-top homes.
 
 Bounds for that follow-up:
 
-- consume only the existing `surface-structural-home-perspective.registry.json` payload plus existing addressed occurrence records;
-- emit an internal Tree evidence object, not `treeStructuralContext` in advisory details;
+- do not treat `allowedTopLevelDirectories` as structural or semantic truth;
+- preserve the repo-top-only guard and do not classify descendants such as `calculogic-validator/tree` or `calculogic-validator/tree/src` as repository-top homes;
+- emit internal Tree evidence first, not `treeStructuralContext` in advisory details;
 - do not add new findings, placement/coherence conclusions, or Addressing/Naming fields;
-- keep helper-local shim artifact surface inference and Naming bridge contributor literals out of the resolver unless they are separately registered or explicitly bridged by a later issue.
+- keep helper-local shim artifact surface inference and Naming bridge contributor literals out of the repository-top resolver unless they are separately registered or explicitly bridged by a later issue.
