@@ -106,7 +106,7 @@ const assertReplacementRuntimeInput = (input) => {
   }
 };
 
-const toReplacementRootClassification = ({ folderKind, structuralHome, semanticHome }) => {
+const toReplacementRootClassification = ({ folderKind, structuralHome, semanticHome, isRepoShapeAllowedTopLevelDirectory }) => {
   if (folderKind === 'structural' || structuralHome) {
     return {
       structuralClass: 'repo-top-structural-root',
@@ -130,13 +130,13 @@ const toReplacementRootClassification = ({ folderKind, structuralHome, semanticH
   return {
     structuralClass: 'unclassified',
     structuralKind: 'unknown',
-    isRepoShapeAllowedTopLevelDirectory: false,
+    isRepoShapeAllowedTopLevelDirectory,
     isStructuralRoot: false,
     isSemanticRoot: false,
   };
 };
 
-const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, semanticHomeLookup, folderKindLookup }) => {
+const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, semanticHomeLookup, folderKindLookup, allowedTopLevelDirectorySet }) => {
   if (!occurrenceRecord || typeof occurrenceRecord !== 'object') {
     return {
       structuralClass: 'unclassified',
@@ -166,6 +166,7 @@ const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, 
         folderKind: lookupFirstAvailable(folderKindLookup, occurrenceRecord),
         structuralHome: lookupFirstAvailable(structuralHomeLookup, occurrenceRecord),
         semanticHome: lookupFirstAvailable(semanticHomeLookup, occurrenceRecord),
+        isRepoShapeAllowedTopLevelDirectory: allowedTopLevelDirectorySet.has(resolvedPath),
       }),
       isRepoTopOccurrence,
       isScopedRootOccurrence,
@@ -222,6 +223,7 @@ export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => 
           structuralHomeLookup,
           semanticHomeLookup,
           folderKindLookup,
+          allowedTopLevelDirectorySet,
         }),
       }));
     },

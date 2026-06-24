@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "semanticNamingFolderTypeRelationships": [
+    {
+      "relationshipPerspective": "semantic-repository-top-family-home",
+      "status": "active",
+      "namingPerspective": "semantic-family-root",
+      "treeFolderType": "repository-top-folder",
+      "structuralHomeCondition": "not-structural-home",
+      "repoShapeCondition": "allowed-top-level-directory",
+      "definition": "A repository-top folder with Naming-owned semantic-family-root evidence and no retained Tree structural-home evidence is interpreted by Tree as a semantic repository-top family home."
+    }
+  ]
+}

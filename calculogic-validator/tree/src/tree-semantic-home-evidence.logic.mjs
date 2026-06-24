@@ -12,6 +12,16 @@ const assertValidInput = (input) => {
   if (!Array.isArray(input.namingSemanticEvidenceRecords)) {
     throw new Error('Tree semantic-home evidence input namingSemanticEvidenceRecords must be an array.');
   }
+
+  if (
+    input.treeSemanticNamingFolderTypeRelationshipEvidence !== undefined &&
+    (!input.treeSemanticNamingFolderTypeRelationshipEvidence ||
+      typeof input.treeSemanticNamingFolderTypeRelationshipEvidence !== 'object' ||
+      Array.isArray(input.treeSemanticNamingFolderTypeRelationshipEvidence) ||
+      !Array.isArray(input.treeSemanticNamingFolderTypeRelationshipEvidence.relationshipRecords))
+  ) {
+    throw new Error('Tree semantic-home evidence input treeSemanticNamingFolderTypeRelationshipEvidence.relationshipRecords must be an array when provided.');
+  }
 };
 
 const toDeterministicNamingRecordsByPath = (namingSemanticEvidenceRecords) => {
@@ -75,6 +85,26 @@ const pickSafePathMatch = (occurrenceRecord, pathMatches) => {
   return pathMatches[0];
 };
 
+const isRepoTopFolder = (occurrenceRecord) => (
+  occurrenceRecord?.occurrenceType === 'folder' &&
+  typeof occurrenceRecord.path === 'string' &&
+  occurrenceRecord.path.length > 0 &&
+  !occurrenceRecord.path.includes('/') &&
+  !occurrenceRecord.path.includes('\\')
+);
+
+const toRelationshipRecordsByPath = (relationshipRecords = []) => {
+  const recordsByPath = new Map();
+  for (const record of relationshipRecords) {
+    if (!record || typeof record !== 'object' || Array.isArray(record)) continue;
+    if (typeof record.path !== 'string' || record.path.length === 0) continue;
+    if (record.relationshipPerspective !== 'semantic-repository-top-family-home') continue;
+    if (!recordsByPath.has(record.path)) recordsByPath.set(record.path, []);
+    recordsByPath.get(record.path).push(record);
+  }
+  return recordsByPath;
+};
+
 const toEvidenceRecord = (occurrenceRecord, namingRecord) => ({
   addressPath: occurrenceRecord.addressPath ?? null,
   parentAddressPath: occurrenceRecord.parentAddressPath ?? null,
@@ -90,14 +120,21 @@ const toEvidenceRecord = (occurrenceRecord, namingRecord) => ({
   ...(typeof namingRecord.familySubgroup === 'string' && namingRecord.familySubgroup.length > 0
     ? { familySubgroup: namingRecord.familySubgroup }
     : {}),
-  namingEvidenceSource: namingRecord.evidenceSource ?? 'namingSemanticFamilyBridge',
-  rationale: 'Tree joined addressed occurrence path with Naming-prepared semantic evidence path.',
+  namingEvidenceSource: namingRecord.evidenceSource ?? namingRecord.namingEvidenceSource ?? 'namingSemanticFamilyBridge',
+  ...(typeof namingRecord.relationshipPerspective === 'string' ? { relationshipPerspective: namingRecord.relationshipPerspective } : {}),
+  ...(typeof namingRecord.relationshipSource === 'string' ? { relationshipSource: namingRecord.relationshipSource } : {}),
+  rationale: typeof namingRecord.relationshipPerspective === 'string'
+    ? 'Tree semantic-home evidence consumed semantic-naming-to-folder-type relationship interpretation.'
+    : 'Tree joined addressed occurrence path with Naming-prepared semantic evidence path.',
 });
 
 export const prepareTreeSemanticHomeEvidence = (input) => {
   assertValidInput(input);
 
   const namingRecordsByPath = toDeterministicNamingRecordsByPath(input.namingSemanticEvidenceRecords);
+  const relationshipRecordsByPath = toRelationshipRecordsByPath(
+    input.treeSemanticNamingFolderTypeRelationshipEvidence?.relationshipRecords,
+  );
   const evidenceRecords = [];
 
   for (const occurrenceRecord of input.addressedOccurrenceRecords) {
@@ -109,7 +146,12 @@ export const prepareTreeSemanticHomeEvidence = (input) => {
       continue;
     }
 
-    const safeMatch = pickSafePathMatch(occurrenceRecord, namingRecordsByPath.get(occurrenceRecord.path));
+    const relationshipMatch = pickSafePathMatch(occurrenceRecord, relationshipRecordsByPath.get(occurrenceRecord.path));
+    const safeMatch = relationshipMatch ?? (
+      isRepoTopFolder(occurrenceRecord)
+        ? null
+        : pickSafePathMatch(occurrenceRecord, namingRecordsByPath.get(occurrenceRecord.path))
+    );
     if (!safeMatch) {
       continue;
     }
