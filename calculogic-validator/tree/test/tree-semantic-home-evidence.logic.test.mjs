@@ -87,6 +87,68 @@ test('safely skips unlinked naming evidence and unlinked addressed occurrences',
   assert.deepEqual(result, { source: 'tree-semantic-home-evidence', evidenceRecords: [] });
 });
 
+test('emits Tree-owned semantic repository-top home evidence only for direct repo-top folders', () => {
+  const result = prepareTreeSemanticHomeEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A', parentAddressPath: null, path: 'calculogic-validator', name: 'calculogic-validator', occurrenceType: 'folder' },
+      { addressPath: 'A.1', parentAddressPath: 'A', path: 'calculogic-validator/tree', name: 'tree', occurrenceType: 'folder' },
+      { addressPath: 'A.1.1', parentAddressPath: 'A.1', path: 'calculogic-validator/tree/src', name: 'src', occurrenceType: 'folder' },
+      { addressPath: 'B', parentAddressPath: null, path: 'calculogic-doc-engine', name: 'calculogic-doc-engine', occurrenceType: 'folder' },
+      { addressPath: 'C', parentAddressPath: null, path: 'README.md', name: 'README.md', occurrenceType: 'file' },
+    ],
+    namingSemanticEvidenceRecords: [],
+    semanticRepositoryTopHomesRegistry: {
+      semanticRepositoryTopHomes: [
+        { semanticRepositoryTopHome: 'calculogic-doc-engine', status: 'active', definition: 'Doc engine package root.' },
+        { semanticRepositoryTopHome: 'calculogic-validator', status: 'active', definition: 'Validator package root.' },
+      ],
+    },
+  });
+
+  assert.deepEqual(result.evidenceRecords.map((record) => record.path), [
+    'calculogic-validator',
+    'calculogic-doc-engine',
+  ]);
+  assert.deepEqual(result.evidenceRecords.map((record) => record.semanticHome), [
+    'calculogic-validator',
+    'calculogic-doc-engine',
+  ]);
+  assert.equal(result.evidenceRecords[0].semanticHomeEvidenceStrength, 'direct-repo-top-semantic-home-match');
+  assert.equal(result.evidenceRecords.some((record) => record.path === 'calculogic-validator/tree'), false);
+  assert.equal(result.evidenceRecords.some((record) => record.path === 'calculogic-validator/tree/src'), false);
+});
+
+test('preserves Naming-derived semantic evidence alongside Tree-owned semantic repository-top evidence', () => {
+  const result = prepareTreeSemanticHomeEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A', parentAddressPath: null, path: 'calculogic-validator', name: 'calculogic-validator', occurrenceType: 'folder' },
+    ],
+    namingSemanticEvidenceRecords: [
+      {
+        path: 'calculogic-validator',
+        semanticName: 'validator-package',
+        semanticFamily: 'validator-family',
+        familyRoot: 'validator',
+        evidenceSource: 'namingSemanticFamilyBridge',
+        evidenceStrength: 'bounded',
+        occurrenceType: 'folder',
+      },
+    ],
+    semanticRepositoryTopHomesRegistry: {
+      semanticRepositoryTopHomes: [
+        { semanticRepositoryTopHome: 'calculogic-validator', status: 'active', definition: 'Validator package root.' },
+      ],
+    },
+  });
+
+  assert.equal(result.evidenceRecords.length, 2);
+  assert.equal(result.evidenceRecords[0].semanticHome, 'calculogic-validator');
+  assert.equal(Object.hasOwn(result.evidenceRecords[0], 'semanticName'), false);
+  assert.equal(result.evidenceRecords[1].semanticHome, 'validator-family');
+  assert.equal(result.evidenceRecords[1].semanticName, 'validator-package');
+  assert.equal(result.evidenceRecords[1].namingEvidenceSource, 'namingSemanticFamilyBridge');
+});
+
 test('handles empty inputs and deterministically rejects invalid payloads', () => {
   assert.deepEqual(
     prepareTreeSemanticHomeEvidence({ addressedOccurrenceRecords: [], namingSemanticEvidenceRecords: [] }),

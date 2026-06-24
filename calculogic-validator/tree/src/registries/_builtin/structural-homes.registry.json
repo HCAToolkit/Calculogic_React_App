@@ -17,16 +17,6 @@
       "definition": "Executable command or package-bin surface home."
     },
     {
-      "structuralHome": "calculogic-doc-engine",
-      "status": "active",
-      "definition": "Repository-owned document-engine package root home."
-    },
-    {
-      "structuralHome": "calculogic-validator",
-      "status": "active",
-      "definition": "Repository-owned validator package root home."
-    },
-    {
       "structuralHome": "compat",
       "status": "active",
       "definition": "Compatibility, shim, adapter, or transition-support home."

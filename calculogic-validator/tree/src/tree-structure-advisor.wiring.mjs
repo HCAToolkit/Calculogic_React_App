@@ -29,6 +29,9 @@ import { prepareTreeNamingOccurrenceBridgeIntake } from './tree-naming-occurrenc
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-registry.logic.mjs';
 import { getBuiltinTreeRepoShapePolicy } from './registries/tree-repo-shape-policy-registry.logic.mjs';
+import {
+  getBuiltinSemanticRepositoryTopHomesRegistry,
+} from './registries/tree-semantic-repository-top-homes-registry.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const WALK_EXCLUDED_DIRECTORIES = new Set([
@@ -78,6 +81,7 @@ export const prepareTreeStructureAdvisorInputs = (
     },
   });
   const structuralHomesRegistry = getBuiltinStructuralHomesRegistry();
+  const semanticRepositoryTopHomesRegistry = getBuiltinSemanticRepositoryTopHomesRegistry();
   const folderKindsRegistry = getBuiltinFolderKindsRegistry();
   const treeRepoShapePolicy = getBuiltinTreeRepoShapePolicy();
   const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
@@ -95,6 +99,7 @@ export const prepareTreeStructureAdvisorInputs = (
   const treeSemanticHomeEvidence = prepareTreeSemanticHomeEvidence({
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
     namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
+    semanticRepositoryTopHomesRegistry,
   });
   const treeFolderKindEvidence = prepareTreeFolderKindEvidence({
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,

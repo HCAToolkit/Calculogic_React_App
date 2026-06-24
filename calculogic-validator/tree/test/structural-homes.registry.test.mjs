@@ -11,8 +11,6 @@ const EXPECTED_STRUCTURAL_HOMES = [
   'app',
   'assets',
   'bin',
-  'calculogic-doc-engine',
-  'calculogic-validator',
   'compat',
   'config',
   'data',

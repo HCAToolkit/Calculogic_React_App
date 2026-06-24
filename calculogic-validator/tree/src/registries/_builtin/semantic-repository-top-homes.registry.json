@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "semanticRepositoryTopHomes": [
+    {
+      "semanticRepositoryTopHome": "calculogic-doc-engine",
+      "status": "active",
+      "definition": "Repository-owned document-engine package root with semantic package ownership at repository top."
+    },
+    {
+      "semanticRepositoryTopHome": "calculogic-validator",
+      "status": "active",
+      "definition": "Repository-owned validator package root with semantic package ownership at repository top."
+    }
+  ]
+}

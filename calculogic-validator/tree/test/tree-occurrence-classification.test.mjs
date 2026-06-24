@@ -5,6 +5,12 @@ import {
 } from '../src/tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceSnapshot } from '../src/tree-occurrence-snapshot.logic.mjs';
 import { prepareTreeStructuralAddressSnapshot } from '../src/tree-structural-address-snapshot.logic.mjs';
+import { prepareTreeStructuralHomeEvidence } from '../src/tree-structural-home-evidence.logic.mjs';
+import { prepareTreeSemanticHomeEvidence } from '../src/tree-semantic-home-evidence.logic.mjs';
+import { prepareTreeFolderKindEvidence } from '../src/tree-folder-kind-evidence.logic.mjs';
+import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
+import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
+import { getBuiltinSemanticRepositoryTopHomesRegistry } from '../src/registries/tree-semantic-repository-top-homes-registry.logic.mjs';
 
 const TEST_REPO_SHAPE_POLICY = {
   allowedTopLevelDirectories: [
@@ -237,4 +243,86 @@ test('tree unexpected top-level replacement policy does not allow general struct
     replacementRuntime.collectUnexpectedTopLevelDirectoryNames(['src', 'data', 'vendor', 'assets', 'ops']),
     ['assets', 'data', 'ops', 'vendor'],
   );
+});
+
+test('tree occurrence classification consumes semantic repository-top homes without descendant inheritance', () => {
+  const selectedPaths = [
+    'src/index.js',
+    'calculogic-validator/tree/src/tree-structure-advisor.logic.mjs',
+    'calculogic-doc-engine/src/index.mjs',
+    'experiments/notes.txt',
+  ];
+  const snapshot = prepareTreeOccurrenceSnapshot({
+    selectedPaths,
+    includeRoots: [],
+    targets: [],
+  });
+  const addressedSnapshot = prepareTreeStructuralAddressSnapshot({
+    occurrenceSnapshot: snapshot,
+    selectedPaths,
+    targets: [],
+    includeRoots: [],
+    scope: { source: 'test' },
+  });
+  const treeStructuralHomeEvidence = prepareTreeStructuralHomeEvidence({
+    addressedOccurrenceRecords: addressedSnapshot.occurrenceRecords,
+    structuralHomesRegistry: getBuiltinStructuralHomesRegistry(),
+  });
+  const treeSemanticHomeEvidence = prepareTreeSemanticHomeEvidence({
+    addressedOccurrenceRecords: addressedSnapshot.occurrenceRecords,
+    namingSemanticEvidenceRecords: [],
+    semanticRepositoryTopHomesRegistry: getBuiltinSemanticRepositoryTopHomesRegistry(),
+  });
+  const treeFolderKindEvidence = prepareTreeFolderKindEvidence({
+    addressedOccurrenceRecords: addressedSnapshot.occurrenceRecords,
+    treeStructuralHomeEvidence,
+    treeSemanticHomeEvidence,
+    folderKindsRegistry: getBuiltinFolderKindsRegistry(),
+  });
+  const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence,
+    treeSemanticHomeEvidence,
+    treeFolderKindEvidence,
+    treeRepoShapePolicy: TEST_REPO_SHAPE_POLICY,
+  });
+
+  const records = byResolvedPath(replacementRuntime.classifyOccurrenceRecords(addressedSnapshot.occurrenceRecords));
+  const folderKinds = Object.fromEntries(
+    treeFolderKindEvidence.evidenceRecords.map((record) => [record.path, record.folderKind]),
+  );
+
+  assert.equal(folderKinds.src, 'structural');
+  assert.equal(records.src.structuralClass, 'repo-top-structural-root');
+  assert.equal(records.src.isStructuralRoot, true);
+  assert.equal(records.src.isSemanticRoot, false);
+
+  for (const semanticPackageRoot of ['calculogic-validator', 'calculogic-doc-engine']) {
+    assert.equal(folderKinds[semanticPackageRoot], 'semantic');
+    assert.equal(records[semanticPackageRoot].structuralClass, 'repo-top-semantic-root');
+    assert.equal(records[semanticPackageRoot].structuralKind, 'semantic-root');
+    assert.equal(records[semanticPackageRoot].isRepoShapeAllowedTopLevelDirectory, true);
+    assert.equal(records[semanticPackageRoot].isStructuralRoot, false);
+    assert.equal(records[semanticPackageRoot].isSemanticRoot, true);
+  }
+
+  assert.equal(records['calculogic-validator/tree'].isRepoTopOccurrence, false);
+  assert.equal(records['calculogic-validator/tree'].structuralClass, 'unclassified');
+  assert.equal(records['calculogic-validator/tree/src'].isRepoTopOccurrence, false);
+  assert.equal(records['calculogic-validator/tree/src'].structuralClass, 'unclassified');
+  assert.equal(folderKinds.experiments, 'unspecified');
+  assert.equal(records.experiments.structuralClass, 'unclassified');
+  assert.equal(records.experiments.isRepoShapeAllowedTopLevelDirectory, false);
+});
+
+test('tree occurrence classification keeps repo-shape allowance separate from classification evidence', () => {
+  const snapshot = prepareTreeOccurrenceSnapshot({
+    selectedPaths: ['doc/readme.md'],
+    includeRoots: [],
+    targets: [],
+  });
+  const records = byResolvedPath(classifySnapshot(snapshot));
+
+  assert.equal(TEST_REPO_SHAPE_POLICY.allowedTopLevelDirectories.includes('doc'), true);
+  assert.equal(records.doc.structuralClass, 'unclassified');
+  assert.equal(records.doc.isRepoShapeAllowedTopLevelDirectory, false);
 });

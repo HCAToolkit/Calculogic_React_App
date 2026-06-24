@@ -12,6 +12,72 @@ const assertValidInput = (input) => {
   if (!Array.isArray(input.namingSemanticEvidenceRecords)) {
     throw new Error('Tree semantic-home evidence input namingSemanticEvidenceRecords must be an array.');
   }
+
+  if (
+    input.semanticRepositoryTopHomesRegistry !== undefined &&
+    (
+      !input.semanticRepositoryTopHomesRegistry ||
+      typeof input.semanticRepositoryTopHomesRegistry !== 'object' ||
+      Array.isArray(input.semanticRepositoryTopHomesRegistry)
+    )
+  ) {
+    throw new Error('Tree semantic-home evidence input semanticRepositoryTopHomesRegistry must be an object when provided.');
+  }
+
+  if (
+    input.semanticRepositoryTopHomesRegistry !== undefined &&
+    !Array.isArray(input.semanticRepositoryTopHomesRegistry.semanticRepositoryTopHomes)
+  ) {
+    throw new Error(
+      'Tree semantic-home evidence semanticRepositoryTopHomesRegistry.semanticRepositoryTopHomes must be an array.',
+    );
+  }
+};
+
+const toSemanticRepositoryTopHomeLookup = (semanticRepositoryTopHomes = []) => {
+  const lookup = new Map();
+
+  for (const entry of semanticRepositoryTopHomes) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      continue;
+    }
+
+    if (
+      typeof entry.semanticRepositoryTopHome !== 'string' ||
+      entry.semanticRepositoryTopHome.length === 0 ||
+      lookup.has(entry.semanticRepositoryTopHome)
+    ) {
+      continue;
+    }
+
+    lookup.set(entry.semanticRepositoryTopHome, {
+      semanticRepositoryTopHome: entry.semanticRepositoryTopHome,
+      semanticRepositoryTopHomeStatus: entry.status ?? null,
+      semanticRepositoryTopHomeDefinition: entry.definition ?? null,
+    });
+  }
+
+  return lookup;
+};
+
+const toRepoTopFolderToken = (occurrenceRecord) => {
+  if (!occurrenceRecord || typeof occurrenceRecord !== 'object' || Array.isArray(occurrenceRecord)) {
+    return null;
+  }
+
+  if (occurrenceRecord.occurrenceType !== 'folder') {
+    return null;
+  }
+
+  if (typeof occurrenceRecord.path !== 'string' || occurrenceRecord.path.length === 0) {
+    return null;
+  }
+
+  if (occurrenceRecord.path.includes('/') || occurrenceRecord.path.includes('\\')) {
+    return null;
+  }
+
+  return occurrenceRecord.path;
 };
 
 const toDeterministicNamingRecordsByPath = (namingSemanticEvidenceRecords) => {
@@ -94,10 +160,27 @@ const toEvidenceRecord = (occurrenceRecord, namingRecord) => ({
   rationale: 'Tree joined addressed occurrence path with Naming-prepared semantic evidence path.',
 });
 
+const toTreeOwnedSemanticRepositoryTopEvidenceRecord = (occurrenceRecord, semanticHomeMetadata) => ({
+  addressPath: occurrenceRecord.addressPath ?? null,
+  parentAddressPath: occurrenceRecord.parentAddressPath ?? null,
+  path: occurrenceRecord.path,
+  name: occurrenceRecord.name ?? null,
+  occurrenceType: occurrenceRecord.occurrenceType ?? null,
+  semanticHome: semanticHomeMetadata.semanticRepositoryTopHome,
+  semanticHomeSource: SOURCE_ID,
+  semanticHomeEvidenceStrength: 'direct-repo-top-semantic-home-match',
+  semanticRepositoryTopHomeStatus: semanticHomeMetadata.semanticRepositoryTopHomeStatus,
+  semanticRepositoryTopHomeDefinition: semanticHomeMetadata.semanticRepositoryTopHomeDefinition,
+  rationale: 'Repo-top folder token matches a Tree semantic repository-top-home registry entry.',
+});
+
 export const prepareTreeSemanticHomeEvidence = (input) => {
   assertValidInput(input);
 
   const namingRecordsByPath = toDeterministicNamingRecordsByPath(input.namingSemanticEvidenceRecords);
+  const semanticRepositoryTopHomeLookup = toSemanticRepositoryTopHomeLookup(
+    input.semanticRepositoryTopHomesRegistry?.semanticRepositoryTopHomes,
+  );
   const evidenceRecords = [];
 
   for (const occurrenceRecord of input.addressedOccurrenceRecords) {
@@ -107,6 +190,13 @@ export const prepareTreeSemanticHomeEvidence = (input) => {
 
     if (typeof occurrenceRecord.path !== 'string' || occurrenceRecord.path.length === 0) {
       continue;
+    }
+
+    const semanticRepositoryTopHomeMetadata = semanticRepositoryTopHomeLookup.get(toRepoTopFolderToken(occurrenceRecord));
+    if (semanticRepositoryTopHomeMetadata) {
+      evidenceRecords.push(
+        toTreeOwnedSemanticRepositoryTopEvidenceRecord(occurrenceRecord, semanticRepositoryTopHomeMetadata),
+      );
     }
 
     const safeMatch = pickSafePathMatch(occurrenceRecord, namingRecordsByPath.get(occurrenceRecord.path));

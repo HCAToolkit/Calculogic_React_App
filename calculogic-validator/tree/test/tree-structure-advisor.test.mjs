@@ -25,6 +25,9 @@ import { planTreeOccurrenceClassificationRuntimeEvaluation } from '../src/tree-o
 import { planTreeOccurrenceClassificationRuntimeExecutionContract } from '../src/tree-occurrence-classification-runtime-execution-contract.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from '../src/registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kinds-registry.logic.mjs';
+import {
+  getBuiltinSemanticRepositoryTopHomesRegistry,
+} from '../src/registries/tree-semantic-repository-top-homes-registry.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
 import { listRegisteredValidators } from '../../src/core/validator-registry.knowledge.mjs';
 import { getValidatorScopeProfile } from '../../src/core/validator-scopes.logic.mjs';
@@ -258,6 +261,7 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
       prepareTreeSemanticHomeEvidence({
         addressedOccurrenceRecords: snapshot.occurrenceRecords,
         namingSemanticEvidenceRecords: [],
+        semanticRepositoryTopHomesRegistry: getBuiltinSemanticRepositoryTopHomesRegistry(),
       }),
     );
 
@@ -401,7 +405,10 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
         ['findingCode', 'severity', 'placementVerdict', 'confidenceScore', 'report', 'isRepoShapeAllowedTopLevelDirectory', 'isStructuralRoot', 'isSemanticRoot', 'structuralClass', 'structuralKind'].some((key) => Object.hasOwn(record, key))),
       false,
     );
-    assert.deepEqual(preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords, []);
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeSemanticHomeEvidence.evidenceRecords.map((record) => record.path),
+      ['calculogic-doc-engine', 'calculogic-validator'],
+    );
     const parityEvidence = preparedInputs.preparedDependencies.treeOccurrenceClassificationParityEvidence;
     assert.equal(Array.isArray(parityEvidence.parityRecords), true);
     assert.equal(typeof parityEvidence.summary, 'object');
@@ -452,6 +459,7 @@ test('tree-structure-advisor wiring prepares semantic-home evidence using naming
     const expectedSemanticHomeEvidence = prepareTreeSemanticHomeEvidence({
       addressedOccurrenceRecords: preparedInputs.structuralAddressSnapshot.occurrenceRecords,
       namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
+      semanticRepositoryTopHomesRegistry: getBuiltinSemanticRepositoryTopHomesRegistry(),
     });
 
     assert.deepEqual(preparedInputs.preparedDependencies.treeSemanticHomeEvidence, expectedSemanticHomeEvidence);
@@ -745,6 +753,46 @@ test('tree-structure-advisor replacement root policy comes from bounded structur
     );
     assert.ok(advisory);
     assert.deepEqual(advisory.details.allowedTopLevelDirectories, EXPECTED_TREE_REPO_SHAPE_ALLOWED_TOP_LEVEL_DIRECTORIES);
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
+test('tree-structure-advisor wiring classifies package roots as semantic and keeps them non-unexpected', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-semantic-repo-top-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo' });
+    const replacementRuntime = preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime;
+    const classifiedRecords = replacementRuntime.classifyOccurrenceRecords(
+      preparedInputs.structuralAddressSnapshot.occurrenceRecords,
+    );
+    const classifiedByPath = Object.fromEntries(classifiedRecords.map((record) => [record.resolvedPath, record]));
+    const fallbackUnexpected = replacementRuntime.collectUnexpectedTopLevelDirectoryNames(
+      preparedInputs.topLevelDirectoryNames,
+    );
+    const result = runTreeStructureAdvisorRuntime({
+      ...preparedInputs,
+      preparedDependencies: {
+        ...preparedInputs.preparedDependencies,
+        treeOccurrenceClassificationReplacementReadiness: READY_OCCURRENCE_CLASSIFICATION_REPLACEMENT_READINESS,
+        treeOccurrenceClassificationRuntimeExecutionContract: READY_OCCURRENCE_CLASSIFICATION_EXECUTION_CONTRACT,
+      },
+    });
+    const readyUnexpected = result.findings
+      .filter((finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER')
+      .map((finding) => finding.path);
+
+    for (const semanticPackageRoot of ['calculogic-doc-engine', 'calculogic-validator']) {
+      assert.equal(classifiedByPath[semanticPackageRoot].structuralClass, 'repo-top-semantic-root');
+      assert.equal(classifiedByPath[semanticPackageRoot].structuralKind, 'semantic-root');
+      assert.equal(classifiedByPath[semanticPackageRoot].isRepoShapeAllowedTopLevelDirectory, true);
+      assert.equal(classifiedByPath[semanticPackageRoot].isStructuralRoot, false);
+      assert.equal(classifiedByPath[semanticPackageRoot].isSemanticRoot, true);
+      assert.equal(fallbackUnexpected.includes(semanticPackageRoot), false);
+      assert.equal(readyUnexpected.includes(semanticPackageRoot), false);
+    }
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
