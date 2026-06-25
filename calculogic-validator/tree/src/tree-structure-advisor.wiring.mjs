@@ -26,12 +26,15 @@ import { recommendTreeOccurrenceClassificationReplacement } from './tree-occurre
 import { planTreeOccurrenceClassificationRuntimeEvaluation } from './tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeExecutionContract } from './tree-occurrence-classification-runtime-execution-contract.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
+import { projectNamingFolderCompositionBridge } from '../../naming/src/naming-folder-composition-projection.logic.mjs';
 import { createNamingOccurrenceBridgePayload } from '../../naming/src/naming-occurrence-bridge-payload.logic.mjs';
+import { getBuiltinNamingFolderCompositionPatternsRegistry } from '../../naming/src/registries/naming-folder-composition-patterns-registry.logic.mjs';
 import { prepareTreeNamingOccurrenceBridgeIntake } from './tree-naming-occurrence-intake.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-registry.logic.mjs';
 import { getBuiltinTreeRepoShapePolicy } from './registries/tree-repo-shape-policy-registry.logic.mjs';
 import { getBuiltinSemanticNamingFolderTypeRelationshipsRegistry } from './registries/tree-semantic-naming-folder-type-relationships-registry.logic.mjs';
+import { getBuiltinStructuralRoleTokensRegistry } from './registries/tree-structural-role-tokens-registry.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const TREE_ADDRESS_PROFILE_ID = 'tree-structure-advisor-address-profile';
@@ -87,16 +90,28 @@ export const prepareTreeStructureAdvisorInputs = (
   const folderKindsRegistry = getBuiltinFolderKindsRegistry();
   const treeRepoShapePolicy = getBuiltinTreeRepoShapePolicy();
   const semanticNamingFolderTypeRelationshipsRegistry = getBuiltinSemanticNamingFolderTypeRelationshipsRegistry();
+  const structuralRoleTokensRegistry = getBuiltinStructuralRoleTokensRegistry();
+  const namingFolderCompositionPatternsRegistry = getBuiltinNamingFolderCompositionPatternsRegistry();
   const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
     ? prepareNamingSemanticEvidenceBridge(namingSemanticFamilyBridge)
     : { observations: [] };
+  const namingFolderCompositionBridge = projectNamingFolderCompositionBridge({
+    folderOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+    folderCompositionPatternsRegistry: namingFolderCompositionPatternsRegistry,
+  });
+  const combinedNamingSemanticEvidenceBridge = {
+    observations: [
+      ...(namingSemanticEvidenceBridge.observations ?? []),
+      ...namingFolderCompositionBridge.observations,
+    ],
+  };
   const addressedOccurrenceNamespace = {
     addressProfileId: TREE_ADDRESS_PROFILE_ID,
     addressedSnapshotId: TREE_ADDRESSED_SNAPSHOT_ID,
     occurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
   };
   const addressedNamingOccurrenceBridge = namingOccurrenceBridge ?? createNamingOccurrenceBridgePayload({
-    namingSemanticFamilyBridge: namingSemanticEvidenceBridge,
+    namingSemanticFamilyBridge: combinedNamingSemanticEvidenceBridge,
     addressedOccurrenceNamespace,
   });
   const addressedNamingSemanticEvidenceBridge = prepareNamingSemanticEvidenceBridge(addressedNamingOccurrenceBridge);
@@ -115,6 +130,7 @@ export const prepareTreeStructureAdvisorInputs = (
     treeStructuralHomeEvidence,
     treeRepoShapePolicy,
     relationshipsRegistry: semanticNamingFolderTypeRelationshipsRegistry,
+    structuralRoleTokensRegistry,
   });
   const treeSemanticHomeEvidence = prepareTreeSemanticHomeEvidence({
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { projectNamingSemanticFamilyBridge } from '../src/naming-validator.host.mjs';
+import { projectNamingFolderCompositionBridge } from '../src/naming-folder-composition-projection.logic.mjs';
 
 test('naming bridge projection emits bounded semantic-family observation fields only', () => {
   const projected = projectNamingSemanticFamilyBridge({
@@ -88,4 +89,32 @@ test('naming bridge projection emits package-root folder semantic-family-root ob
       },
     },
   ]);
+});
+
+test('naming folder-composition bridge emits only explicit folder observations from registry-backed patterns', () => {
+  const result = projectNamingFolderCompositionBridge({
+    folderOccurrenceRecords: [
+      { path: 'calculogic-validator/naming/naming-src', name: 'naming-src', occurrenceType: 'folder' },
+      { path: 'calculogic-validator/naming/naming-src.logic.mjs', name: 'naming-src.logic.mjs', occurrenceType: 'file' },
+      { path: 'calculogic-validator/naming/tree-src', name: 'tree-src', occurrenceType: 'folder' },
+    ],
+    folderCompositionPatternsRegistry: {
+      folderCompositionPatterns: [{
+        patternId: 'semantic-qualified-src-container.v1',
+        status: 'active',
+        compositionKind: 'semantic-qualified-structural-container',
+        semanticQualifier: 'naming',
+        structuralRoleToken: 'src',
+        tokenOrder: ['semantic-qualifier', 'structural-role-token'],
+        folderName: 'naming-src',
+        qualification: 'explicit-supported-folder-composition',
+        confidence: 'bounded',
+      }],
+    },
+  });
+
+  assert.deepEqual(result.observations.map((observation) => observation.path), ['calculogic-validator/naming/naming-src']);
+  assert.equal(result.observations[0].semanticQualifier, 'naming');
+  assert.equal(result.observations[0].structuralRoleToken, 'src');
+  assert.equal(result.observations[0].folderCompositionKind, 'semantic-qualified-structural-container');
 });

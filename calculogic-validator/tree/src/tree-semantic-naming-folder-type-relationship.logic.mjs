@@ -92,6 +92,118 @@ const assertValidInput = (input) => {
   if (!Array.isArray(input.namingSemanticEvidenceRecords)) throw new Error('Tree semantic naming folder-type relationship input namingSemanticEvidenceRecords must be an array.');
   if (!input.treeStructuralHomeEvidence || !Array.isArray(input.treeStructuralHomeEvidence.evidenceRecords)) throw new Error('Tree semantic naming folder-type relationship input treeStructuralHomeEvidence.evidenceRecords must be an array.');
   if (!input.relationshipsRegistry || !Array.isArray(input.relationshipsRegistry.semanticNamingFolderTypeRelationships)) throw new Error('Tree semantic naming folder-type relationship input relationshipsRegistry.semanticNamingFolderTypeRelationships must be an array.');
+  if (input.structuralRoleTokensRegistry !== undefined && (!input.structuralRoleTokensRegistry || !Array.isArray(input.structuralRoleTokensRegistry.structuralRoleTokens))) throw new Error('Tree semantic naming folder-type relationship input structuralRoleTokensRegistry.structuralRoleTokens must be an array when provided.');
+};
+
+
+const toStructuralRoleTokenLookup = (registry = {}) => {
+  const lookup = new Map();
+  for (const entry of registry.structuralRoleTokens ?? []) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+    if (entry.status !== 'active') continue;
+    if (entry.relationshipPerspective !== 'semantic-qualified-structural-container') continue;
+    if (typeof entry.token !== 'string' || entry.token.length === 0) continue;
+    if (typeof entry.structuralRole !== 'string' || entry.structuralRole.length === 0) continue;
+    if (!lookup.has(entry.token)) lookup.set(entry.token, entry);
+  }
+  return lookup;
+};
+
+const isQualifiedFolderCompositionObservation = (namingRecord) => (
+  namingRecord &&
+  typeof namingRecord === 'object' &&
+  !Array.isArray(namingRecord) &&
+  namingRecord.occurrenceType === 'folder' &&
+  namingRecord.semanticEvidenceKind === 'folder-semantic-structural-composition' &&
+  namingRecord.folderCompositionKind === 'semantic-qualified-structural-container' &&
+  typeof namingRecord.semanticQualifier === 'string' && namingRecord.semanticQualifier.length > 0 &&
+  typeof namingRecord.structuralRoleToken === 'string' && namingRecord.structuralRoleToken.length > 0
+);
+
+const toRecordsByAddress = (records) => {
+  const recordsByAddress = new Map();
+  for (const record of records) {
+    if (!record || typeof record !== 'object' || Array.isArray(record)) continue;
+    if (typeof record.addressPath !== 'string' || record.addressPath.length === 0) continue;
+    recordsByAddress.set(record.addressPath, record);
+  }
+  return recordsByAddress;
+};
+
+const toAncestorLineage = (occurrenceRecord, occurrenceRecordsByAddress) => {
+  const lineage = [];
+  let parentAddressPath = occurrenceRecord.parentAddressPath;
+  const visited = new Set();
+  while (typeof parentAddressPath === 'string' && parentAddressPath.length > 0 && !visited.has(parentAddressPath)) {
+    visited.add(parentAddressPath);
+    const parentRecord = occurrenceRecordsByAddress.get(parentAddressPath);
+    if (!parentRecord) break;
+    lineage.push(parentRecord);
+    parentAddressPath = parentRecord.parentAddressPath;
+  }
+  return lineage;
+};
+
+const toEstablishedSemanticContext = (ancestorLineage) => {
+  const nearestFolder = ancestorLineage.find((record) => record?.occurrenceType === 'folder' && typeof (record.name ?? record.actualName) === 'string');
+  return nearestFolder ? { semanticContext: nearestFolder.name ?? nearestFolder.actualName, source: 'addressed-parent-folder-lineage' } : null;
+};
+
+const pushFolderCompositionRelationshipIfTriggered = ({
+  relationshipRecords,
+  occurrenceRecord,
+  namingRecord,
+  structuralRoleTokenLookup,
+  occurrenceRecordsByAddress,
+}) => {
+  if (!isQualifiedFolderCompositionObservation(namingRecord)) return false;
+
+  const structuralRoleTokenMetadata = structuralRoleTokenLookup.get(namingRecord.structuralRoleToken);
+  const ancestorLineage = toAncestorLineage(occurrenceRecord, occurrenceRecordsByAddress);
+  const establishedContext = toEstablishedSemanticContext(ancestorLineage);
+  let relationshipInterpretation = 'semantic-qualified-structural-container-context-unresolved';
+
+  if (!structuralRoleTokenMetadata) {
+    relationshipInterpretation = 'structural-token-not-registered-for-this-perspective';
+  } else if (establishedContext?.semanticContext === namingRecord.semanticQualifier) {
+    relationshipInterpretation = 'semantic-qualified-structural-container-aligned';
+  } else if (establishedContext?.semanticContext) {
+    relationshipInterpretation = 'semantic-qualified-structural-container-semantic-context-mismatch';
+  }
+
+  relationshipRecords.push({
+    addressPath: occurrenceRecord.addressPath ?? null,
+    parentAddressPath: occurrenceRecord.parentAddressPath ?? null,
+    path: occurrenceRecord.path,
+    name: occurrenceRecord.name ?? null,
+    occurrenceType: occurrenceRecord.occurrenceType ?? null,
+    relationshipPerspective: 'semantic-qualified-structural-container',
+    relationshipSource: SOURCE_ID,
+    relationshipInterpretation,
+    relationshipEvidenceStrength: namingRecord.compositionConfidence ?? 'bounded',
+    semanticQualifier: namingRecord.semanticQualifier,
+    folderCompositionKind: namingRecord.folderCompositionKind,
+    structuralRoleToken: namingRecord.structuralRoleToken,
+    structuralRole: structuralRoleTokenMetadata?.structuralRole ?? null,
+    establishedSemanticContext: establishedContext?.semanticContext ?? null,
+    semanticContextSource: establishedContext?.source ?? null,
+    ancestorLineage: ancestorLineage.map((record) => ({
+      addressPath: record.addressPath ?? null,
+      parentAddressPath: record.parentAddressPath ?? null,
+      path: record.path ?? null,
+      name: record.name ?? record.actualName ?? null,
+      occurrenceType: record.occurrenceType ?? null,
+    })),
+    namingEvidenceSource: namingRecord.evidenceSource ?? 'namingSemanticFamilyBridge',
+    semanticEvidenceKind: namingRecord.semanticEvidenceKind,
+    compositionQualification: namingRecord.compositionQualification ?? null,
+    ...(namingRecord.addressProfileId ? { addressProfileId: namingRecord.addressProfileId } : {}),
+    ...(namingRecord.addressedSnapshotId ? { addressedSnapshotId: namingRecord.addressedSnapshotId } : {}),
+    ...(namingRecord.occurrenceAddress ? { occurrenceAddress: namingRecord.occurrenceAddress } : {}),
+    ...(namingRecord.evidenceProvenance ? { evidenceProvenance: { ...namingRecord.evidenceProvenance } } : {}),
+    rationale: 'Tree interpreted a Naming-owned folder-only mixed semantic/structural composition against addressed ancestor lineage and a Tree-owned embedded structural-role token registry.',
+  });
+  return true;
 };
 
 export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) => {
@@ -102,11 +214,23 @@ export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) =
   const namingLookup = toEvidenceLookup(input.namingSemanticEvidenceRecords);
   const structuralLookup = toEvidenceLookup(input.treeStructuralHomeEvidence.evidenceRecords);
   const allowedTopLevelDirectorySet = toAllowedTopLevelDirectorySet(input.treeRepoShapePolicy);
+  const structuralRoleTokenLookup = toStructuralRoleTokenLookup(input.structuralRoleTokensRegistry);
+  const occurrenceRecordsByAddress = toRecordsByAddress(input.addressedOccurrenceRecords);
   const relationshipRecords = [];
   const unclassifiedRelationshipRecords = [];
 
   for (const occurrenceRecord of input.addressedOccurrenceRecords) {
     if (occurrenceRecord?.occurrenceType !== 'folder') continue;
+
+    const namingRecord = hasAmbiguousEvidence(namingLookup, occurrenceRecord) ? null : lookupEvidence(namingLookup, occurrenceRecord);
+    if (pushFolderCompositionRelationshipIfTriggered({
+      relationshipRecords,
+      occurrenceRecord,
+      namingRecord,
+      structuralRoleTokenLookup,
+      occurrenceRecordsByAddress,
+    })) continue;
+
     if (!isRepoTopFolder(occurrenceRecord)) continue;
     if (lookupEvidence(structuralLookup, occurrenceRecord)) continue;
     if (!rule) {
@@ -134,7 +258,6 @@ export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) =
       continue;
     }
 
-    const namingRecord = lookupEvidence(namingLookup, occurrenceRecord);
     if (!namingRecord) {
       unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
         occurrenceRecord,

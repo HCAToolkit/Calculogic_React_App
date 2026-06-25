@@ -2054,3 +2054,51 @@ test('tree structure advisor wiring preserves path-keyed fallback when prepared 
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
 });
+
+test('semantic-qualified structural-container relationship is folder-only address-keyed and preserves existing roots', () => {
+  const addressedOccurrenceRecords = [
+    { addressPath: 'A.1', parentAddressPath: null, path: 'src', name: 'src', occurrenceType: 'folder' },
+    { addressPath: 'A.2', parentAddressPath: null, path: 'calculogic-validator', name: 'calculogic-validator', occurrenceType: 'folder' },
+    { addressPath: 'A.2.1', parentAddressPath: 'A.2', path: 'calculogic-validator/naming', name: 'naming', occurrenceType: 'folder' },
+    { addressPath: 'A.2.1.1', parentAddressPath: 'A.2.1', path: 'calculogic-validator/naming/naming-src', name: 'naming-src', occurrenceType: 'folder' },
+    { addressPath: 'A.2.1.2', parentAddressPath: 'A.2.1', path: 'calculogic-validator/naming/naming-src.logic.mjs', name: 'naming-src.logic.mjs', occurrenceType: 'file' },
+    { addressPath: 'A.2.1.3', parentAddressPath: 'A.2.1', path: 'calculogic-validator/naming/naming-tools', name: 'naming-tools', occurrenceType: 'folder' },
+    { addressPath: 'A.2.2', parentAddressPath: 'A.2', path: 'calculogic-validator/tree', name: 'tree', occurrenceType: 'folder' },
+    { addressPath: 'A.2.2.1', parentAddressPath: 'A.2.2', path: 'calculogic-validator/tree/naming-src', name: 'naming-src', occurrenceType: 'folder' },
+    { addressPath: 'A.3', parentAddressPath: null, path: 'calculogic-doc-engine', name: 'calculogic-doc-engine', occurrenceType: 'folder' },
+  ];
+  const namingSemanticEvidenceRecords = [
+    { path: 'calculogic-validator', occurrenceType: 'folder', semanticName: 'calculogic-validator', semanticFamily: 'calculogic-validator', familyRoot: 'calculogic', semanticEvidenceKind: 'semantic-family-root-folder', familyRootQualification: 'package-root-folder' },
+    { path: 'calculogic-doc-engine', occurrenceType: 'folder', semanticName: 'calculogic-doc-engine', semanticFamily: 'calculogic-doc-engine', familyRoot: 'calculogic', semanticEvidenceKind: 'semantic-family-root-folder', familyRootQualification: 'package-root-folder' },
+    { path: 'calculogic-validator/naming/naming-src', occurrenceType: 'folder', semanticName: 'naming', semanticFamily: 'naming', familyRoot: 'naming', semanticEvidenceKind: 'folder-semantic-structural-composition', folderCompositionKind: 'semantic-qualified-structural-container', semanticQualifier: 'naming', structuralRoleToken: 'src', compositionQualification: 'explicit-supported-folder-composition', compositionConfidence: 'bounded' },
+    { path: 'calculogic-validator/tree/naming-src', occurrenceType: 'folder', semanticName: 'naming', semanticFamily: 'naming', familyRoot: 'naming', semanticEvidenceKind: 'folder-semantic-structural-composition', folderCompositionKind: 'semantic-qualified-structural-container', semanticQualifier: 'naming', structuralRoleToken: 'src', compositionQualification: 'explicit-supported-folder-composition', compositionConfidence: 'bounded' },
+    { path: 'calculogic-validator/naming/naming-src.logic.mjs', occurrenceType: 'file', semanticName: 'naming', semanticFamily: 'naming', familyRoot: 'naming', semanticEvidenceKind: 'folder-semantic-structural-composition', folderCompositionKind: 'semantic-qualified-structural-container', semanticQualifier: 'naming', structuralRoleToken: 'src' },
+  ];
+  const treeStructuralHomeEvidence = prepareTreeStructuralHomeEvidence({ addressedOccurrenceRecords, structuralHomesRegistry: getBuiltinStructuralHomesRegistry() });
+  const relationshipEvidence = prepareTreeSemanticNamingFolderTypeRelationshipEvidence({
+    addressedOccurrenceRecords,
+    namingSemanticEvidenceRecords,
+    treeStructuralHomeEvidence,
+    treeRepoShapePolicy: { allowedTopLevelDirectories: ['calculogic-doc-engine', 'calculogic-validator', 'src'] },
+    relationshipsRegistry: getBuiltinSemanticNamingFolderTypeRelationshipsRegistry(),
+    structuralRoleTokensRegistry: { structuralRoleTokens: [{ token: 'src', status: 'active', structuralRole: 'implementation-container', relationshipPerspective: 'semantic-qualified-structural-container' }] },
+  });
+
+  const byPath = Object.fromEntries(relationshipEvidence.relationshipRecords.map((record) => [record.path, record]));
+  assert.equal(byPath['calculogic-validator/naming/naming-src'].relationshipPerspective, 'semantic-qualified-structural-container');
+  assert.equal(byPath['calculogic-validator/naming/naming-src'].relationshipInterpretation, 'semantic-qualified-structural-container-aligned');
+  assert.equal(byPath['calculogic-validator/naming/naming-src'].structuralRole, 'implementation-container');
+  assert.equal(byPath['calculogic-validator/tree/naming-src'].relationshipInterpretation, 'semantic-qualified-structural-container-semantic-context-mismatch');
+  assert.equal(byPath['calculogic-validator/tree/naming-src'].establishedSemanticContext, 'tree');
+  assert.equal(Object.hasOwn(byPath, 'calculogic-validator/naming/naming-src.logic.mjs'), false);
+  assert.equal(Object.hasOwn(byPath, 'calculogic-validator/naming/naming-tools'), false);
+  assert.equal(treeStructuralHomeEvidence.evidenceRecords.some((record) => record.path === 'calculogic-validator/naming/naming-src'), false);
+  assert.equal(treeStructuralHomeEvidence.evidenceRecords.some((record) => record.path === 'src' && record.structuralHome === 'src'), true);
+  assert.deepEqual(
+    relationshipEvidence.relationshipRecords
+      .filter((record) => record.relationshipPerspective === 'semantic-repository-top-family-home')
+      .map((record) => record.path)
+      .sort(),
+    ['calculogic-doc-engine', 'calculogic-validator'],
+  );
+});
