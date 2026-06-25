@@ -74,6 +74,14 @@ const toPathLookup = (evidenceRecords, evidenceKey) => {
   return lookup;
 };
 
+const hasSameAddressedOccurrenceIdentity = ({ relationshipRecord, occurrenceRecord }) => (
+  typeof relationshipRecord?.addressPath === 'string' &&
+  relationshipRecord.addressPath.length > 0 &&
+  typeof occurrenceRecord?.addressPath === 'string' &&
+  occurrenceRecord.addressPath.length > 0 &&
+  relationshipRecord.addressPath === occurrenceRecord.addressPath
+);
+
 const toRelationshipQualifiedFolderKindEvidenceRecords = ({ relationshipRecords, addressedOccurrenceRecordsByPath, supportedFolderKinds }) => {
   if (!supportedFolderKinds.has('semantic-qualified-structural-container')) return [];
 
@@ -83,6 +91,7 @@ const toRelationshipQualifiedFolderKindEvidenceRecords = ({ relationshipRecords,
     .map((relationshipRecord) => {
       const occurrenceRecord = addressedOccurrenceRecordsByPath.get(relationshipRecord.path);
       if (!occurrenceRecord) return null;
+      if (!hasSameAddressedOccurrenceIdentity({ relationshipRecord, occurrenceRecord })) return null;
 
       return toEvidenceRecord({
         occurrenceRecord,
@@ -137,7 +146,6 @@ export const prepareTreeFolderKindEvidence = (input) => {
   const relationshipOnlyIneligiblePathSet = new Set(
     relationshipRecords
       .filter((record) => record?.relationshipPerspective === 'semantic-qualified-structural-container')
-      .filter((record) => record.relationshipInterpretation !== 'semantic-qualified-structural-container-aligned')
       .map((record) => record.path)
       .filter((path) => typeof path === 'string' && path.length > 0),
   );
