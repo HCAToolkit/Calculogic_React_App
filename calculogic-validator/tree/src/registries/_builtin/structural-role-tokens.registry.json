@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "structuralRoleTokens": [
+    {
+      "token": "src",
+      "status": "active",
+      "structuralRole": "implementation-container",
+      "relationshipPerspective": "semantic-qualified-structural-container",
+      "definition": "Embedded structural-role token that may represent implementation-container meaning inside a Naming-owned mixed folder-name composition."
+    }
+  ]
+}

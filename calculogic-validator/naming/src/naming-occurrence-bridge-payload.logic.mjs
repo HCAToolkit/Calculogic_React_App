@@ -14,6 +14,15 @@ const NAMING_SEMANTIC_FIELDS = [
   'semanticEvidenceKind',
   'familyRootQualification',
   'evidenceSource',
+  'folderCompositionKind',
+  'semanticQualifier',
+  'structuralRoleToken',
+  'compositionQualification',
+  'compositionConfidence',
+  'tokenOrder',
+  'semanticContext',
+  'semanticContextQualification',
+  'semanticContextConfidence',
 ];
 
 const toOptionalNonEmptyString = (value) => (typeof value === 'string' && value.length > 0 ? value : null);
@@ -62,6 +71,14 @@ const copyNamingSemanticPayload = (observation) => {
       const clonedFlags = cloneStringArray(observation[field]);
       if (clonedFlags) {
         payload[field] = clonedFlags;
+      }
+      continue;
+    }
+
+    if (field === 'tokenOrder') {
+      const clonedTokenOrder = cloneStringArray(observation.tokenOrder);
+      if (clonedTokenOrder) {
+        payload.tokenOrder = clonedTokenOrder;
       }
       continue;
     }
