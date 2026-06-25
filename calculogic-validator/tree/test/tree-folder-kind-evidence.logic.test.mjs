@@ -7,6 +7,7 @@ const folderKindsRegistryFixture = {
   folderKinds: [
     { folderKind: 'structural', status: 'active' },
     { folderKind: 'semantic', status: 'active' },
+    { folderKind: 'semantic-qualified-structural-container', status: 'active' },
     { folderKind: 'unspecified', status: 'active' },
   ],
 };
@@ -59,6 +60,34 @@ test('returns deterministic evidence-only records from tree-owned inputs', () =>
     'structuralHome',
   ]);
 });
+
+
+test('emits relationship-qualified folder-kind evidence only for aligned mixed-folder relationships', () => {
+  const result = prepareTreeFolderKindEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A.1', parentAddressPath: null, path: 'calculogic-validator/naming/naming-src', name: 'naming-src', occurrenceType: 'folder' },
+      { addressPath: 'A.2', parentAddressPath: null, path: 'calculogic-validator/tree/naming-src', name: 'naming-src', occurrenceType: 'folder' },
+      { addressPath: 'A.3', parentAddressPath: null, path: 'calculogic-validator/naming-without-context/naming-src', name: 'naming-src', occurrenceType: 'folder' },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticNamingFolderTypeRelationshipEvidence: {
+      relationshipRecords: [
+        { path: 'calculogic-validator/naming/naming-src', relationshipPerspective: 'semantic-qualified-structural-container', relationshipInterpretation: 'semantic-qualified-structural-container-aligned', structuralRole: 'implementation-container', establishedSemanticContext: 'naming', semanticContextEvidenceAddressPath: 'A.naming' },
+        { path: 'calculogic-validator/tree/naming-src', relationshipPerspective: 'semantic-qualified-structural-container', relationshipInterpretation: 'semantic-qualified-structural-container-semantic-context-mismatch', structuralRole: 'implementation-container', establishedSemanticContext: 'tree', semanticContextEvidenceAddressPath: 'A.tree' },
+        { path: 'calculogic-validator/naming-without-context/naming-src', relationshipPerspective: 'semantic-qualified-structural-container', relationshipInterpretation: 'semantic-qualified-structural-container-context-unresolved', structuralRole: 'implementation-container' },
+      ],
+    },
+    folderKindsRegistry: folderKindsRegistryFixture,
+  });
+
+  assert.deepEqual(result.evidenceRecords.map((record) => record.path), ['calculogic-validator/naming/naming-src']);
+  assert.equal(result.evidenceRecords[0].folderKind, 'semantic-qualified-structural-container');
+  assert.equal(result.evidenceRecords[0].relationshipQualified, true);
+  assert.equal(result.evidenceRecords[0].relationshipInterpretation, 'semantic-qualified-structural-container-aligned');
+  assert.equal(result.evidenceRecords[0].semanticHome, null);
+});
+
 
 test('does not emit findings/verdict or retired root-classification fields', () => {
   const result = prepareTreeFolderKindEvidence({

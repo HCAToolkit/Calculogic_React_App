@@ -141,6 +141,7 @@ export const prepareTreeStructureAdvisorInputs = (
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
     treeStructuralHomeEvidence,
     treeSemanticHomeEvidence,
+    treeSemanticNamingFolderTypeRelationshipEvidence,
     folderKindsRegistry,
   });
   const treeOccurrenceClassificationReplacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({

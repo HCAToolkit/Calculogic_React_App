@@ -24,6 +24,13 @@ const assertValidInput = (input) => {
   }
 };
 
+const SEMANTIC_HOME_ELIGIBLE_NAMING_EVIDENCE_KINDS = new Set(['semantic-family-root-folder']);
+
+const isSemanticHomeEligibleNamingRecord = (record) => (
+  record?.semanticEvidenceKind === undefined ||
+  SEMANTIC_HOME_ELIGIBLE_NAMING_EVIDENCE_KINDS.has(record.semanticEvidenceKind)
+);
+
 const toDeterministicNamingRecordsByPath = (namingSemanticEvidenceRecords) => {
   const recordsByPath = new Map();
 
@@ -33,6 +40,10 @@ const toDeterministicNamingRecordsByPath = (namingSemanticEvidenceRecords) => {
     }
 
     if (typeof record.path !== 'string' || record.path.length === 0) {
+      continue;
+    }
+
+    if (!isSemanticHomeEligibleNamingRecord(record)) {
       continue;
     }
 
