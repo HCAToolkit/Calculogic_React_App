@@ -89,6 +89,28 @@ test('emits relationship-qualified folder-kind evidence only for aligned mixed-f
 });
 
 
+test('skips aligned relationship-qualified folder-kind evidence outside the current addressed scope', () => {
+  const result = prepareTreeFolderKindEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'A.2', parentAddressPath: null, path: 'calculogic-validator/tree/naming-src', name: 'naming-src', occurrenceType: 'folder' },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticNamingFolderTypeRelationshipEvidence: {
+      relationshipRecords: [
+        { path: 'calculogic-validator/naming/naming-src', relationshipPerspective: 'semantic-qualified-structural-container', relationshipInterpretation: 'semantic-qualified-structural-container-aligned', structuralRole: 'implementation-container', establishedSemanticContext: 'naming', semanticContextEvidenceAddressPath: 'A.naming' },
+      ],
+    },
+    folderKindsRegistry: folderKindsRegistryFixture,
+  });
+
+  assert.equal(
+    result.evidenceRecords.some((record) => record.path === 'calculogic-validator/naming/naming-src'),
+    false,
+  );
+});
+
+
 test('does not emit findings/verdict or retired root-classification fields', () => {
   const result = prepareTreeFolderKindEvidence({
     addressedOccurrenceRecords: [{ addressPath: 'A', parentAddressPath: null, path: 'src', name: 'src', occurrenceType: 'folder' }],

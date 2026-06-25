@@ -81,7 +81,9 @@ const toRelationshipQualifiedFolderKindEvidenceRecords = ({ relationshipRecords,
     .filter((record) => record?.relationshipPerspective === 'semantic-qualified-structural-container')
     .filter((record) => record.relationshipInterpretation === 'semantic-qualified-structural-container-aligned')
     .map((relationshipRecord) => {
-      const occurrenceRecord = addressedOccurrenceRecordsByPath.get(relationshipRecord.path) ?? relationshipRecord;
+      const occurrenceRecord = addressedOccurrenceRecordsByPath.get(relationshipRecord.path);
+      if (!occurrenceRecord) return null;
+
       return toEvidenceRecord({
         occurrenceRecord,
         folderKind: 'semantic-qualified-structural-container',
@@ -98,9 +100,10 @@ const toRelationshipQualifiedFolderKindEvidenceRecords = ({ relationshipRecords,
           semanticContextEvidenceAddressPath: relationshipRecord.semanticContextEvidenceAddressPath ?? null,
           semanticContextEvidenceOccurrenceAddress: relationshipRecord.semanticContextEvidenceOccurrenceAddress ?? null,
         },
-        rationale: 'Tree emitted relationship-qualified folder-kind evidence only after an aligned semantic-qualified structural-container relationship interpretation.',
+        rationale: 'Tree emitted relationship-qualified folder-kind evidence only after an aligned semantic-qualified structural-container relationship interpretation in the current addressed occurrence scope.',
       });
-    });
+    })
+    .filter(Boolean);
 };
 
 const toEvidenceRecord = ({ occurrenceRecord, folderKind, folderKindSource, folderKindEvidenceStrength, structuralHome, semanticHome, rationale, extraFields = {} }) => ({
