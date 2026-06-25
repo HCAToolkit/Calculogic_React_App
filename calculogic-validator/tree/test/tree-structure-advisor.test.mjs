@@ -566,7 +566,9 @@ test('tree semantic naming folder-type relationship classifies only repository-t
   assert.equal(recordsByPath['calculogic-doc-engine'].structuralClass, 'repo-top-semantic-root');
   assert.equal(recordsByPath['calculogic-doc-engine'].isSemanticRoot, true);
   assert.equal(recordsByPath['calculogic-validator/tree'].structuralClass, 'unclassified');
+  assert.equal(Object.hasOwn(recordsByPath['calculogic-validator/tree'], 'classificationExplanation'), false);
   assert.equal(recordsByPath['calculogic-validator/tree/src'].structuralClass, 'unclassified');
+  assert.equal(Object.hasOwn(recordsByPath['calculogic-validator/tree/src'], 'classificationExplanation'), false);
   assert.equal(recordsByPath['unmatched-package'].structuralClass, 'unclassified');
   assert.equal(recordsByPath['unmatched-package'].isRepoShapeAllowedTopLevelDirectory, false);
   assert.deepEqual(
@@ -589,7 +591,31 @@ test('tree semantic naming folder-type relationship classifies only repository-t
   );
 
   assert.equal(missingReasonsByPath['calculogic-validator'], 'missing-required-naming-observation');
-  assert.equal(missingReasonsByPath['calculogic-validator/tree'], 'non-repository-top-descendant');
+
+  const unqualifiedRelationshipEvidence = prepareTreeSemanticNamingFolderTypeRelationshipEvidence({
+    addressedOccurrenceRecords,
+    namingSemanticEvidenceRecords: [
+      {
+        path: 'calculogic-validator',
+        occurrenceType: 'folder',
+        semanticName: 'calculogic-validator',
+        semanticFamily: 'calculogic-validator',
+        familyRoot: 'calculogic',
+      },
+    ],
+    treeStructuralHomeEvidence: structuralHomeEvidence,
+    treeRepoShapePolicy: getBuiltinTreeRepoShapePolicy(),
+    relationshipsRegistry: getBuiltinSemanticNamingFolderTypeRelationshipsRegistry(),
+  });
+  const unqualifiedCalculogicValidatorRecord = unqualifiedRelationshipEvidence.unclassifiedRelationshipRecords.find(
+    (record) => record.path === 'calculogic-validator',
+  );
+  assert.equal(
+    unqualifiedCalculogicValidatorRecord.classificationExplanation.reason,
+    'naming-observation-not-qualified-as-family-root',
+  );
+  assert.equal(Object.hasOwn(missingReasonsByPath, 'calculogic-validator/tree'), false);
+  assert.equal(Object.hasOwn(missingReasonsByPath, 'calculogic-validator/tree/src'), false);
   assert.equal(missingReasonsByPath['unmatched-package'], 'unknown-or-unmodeled-folder-relationship');
 });
 

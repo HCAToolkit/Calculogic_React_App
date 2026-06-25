@@ -99,7 +99,6 @@ export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) =
 
   const rule = toActiveRepositoryTopFamilyHomeRule(input.relationshipsRegistry);
 
-
   const namingLookup = toEvidenceLookup(input.namingSemanticEvidenceRecords);
   const structuralLookup = toEvidenceLookup(input.treeStructuralHomeEvidence.evidenceRecords);
   const allowedTopLevelDirectorySet = toAllowedTopLevelDirectorySet(input.treeRepoShapePolicy);
@@ -108,14 +107,7 @@ export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) =
 
   for (const occurrenceRecord of input.addressedOccurrenceRecords) {
     if (occurrenceRecord?.occurrenceType !== 'folder') continue;
-    if (!isRepoTopFolder(occurrenceRecord)) {
-      unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
-        occurrenceRecord,
-        reason: 'non-repository-top-descendant',
-        diagnostic: 'The repository-top family-root relationship applies only to repository-top folder occurrences.',
-      }));
-      continue;
-    }
+    if (!isRepoTopFolder(occurrenceRecord)) continue;
     if (lookupEvidence(structuralLookup, occurrenceRecord)) continue;
     if (!rule) {
       unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
