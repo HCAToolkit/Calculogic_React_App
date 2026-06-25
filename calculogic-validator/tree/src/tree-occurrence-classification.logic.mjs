@@ -97,6 +97,16 @@ const assertReplacementRuntimeInput = (input) => {
     throw new Error('Tree occurrence classification replacement runtime treeFolderKindEvidence.evidenceRecords must be an array.');
   }
 
+  if (
+    input.treeSemanticNamingFolderTypeRelationshipEvidence !== undefined &&
+    (!input.treeSemanticNamingFolderTypeRelationshipEvidence ||
+      typeof input.treeSemanticNamingFolderTypeRelationshipEvidence !== 'object' ||
+      Array.isArray(input.treeSemanticNamingFolderTypeRelationshipEvidence) ||
+      !Array.isArray(input.treeSemanticNamingFolderTypeRelationshipEvidence.unclassifiedRelationshipRecords))
+  ) {
+    throw new Error('Tree occurrence classification replacement runtime treeSemanticNamingFolderTypeRelationshipEvidence.unclassifiedRelationshipRecords must be an array when provided.');
+  }
+
   if (!input.treeRepoShapePolicy || typeof input.treeRepoShapePolicy !== 'object' || Array.isArray(input.treeRepoShapePolicy)) {
     throw new Error('Tree occurrence classification replacement runtime input must include treeRepoShapePolicy object.');
   }
@@ -106,7 +116,7 @@ const assertReplacementRuntimeInput = (input) => {
   }
 };
 
-const toReplacementRootClassification = ({ folderKind, structuralHome, semanticHome, isRepoShapeAllowedTopLevelDirectory }) => {
+const toReplacementRootClassification = ({ folderKind, structuralHome, semanticHome, isRepoShapeAllowedTopLevelDirectory, classificationExplanation }) => {
   if (folderKind === 'structural' || structuralHome) {
     return {
       structuralClass: 'repo-top-structural-root',
@@ -131,12 +141,13 @@ const toReplacementRootClassification = ({ folderKind, structuralHome, semanticH
     structuralClass: 'unclassified',
     structuralKind: 'unknown',
     isRepoShapeAllowedTopLevelDirectory,
+    ...(classificationExplanation ? { classificationExplanation } : {}),
     isStructuralRoot: false,
     isSemanticRoot: false,
   };
 };
 
-const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, semanticHomeLookup, folderKindLookup, allowedTopLevelDirectorySet }) => {
+const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, semanticHomeLookup, folderKindLookup, relationshipExplanationLookup, allowedTopLevelDirectorySet }) => {
   if (!occurrenceRecord || typeof occurrenceRecord !== 'object') {
     return {
       structuralClass: 'unclassified',
@@ -167,6 +178,7 @@ const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, 
         structuralHome: lookupFirstAvailable(structuralHomeLookup, occurrenceRecord),
         semanticHome: lookupFirstAvailable(semanticHomeLookup, occurrenceRecord),
         isRepoShapeAllowedTopLevelDirectory: allowedTopLevelDirectorySet.has(resolvedPath),
+        classificationExplanation: lookupFirstAvailable(relationshipExplanationLookup, occurrenceRecord),
       }),
       isRepoTopOccurrence,
       isScopedRootOccurrence,
@@ -187,12 +199,15 @@ const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, 
     };
   }
 
+  const relationshipExplanation = lookupFirstAvailable(relationshipExplanationLookup, occurrenceRecord);
+
   return {
     structuralClass: 'unclassified',
     structuralKind: 'unknown',
     isRepoTopOccurrence,
     isScopedRootOccurrence,
     isRepoShapeAllowedTopLevelDirectory: false,
+    ...(relationshipExplanation ? { classificationExplanation: relationshipExplanation } : {}),
     isStructuralRoot: false,
     isSemanticRoot: false,
     isSubtreePartitionCandidate,
@@ -205,6 +220,10 @@ export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => 
   const structuralHomeLookup = toEvidenceLookup(input.treeStructuralHomeEvidence.evidenceRecords, 'structuralHome');
   const semanticHomeLookup = toEvidenceLookup(input.treeSemanticHomeEvidence.evidenceRecords, 'semanticHome');
   const folderKindLookup = toEvidenceLookup(input.treeFolderKindEvidence.evidenceRecords, 'folderKind');
+  const relationshipExplanationLookup = toEvidenceLookup(
+    input.treeSemanticNamingFolderTypeRelationshipEvidence?.unclassifiedRelationshipRecords ?? [],
+    'classificationExplanation',
+  );
   const allowedTopLevelDirectorySet = toAllowedTopLevelDirectorySet(
     input.treeRepoShapePolicy.allowedTopLevelDirectories,
   );
@@ -223,6 +242,7 @@ export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => 
           structuralHomeLookup,
           semanticHomeLookup,
           folderKindLookup,
+          relationshipExplanationLookup,
           allowedTopLevelDirectorySet,
         }),
       }));

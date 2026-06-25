@@ -127,6 +127,10 @@ The relationship registry is Tree-owned because it describes Tree interpretation
 
 Repo-shape allowance remains separate from classification: an allowed top-level directory can be structurally classified, semantically classified through this relationship, or remain unspecified if the required Tree/Naming evidence is absent.
 
+Current implementation reality: the normal runner path stages package-root folder observations in the Naming-owned semantic-family bridge when Naming sees package-manifest evidence for a repository-top package folder. Those observations carry folder occurrence type, semantic identity fields, explicit `semanticEvidenceKind: semantic-family-root-folder`, explicit `familyRootQualification: package-root-folder`, and provenance back to the Naming finding that justified the observation. Tree consumes the addressed form of that bridge evidence after Addressing has supplied occurrence identity and lineage.
+
+When a folder remains unclassified in the internal prepared classification path, Tree may attach a bounded `classificationExplanation` object. That explanation is internal evidence, not a new finding or report-envelope change. Current reason codes include `missing-required-naming-observation`, `naming-observation-not-qualified-as-family-root`, `no-active-relationship-perspective-match`, `non-repository-top-descendant`, `ambiguous-or-conflicting-evidence`, and `unknown-or-unmodeled-folder-relationship`.
+
 
 ### Naming occurrence bridge intake boundary (Status: Current implementation reality)
 

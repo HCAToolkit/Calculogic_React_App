@@ -11,6 +11,9 @@ const NAMING_SEMANTIC_FIELDS = [
   'ambiguityFlags',
   'splitFamilyFlags',
   'disambiguation',
+  'semanticEvidenceKind',
+  'familyRootQualification',
+  'evidenceSource',
 ];
 
 const toOptionalNonEmptyString = (value) => (typeof value === 'string' && value.length > 0 ? value : null);
@@ -122,6 +125,9 @@ const toAddressAttachedObservation = ({
       ? { occurrenceType: occurrenceRecord.occurrenceType }
       : {}),
     ...copyNamingSemanticPayload(semanticObservation),
+    ...(isPlainObject(semanticObservation.evidenceProvenance)
+      ? { evidenceProvenance: { ...semanticObservation.evidenceProvenance } }
+      : {}),
   };
 };
 

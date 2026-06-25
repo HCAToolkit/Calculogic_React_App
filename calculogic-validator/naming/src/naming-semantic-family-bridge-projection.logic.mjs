@@ -3,6 +3,26 @@ const toSortedUniqueStringFlags = (flags) =>
     new Set(flags.filter((flag) => typeof flag === 'string' && flag.length > 0)),
   ).sort((left, right) => left.localeCompare(right));
 
+const PACKAGE_MANIFEST_FILE_NAME = 'package.json';
+
+const toPackageRootSemanticTokens = (packageJsonPath) => {
+  if (typeof packageJsonPath !== 'string' || !packageJsonPath.endsWith(`/${PACKAGE_MANIFEST_FILE_NAME}`)) {
+    return null;
+  }
+
+  const packageRootPath = packageJsonPath.slice(0, -`/${PACKAGE_MANIFEST_FILE_NAME}`.length);
+  if (!packageRootPath || packageRootPath.includes('/')) {
+    return null;
+  }
+
+  const [familyRoot] = packageRootPath.split('-');
+  if (!familyRoot) {
+    return null;
+  }
+
+  return { packageRootPath, semanticName: packageRootPath, semanticFamily: packageRootPath, familyRoot };
+};
+
 const cloneEvidenceLimitNotes = (evidenceLimitNotes) =>
   Array.isArray(evidenceLimitNotes)
     ? evidenceLimitNotes
@@ -27,7 +47,7 @@ const toDisambiguationPayload = (disambiguation) => {
   return Object.keys(payload).length > 0 ? payload : null;
 };
 
-const toBridgeObservationFromFinding = (finding) => {
+const toCanonicalBridgeObservationFromFinding = (finding) => {
   if (!finding || typeof finding !== 'object' || Array.isArray(finding)) {
     return null;
   }
@@ -78,15 +98,55 @@ const toBridgeObservationFromFinding = (finding) => {
   };
 };
 
+const toFolderFamilyRootObservationFromFinding = (finding) => {
+  if (!finding || typeof finding !== 'object' || Array.isArray(finding)) {
+    return null;
+  }
+
+  if (finding.code !== 'NAMING_ALLOWED_SPECIAL_CASE') {
+    return null;
+  }
+
+  if (finding.details?.specialCaseType !== 'ecosystem-required') {
+    return null;
+  }
+
+  const packageRootTokens = toPackageRootSemanticTokens(finding.path);
+  if (!packageRootTokens) {
+    return null;
+  }
+
+  return {
+    path: packageRootTokens.packageRootPath,
+    repoRelativePath: packageRootTokens.packageRootPath,
+    occurrenceType: 'folder',
+    semanticName: packageRootTokens.semanticName,
+    familyRoot: packageRootTokens.familyRoot,
+    semanticFamily: packageRootTokens.semanticFamily,
+    semanticEvidenceKind: 'semantic-family-root-folder',
+    familyRootQualification: 'package-root-folder',
+    evidenceSource: 'naming-semantic-family-bridge-projection',
+    evidenceProvenance: {
+      sourceFindingCode: finding.code,
+      sourceFindingPath: finding.path,
+      sourceSpecialCaseType: finding.details.specialCaseType,
+    },
+  };
+};
+
 export const projectNamingSemanticFamilyBridge = (namingRuntimeOrReportOutput = {}) => {
   const findings = Array.isArray(namingRuntimeOrReportOutput.findings)
     ? namingRuntimeOrReportOutput.findings
     : [];
 
   return {
-    observations: findings
-      .map(toBridgeObservationFromFinding)
-      .filter(Boolean)
-      .sort((left, right) => left.path.localeCompare(right.path)),
+    observations: [
+      ...findings.map(toCanonicalBridgeObservationFromFinding).filter(Boolean),
+      ...findings.map(toFolderFamilyRootObservationFromFinding).filter(Boolean),
+    ].sort((left, right) =>
+      left.path.localeCompare(right.path) ||
+      (left.occurrenceType ?? '').localeCompare(right.occurrenceType ?? '') ||
+      left.semanticName.localeCompare(right.semanticName),
+    ),
   };
 };

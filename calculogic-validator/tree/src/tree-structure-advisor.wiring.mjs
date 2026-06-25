@@ -26,6 +26,7 @@ import { recommendTreeOccurrenceClassificationReplacement } from './tree-occurre
 import { planTreeOccurrenceClassificationRuntimeEvaluation } from './tree-occurrence-classification-runtime-evaluation-plan.logic.mjs';
 import { planTreeOccurrenceClassificationRuntimeExecutionContract } from './tree-occurrence-classification-runtime-execution-contract.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
+import { createNamingOccurrenceBridgePayload } from '../../naming/src/naming-occurrence-bridge-payload.logic.mjs';
 import { prepareTreeNamingOccurrenceBridgeIntake } from './tree-naming-occurrence-intake.logic.mjs';
 import { getBuiltinStructuralHomesRegistry } from './registries/tree-structural-homes-registry.logic.mjs';
 import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-registry.logic.mjs';
@@ -33,6 +34,9 @@ import { getBuiltinTreeRepoShapePolicy } from './registries/tree-repo-shape-poli
 import { getBuiltinSemanticNamingFolderTypeRelationshipsRegistry } from './registries/tree-semantic-naming-folder-type-relationships-registry.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
+const TREE_ADDRESS_PROFILE_ID = 'tree-structure-advisor-address-profile';
+const TREE_ADDRESSED_SNAPSHOT_ID = 'tree-structure-advisor-current-snapshot';
+
 const WALK_EXCLUDED_DIRECTORIES = new Set([
   '.git',
   '.next',
@@ -86,8 +90,18 @@ export const prepareTreeStructureAdvisorInputs = (
   const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
     ? prepareNamingSemanticEvidenceBridge(namingSemanticFamilyBridge)
     : { observations: [] };
+  const addressedOccurrenceNamespace = {
+    addressProfileId: TREE_ADDRESS_PROFILE_ID,
+    addressedSnapshotId: TREE_ADDRESSED_SNAPSHOT_ID,
+    occurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
+  };
+  const addressedNamingOccurrenceBridge = namingOccurrenceBridge ?? createNamingOccurrenceBridgePayload({
+    namingSemanticFamilyBridge: namingSemanticEvidenceBridge,
+    addressedOccurrenceNamespace,
+  });
+  const addressedNamingSemanticEvidenceBridge = prepareNamingSemanticEvidenceBridge(addressedNamingOccurrenceBridge);
   const treeNamingOccurrenceBridgeIntake = prepareTreeNamingOccurrenceBridgeIntake({
-    namingOccurrenceBridge,
+    namingOccurrenceBridge: addressedNamingOccurrenceBridge,
     namingSemanticFamilyBridge,
   });
 
@@ -97,14 +111,14 @@ export const prepareTreeStructureAdvisorInputs = (
   });
   const treeSemanticNamingFolderTypeRelationshipEvidence = prepareTreeSemanticNamingFolderTypeRelationshipEvidence({
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
-    namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
+    namingSemanticEvidenceRecords: addressedNamingSemanticEvidenceBridge.observations,
     treeStructuralHomeEvidence,
     treeRepoShapePolicy,
     relationshipsRegistry: semanticNamingFolderTypeRelationshipsRegistry,
   });
   const treeSemanticHomeEvidence = prepareTreeSemanticHomeEvidence({
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
-    namingSemanticEvidenceRecords: namingSemanticEvidenceBridge.observations,
+    namingSemanticEvidenceRecords: addressedNamingSemanticEvidenceBridge.observations,
     treeSemanticNamingFolderTypeRelationshipEvidence,
   });
   const treeFolderKindEvidence = prepareTreeFolderKindEvidence({
@@ -116,6 +130,7 @@ export const prepareTreeStructureAdvisorInputs = (
   const treeOccurrenceClassificationReplacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
     treeStructuralHomeEvidence,
     treeSemanticHomeEvidence,
+    treeSemanticNamingFolderTypeRelationshipEvidence,
     treeFolderKindEvidence,
     treeRepoShapePolicy,
   });
@@ -128,6 +143,7 @@ export const prepareTreeStructureAdvisorInputs = (
     currentOccurrenceClassificationRecords,
     treeStructuralHomeEvidence,
     treeSemanticHomeEvidence,
+    treeSemanticNamingFolderTypeRelationshipEvidence,
     treeFolderKindEvidence,
   });
 
@@ -167,6 +183,8 @@ export const prepareTreeStructureAdvisorInputs = (
     structuralAddressSnapshot,
     preparedDependencies: {
       treeStructuralHomeEvidence,
+      addressedNamingOccurrenceBridge,
+      addressedNamingSemanticEvidenceBridge,
       treeSemanticNamingFolderTypeRelationshipEvidence,
       treeSemanticHomeEvidence,
       treeFolderKindEvidence,

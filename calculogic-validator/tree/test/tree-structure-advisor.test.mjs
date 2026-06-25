@@ -29,8 +29,10 @@ import { getBuiltinFolderKindsRegistry } from '../src/registries/tree-folder-kin
 import { getBuiltinTreeRepoShapePolicy } from '../src/registries/tree-repo-shape-policy-registry.logic.mjs';
 import { getBuiltinSemanticNamingFolderTypeRelationshipsRegistry } from '../src/registries/tree-semantic-naming-folder-type-relationships-registry.logic.mjs';
 import { prepareNamingSemanticEvidenceBridge } from '../../naming/src/naming-semantic-evidence-bridge.logic.mjs';
+import { runNamingValidator, projectNamingSemanticFamilyBridge } from '../../naming/src/naming-validator.wiring.mjs';
 import { listRegisteredValidators } from '../../src/core/validator-registry.knowledge.mjs';
 import { getValidatorScopeProfile } from '../../src/core/validator-scopes.logic.mjs';
+import { runValidatorRunner } from '../../src/core/validator-runner.logic.mjs';
 
 const writeJson = async (filePath, value) => {
   await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');
@@ -340,8 +342,11 @@ test('tree-structure-advisor wiring carries neutral structural-address snapshot 
       preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime.source,
       expectedOccurrenceClassificationReplacementRuntime.source,
     );
+    const omitClassificationExplanation = (records) => records.map(({ classificationExplanation: _classificationExplanation, ...record }) => record);
     assert.deepEqual(
-      preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(snapshot.occurrenceRecords),
+      omitClassificationExplanation(
+        preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(snapshot.occurrenceRecords),
+      ),
       expectedOccurrenceClassificationReplacementRuntime.classifyOccurrenceRecords(snapshot.occurrenceRecords),
     );
     const runtimeExecutionContract = preparedInputs.preparedDependencies.treeOccurrenceClassificationRuntimeExecutionContract;
@@ -505,10 +510,10 @@ test('tree semantic naming folder-type relationship classifies only repository-t
     { addressPath: 'A.4', parentAddressPath: null, path: 'unmatched-package', resolvedPath: 'unmatched-package', actualName: 'unmatched-package', name: 'unmatched-package', occurrenceType: 'folder' },
   ];
   const namingSemanticEvidenceRecords = [
-    { path: 'calculogic-validator', occurrenceType: 'folder', semanticName: 'calculogic-validator', semanticFamily: 'calculogic-validator', familyRoot: 'calculogic' },
+    { path: 'calculogic-validator', occurrenceType: 'folder', semanticName: 'calculogic-validator', semanticFamily: 'calculogic-validator', familyRoot: 'calculogic', semanticEvidenceKind: 'semantic-family-root-folder', familyRootQualification: 'package-root-folder' },
     { path: 'calculogic-validator/tree', occurrenceType: 'folder', semanticName: 'tree', semanticFamily: 'tree', familyRoot: 'tree' },
     { path: 'calculogic-validator/tree/src', occurrenceType: 'folder', semanticName: 'src', semanticFamily: 'src', familyRoot: 'src' },
-    { path: 'calculogic-doc-engine', occurrenceType: 'folder', semanticName: 'calculogic-doc-engine', semanticFamily: 'calculogic-doc-engine', familyRoot: 'calculogic' },
+    { path: 'calculogic-doc-engine', occurrenceType: 'folder', semanticName: 'calculogic-doc-engine', semanticFamily: 'calculogic-doc-engine', familyRoot: 'calculogic', semanticEvidenceKind: 'semantic-family-root-folder', familyRootQualification: 'package-root-folder' },
   ];
   const structuralHomeEvidence = prepareTreeStructuralHomeEvidence({
     addressedOccurrenceRecords,
@@ -568,6 +573,24 @@ test('tree semantic naming folder-type relationship classifies only repository-t
     replacementRuntime.collectUnexpectedTopLevelDirectoryNames(['src', 'calculogic-validator', 'calculogic-doc-engine', 'unmatched-package']),
     ['unmatched-package'],
   );
+
+  const missingNamingRelationshipEvidence = prepareTreeSemanticNamingFolderTypeRelationshipEvidence({
+    addressedOccurrenceRecords,
+    namingSemanticEvidenceRecords: [],
+    treeStructuralHomeEvidence: structuralHomeEvidence,
+    treeRepoShapePolicy: getBuiltinTreeRepoShapePolicy(),
+    relationshipsRegistry: getBuiltinSemanticNamingFolderTypeRelationshipsRegistry(),
+  });
+  const missingReasonsByPath = Object.fromEntries(
+    missingNamingRelationshipEvidence.unclassifiedRelationshipRecords.map((record) => [
+      record.path,
+      record.classificationExplanation.reason,
+    ]),
+  );
+
+  assert.equal(missingReasonsByPath['calculogic-validator'], 'missing-required-naming-observation');
+  assert.equal(missingReasonsByPath['calculogic-validator/tree'], 'non-repository-top-descendant');
+  assert.equal(missingReasonsByPath['unmatched-package'], 'unknown-or-unmodeled-folder-relationship');
 });
 
 test('tree-structure-advisor runtime report output remains unchanged by structural-address handoff presence', async () => {
@@ -785,6 +808,59 @@ test('tree-structure-advisor top-level advisory falls back when ready replacemen
 
 
 
+
+
+test('tree-structure-advisor runner staging receives addressed Naming package-root observations', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-runner-package-root-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+    await writeJson(path.join(fixtureDir, 'calculogic-validator', 'package.json'), { name: '@calculogic/validator' });
+    await writeJson(path.join(fixtureDir, 'calculogic-doc-engine', 'package.json'), { name: '@calculogic/doc-engine' });
+    await fs.mkdir(path.join(fixtureDir, 'unmatched-package'), { recursive: true });
+    await fs.writeFile(path.join(fixtureDir, 'unmatched-package', 'index.logic.mjs'), 'export const unmatched = true\n', 'utf8');
+
+    const runnerReport = runValidatorRunner(fixtureDir, {
+      scope: 'repo',
+      validators: ['tree-structure-advisor'],
+    });
+    const treeReport = runnerReport.validators.find((entry) => entry.id === 'tree-structure-advisor');
+    const unexpectedTopLevelPaths = treeReport.findings
+      .filter((finding) => finding.code === 'TREE_UNEXPECTED_TOP_LEVEL_FOLDER')
+      .map((finding) => finding.path);
+
+    assert.deepEqual(unexpectedTopLevelPaths, ['unmatched-package']);
+
+    const namingResult = runNamingValidator(fixtureDir, { scope: 'repo' });
+    const namingSemanticFamilyBridge = projectNamingSemanticFamilyBridge(namingResult);
+    assert.deepEqual(
+      namingSemanticFamilyBridge.observations
+        .filter((observation) => observation.semanticEvidenceKind === 'semantic-family-root-folder')
+        .map((observation) => [observation.path, observation.familyRootQualification]),
+      [
+        ['calculogic-doc-engine', 'package-root-folder'],
+        ['calculogic-validator', 'package-root-folder'],
+      ],
+    );
+
+    const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, { scope: 'repo', namingSemanticFamilyBridge });
+    const addressedFolderObservations = preparedInputs.preparedDependencies.addressedNamingSemanticEvidenceBridge.observations
+      .filter((observation) => observation.semanticEvidenceKind === 'semantic-family-root-folder');
+
+    assert.equal(addressedFolderObservations.every((observation) => observation.occurrenceAddress), true);
+    assert.deepEqual(
+      preparedInputs.preparedDependencies.treeSemanticNamingFolderTypeRelationshipEvidence.relationshipRecords
+        .map((record) => [record.path, record.relationshipPerspective, record.familyRootQualification]),
+      [
+        ['calculogic-doc-engine', 'semantic-repository-top-family-home', 'package-root-folder'],
+        ['calculogic-validator', 'semantic-repository-top-family-home', 'package-root-folder'],
+      ],
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor ready route keeps semantic package roots non-unexpected through active classification', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-semantic-ready-route-'));
 
@@ -795,8 +871,8 @@ test('tree-structure-advisor ready route keeps semantic package roots non-unexpe
 
     const namingSemanticFamilyBridge = {
       observations: [
-        { path: 'calculogic-validator', occurrenceType: 'folder', semanticName: 'calculogic-validator', semanticFamily: 'calculogic-validator', familyRoot: 'calculogic' },
-        { path: 'calculogic-doc-engine', occurrenceType: 'folder', semanticName: 'calculogic-doc-engine', semanticFamily: 'calculogic-doc-engine', familyRoot: 'calculogic' },
+        { path: 'calculogic-validator', occurrenceType: 'folder', semanticName: 'calculogic-validator', semanticFamily: 'calculogic-validator', familyRoot: 'calculogic', semanticEvidenceKind: 'semantic-family-root-folder', familyRootQualification: 'package-root-folder' },
+        { path: 'calculogic-doc-engine', occurrenceType: 'folder', semanticName: 'calculogic-doc-engine', semanticFamily: 'calculogic-doc-engine', familyRoot: 'calculogic', semanticEvidenceKind: 'semantic-family-root-folder', familyRootQualification: 'package-root-folder' },
       ],
     };
 

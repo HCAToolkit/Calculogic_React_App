@@ -13,20 +13,28 @@ const toIdentityKeys = (record) => {
 
 const toEvidenceLookup = (records) => {
   const lookup = new Map();
+  const ambiguousKeys = new Set();
   for (const record of records) {
     for (const key of toIdentityKeys(record)) {
-      if (!lookup.has(key)) lookup.set(key, record);
+      if (lookup.has(key)) {
+        ambiguousKeys.add(key);
+        continue;
+      }
+      lookup.set(key, record);
     }
   }
-  return lookup;
+  return { lookup, ambiguousKeys };
 };
 
-const lookupEvidence = (lookup, occurrenceRecord) => {
+const lookupEvidence = (evidenceLookup, occurrenceRecord) => {
   for (const key of toIdentityKeys(occurrenceRecord)) {
-    if (lookup.has(key)) return lookup.get(key);
+    if (evidenceLookup.lookup.has(key)) return evidenceLookup.lookup.get(key);
   }
   return null;
 };
+
+const hasAmbiguousEvidence = (evidenceLookup, occurrenceRecord) =>
+  toIdentityKeys(occurrenceRecord).some((key) => evidenceLookup.ambiguousKeys.has(key));
 
 const isRepoTopFolder = (occurrenceRecord) => (
   occurrenceRecord?.occurrenceType === 'folder' &&
@@ -51,7 +59,7 @@ const toActiveRepositoryTopFamilyHomeRule = (registry) => (
   rule.structuralHomeCondition === 'not-structural-home'
 ));
 
-const hasSemanticFamilyRootEvidence = (namingRecord) => (
+const hasRequiredSemanticFields = (namingRecord) => (
   namingRecord &&
   typeof namingRecord === 'object' &&
   !Array.isArray(namingRecord) &&
@@ -59,6 +67,24 @@ const hasSemanticFamilyRootEvidence = (namingRecord) => (
   typeof namingRecord.semanticFamily === 'string' && namingRecord.semanticFamily.length > 0 &&
   typeof namingRecord.familyRoot === 'string' && namingRecord.familyRoot.length > 0
 );
+
+const isQualifiedSemanticFamilyRootObservation = (namingRecord) => (
+  hasRequiredSemanticFields(namingRecord) &&
+  namingRecord.occurrenceType === 'folder' &&
+  namingRecord.semanticEvidenceKind === 'semantic-family-root-folder' &&
+  namingRecord.familyRootQualification === 'package-root-folder'
+);
+
+const toUnclassifiedRelationshipRecord = ({ occurrenceRecord, reason, diagnostic }) => ({
+  addressPath: occurrenceRecord.addressPath ?? null,
+  parentAddressPath: occurrenceRecord.parentAddressPath ?? null,
+  path: occurrenceRecord.path ?? null,
+  name: occurrenceRecord.name ?? null,
+  occurrenceType: occurrenceRecord.occurrenceType ?? null,
+  relationshipPerspective: null,
+  relationshipSource: SOURCE_ID,
+  classificationExplanation: { reason, diagnostic },
+});
 
 const assertValidInput = (input) => {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Tree semantic naming folder-type relationship input must be an object.');
@@ -72,20 +98,69 @@ export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) =
   assertValidInput(input);
 
   const rule = toActiveRepositoryTopFamilyHomeRule(input.relationshipsRegistry);
-  if (!rule) return { source: SOURCE_ID, relationshipRecords: [] };
+
 
   const namingLookup = toEvidenceLookup(input.namingSemanticEvidenceRecords);
   const structuralLookup = toEvidenceLookup(input.treeStructuralHomeEvidence.evidenceRecords);
   const allowedTopLevelDirectorySet = toAllowedTopLevelDirectorySet(input.treeRepoShapePolicy);
   const relationshipRecords = [];
+  const unclassifiedRelationshipRecords = [];
 
   for (const occurrenceRecord of input.addressedOccurrenceRecords) {
-    if (!isRepoTopFolder(occurrenceRecord)) continue;
-    if (structuralLookup.has(`path:${occurrenceRecord.path}`) || lookupEvidence(structuralLookup, occurrenceRecord)) continue;
-    if (rule.repoShapeCondition === 'allowed-top-level-directory' && !allowedTopLevelDirectorySet.has(occurrenceRecord.path)) continue;
+    if (occurrenceRecord?.occurrenceType !== 'folder') continue;
+    if (!isRepoTopFolder(occurrenceRecord)) {
+      unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
+        occurrenceRecord,
+        reason: 'non-repository-top-descendant',
+        diagnostic: 'The repository-top family-root relationship applies only to repository-top folder occurrences.',
+      }));
+      continue;
+    }
+    if (lookupEvidence(structuralLookup, occurrenceRecord)) continue;
+    if (!rule) {
+      unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
+        occurrenceRecord,
+        reason: 'no-active-relationship-perspective-match',
+        diagnostic: 'No active Tree relationship perspective matched this Naming and folder-type evidence combination.',
+      }));
+      continue;
+    }
+    if (rule.repoShapeCondition === 'allowed-top-level-directory' && !allowedTopLevelDirectorySet.has(occurrenceRecord.path)) {
+      unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
+        occurrenceRecord,
+        reason: 'unknown-or-unmodeled-folder-relationship',
+        diagnostic: 'The folder is not allowed by repo-shape policy and has no registered semantic repository-top relationship.',
+      }));
+      continue;
+    }
+    if (hasAmbiguousEvidence(namingLookup, occurrenceRecord)) {
+      unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
+        occurrenceRecord,
+        reason: 'ambiguous-or-conflicting-evidence',
+        diagnostic: 'Multiple Naming evidence records matched this folder occurrence, so Tree did not choose a semantic repository-top relationship.',
+      }));
+      continue;
+    }
 
     const namingRecord = lookupEvidence(namingLookup, occurrenceRecord);
-    if (!hasSemanticFamilyRootEvidence(namingRecord)) continue;
+    if (!namingRecord) {
+      unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
+        occurrenceRecord,
+        reason: 'missing-required-naming-observation',
+        diagnostic: 'No semantic repository-top family-home relationship was established because Tree received no addressed Naming semantic-family-root observation for this folder occurrence.',
+      }));
+      continue;
+    }
+    if (!isQualifiedSemanticFamilyRootObservation(namingRecord)) {
+      unclassifiedRelationshipRecords.push(toUnclassifiedRelationshipRecord({
+        occurrenceRecord,
+        reason: hasRequiredSemanticFields(namingRecord) ? 'naming-observation-not-qualified-as-family-root' : 'missing-required-naming-observation',
+        diagnostic: hasRequiredSemanticFields(namingRecord)
+          ? 'Naming evidence exists for this folder, but it does not identify the folder occurrence itself as a semantic-family-root observation.'
+          : 'Naming evidence for this folder is missing required semantic-family-root fields.',
+      }));
+      continue;
+    }
 
     relationshipRecords.push({
       addressPath: occurrenceRecord.addressPath ?? null,
@@ -105,9 +180,15 @@ export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) =
       familyRoot: namingRecord.familyRoot,
       ...(typeof namingRecord.familySubgroup === 'string' && namingRecord.familySubgroup.length > 0 ? { familySubgroup: namingRecord.familySubgroup } : {}),
       namingEvidenceSource: namingRecord.evidenceSource ?? 'namingSemanticFamilyBridge',
-      rationale: 'Tree interpreted Naming semantic-family-root evidence against repository-top folder context and retained structural-home evidence.',
+      semanticEvidenceKind: namingRecord.semanticEvidenceKind,
+      familyRootQualification: namingRecord.familyRootQualification,
+      ...(namingRecord.addressProfileId ? { addressProfileId: namingRecord.addressProfileId } : {}),
+      ...(namingRecord.addressedSnapshotId ? { addressedSnapshotId: namingRecord.addressedSnapshotId } : {}),
+      ...(namingRecord.occurrenceAddress ? { occurrenceAddress: namingRecord.occurrenceAddress } : {}),
+      ...(namingRecord.evidenceProvenance ? { evidenceProvenance: { ...namingRecord.evidenceProvenance } } : {}),
+      rationale: 'Tree interpreted an explicitly qualified Naming semantic-family-root folder observation against repository-top folder context and retained structural-home evidence.',
     });
   }
 
-  return { source: SOURCE_ID, relationshipRecords };
+  return { source: SOURCE_ID, relationshipRecords, unclassifiedRelationshipRecords };
 };
