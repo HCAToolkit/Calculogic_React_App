@@ -110,11 +110,60 @@ test('naming folder-composition bridge emits only explicit folder observations f
         qualification: 'explicit-supported-folder-composition',
         confidence: 'bounded',
       }],
+      folderSemanticContextPatterns: [{
+        patternId: 'naming-folder-semantic-context.v1',
+        status: 'active',
+        folderName: 'naming',
+        semanticContext: 'naming',
+        qualification: 'explicit-supported-folder-semantic-context',
+        confidence: 'bounded',
+      }],
     },
   });
 
-  assert.deepEqual(result.observations.map((observation) => observation.path), ['calculogic-validator/naming/naming-src']);
+  assert.deepEqual(
+    result.observations.map((observation) => [observation.path, observation.semanticEvidenceKind]),
+    [
+      ['calculogic-validator/naming/naming-src', 'folder-semantic-structural-composition'],
+    ],
+  );
   assert.equal(result.observations[0].semanticQualifier, 'naming');
   assert.equal(result.observations[0].structuralRoleToken, 'src');
   assert.equal(result.observations[0].folderCompositionKind, 'semantic-qualified-structural-container');
+});
+
+test('naming folder-composition projection emits explicit ancestor semantic-context observations separately from composition observations', () => {
+  const result = projectNamingFolderCompositionBridge({
+    folderOccurrenceRecords: [
+      { path: 'calculogic-validator/naming', name: 'naming', occurrenceType: 'folder' },
+      { path: 'calculogic-validator/naming/naming-src', name: 'naming-src', occurrenceType: 'folder' },
+    ],
+    folderCompositionPatternsRegistry: {
+      folderCompositionPatterns: [{
+        patternId: 'semantic-qualified-src-container.v1',
+        status: 'active',
+        compositionKind: 'semantic-qualified-structural-container',
+        semanticQualifier: 'naming',
+        structuralRoleToken: 'src',
+        tokenOrder: ['semantic-qualifier', 'structural-role-token'],
+        folderName: 'naming-src',
+      }],
+      folderSemanticContextPatterns: [{
+        patternId: 'naming-folder-semantic-context.v1',
+        status: 'active',
+        folderName: 'naming',
+        semanticContext: 'naming',
+        qualification: 'explicit-supported-folder-semantic-context',
+        confidence: 'bounded',
+      }],
+    },
+  });
+
+  assert.deepEqual(
+    result.observations.map((observation) => [observation.path, observation.semanticEvidenceKind, observation.semanticContext ?? observation.semanticQualifier]),
+    [
+      ['calculogic-validator/naming', 'folder-semantic-context', 'naming'],
+      ['calculogic-validator/naming/naming-src', 'folder-semantic-structural-composition', 'naming'],
+    ],
+  );
 });

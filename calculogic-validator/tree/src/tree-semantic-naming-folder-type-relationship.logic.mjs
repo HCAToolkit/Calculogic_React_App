@@ -144,9 +144,61 @@ const toAncestorLineage = (occurrenceRecord, occurrenceRecordsByAddress) => {
   return lineage;
 };
 
-const toEstablishedSemanticContext = (ancestorLineage) => {
-  const nearestFolder = ancestorLineage.find((record) => record?.occurrenceType === 'folder' && typeof (record.name ?? record.actualName) === 'string');
-  return nearestFolder ? { semanticContext: nearestFolder.name ?? nearestFolder.actualName, source: 'addressed-parent-folder-lineage' } : null;
+const toAddressOnlyIdentityKeys = (record) => {
+  const keys = [];
+  if (!record || typeof record !== 'object' || Array.isArray(record)) return keys;
+  if (typeof record.addressProfileId === 'string' && typeof record.addressedSnapshotId === 'string' && typeof record.occurrenceAddress === 'string') {
+    keys.push(`address-tuple:${record.addressProfileId}::${record.addressedSnapshotId}::${record.occurrenceAddress}`);
+  }
+  if (typeof record.addressPath === 'string' && record.addressPath.length > 0) keys.push(`address:${record.addressPath}`);
+  return keys;
+};
+
+const toAncestorSemanticContextLookup = (namingSemanticEvidenceRecords) => {
+  const lookup = new Map();
+  const ambiguousKeys = new Set();
+
+  for (const record of namingSemanticEvidenceRecords) {
+    if (!record || typeof record !== 'object' || Array.isArray(record)) continue;
+    if (record.occurrenceType !== 'folder') continue;
+    if (record.semanticEvidenceKind !== 'folder-semantic-context') continue;
+    if (typeof record.semanticContext !== 'string' || record.semanticContext.length === 0) continue;
+
+    for (const key of toAddressOnlyIdentityKeys(record)) {
+      if (lookup.has(key)) {
+        ambiguousKeys.add(key);
+        continue;
+      }
+      lookup.set(key, record);
+    }
+  }
+
+  return { lookup, ambiguousKeys };
+};
+
+const lookupAncestorSemanticContextEvidence = (ancestorSemanticContextLookup, ancestorRecord) => {
+  for (const key of toAddressOnlyIdentityKeys(ancestorRecord)) {
+    if (ancestorSemanticContextLookup.ambiguousKeys.has(key)) return null;
+    if (ancestorSemanticContextLookup.lookup.has(key)) return ancestorSemanticContextLookup.lookup.get(key);
+  }
+  return null;
+};
+
+const toEstablishedSemanticContext = (ancestorLineage, ancestorSemanticContextLookup) => {
+  for (const ancestorRecord of ancestorLineage) {
+    const contextRecord = lookupAncestorSemanticContextEvidence(ancestorSemanticContextLookup, ancestorRecord);
+    if (!contextRecord) continue;
+    return {
+      semanticContext: contextRecord.semanticContext,
+      source: contextRecord.evidenceSource ?? 'addressed-naming-semantic-context-evidence',
+      qualification: contextRecord.semanticContextQualification ?? null,
+      confidence: contextRecord.semanticContextConfidence ?? contextRecord.evidenceStrength ?? 'bounded',
+      evidenceAddressPath: contextRecord.addressPath ?? null,
+      evidenceOccurrenceAddress: contextRecord.occurrenceAddress ?? null,
+      evidenceProvenance: contextRecord.evidenceProvenance ? { ...contextRecord.evidenceProvenance } : null,
+    };
+  }
+  return null;
 };
 
 const pushFolderCompositionRelationshipIfTriggered = ({
@@ -155,12 +207,13 @@ const pushFolderCompositionRelationshipIfTriggered = ({
   namingRecord,
   structuralRoleTokenLookup,
   occurrenceRecordsByAddress,
+  ancestorSemanticContextLookup,
 }) => {
   if (!isQualifiedFolderCompositionObservation(namingRecord)) return false;
 
   const structuralRoleTokenMetadata = structuralRoleTokenLookup.get(namingRecord.structuralRoleToken);
   const ancestorLineage = toAncestorLineage(occurrenceRecord, occurrenceRecordsByAddress);
-  const establishedContext = toEstablishedSemanticContext(ancestorLineage);
+  const establishedContext = toEstablishedSemanticContext(ancestorLineage, ancestorSemanticContextLookup);
   let relationshipInterpretation = 'semantic-qualified-structural-container-context-unresolved';
 
   if (!structuralRoleTokenMetadata) {
@@ -187,6 +240,10 @@ const pushFolderCompositionRelationshipIfTriggered = ({
     structuralRole: structuralRoleTokenMetadata?.structuralRole ?? null,
     establishedSemanticContext: establishedContext?.semanticContext ?? null,
     semanticContextSource: establishedContext?.source ?? null,
+    semanticContextQualification: establishedContext?.qualification ?? null,
+    semanticContextConfidence: establishedContext?.confidence ?? null,
+    semanticContextEvidenceAddressPath: establishedContext?.evidenceAddressPath ?? null,
+    semanticContextEvidenceOccurrenceAddress: establishedContext?.evidenceOccurrenceAddress ?? null,
     ancestorLineage: ancestorLineage.map((record) => ({
       addressPath: record.addressPath ?? null,
       parentAddressPath: record.parentAddressPath ?? null,
@@ -201,6 +258,7 @@ const pushFolderCompositionRelationshipIfTriggered = ({
     ...(namingRecord.addressedSnapshotId ? { addressedSnapshotId: namingRecord.addressedSnapshotId } : {}),
     ...(namingRecord.occurrenceAddress ? { occurrenceAddress: namingRecord.occurrenceAddress } : {}),
     ...(namingRecord.evidenceProvenance ? { evidenceProvenance: { ...namingRecord.evidenceProvenance } } : {}),
+    ...(establishedContext?.evidenceProvenance ? { semanticContextEvidenceProvenance: establishedContext.evidenceProvenance } : {}),
     rationale: 'Tree interpreted a Naming-owned folder-only mixed semantic/structural composition against addressed ancestor lineage and a Tree-owned embedded structural-role token registry.',
   });
   return true;
@@ -216,6 +274,7 @@ export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) =
   const allowedTopLevelDirectorySet = toAllowedTopLevelDirectorySet(input.treeRepoShapePolicy);
   const structuralRoleTokenLookup = toStructuralRoleTokenLookup(input.structuralRoleTokensRegistry);
   const occurrenceRecordsByAddress = toRecordsByAddress(input.addressedOccurrenceRecords);
+  const ancestorSemanticContextLookup = toAncestorSemanticContextLookup(input.namingSemanticEvidenceRecords);
   const relationshipRecords = [];
   const unclassifiedRelationshipRecords = [];
 
@@ -229,6 +288,7 @@ export const prepareTreeSemanticNamingFolderTypeRelationshipEvidence = (input) =
       namingRecord,
       structuralRoleTokenLookup,
       occurrenceRecordsByAddress,
+      ancestorSemanticContextLookup,
     })) continue;
 
     if (!isRepoTopFolder(occurrenceRecord)) continue;

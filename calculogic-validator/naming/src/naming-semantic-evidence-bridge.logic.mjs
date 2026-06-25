@@ -70,6 +70,33 @@ const toNamingSemanticEvidenceRecord = (observation) => {
     ...(typeof observation.familyRootQualification === 'string' && observation.familyRootQualification.length > 0
       ? { familyRootQualification: observation.familyRootQualification }
       : {}),
+    ...(typeof observation.folderCompositionKind === 'string' && observation.folderCompositionKind.length > 0
+      ? { folderCompositionKind: observation.folderCompositionKind }
+      : {}),
+    ...(typeof observation.semanticQualifier === 'string' && observation.semanticQualifier.length > 0
+      ? { semanticQualifier: observation.semanticQualifier }
+      : {}),
+    ...(typeof observation.structuralRoleToken === 'string' && observation.structuralRoleToken.length > 0
+      ? { structuralRoleToken: observation.structuralRoleToken }
+      : {}),
+    ...(Array.isArray(observation.tokenOrder)
+      ? { tokenOrder: observation.tokenOrder.filter((token) => typeof token === 'string' && token.length > 0) }
+      : {}),
+    ...(typeof observation.compositionQualification === 'string' && observation.compositionQualification.length > 0
+      ? { compositionQualification: observation.compositionQualification }
+      : {}),
+    ...(typeof observation.compositionConfidence === 'string' && observation.compositionConfidence.length > 0
+      ? { compositionConfidence: observation.compositionConfidence }
+      : {}),
+    ...(typeof observation.semanticContext === 'string' && observation.semanticContext.length > 0
+      ? { semanticContext: observation.semanticContext }
+      : {}),
+    ...(typeof observation.semanticContextQualification === 'string' && observation.semanticContextQualification.length > 0
+      ? { semanticContextQualification: observation.semanticContextQualification }
+      : {}),
+    ...(typeof observation.semanticContextConfidence === 'string' && observation.semanticContextConfidence.length > 0
+      ? { semanticContextConfidence: observation.semanticContextConfidence }
+      : {}),
     ...(typeof observation.evidenceSource === 'string' && observation.evidenceSource.length > 0
       ? { evidenceSource: observation.evidenceSource }
       : {}),

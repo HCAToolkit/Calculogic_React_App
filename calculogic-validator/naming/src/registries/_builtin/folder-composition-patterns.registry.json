@@ -13,5 +13,25 @@
       "confidence": "bounded",
       "definition": "Naming-owned fixture pattern for a folder occurrence whose name explicitly combines a semantic qualifier with a represented structural-role token."
     }
+  ],
+  "folderSemanticContextPatterns": [
+    {
+      "patternId": "naming-folder-semantic-context.v1",
+      "status": "active",
+      "folderName": "naming",
+      "semanticContext": "naming",
+      "qualification": "explicit-supported-folder-semantic-context",
+      "confidence": "bounded",
+      "definition": "Naming-owned explicit semantic-context evidence for an addressed ancestor folder occurrence."
+    },
+    {
+      "patternId": "tree-folder-semantic-context.v1",
+      "status": "active",
+      "folderName": "tree",
+      "semanticContext": "tree",
+      "qualification": "explicit-supported-folder-semantic-context",
+      "confidence": "bounded",
+      "definition": "Naming-owned explicit semantic-context evidence for an addressed ancestor folder occurrence."
+    }
   ]
 }

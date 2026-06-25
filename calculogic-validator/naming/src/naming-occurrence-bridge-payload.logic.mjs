@@ -20,6 +20,9 @@ const NAMING_SEMANTIC_FIELDS = [
   'compositionQualification',
   'compositionConfidence',
   'tokenOrder',
+  'semanticContext',
+  'semanticContextQualification',
+  'semanticContextConfidence',
 ];
 
 const toOptionalNonEmptyString = (value) => (typeof value === 'string' && value.length > 0 ? value : null);
