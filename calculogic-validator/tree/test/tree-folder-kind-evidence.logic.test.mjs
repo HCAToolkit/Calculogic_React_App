@@ -105,7 +105,9 @@ test('skips aligned relationship-qualified folder-kind evidence when addressed i
   });
 
   assert.equal(
-    result.evidenceRecords.some((record) => record.path === 'calculogic-validator/naming/naming-src'),
+    result.evidenceRecords.some((record) =>
+      record.path === 'calculogic-validator/naming/naming-src' && record.relationshipQualified === true,
+    ),
     false,
   );
 });
@@ -130,6 +132,28 @@ test('skips aligned relationship-qualified folder-kind evidence outside the curr
     result.evidenceRecords.some((record) => record.path === 'calculogic-validator/naming/naming-src'),
     false,
   );
+});
+
+
+test('stale same-path relationship evidence does not suppress generic structural folder-kind fallback', () => {
+  const result = prepareTreeFolderKindEvidence({
+    addressedOccurrenceRecords: [
+      { addressPath: 'B.1', parentAddressPath: null, path: 'src', name: 'src', occurrenceType: 'folder' },
+    ],
+    treeStructuralHomeEvidence: { source: 'x', evidenceRecords: [{ path: 'src', structuralHome: 'src' }] },
+    treeSemanticHomeEvidence: { source: 'x', evidenceRecords: [] },
+    treeSemanticNamingFolderTypeRelationshipEvidence: {
+      relationshipRecords: [
+        { addressPath: 'A.4.2', path: 'src', relationshipPerspective: 'semantic-qualified-structural-container', relationshipInterpretation: 'semantic-qualified-structural-container-aligned', structuralRole: 'implementation-container', establishedSemanticContext: 'naming', semanticContextEvidenceAddressPath: 'A.naming' },
+      ],
+    },
+    folderKindsRegistry: folderKindsRegistryFixture,
+  });
+
+  assert.deepEqual(result.evidenceRecords.map((record) => [record.path, record.addressPath, record.folderKind]), [
+    ['src', 'B.1', 'structural'],
+  ]);
+  assert.equal(result.evidenceRecords.some((record) => record.relationshipQualified === true), false);
 });
 
 

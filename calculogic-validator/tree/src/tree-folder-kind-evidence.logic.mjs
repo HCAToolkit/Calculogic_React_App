@@ -82,6 +82,25 @@ const hasSameAddressedOccurrenceIdentity = ({ relationshipRecord, occurrenceReco
   relationshipRecord.addressPath === occurrenceRecord.addressPath
 );
 
+const toRelationshipRecordsByPath = (relationshipRecords) => {
+  const recordsByPath = new Map();
+  for (const record of relationshipRecords) {
+    if (record?.relationshipPerspective !== 'semantic-qualified-structural-container') continue;
+    if (typeof record.path !== 'string' || record.path.length === 0) continue;
+    if (!recordsByPath.has(record.path)) recordsByPath.set(record.path, []);
+    recordsByPath.get(record.path).push(record);
+  }
+
+  for (const records of recordsByPath.values()) {
+    records.sort((left, right) =>
+      (left.addressPath ?? '').localeCompare(right.addressPath ?? '') ||
+      (left.relationshipInterpretation ?? '').localeCompare(right.relationshipInterpretation ?? ''),
+    );
+  }
+
+  return recordsByPath;
+};
+
 const toRelationshipQualifiedFolderKindEvidenceRecords = ({ relationshipRecords, addressedOccurrenceRecordsByPath, supportedFolderKinds }) => {
   if (!supportedFolderKinds.has('semantic-qualified-structural-container')) return [];
 
@@ -143,19 +162,18 @@ export const prepareTreeFolderKindEvidence = (input) => {
   );
 
   const relationshipRecords = input.treeSemanticNamingFolderTypeRelationshipEvidence?.relationshipRecords ?? [];
-  const relationshipOnlyIneligiblePathSet = new Set(
-    relationshipRecords
-      .filter((record) => record?.relationshipPerspective === 'semantic-qualified-structural-container')
-      .map((record) => record.path)
-      .filter((path) => typeof path === 'string' && path.length > 0),
-  );
-  const relationshipQualifiedPathSet = new Set();
+  const relationshipRecordsByPath = toRelationshipRecordsByPath(relationshipRecords);
+  const relationshipQualifiedAddressPathSet = new Set();
   const evidenceRecords = toRelationshipQualifiedFolderKindEvidenceRecords({
     relationshipRecords,
     addressedOccurrenceRecordsByPath,
     supportedFolderKinds,
   });
-  for (const evidenceRecord of evidenceRecords) relationshipQualifiedPathSet.add(evidenceRecord.path);
+  for (const evidenceRecord of evidenceRecords) {
+    if (typeof evidenceRecord.addressPath === 'string' && evidenceRecord.addressPath.length > 0) {
+      relationshipQualifiedAddressPathSet.add(evidenceRecord.addressPath);
+    }
+  }
 
   for (const occurrenceRecord of input.addressedOccurrenceRecords) {
     if (!occurrenceRecord || typeof occurrenceRecord !== 'object' || Array.isArray(occurrenceRecord)) {
@@ -170,7 +188,12 @@ export const prepareTreeFolderKindEvidence = (input) => {
       continue;
     }
 
-    if (relationshipQualifiedPathSet.has(occurrenceRecord.path) || relationshipOnlyIneligiblePathSet.has(occurrenceRecord.path)) {
+    const currentOccurrenceRelationshipRecords = relationshipRecordsByPath.get(occurrenceRecord.path) ?? [];
+    const hasCurrentOccurrenceRelationship = currentOccurrenceRelationshipRecords.some((relationshipRecord) =>
+      hasSameAddressedOccurrenceIdentity({ relationshipRecord, occurrenceRecord }),
+    );
+
+    if (relationshipQualifiedAddressPathSet.has(occurrenceRecord.addressPath) || hasCurrentOccurrenceRelationship) {
       continue;
     }
 
