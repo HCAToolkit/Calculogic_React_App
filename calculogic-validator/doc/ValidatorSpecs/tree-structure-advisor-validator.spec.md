@@ -111,6 +111,29 @@ Bounded consumable naming bridge surfaces include:
 
 Tree advisor does **not** re-own naming validity judgments. Naming validity remains owned by naming conventions/specs and the naming validator slice.
 
+Tree now also consumes repository-top folder observations from that same Naming-owned evidence surface when Naming supplies semantic-family-root evidence for folder occurrences. Tree does not parse those folder names into semantic identity. Tree evaluates a Tree-owned relationship perspective between the Naming evidence and the folder occurrence context.
+
+Active relationship perspective for current runtime truth:
+
+```text
+Naming perspective: semantic-family-root
++ Tree perspective: repository-top folder
++ Tree condition: not a retained structural repository-top home
++ Tree repo-shape condition: allowed top-level directory
+→ Tree relationship perspective: semantic-repository-top-family-home
+```
+
+The relationship registry is Tree-owned because it describes Tree interpretation of folder role, repository-top position, structural-home status, and repo-shape context. It contains reusable relationship conventions only; it must not contain named semantic-home facts such as package-folder-name → semantic home. Naming remains the owner of `semanticName`, `familyRoot`, `semanticFamily`, and optional `familySubgroup`.
+
+Repo-shape allowance remains separate from classification: an allowed top-level directory can be structurally classified, semantically classified through this relationship, or remain unspecified if the required Tree/Naming evidence is absent.
+
+Current repository-top relationship explanations are scoped to repository-top folder occurrences that are not already classified by retained structural-home evidence; nested folders, files, and structural folders do not receive explanation records from this perspective.
+
+Current implementation reality: the normal runner path stages package-root folder observations in the Naming-owned semantic-family bridge when Naming sees package-manifest evidence for a repository-top package folder. Those observations carry folder occurrence type, semantic identity fields, explicit `semanticEvidenceKind: semantic-family-root-folder`, explicit `familyRootQualification: package-root-folder`, and provenance back to the Naming finding that justified the observation. Tree consumes the addressed form of that bridge evidence after Addressing has supplied occurrence identity and lineage.
+
+When a folder remains unclassified in the internal prepared classification path, Tree may attach a bounded `classificationExplanation` object. That explanation is internal evidence, not a new finding or report-envelope change. Current reason codes include `missing-required-naming-observation`, `naming-observation-not-qualified-as-family-root`, `no-active-relationship-perspective-match`, `ambiguous-or-conflicting-evidence`, and `unknown-or-unmodeled-folder-relationship`.
+
+
 ### Naming occurrence bridge intake boundary (Status: Current implementation reality)
 
 Tree has a neutral intake boundary for a staged sibling `namingOccurrenceBridge` payload when that payload is explicitly supplied to Tree wiring or attached beside the path-keyed semantic-family bridge payload in tests/helper transport. The boundary recognizes address-keyed join identity tuples made from `addressProfileId` + `addressedSnapshotId` + `occurrenceAddress`; it preserves or summarizes Naming-originated bridge diagnostics and compatibility diagnostic counts; and the intake summary remains non-finding evidence that does not replace current Tree findings, placement reasoning, scatter/cluster logic, drift/advisory logic, structural-home reasoning, semantic-home reasoning, or folder-kind interpretation.
@@ -351,8 +374,8 @@ This section clarifies modeling intent for tree root registries without changing
   - generic surface-like roots such as `src`, `test`, `doc`, `docs`, `scripts`, `tools`, `public`, `bin`
   - these are interpreted by tree as structural folder surfaces
 - **Semantic/custom-style top roots**:
-  - top roots that encode semantic/package identity or repo-local ownership style
-  - examples can include package-style roots used by a specific repository architecture
+  - top roots whose semantic/package identity is supplied by Naming-owned evidence and interpreted by Tree through the semantic-naming-to-folder-type relationship perspective
+  - current runtime truth does not model these roots as Tree-owned named semantic-home registry entries
 
 ### 2) Builtin vs custom ownership
 
