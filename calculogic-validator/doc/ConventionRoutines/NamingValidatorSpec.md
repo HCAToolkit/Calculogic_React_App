@@ -391,6 +391,7 @@ Additive occurrence bridge staging path (current implementation reality):
 - the occurrence bridge preserves the current path-keyed compatibility field and does not carry tree-owned conclusion fields such as semantic-home, structural-home, folder-kind, placement, scatter, cluster, or drift conclusions
 - tree consumption remains on the current path-keyed semantic-family bridge until a separate tree consumption slice changes that behavior
 - naming may also project explicit folder-only `folder-semantic-structural-composition` observations when an addressed folder occurrence matches a Naming-owned folder-composition registry pattern; this current runtime truth is intentionally narrow and supplies `semanticQualifier`, `structuralRoleToken`, `folderCompositionKind`, token order, qualification, confidence, and provenance without Tree re-parsing the folder name
+- `folder-semantic-structural-composition` observations are relationship input only; their `semanticQualifier`, `semanticName`, `semanticFamily`, and `familyRoot` fields do not assert semantic-home truth for the mixed folder occurrence
 - naming may project separate explicit `folder-semantic-context` observations for supported ancestor folder occurrences; Tree may consume these only after Addressing attaches occurrence identity and must not replace them with raw ancestor folder names or path segments
 - file occurrences with similar basenames are outside this folder-composition projection and must not receive composition observations
 

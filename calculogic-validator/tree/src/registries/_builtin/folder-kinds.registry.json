@@ -12,6 +12,11 @@
       "definition": "Folder whose primary meaning comes from semantic-family or semantic-root alignment."
     },
     {
+      "folderKind": "semantic-qualified-structural-container",
+      "status": "active",
+      "definition": "Folder whose kind is emitted only from an aligned Tree-owned semantic-qualified structural-container relationship interpretation."
+    },
+    {
       "folderKind": "unspecified",
       "status": "active",
       "definition": "Folder whose meaning is not yet strong enough to classify confidently as structural or semantic."
