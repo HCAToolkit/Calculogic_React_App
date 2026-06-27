@@ -355,6 +355,44 @@ test('tree occurrence classification rejects unapproved relationship-qualified f
   assert.equal(records.every((record) => record.classificationEvidenceKind !== 'relationship-qualified-folder-kind'), true);
 });
 
+
+test('tree occurrence classification requires explicit structural role for relationship-qualified folder-kind evidence', () => {
+  const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence: { source: 'test', evidenceRecords: [] },
+    treeSemanticHomeEvidence: { source: 'test', evidenceRecords: [] },
+    treeRepoShapePolicy: TEST_REPO_SHAPE_POLICY,
+    treeFolderKindEvidence: {
+      source: 'test',
+      evidenceRecords: [
+        {
+          path: 'calculogic-validator/naming/naming-src',
+          addressPath: 'E.1',
+          occurrenceType: 'folder',
+          folderKind: 'semantic-qualified-structural-container',
+          relationshipQualified: true,
+          relationshipPerspective: 'semantic-qualified-structural-container',
+          relationshipInterpretation: 'semantic-qualified-structural-container-aligned',
+          structuralRole: null,
+        },
+      ],
+    },
+  });
+
+  const [record] = replacementRuntime.classifyOccurrenceRecords([
+    {
+      path: 'calculogic-validator/naming/naming-src',
+      resolvedPath: 'calculogic-validator/naming/naming-src',
+      actualName: 'naming-src',
+      addressPath: 'E.1',
+      occurrenceType: 'folder',
+    },
+  ]);
+
+  assert.notEqual(record.structuralClass, 'relationship-qualified-structural-container');
+  assert.equal(record.structuralClass, 'unclassified');
+  assert.equal(record.classificationEvidenceKind, undefined);
+});
+
 test('tree occurrence classification keeps files outside the relationship-qualified folder route', () => {
   const replacementRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
     treeStructuralHomeEvidence: { source: 'test', evidenceRecords: [] },

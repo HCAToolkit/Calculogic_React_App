@@ -73,7 +73,9 @@ const isApprovedRelationshipQualifiedFolderKindEvidence = (record) => (
   record.folderKind === 'semantic-qualified-structural-container' &&
   record.relationshipQualified === true &&
   record.relationshipPerspective === 'semantic-qualified-structural-container' &&
-  record.relationshipInterpretation === 'semantic-qualified-structural-container-aligned'
+  record.relationshipInterpretation === 'semantic-qualified-structural-container-aligned' &&
+  typeof record.structuralRole === 'string' &&
+  record.structuralRole.length > 0
 );
 
 const toRelationshipQualifiedFolderKindLookupByAddressPath = (evidenceRecords) => {
@@ -113,7 +115,7 @@ const lookupExactRelationshipQualifiedFolderKindEvidence = (lookup, occurrenceRe
 
 const toRelationshipQualifiedStructuralContainerClassification = (evidenceRecord) => ({
   structuralClass: 'relationship-qualified-structural-container',
-  structuralKind: evidenceRecord.structuralRole ?? 'implementation-container',
+  structuralKind: evidenceRecord.structuralRole,
   isRepoShapeAllowedTopLevelDirectory: false,
   isStructuralRoot: false,
   isSemanticRoot: false,
@@ -121,7 +123,7 @@ const toRelationshipQualifiedStructuralContainerClassification = (evidenceRecord
   classificationEvidenceKind: 'relationship-qualified-folder-kind',
   relationshipPerspective: evidenceRecord.relationshipPerspective,
   relationshipInterpretation: evidenceRecord.relationshipInterpretation,
-  structuralRole: evidenceRecord.structuralRole ?? null,
+  structuralRole: evidenceRecord.structuralRole,
   semanticContext: evidenceRecord.semanticContext ?? null,
   semanticContextEvidenceAddressPath: evidenceRecord.semanticContextEvidenceAddressPath ?? null,
 });
