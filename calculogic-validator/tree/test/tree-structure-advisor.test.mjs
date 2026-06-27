@@ -926,6 +926,31 @@ test('tree-structure-advisor runner staging receives addressed Naming package-ro
     assert.equal(folderKindsByPath['calculogic-validator/naming/naming-src'].folderKind, 'semantic-qualified-structural-container');
     assert.equal(folderKindsByPath['calculogic-validator/naming/naming-src'].relationshipQualified, true);
     assert.equal(Object.hasOwn(folderKindsByPath, 'calculogic-validator/tree/naming-src'), false);
+
+    const classificationsByPath = Object.fromEntries(
+      preparedInputs.preparedDependencies.treeOccurrenceClassificationReplacementRuntime
+        .classifyOccurrenceRecords(preparedInputs.structuralAddressSnapshot.occurrenceRecords)
+        .filter((record) => record.occurrenceType === 'folder')
+        .map((record) => [record.path, record]),
+    );
+    assert.equal(
+      classificationsByPath['calculogic-validator/naming/naming-src'].structuralClass,
+      'relationship-qualified-structural-container',
+    );
+    assert.equal(classificationsByPath['calculogic-validator/naming/naming-src'].structuralKind, 'implementation-container');
+    assert.equal(classificationsByPath['calculogic-validator/naming/naming-src'].relationshipQualified, true);
+    assert.equal(
+      classificationsByPath['calculogic-validator/naming/naming-src'].classificationEvidenceKind,
+      'relationship-qualified-folder-kind',
+    );
+    assert.equal(classificationsByPath['calculogic-validator/naming/naming-src'].isStructuralRoot, false);
+    assert.equal(classificationsByPath['calculogic-validator/naming/naming-src'].isSemanticRoot, false);
+    assert.equal(classificationsByPath['calculogic-validator/naming/naming-src'].semanticHome, undefined);
+    assert.notEqual(classificationsByPath['calculogic-validator/naming/naming-src'].structuralClass, 'repo-top-semantic-root');
+    assert.notEqual(
+      classificationsByPath['calculogic-validator/tree/naming-src']?.structuralClass,
+      'relationship-qualified-structural-container',
+    );
   } finally {
     await fs.rm(fixtureDir, { recursive: true, force: true });
   }
@@ -2171,6 +2196,23 @@ test('semantic-qualified structural-container relationship uses addressed semant
   assert.equal(Object.hasOwn(folderKindsByPath, 'calculogic-validator/tree/naming-src'), false);
   assert.equal(Object.hasOwn(folderKindsByPath, 'calculogic-validator/naming-without-context/naming-src'), false);
   assert.equal(Object.hasOwn(folderKindsByPath, 'calculogic-validator/naming/naming-src.logic.mjs'), false);
+
+  const classificationRuntime = prepareTreeOccurrenceClassificationReplacementRuntime({
+    treeStructuralHomeEvidence,
+    treeSemanticHomeEvidence: semanticHomeEvidence,
+    treeSemanticNamingFolderTypeRelationshipEvidence: relationshipEvidence,
+    treeFolderKindEvidence: folderKindEvidence,
+    treeRepoShapePolicy: { allowedTopLevelDirectories: ['calculogic-doc-engine', 'calculogic-validator', 'src'] },
+  });
+  const classificationsByPath = Object.fromEntries(
+    classificationRuntime.classifyOccurrenceRecords(addressedOccurrenceRecords).map((record) => [record.path, record]),
+  );
+  assert.equal(classificationsByPath['calculogic-validator/naming/naming-src'].structuralClass, 'relationship-qualified-structural-container');
+  assert.equal(classificationsByPath['calculogic-validator/naming/naming-src'].structuralKind, 'implementation-container');
+  assert.equal(classificationsByPath['calculogic-validator/naming/naming-src'].classificationEvidenceKind, 'relationship-qualified-folder-kind');
+  assert.equal(classificationsByPath['calculogic-validator/tree/naming-src'].structuralClass, 'unclassified');
+  assert.equal(classificationsByPath['calculogic-validator/naming-without-context/naming-src'].structuralClass, 'unclassified');
+  assert.equal(classificationsByPath['calculogic-validator/naming/naming-src.logic.mjs'].structuralClass, 'unclassified');
 
   assert.deepEqual(
     relationshipEvidence.relationshipRecords
