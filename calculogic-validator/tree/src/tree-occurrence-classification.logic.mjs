@@ -62,6 +62,72 @@ const lookupFirstAvailable = (lookup, record, fallback = null) => {
   return fallback;
 };
 
+
+const isApprovedRelationshipQualifiedFolderKindEvidence = (record) => (
+  record &&
+  typeof record === 'object' &&
+  !Array.isArray(record) &&
+  typeof record.addressPath === 'string' &&
+  record.addressPath.length > 0 &&
+  record.occurrenceType === 'folder' &&
+  record.folderKind === 'semantic-qualified-structural-container' &&
+  record.relationshipQualified === true &&
+  record.relationshipPerspective === 'semantic-qualified-structural-container' &&
+  record.relationshipInterpretation === 'semantic-qualified-structural-container-aligned' &&
+  typeof record.structuralRole === 'string' &&
+  record.structuralRole.length > 0
+);
+
+const toRelationshipQualifiedFolderKindLookupByAddressPath = (evidenceRecords) => {
+  const lookup = new Map();
+
+  for (const evidenceRecord of evidenceRecords) {
+    if (!isApprovedRelationshipQualifiedFolderKindEvidence(evidenceRecord)) {
+      continue;
+    }
+
+    if (lookup.has(evidenceRecord.addressPath)) {
+      continue;
+    }
+
+    lookup.set(evidenceRecord.addressPath, evidenceRecord);
+  }
+
+  return lookup;
+};
+
+const lookupExactRelationshipQualifiedFolderKindEvidence = (lookup, occurrenceRecord) => {
+  if (
+    occurrenceRecord?.occurrenceType !== 'folder' ||
+    typeof occurrenceRecord.addressPath !== 'string' ||
+    occurrenceRecord.addressPath.length === 0
+  ) {
+    return null;
+  }
+
+  const evidenceRecord = lookup.get(occurrenceRecord.addressPath) ?? null;
+  if (!isApprovedRelationshipQualifiedFolderKindEvidence(evidenceRecord)) {
+    return null;
+  }
+
+  return evidenceRecord;
+};
+
+const toRelationshipQualifiedStructuralContainerClassification = (evidenceRecord) => ({
+  structuralClass: 'relationship-qualified-structural-container',
+  structuralKind: evidenceRecord.structuralRole,
+  isRepoShapeAllowedTopLevelDirectory: false,
+  isStructuralRoot: false,
+  isSemanticRoot: false,
+  relationshipQualified: true,
+  classificationEvidenceKind: 'relationship-qualified-folder-kind',
+  relationshipPerspective: evidenceRecord.relationshipPerspective,
+  relationshipInterpretation: evidenceRecord.relationshipInterpretation,
+  structuralRole: evidenceRecord.structuralRole,
+  semanticContext: evidenceRecord.semanticContext ?? null,
+  semanticContextEvidenceAddressPath: evidenceRecord.semanticContextEvidenceAddressPath ?? null,
+});
+
 const toAllowedTopLevelDirectorySet = (allowedTopLevelDirectories) =>
   new Set(
     allowedTopLevelDirectories
@@ -147,7 +213,7 @@ const toReplacementRootClassification = ({ folderKind, structuralHome, semanticH
   };
 };
 
-const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, semanticHomeLookup, folderKindLookup, relationshipExplanationLookup, allowedTopLevelDirectorySet }) => {
+const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, semanticHomeLookup, folderKindLookup, relationshipQualifiedFolderKindLookupByAddressPath, relationshipExplanationLookup, allowedTopLevelDirectorySet }) => {
   if (!occurrenceRecord || typeof occurrenceRecord !== 'object') {
     return {
       structuralClass: 'unclassified',
@@ -180,6 +246,17 @@ const classifyWithPreparedEvidence = ({ occurrenceRecord, structuralHomeLookup, 
         isRepoShapeAllowedTopLevelDirectory: allowedTopLevelDirectorySet.has(resolvedPath),
         classificationExplanation: lookupFirstAvailable(relationshipExplanationLookup, occurrenceRecord),
       }),
+      isRepoTopOccurrence,
+      isScopedRootOccurrence,
+      isSubtreePartitionCandidate,
+    };
+  }
+
+  const relationshipQualifiedFolderKindEvidence = lookupExactRelationshipQualifiedFolderKindEvidence(relationshipQualifiedFolderKindLookupByAddressPath, occurrenceRecord);
+
+  if (relationshipQualifiedFolderKindEvidence) {
+    return {
+      ...toRelationshipQualifiedStructuralContainerClassification(relationshipQualifiedFolderKindEvidence),
       isRepoTopOccurrence,
       isScopedRootOccurrence,
       isSubtreePartitionCandidate,
@@ -220,6 +297,9 @@ export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => 
   const structuralHomeLookup = toEvidenceLookup(input.treeStructuralHomeEvidence.evidenceRecords, 'structuralHome');
   const semanticHomeLookup = toEvidenceLookup(input.treeSemanticHomeEvidence.evidenceRecords, 'semanticHome');
   const folderKindLookup = toEvidenceLookup(input.treeFolderKindEvidence.evidenceRecords, 'folderKind');
+  const relationshipQualifiedFolderKindLookupByAddressPath = toRelationshipQualifiedFolderKindLookupByAddressPath(
+    input.treeFolderKindEvidence.evidenceRecords,
+  );
   const relationshipExplanationLookup = toEvidenceLookup(
     input.treeSemanticNamingFolderTypeRelationshipEvidence?.unclassifiedRelationshipRecords ?? [],
     'classificationExplanation',
@@ -242,6 +322,7 @@ export const prepareTreeOccurrenceClassificationReplacementRuntime = (input) => 
           structuralHomeLookup,
           semanticHomeLookup,
           folderKindLookup,
+          relationshipQualifiedFolderKindLookupByAddressPath,
           relationshipExplanationLookup,
           allowedTopLevelDirectorySet,
         }),
