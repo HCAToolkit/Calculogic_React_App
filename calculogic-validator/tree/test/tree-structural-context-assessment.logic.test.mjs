@@ -82,6 +82,17 @@ test('partial or incomplete classification produces no assessment record', () =>
   assert.deepEqual(assess([partial]).assessmentRecords, []);
 });
 
+test('matching-looking file classification produces no assessment record', () => {
+  assert.deepEqual(assess([matchingClassification({ occurrenceType: 'file' })]).assessmentRecords, []);
+});
+
+test('matching-looking classification without addressPath produces no assessment record', () => {
+  const incomplete = matchingClassification();
+  delete incomplete.addressPath;
+
+  assert.deepEqual(assess([incomplete]).assessmentRecords, []);
+});
+
 test('missing structuralRole on classification produces no assessment record', () => {
   const incomplete = matchingClassification();
   delete incomplete.structuralRole;

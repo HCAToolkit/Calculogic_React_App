@@ -50,6 +50,8 @@ const classificationHasCompleteMatchShape = (record) => (
   record &&
   typeof record === 'object' &&
   !Array.isArray(record) &&
+  record.occurrenceType === 'folder' &&
+  isNonEmptyString(record.addressPath) &&
   isNonEmptyString(record.structuralRole) &&
   REQUIRED_SELECTORS.every((selector) => Object.hasOwn(record, selector))
 );
