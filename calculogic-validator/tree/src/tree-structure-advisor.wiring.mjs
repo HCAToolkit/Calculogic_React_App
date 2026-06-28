@@ -19,6 +19,7 @@ import {
   prepareTreeOccurrenceClassificationReplacementRuntime,
 } from './tree-occurrence-classification.logic.mjs';
 import { prepareTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-evidence.logic.mjs';
+import { prepareTreeStructuralContextAssessment } from './tree-structural-context-assessment.logic.mjs';
 import { summarizeTreeOccurrenceClassificationParityEvidence } from './tree-occurrence-classification-parity-summary.logic.mjs';
 import { prepareTreeOccurrenceClassificationShadowReport } from './tree-occurrence-classification-shadow-report.logic.mjs';
 import { evaluateTreeOccurrenceClassificationReplacementReadiness } from './tree-occurrence-classification-replacement-readiness.logic.mjs';
@@ -35,6 +36,7 @@ import { getBuiltinFolderKindsRegistry } from './registries/tree-folder-kinds-re
 import { getBuiltinTreeRepoShapePolicy } from './registries/tree-repo-shape-policy-registry.logic.mjs';
 import { getBuiltinSemanticNamingFolderTypeRelationshipsRegistry } from './registries/tree-semantic-naming-folder-type-relationships-registry.logic.mjs';
 import { getBuiltinStructuralRoleTokensRegistry } from './registries/tree-structural-role-tokens-registry.logic.mjs';
+import { getBuiltinStructuralContextAssessmentPoliciesRegistry } from './registries/tree-structural-context-assessment-policies-registry.logic.mjs';
 
 const TOP_LEVEL_SCAN_EXCLUSIONS = new Set(['.git', 'node_modules']);
 const TREE_ADDRESS_PROFILE_ID = 'tree-structure-advisor-address-profile';
@@ -91,6 +93,7 @@ export const prepareTreeStructureAdvisorInputs = (
   const treeRepoShapePolicy = getBuiltinTreeRepoShapePolicy();
   const semanticNamingFolderTypeRelationshipsRegistry = getBuiltinSemanticNamingFolderTypeRelationshipsRegistry();
   const structuralRoleTokensRegistry = getBuiltinStructuralRoleTokensRegistry();
+  const structuralContextAssessmentPoliciesRegistry = getBuiltinStructuralContextAssessmentPoliciesRegistry();
   const namingFolderCompositionPatternsRegistry = getBuiltinNamingFolderCompositionPatternsRegistry();
   const namingSemanticEvidenceBridge = namingSemanticFamilyBridge
     ? prepareNamingSemanticEvidenceBridge(namingSemanticFamilyBridge)
@@ -155,6 +158,11 @@ export const prepareTreeStructureAdvisorInputs = (
     structuralAddressSnapshot.occurrenceRecords,
   );
 
+  const treeStructuralContextAssessment = prepareTreeStructuralContextAssessment({
+    currentOccurrenceClassificationRecords,
+    structuralContextAssessmentPoliciesRegistry,
+  });
+
   const treeOccurrenceClassificationParityEvidence = prepareTreeOccurrenceClassificationParityEvidence({
     addressedOccurrenceRecords: structuralAddressSnapshot.occurrenceRecords,
     currentOccurrenceClassificationRecords,
@@ -206,6 +214,7 @@ export const prepareTreeStructureAdvisorInputs = (
       treeSemanticHomeEvidence,
       treeFolderKindEvidence,
       treeRepoShapePolicy,
+      treeStructuralContextAssessment,
       treeOccurrenceClassificationParityEvidence,
       treeOccurrenceClassificationParitySummary,
       treeOccurrenceClassificationShadowReport,

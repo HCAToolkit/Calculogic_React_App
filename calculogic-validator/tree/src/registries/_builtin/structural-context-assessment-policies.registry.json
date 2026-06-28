@@ -1,0 +1,22 @@
+{
+  "version": "1",
+  "policies": [
+    {
+      "policyId": "relationship-qualified-semantic-qualified-structural-container-aligned",
+      "match": {
+        "structuralClass": "relationship-qualified-structural-container",
+        "structuralKind": "implementation-container",
+        "relationshipQualified": true,
+        "classificationEvidenceKind": "relationship-qualified-folder-kind",
+        "relationshipPerspective": "semantic-qualified-structural-container",
+        "relationshipInterpretation": "semantic-qualified-structural-container-aligned"
+      },
+      "assessment": {
+        "outcome": "coherent",
+        "kind": "coherent-semantic-qualified-structural-container",
+        "reportable": false,
+        "rationale": "Tree-approved aligned semantic-qualified structural implementation-container classification is structurally coherent in its addressed semantic context."
+      }
+    }
+  ]
+}
