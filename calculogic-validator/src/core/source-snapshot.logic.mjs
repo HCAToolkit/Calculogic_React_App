@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const runGit = (cwd, args) =>
@@ -25,7 +26,11 @@ const parseStatusDiagnostics = (statusOutput) => {
 };
 
 export const getSourceSnapshot = ({ cwd }) => {
-  const baseSnapshot = { source: 'fs' };
+  const repositoryRoot = cwd ? path.resolve(cwd) : undefined;
+  const baseSnapshot = {
+    source: 'fs',
+    ...(repositoryRoot ? { repositoryRoot } : {}),
+  };
 
   if (!cwd || !existsSync(`${cwd}/.git`)) {
     return baseSnapshot;

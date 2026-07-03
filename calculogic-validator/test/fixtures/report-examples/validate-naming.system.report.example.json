@@ -5,6 +5,7 @@
   "validatorVersion": "0.1.0",
   "sourceSnapshot": {
     "source": "fs",
+    "repositoryRoot": "<repository-root>",
     "gitRef": "HEAD",
     "gitHeadSha": "<git-head-sha>",
     "diagnostics": {
@@ -13,6 +14,9 @@
       "untrackedCount": 0
     }
   },
+  "startedAt": "<iso-startedAt>",
+  "endedAt": "<iso-endedAt>",
+  "durationMs": 0,
   "registryState": "builtin",
   "registrySource": "builtin",
   "registryDigests": {
@@ -20,9 +24,6 @@
     "custom": "8d5ccfbe4cc90cf86d4b03abcc68e003d7f6f05b7508eb241c9b8d49ac29dd8f",
     "resolved": "603befb271f58265771b5106d85c3b593e956a73f2c768352aa4a305a4a2b0fd"
   },
-  "startedAt": "<iso-startedAt>",
-  "endedAt": "<iso-endedAt>",
-  "durationMs": 0,
   "scope": "system",
   "totalFilesScanned": 7,
   "filters": {

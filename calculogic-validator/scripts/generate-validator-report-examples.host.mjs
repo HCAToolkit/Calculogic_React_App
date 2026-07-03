@@ -14,6 +14,10 @@ const replaceUnstableSourceSnapshot = (sourceSnapshot) => {
     ...sourceSnapshot,
   };
 
+  if (typeof normalized.repositoryRoot === 'string') {
+    normalized.repositoryRoot = '<repository-root>';
+  }
+
   if (typeof normalized.gitHeadSha === 'string') {
     normalized.gitHeadSha = '<git-head-sha>';
   }

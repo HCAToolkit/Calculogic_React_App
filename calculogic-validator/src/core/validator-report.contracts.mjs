@@ -12,6 +12,7 @@ export const CALCULOGIC_VALIDATOR_REPORT_VERSION = '0.1.0';
  *   configDigest?: string,
  *   sourceSnapshot?: {
  *     source: 'fs',
+ *     repositoryRoot?: string, // Absolute analyzed target root when cwd is supplied.
  *     gitRef?: 'HEAD',
  *     gitHeadSha?: string,
  *     diagnostics?: {

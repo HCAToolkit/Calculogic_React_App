@@ -9,8 +9,9 @@
   },
   "files": [
     "src/**",
-    "naming/**",
-    "tree/**",
+    "naming/src/**",
+    "tree/src/**",
+    "structural-addressing/src/**",
     "bin/**",
     "scripts/**",
     "README.md",
