@@ -193,7 +193,7 @@ test('validate:naming help keeps current command usage surface from registry com
       '  - docs: Documentation-focused scan (doc/docs and root conventional docs: README.md).',
       '  - repo: Repository-wide scan of all reportable files.',
       '  - system: System/tooling files scan (root package/tsconfig/eslint/vite files).',
-      '  - validator: Validator-only scan (calculogic-validator/**).',
+      '  - validator: Validator development-root scan (available only in validator owner/development contexts).',
       'Default scope: repo',
       'Examples:',
       '  ✅ npm run validate:naming -- --scope=app',

@@ -1,4 +1,4 @@
-import { getValidatorScopeProfile } from '../validator-scopes.logic.mjs';
+import { resolveContextualValidatorScopeProfile } from '../validator-scopes.logic.mjs';
 import { runValidatorRunner } from '../validator-runner.logic.mjs';
 import { loadValidatorConfigFromFile } from '../config/validator-config.logic.mjs';
 import {
@@ -52,9 +52,18 @@ export const runValidatorRunnerCli = ({
     return { shouldExit: true, exitCode: 0 };
   }
 
-  if (parsed.selectedScope && !getValidatorScopeProfile(parsed.selectedScope)) {
-    printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
-    return { shouldExit: true, exitCode: 1 };
+  if (parsed.selectedScope) {
+    const scopeResolution = resolveContextualValidatorScopeProfile(parsed.selectedScope, {
+      targetRepositoryRoot: repositoryRoot,
+    });
+    if (scopeResolution.status === 'invalid-scope') {
+      printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
+      return { shouldExit: true, exitCode: 1 };
+    }
+    if (scopeResolution.status === 'unavailable-scope') {
+      printValidatorUsageErrorToStderr(scopeResolution.message, usageLines);
+      return { shouldExit: true, exitCode: 1 };
+    }
   }
 
   try {

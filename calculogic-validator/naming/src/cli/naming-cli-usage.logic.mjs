@@ -1,5 +1,5 @@
 import { getValidatorById } from '../../../src/core/validator-registry.knowledge.mjs';
-import { listNamingValidatorScopes, getScopeProfile } from '../naming-validator.host.mjs';
+import { listAvailableValidatorScopes, getContextualValidatorScopeProfile } from '../../../src/core/validator-scopes.logic.mjs';
 
 const preferredScopeOrder = ['repo', 'app', 'docs', 'validator', 'system'];
 
@@ -10,8 +10,9 @@ export const buildNamingCliUsageLines = ({
   validatorId = 'naming',
   commandPrefix,
   strictExampleCommand,
+  repositoryRoot,
 } = {}) => {
-  const supportedScopes = listNamingValidatorScopes();
+  const supportedScopes = listAvailableValidatorScopes({ targetRepositoryRoot: repositoryRoot });
   const supportedScopesToken = buildScopeToken(supportedScopes);
   const validator = getValidatorById(validatorId);
   if (!validator) {
@@ -31,7 +32,7 @@ export const buildNamingCliUsageLines = ({
     `Usage: ${effectiveCommandPrefix} [--scope=<${supportedScopesToken}>] [--target=<path>]... [--config=<path>] [--strict]`,
     'Scopes:',
     ...supportedScopes.map((scope) => {
-      const profile = getScopeProfile(scope);
+      const profile = getContextualValidatorScopeProfile(scope, { targetRepositoryRoot: repositoryRoot });
       return `  - ${scope}: ${profile?.description ?? ''}`;
     }),
     'Default scope: repo',

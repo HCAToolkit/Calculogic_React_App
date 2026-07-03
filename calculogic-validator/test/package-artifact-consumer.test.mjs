@@ -143,6 +143,15 @@ test('packed validator artifact installs into a clean consumer host and runs pub
     assert.equal(treeReport.validators[0].id, 'tree-structure-advisor');
     assert.equal(treeReport.validators[0].meta.filters.targets[0], 'src');
 
+    const validatorScopeBinPath = path.join(hostRoot, 'node_modules', '.bin', 'calculogic-validate-naming');
+    const validatorScopeResult = runCommand(validatorScopeBinPath, ['--scope=validator'], { cwd: hostRoot });
+    assert.equal(validatorScopeResult.error, undefined, formatCommandFailure({ command: validatorScopeBinPath, args: ['--scope=validator'], cwd: hostRoot, result: validatorScopeResult }));
+    assert.equal(validatorScopeResult.status, 1, formatCommandFailure({ command: validatorScopeBinPath, args: ['--scope=validator'], cwd: hostRoot, result: validatorScopeResult }));
+    assert.equal(validatorScopeResult.stdout.trim(), '');
+    assert.match(validatorScopeResult.stderr, /validator-development-root-unavailable/u);
+    assert.match(validatorScopeResult.stderr, /repo, app, docs, system/u);
+    assert.equal(validatorScopeResult.stderr.includes(installedPackageRoot), false);
+
     const healthBinPath = path.join(hostRoot, 'node_modules', '.bin', 'calculogic-validator-health');
     const healthResult = runCommand(healthBinPath, [], { cwd: hostRoot });
     assertSuccessfulCommand({ command: healthBinPath, args: [], cwd: hostRoot, result: healthResult });

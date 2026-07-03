@@ -139,6 +139,36 @@ Guardrail: the helper does not own slice meaning. Slice runtimes remain responsi
 
 Cross-slice validators should start from this shared scoped snapshot/input layer before applying cross-slice interpretation rules.
 
+
+### 6.7 Validator development context for `validator` scope (Canonical)
+
+The `validator` scope is a validator owner/development capability. It is context-aware and is available only when the runtime can resolve a validator development root for the current command context. It is not an alias for `repo`, is not the package installation directory, is not `node_modules`, and is unavailable by default in ordinary installed consumers.
+
+Suite-core distinguishes three independently owned locations:
+
+1. **Package root**: physical location of the `@calculogic/validator` runtime code.
+2. **Target repository root**: repository the command validates.
+3. **Validator development root**: optional owner/development checkout or subtree whose contents are eligible for `validator` scope.
+
+Current runtime truth for required contexts:
+
+- embedded React-app development
+  - package root: `<target>/calculogic-validator`
+  - target root: `<target>`
+  - validator development root: `<target>/calculogic-validator`
+- standalone validator development
+  - package root: `<target>`
+  - target root: `<target>`
+  - validator development root: `<target>`
+- ordinary installed consumer
+  - package root: `<target>/node_modules/@calculogic/validator` or another external installed location
+  - target root: `<target>`
+  - validator development root: absent by default
+
+Context resolution uses the package-root and target-root relationship for these current contexts. If that relationship is insufficient for a later context, the suite should stop and model that context explicitly rather than guessing from documentation files, arbitrary sibling directory names, or `node_modules` path substrings.
+
+Intentional non-goal for this slice: this contract does not introduce a general user-facing configuration file or CLI flag for declaring arbitrary validator development roots.
+
 ## 7) Shared report-envelope boundary (Canonical + transitional/current mapping)
 
 Suite-level envelope authority is intentionally minimal here. Primary schema authority is [`ValidatorReportSchema-V0_1.md`](./ValidatorReportSchema-V0_1.md).

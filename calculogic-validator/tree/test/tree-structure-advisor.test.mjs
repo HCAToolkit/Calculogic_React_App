@@ -681,6 +681,7 @@ test('tree-structure-advisor structural-address handoff preserves file target ki
 
     const preparedInputs = prepareTreeStructureAdvisorInputs(fixtureDir, {
       scope: 'validator',
+      packageRoot: path.join(fixtureDir, 'calculogic-validator'),
       targets: ['package.json'],
     });
     const snapshot = preparedInputs.structuralAddressSnapshot;

@@ -1,4 +1,4 @@
-import { getValidatorScopeProfile } from '../validator-scopes.logic.mjs';
+import { getContextualValidatorScopeProfile } from '../validator-scopes.logic.mjs';
 
 const PREFERRED_VALIDATOR_SCOPE_ORDER = ['repo', 'app', 'docs', 'validator', 'system'];
 
@@ -15,8 +15,8 @@ export const buildValidatorScopeUsageLines = ({ supportedScopes, getScopeProfile
     return `  - ${scope}: ${profile?.description ?? ''}`;
   });
 
-export const buildValidatorScopeUsageLinesFromRuntimeProfiles = (supportedScopes) =>
+export const buildValidatorScopeUsageLinesFromRuntimeProfiles = (supportedScopes, options = {}) =>
   buildValidatorScopeUsageLines({
     supportedScopes,
-    getScopeProfile: getValidatorScopeProfile,
+    getScopeProfile: (scope) => getContextualValidatorScopeProfile(scope, options),
   });

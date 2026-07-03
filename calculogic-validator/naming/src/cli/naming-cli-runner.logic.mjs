@@ -1,4 +1,4 @@
-import { runNamingValidator, getScopeProfile } from '../naming-validator.host.mjs';
+import { runNamingValidator } from '../naming-validator.host.mjs';
 import { loadValidatorConfigFromFile } from '../../../src/core/config/validator-config.logic.mjs';
 import {
   computeConfigDigest,
@@ -15,6 +15,7 @@ import {
   printValidatorUsageToStdout,
   printValidatorUsageErrorToStderr,
 } from '../../../src/core/cli/validator-cli-usage.logic.mjs';
+import { resolveContextualValidatorScopeProfile } from '../../../src/core/validator-scopes.logic.mjs';
 import { parseNamingCliArguments } from './naming-cli-args.logic.mjs';
 import { buildNamingValidatorReport } from './naming-report-builder.logic.mjs';
 
@@ -37,11 +38,18 @@ export const runNamingCli = ({ argv, usageLines, repositoryRoot, npmArgForwardin
     return { shouldExit: true, exitCode: 0 };
   }
 
-  const selectedScopeProfile = getScopeProfile(parsed.selectedScope);
-  if (!selectedScopeProfile) {
+  const scopeResolution = resolveContextualValidatorScopeProfile(parsed.selectedScope, {
+    targetRepositoryRoot: repositoryRoot,
+  });
+  if (scopeResolution.status === 'invalid-scope') {
     printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
     return { shouldExit: true, exitCode: 1 };
   }
+  if (scopeResolution.status === 'unavailable-scope') {
+    printValidatorUsageErrorToStderr(scopeResolution.message, usageLines);
+    return { shouldExit: true, exitCode: 1 };
+  }
+  const selectedScopeProfile = scopeResolution.profile;
 
   let config;
   try {

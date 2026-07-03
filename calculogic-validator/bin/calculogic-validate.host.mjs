@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { listValidatorScopes } from '../src/core/validator-scopes.logic.mjs';
+import { listAvailableValidatorScopes } from '../src/core/validator-scopes.logic.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
 import { parseRepeatableTargetArgument } from '../src/core/cli/validator-cli-targets.logic.mjs';
@@ -10,7 +10,8 @@ import {
 } from '../src/core/cli/validator-cli-scopes.logic.mjs';
 import { runValidatorRunnerCli } from '../src/core/cli/validator-cli-runner.logic.mjs';
 
-const supportedScopes = listValidatorScopes();
+const repositoryRoot = resolveRepositoryRoot();
+const supportedScopes = listAvailableValidatorScopes({ targetRepositoryRoot: repositoryRoot });
 const supportedScopesToken = buildSupportedScopeToken(supportedScopes);
 
 const usageLines = [
@@ -18,7 +19,7 @@ const usageLines = [
   'Validators:',
   ...listRegisteredValidators().map((validatorId) => `  - ${validatorId}`),
   'Scopes:',
-  ...buildValidatorScopeUsageLinesFromRuntimeProfiles(supportedScopes),
+  ...buildValidatorScopeUsageLinesFromRuntimeProfiles(supportedScopes, { targetRepositoryRoot: repositoryRoot }),
   'Default scope: validator default (repo for naming)',
   'Default validators: all registered validators',
   'Examples:',
@@ -83,8 +84,6 @@ const parseCliArgs = (argv) => {
 
   return { helpRequested: false, selectedScope, validators, configPath, strict, targets };
 };
-
-const repositoryRoot = resolveRepositoryRoot();
 
 const result = runValidatorRunnerCli({
   argv: process.argv.slice(2),

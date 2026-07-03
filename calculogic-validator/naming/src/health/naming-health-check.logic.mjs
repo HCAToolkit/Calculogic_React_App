@@ -5,6 +5,7 @@ import {
   runNamingValidator,
   summarizeFindings,
 } from '../naming-validator.host.mjs';
+import { listAvailableValidatorScopes } from '../../../src/core/validator-scopes.logic.mjs';
 
 export const NAMING_HEALTH_SCOPES = ['repo', 'app', 'docs', 'validator', 'system'];
 
@@ -84,7 +85,8 @@ export const assertNamingHealthDocs = (repositoryRoot) => {
 };
 
 export const runNamingHealthCheck = (repositoryRoot, { requireDocs = true } = {}) => {
-  for (const scope of NAMING_HEALTH_SCOPES) {
+  const availableScopes = listAvailableValidatorScopes({ targetRepositoryRoot: repositoryRoot });
+  for (const scope of NAMING_HEALTH_SCOPES.filter((candidateScope) => availableScopes.includes(candidateScope))) {
     assertDeterministicNamingScope(repositoryRoot, scope);
   }
 

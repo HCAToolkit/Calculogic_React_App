@@ -1,4 +1,4 @@
-import { listValidatorScopes } from '../validator-scopes.logic.mjs';
+import { listAvailableValidatorScopes } from '../validator-scopes.logic.mjs';
 import { getValidatorById } from '../validator-registry.knowledge.mjs';
 import { parseRepeatableTargetArgument } from './validator-cli-targets.logic.mjs';
 import {
@@ -49,7 +49,8 @@ export const buildDirectValidatorRunnerUsageLines = ({
   validatorId,
   defaultScopeLine,
   examples,
-  supportedScopes = listValidatorScopes(),
+  repositoryRoot,
+  supportedScopes = listAvailableValidatorScopes({ targetRepositoryRoot: repositoryRoot }),
 }) => {
   const validator = getValidatorById(validatorId);
   if (!validator) {
@@ -66,7 +67,7 @@ export const buildDirectValidatorRunnerUsageLines = ({
   return [
     `Usage: ${repoLocalNpmInvocation} [--scope=<${supportedScopesToken}>] [--target=<path>]... [--config=<path>]`,
     'Scopes:',
-    ...buildValidatorScopeUsageLinesFromRuntimeProfiles(supportedScopes),
+    ...buildValidatorScopeUsageLinesFromRuntimeProfiles(supportedScopes, { targetRepositoryRoot: repositoryRoot }),
     defaultScopeLine,
     `Validator: ${validator.id}`,
     'Examples:',

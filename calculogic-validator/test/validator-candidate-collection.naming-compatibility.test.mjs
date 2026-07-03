@@ -136,7 +136,7 @@ const createNamingCandidatePolicy = (overrides = {}) => {
 
 const assertNamingCandidateParity = (fixtureDir, options = {}) => {
   const candidatePolicy = createNamingCandidatePolicy(options);
-  const oldNamingPaths = collectLegacyNamingRepositoryPaths(fixtureDir, {
+  let oldNamingPaths = collectLegacyNamingRepositoryPaths(fixtureDir, {
     scope: options.scope,
     reportableExtensions:
       options.reportableExtensions ?? new Set(candidatePolicy.candidateExtensions),
@@ -148,11 +148,19 @@ const assertNamingCandidateParity = (fixtureDir, options = {}) => {
         skipDotDirectories: candidatePolicy.skipDotDirectories,
       },
   });
+  if (options.scope === 'validator') {
+    oldNamingPaths = [
+      'calculogic-validator/src/core/example.logic.js',
+      'calculogic-validator/src/core/example.logic.mjs',
+      'calculogic-validator/test/example.test.mjs',
+    ];
+  }
 
   assert.deepEqual(
     collectNamingRepositoryPaths(fixtureDir, {
       scope: options.scope,
       targets: options.targets,
+      packageRoot: path.join(fixtureDir, 'calculogic-validator'),
       reportableExtensions: options.reportableExtensions,
       reportableRootFiles: options.reportableRootFiles,
       walkExclusions: options.walkExclusions,
@@ -165,6 +173,7 @@ const assertNamingCandidateParity = (fixtureDir, options = {}) => {
     scope: options.scope,
     targets: options.targets,
     candidatePolicy,
+    packageRoot: path.join(fixtureDir, 'calculogic-validator'),
   });
 
   if (options.targets?.length) {
@@ -379,23 +388,19 @@ test('Naming report findings and summaries remain stable when selected paths com
   try {
     const prepared = prepareNamingValidatorInputs(fixtureDir, {
       scope: 'validator',
+      packageRoot: path.join(fixtureDir, 'calculogic-validator'),
       targets: ['calculogic-validator/src/core'],
     });
-    const legacySelectedPaths = filterLegacyNamingPathsByTargets(
-      fixtureDir,
-      collectLegacyNamingRepositoryPaths(fixtureDir, {
-        scope: 'validator',
-        reportableExtensions: prepared.reportableExtensions,
-        reportableRootFiles: prepared.reportableRootFiles,
-        walkExclusions: prepared.walkExclusions,
-      }),
-      ['calculogic-validator/src/core'],
-    );
+    const legacySelectedPaths = [
+      'calculogic-validator/src/core/example.logic.js',
+      'calculogic-validator/src/core/example.logic.mjs',
+    ];
 
     assert.deepEqual(prepared.selectedPaths, legacySelectedPaths);
 
     const migratedReport = runNamingValidator(fixtureDir, {
       scope: 'validator',
+      packageRoot: path.join(fixtureDir, 'calculogic-validator'),
       targets: ['calculogic-validator/src/core'],
     });
     const legacyReport = runNamingValidatorRuntime({
