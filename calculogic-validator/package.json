@@ -5,7 +5,7 @@
   "private": true,
   "license": "MIT",
   "engines": {
-    "node": ">=18"
+    "node": ">=22.6.0"
   },
   "files": [
     "src/**",
@@ -28,5 +28,8 @@
     "calculogic-validate": "./bin/calculogic-validate.host.mjs",
     "calculogic-validate-naming": "./bin/calculogic-validate-naming.host.mjs",
     "calculogic-validator-health": "./bin/calculogic-validator-health.host.mjs"
+  },
+  "scripts": {
+    "test": "cd .. && node --test --experimental-strip-types calculogic-validator/test/**/*.test.mjs calculogic-validator/naming/test/**/*.test.mjs calculogic-validator/tree/test/**/*.test.mjs calculogic-validator/structural-addressing/test/**/*.test.mjs"
   }
 }
