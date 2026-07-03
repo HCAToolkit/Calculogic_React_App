@@ -19,7 +19,22 @@ It defines both envelopes emitted in current runtime:
 - **SourceSnapshot**: reproducibility metadata about scanned source state.
 - **Config Digest**: stable digest of resolved config used for the run.
 
-## 3) Canonical current contract: Slice Report Envelope
+## 3) Canonical current contract: SourceSnapshot
+
+`sourceSnapshot` is target-context/reproducibility metadata for both Slice Reports and Runner Reports.
+
+Current `sourceSnapshot` object fields:
+
+- `source` (string; required when `sourceSnapshot` is emitted; current value: `"fs"`)
+- `repositoryRoot` (string; optional): absolute filesystem path of the repository root / analyzed target root used to construct the source snapshot for this report. Current CLI/runtime report paths supply `cwd` to source-snapshot construction, so direct Naming CLI reports and runner reports currently emit this field. Lower-level callers that omit `cwd` may receive a snapshot without it. For installed package consumers, this identifies the consumer host repository being analyzed. It is machine-specific absolute-path metadata and is not a stable cross-machine identifier. It is not a repo-relative source path, validator package installation path, package-development-root declaration, semantic scope field, or replacement for `gitRef` / `gitHeadSha`.
+- `gitRef` (string; optional; current value when available: `"HEAD"`)
+- `gitHeadSha` (string; optional; emitted when git metadata is available)
+- `diagnostics` (object; optional; emitted when git status diagnostics are available)
+  - `diagnostics.isDirty` (boolean; required when `diagnostics` is emitted)
+  - `diagnostics.changedCount` (number; required when `diagnostics` is emitted)
+  - `diagnostics.untrackedCount` (number; required when `diagnostics` is emitted)
+
+## 4) Canonical current contract: Slice Report Envelope
 
 Current naming CLI output includes:
 
@@ -63,7 +78,7 @@ Slice-specific note (current naming emitted behavior):
 - Aggregate inclusion is explicit and tiered: `familyRootCounts` only uses `canonical` findings with naming-derived `semanticName` + `familyRoot`, while `familySubgroupCounts` and `semanticFamilyCounts` only use singular family evidence (`canonical` + `semanticName` + `semanticFamily` + `familyRoot` and no `family-boundary-heuristic` ambiguity marker).
 - These aggregate fields and per-file markers are report observations rather than automatic registry/policy declarations.
 
-## 4) Canonical current contract: Runner Report Envelope
+## 5) Canonical current contract: Runner Report Envelope
 
 Current runner output includes:
 
@@ -85,7 +100,7 @@ Current runner output includes:
 - `validatorVersion` (string; transitional/current compatibility field)
 - `configDigest` (string)
 
-## 5) Canonical current contract: Runner `validators[]` Entry
+## 6) Canonical current contract: Runner `validators[]` Entry
 
 Each entry includes:
 
@@ -105,7 +120,7 @@ Entry-level optional fields:
 
 Runner currently passes through deterministic slice summary fields in addition to `counts` (for example naming `codeCounts`, `familyRootCounts`, `familySubgroupCounts`, `semanticFamilyCounts`, and tree `codeCounts`).
 
-## 6) Canonical current contract: Finding Object Baseline
+## 7) Canonical current contract: Finding Object Baseline
 
 Suite-wide minimum finding baseline in current runtime:
 
@@ -126,7 +141,7 @@ Optional fields currently emitted by slices:
 - `details` (object)
 - `suggestedFix` (string; naming policy metadata)
 
-## 7) Determinism Rules (Canonical)
+## 8) Determinism Rules (Canonical)
 
 - Normalize reported file paths to `/` separators.
 - Keep selected path sets deterministic via sort/dedupe before classification.
@@ -134,13 +149,13 @@ Optional fields currently emitted by slices:
 - Sort aggregate summary object keys deterministically where runtime emits sorted breakdowns.
 - Same inputs + same resolved config => identical report payload.
 
-## 8) Transitional/current mapping notes
+## 9) Transitional/current mapping notes
 
 - `validatorVersion` is a compatibility alias currently emitted alongside `toolVersion`.
 - Runner and slice reports use `configDigest`; any `configFingerprint` wording is deferred/planning only.
 - Fix-plan output fields (`suggestedFix[]`, `appliedFix[]` at envelope level) are deferred/planning only and are not part of the current emitted envelope.
 
-## 9) Current generated examples (illustrative)
+## 10) Current generated examples (illustrative)
 
 Classification: **Illustrative**
 
@@ -158,6 +173,7 @@ node --experimental-strip-types calculogic-validator/scripts/generate-validator-
 Normalization policy for these examples is intentionally bounded for deterministic repo artifacts:
 
 - normalize `startedAt`, `endedAt`, and `durationMs`
+- normalize `sourceSnapshot.repositoryRoot` because it is machine-specific absolute-path metadata
 - normalize `sourceSnapshot.gitHeadSha`
 - normalize `sourceSnapshot.diagnostics` dirty/changed counters
 

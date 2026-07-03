@@ -27,6 +27,7 @@ const assertCommonEnvelope = (report) => {
   assert.equal(report.endedAt, '<iso-endedAt>');
   assert.equal(report.durationMs, 0);
   assert.ok(report.sourceSnapshot && typeof report.sourceSnapshot === 'object');
+  assert.equal(report.sourceSnapshot.repositoryRoot, '<repository-root>');
 
   if (typeof report.sourceSnapshot.gitHeadSha === 'string') {
     assert.equal(report.sourceSnapshot.gitHeadSha, '<git-head-sha>');
