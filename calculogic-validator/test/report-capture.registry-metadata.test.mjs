@@ -14,10 +14,10 @@ const rootPackageJson = JSON.parse(
   fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
 );
 
-const directScriptByPreset = {
-  'report:naming:system': 'calculogic-validator/scripts/validate-naming.host.mjs',
-  'report:tree:system': 'calculogic-validator/scripts/validate-tree.host.mjs',
-  'report:all:system': 'calculogic-validator/scripts/validate-all.host.mjs',
+const packageCommandByPreset = {
+  'report:naming:system': 'calculogic-validate-naming',
+  'report:tree:system': 'calculogic-validate-tree',
+  'report:all:system': 'calculogic-validate',
 };
 
 const reportCapturePackageScripts = Object.entries(rootPackageJson.scripts)
@@ -33,11 +33,14 @@ const normalizeReport = (report) => {
   return normalized;
 };
 
-const runDirectReport = ({ scriptPath, scope }) => {
+const runPackageCommandReport = ({ commandExecutable, scope }) => {
   const result = spawnSync(
-    process.execPath,
-    ['--experimental-strip-types', scriptPath, `--scope=${scope}`],
-    { cwd: process.cwd(), encoding: 'utf8' },
+    path.resolve('node_modules/.bin', commandExecutable),
+    [`--scope=${scope}`],
+    {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+    },
   );
 
   assert.ok([0, 1, 2].includes(result.status));
@@ -49,6 +52,7 @@ const runCapturedReport = ({ preset, outputDir }) => {
   const hostPath = path.resolve(
     'calculogic-validator/tools/report-capture/src/report-capture.host.mjs',
   );
+  const binPath = path.resolve('node_modules/.bin');
   const result = spawnSync(
     process.execPath,
     [
@@ -64,7 +68,11 @@ const runCapturedReport = ({ preset, outputDir }) => {
       preset.wrappedCommand.executable,
       ...preset.wrappedCommand.args,
     ],
-    { cwd: process.cwd(), encoding: 'utf8' },
+    {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      env: { ...process.env, PATH: `${binPath}${path.delimiter}${process.env.PATH ?? ''}` },
+    },
   );
 
   assert.ok([0, 1, 2].includes(result.status));
@@ -159,13 +167,13 @@ test('report-capture preset metadata records command mechanics but not semantic 
   );
 });
 
-for (const [scriptName, scriptPath] of Object.entries(directScriptByPreset)) {
+for (const [scriptName, commandExecutable] of Object.entries(packageCommandByPreset)) {
   test(`${scriptName} capture metadata preserves emitted report JSON`, () => {
     const preset = getValidatorReportCapturePresetByScriptName(scriptName);
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'report-capture-registry-parity-'));
 
     try {
-      const directReport = runDirectReport({ scriptPath, scope: 'system' });
+      const directReport = runPackageCommandReport({ commandExecutable, scope: 'system' });
       const capturedReport = runCapturedReport({ preset, outputDir: tempDir });
 
       assert.deepEqual(normalizeReport(capturedReport), normalizeReport(directReport));

@@ -88,13 +88,12 @@ test('registry metadata command, report, and bin fields match current naming pat
     const { commands, packageBin, report, reportCapture } = validator.metadata;
 
     assert.match(commands.repoLocalNpmScript, /^validate:(?:naming|tree)$/u);
-    assert.equal(rootPackageJson.scripts[commands.repoLocalNpmScript]?.startsWith('node '), true);
-    assert.equal(commands.repoLocalNpmInvocation, `npm run ${commands.repoLocalNpmScript} --`);
-    assert.match(
-      commands.directScriptPath,
-      /^calculogic-validator\/scripts\/validate-[a-z-]+\.host\.mjs$/u,
+    assert.equal(
+      rootPackageJson.scripts[commands.repoLocalNpmScript],
+      commands.commandExecutable,
     );
-    assert.equal(fs.existsSync(path.join(process.cwd(), commands.directScriptPath)), true);
+    assert.equal(commands.repoLocalNpmInvocation, `npm run ${commands.repoLocalNpmScript} --`);
+    assert.equal(commands.commandExecutable, packageBin.expectedName);
 
     assert.match(report.profileId, /^[a-z][a-z0-9-]*$/u);
     assert.equal(report.profileId, report.entryId);

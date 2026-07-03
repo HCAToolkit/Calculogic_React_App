@@ -72,7 +72,7 @@ const REPORT_CAPTURE_DEFAULT_OPTIONS = {
 const buildValidatorReportCapturePresets = ({
   scriptNamespace,
   profileId,
-  directScriptPath,
+  commandExecutable,
   prefixBase,
   semanticPolicyOwner,
   scopes,
@@ -87,8 +87,8 @@ const buildValidatorReportCapturePresets = ({
       prefix: `${prefixBase}-${scope}`,
     },
     wrappedCommand: {
-      executable: 'node',
-      args: ['--experimental-strip-types', directScriptPath, `--scope=${scope}`],
+      executable: commandExecutable,
+      args: [`--scope=${scope}`],
     },
   }));
 
@@ -96,7 +96,7 @@ const namingValidatorSliceReportCapturePresets = [
   ...buildValidatorReportCapturePresets({
     scriptNamespace: 'naming',
     profileId: 'naming',
-    directScriptPath: 'calculogic-validator/scripts/validate-naming.host.mjs',
+    commandExecutable: 'calculogic-validate-naming',
     prefixBase: 'naming',
     semanticPolicyOwner: 'naming',
     scopes: ['repo', 'app', 'docs'],
@@ -111,12 +111,8 @@ const namingValidatorSliceReportCapturePresets = [
       prefix: 'naming-validator',
     },
     wrappedCommand: {
-      executable: 'node',
-      args: [
-        '--experimental-strip-types',
-        'calculogic-validator/scripts/validate-naming.host.mjs',
-        '--scope=validator',
-      ],
+      executable: 'calculogic-validate-naming',
+      args: ['--scope=validator'],
     },
   },
   {
@@ -129,10 +125,8 @@ const namingValidatorSliceReportCapturePresets = [
       prefix: 'naming-validator-entry',
     },
     wrappedCommand: {
-      executable: 'node',
+      executable: 'calculogic-validate-naming',
       args: [
-        '--experimental-strip-types',
-        'calculogic-validator/scripts/validate-naming.host.mjs',
         '--scope=validator',
         '--target',
         'calculogic-validator/bin',
@@ -151,10 +145,8 @@ const namingValidatorSliceReportCapturePresets = [
       prefix: `naming-validator-${targetName}`,
     },
     wrappedCommand: {
-      executable: 'node',
+      executable: 'calculogic-validate-naming',
       args: [
-        '--experimental-strip-types',
-        'calculogic-validator/scripts/validate-naming.host.mjs',
         '--scope=validator',
         '--target',
         `calculogic-validator/${targetName}`,
@@ -171,12 +163,8 @@ const namingValidatorSliceReportCapturePresets = [
       prefix: 'naming-system',
     },
     wrappedCommand: {
-      executable: 'node',
-      args: [
-        '--experimental-strip-types',
-        'calculogic-validator/scripts/validate-naming.host.mjs',
-        '--scope=system',
-      ],
+      executable: 'calculogic-validate-naming',
+      args: ['--scope=system'],
     },
   },
 ];
@@ -186,7 +174,7 @@ export const VALIDATOR_REPORT_CAPTURE_PRESETS = [
   ...buildValidatorReportCapturePresets({
     scriptNamespace: 'all',
     profileId: 'validate-all',
-    directScriptPath: 'calculogic-validator/scripts/validate-all.host.mjs',
+    commandExecutable: 'calculogic-validate',
     prefixBase: 'validate-all',
     semanticPolicyOwner: 'suite-core-runner',
     scopes: ['repo', 'app', 'docs', 'validator', 'system'],
@@ -194,7 +182,7 @@ export const VALIDATOR_REPORT_CAPTURE_PRESETS = [
   ...buildValidatorReportCapturePresets({
     scriptNamespace: 'tree',
     profileId: 'tree-structure-advisor',
-    directScriptPath: 'calculogic-validator/scripts/validate-tree.host.mjs',
+    commandExecutable: 'calculogic-validate-tree',
     prefixBase: 'validate-tree',
     semanticPolicyOwner: 'tree',
     scopes: ['repo', 'app', 'docs', 'validator', 'system'],
@@ -231,7 +219,7 @@ export const VALIDATOR_REGISTRY = [
       commands: {
         repoLocalNpmScript: 'validate:naming',
         repoLocalNpmInvocation: 'npm run validate:naming --',
-        directScriptPath: 'calculogic-validator/scripts/validate-naming.host.mjs',
+        commandExecutable: 'calculogic-validate-naming',
       },
       packageBin: {
         expectedName: 'calculogic-validate-naming',
@@ -282,11 +270,11 @@ export const VALIDATOR_REGISTRY = [
       commands: {
         repoLocalNpmScript: 'validate:tree',
         repoLocalNpmInvocation: 'npm run validate:tree --',
-        directScriptPath: 'calculogic-validator/scripts/validate-tree.host.mjs',
+        commandExecutable: 'calculogic-validate-tree',
       },
       packageBin: {
         expectedName: 'calculogic-validate-tree',
-        available: false,
+        available: true,
       },
       runner: {
         defaultIncludedInValidateAll: true,
