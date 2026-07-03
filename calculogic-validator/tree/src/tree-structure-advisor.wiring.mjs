@@ -242,6 +242,7 @@ export const runTreeStructureAdvisor = (
   const preparedInputs = prepareTreeStructureAdvisorInputs(repositoryRoot, {
     scope,
     targets,
+    packageRoot,
     namingSemanticFamilyBridge,
     namingOccurrenceBridge,
     preparedAddressKeyedJoinEvidence,

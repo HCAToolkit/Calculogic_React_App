@@ -673,6 +673,29 @@ test('tree-structure-advisor structural-address handoff keeps target-derived sco
   }
 });
 
+test('tree-structure-advisor exported runner forwards packageRoot for fixture validator scope', async () => {
+  const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-runner-package-root-'));
+
+  try {
+    await writeBaseFixtureRepo(fixtureDir);
+
+    const result = runTreeStructureAdvisor(fixtureDir, {
+      scope: 'validator',
+      packageRoot: path.join(fixtureDir, 'calculogic-validator'),
+    });
+
+    assert.equal(result.scope, 'validator');
+    assert.equal(result.totalFilesScanned, 1);
+    assert.equal(result.filters.isFiltered, false);
+    assert.equal(
+      result.findings.every((finding) => finding.path.startsWith('calculogic-validator/')),
+      true,
+    );
+  } finally {
+    await fs.rm(fixtureDir, { recursive: true, force: true });
+  }
+});
+
 test('tree-structure-advisor structural-address handoff preserves file target kind when target is outside active scope', async () => {
   const fixtureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tree-structure-address-targeted-file-kind-'));
 
