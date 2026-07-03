@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ROOT_APP_FILES } from './validator-root-files.knowledge.mjs';
+import { resolveValidatorDevelopmentContext } from './validator-development-context.logic.mjs';
 
 // Ownership decision (2026-03 narrow audit slice):
 // - Keep this module as the canonical validator-owned runtime owner for builtin scope profiles.
@@ -24,7 +25,7 @@ const LEGACY_SCOPE_DESCRIPTIONS = {
   repo: 'Repository-wide scan of all reportable files.',
   app: 'Application-only scan (src/** and test/**).',
   docs: 'Documentation-focused scan (doc/docs and root conventional docs: README.md).',
-  validator: 'Validator-only scan (calculogic-validator/**).',
+  validator: 'Validator development-root scan (available only in validator owner/development contexts).',
   system: 'System/tooling files scan (root package/tsconfig/eslint/vite files).',
 };
 
@@ -116,8 +117,56 @@ export const cloneScopeProfile = (profile) => ({
   includeRootFiles: [...profile.includeRootFiles],
 });
 
+
 export const listValidatorScopes = () =>
   Array.from(new Set(Object.keys(getBuiltinScopeProfiles()))).sort((a, b) => a.localeCompare(b));
+
+export const resolveContextualValidatorScopeProfile = (scope, { targetRepositoryRoot = process.cwd(), packageRoot } = {}) => {
+  const normalizedScope = scope ?? DEFAULT_VALIDATOR_SCOPE;
+  const profile = getBuiltinScopeProfiles()[normalizedScope];
+
+  if (!profile) {
+    return { status: 'invalid-scope', scope: normalizedScope, profile: null };
+  }
+
+  if (normalizedScope !== 'validator') {
+    return { status: 'available', scope: normalizedScope, profile: cloneScopeProfile(profile) };
+  }
+
+  const context = resolveValidatorDevelopmentContext({ targetRepositoryRoot, packageRoot });
+  if (!context.validatorDevelopmentRoot) {
+    return {
+      status: 'unavailable-scope',
+      scope: normalizedScope,
+      profile: null,
+      context,
+      message:
+        'validator-development-root-unavailable: --scope=validator requires a validator development root and is unavailable in this consumer context. Use an ordinary scope instead: repo, app, docs, system.',
+    };
+  }
+
+  const relativeValidatorRoot = path.relative(context.targetRepositoryRoot, context.validatorDevelopmentRoot) || '.';
+  return {
+    status: 'available',
+    scope: normalizedScope,
+    context,
+    profile: {
+      ...cloneScopeProfile(profile),
+      includeRoots: [relativeValidatorRoot.split(path.sep).join('/')],
+      includeRootFiles: [],
+    },
+  };
+};
+
+export const getContextualValidatorScopeProfile = (scope, options = {}) => {
+  const result = resolveContextualValidatorScopeProfile(scope, options);
+  return result.status === 'available' ? result.profile : null;
+};
+
+export const listAvailableValidatorScopes = (options = {}) =>
+  listValidatorScopes().filter(
+    (scope) => resolveContextualValidatorScopeProfile(scope, options).status === 'available',
+  );
 
 export const getValidatorScopeProfile = (scope) => {
   const normalizedScope = scope ?? DEFAULT_VALIDATOR_SCOPE;

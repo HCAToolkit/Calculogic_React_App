@@ -64,13 +64,14 @@ const collectTopLevelDirectoryNames = (repositoryRoot) =>
 
 export const prepareTreeStructureAdvisorInputs = (
   repositoryRoot,
-  { scope, targets, namingSemanticFamilyBridge, namingOccurrenceBridge, preparedAddressKeyedJoinEvidence } = {},
+  { scope, targets, packageRoot, namingSemanticFamilyBridge, namingOccurrenceBridge, preparedAddressKeyedJoinEvidence } = {},
 ) => {
   const scopedSnapshotInputs = collectSuiteScopedSnapshotInputs(repositoryRoot, {
     scope,
     targets,
     walkExcludedDirectories: WALK_EXCLUDED_DIRECTORIES,
     skipDotDirectories: true,
+    packageRoot,
   });
   const selectedPaths = scopedSnapshotInputs.selectedPaths;
   const structuralAddressTargets = scopedSnapshotInputs.targetDescriptors ?? scopedSnapshotInputs.targets;
@@ -236,11 +237,12 @@ export const prepareTreeStructureAdvisorInputs = (
 
 export const runTreeStructureAdvisor = (
   repositoryRoot,
-  { scope, targets, namingSemanticFamilyBridge, namingOccurrenceBridge, preparedAddressKeyedJoinEvidence } = {},
+  { scope, targets, packageRoot, namingSemanticFamilyBridge, namingOccurrenceBridge, preparedAddressKeyedJoinEvidence } = {},
 ) => {
   const preparedInputs = prepareTreeStructureAdvisorInputs(repositoryRoot, {
     scope,
     targets,
+    packageRoot,
     namingSemanticFamilyBridge,
     namingOccurrenceBridge,
     preparedAddressKeyedJoinEvidence,

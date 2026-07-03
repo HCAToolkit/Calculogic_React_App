@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getValidatorScopeProfile, DEFAULT_VALIDATOR_SCOPE } from './validator-scopes.logic.mjs';
+import { resolveContextualValidatorScopeProfile, DEFAULT_VALIDATOR_SCOPE } from './validator-scopes.logic.mjs';
 import {
   normalizePath,
   resolveScopedTargets,
@@ -16,6 +16,7 @@ const collectPathsFromScopeRoot = (
     walkExcludedDirectories = new Set(),
     skipDotDirectories = true,
     skipSymlinkedCandidateScopeRoots = false,
+    packageRoot,
   } = {},
 ) => {
   const absoluteRoot = path.resolve(repositoryRoot, scopeRoot);
@@ -95,14 +96,24 @@ export const collectSuiteScopedPaths = (
     walkExcludedDirectories = new Set(),
     skipDotDirectories = true,
     skipSymlinkedCandidateScopeRoots = false,
+    packageRoot,
   } = {},
 ) => {
   const selectedScope = scope ?? DEFAULT_VALIDATOR_SCOPE;
-  const profile = getValidatorScopeProfile(selectedScope);
+  const scopeResolution = resolveContextualValidatorScopeProfile(selectedScope, {
+    targetRepositoryRoot: repositoryRoot,
+    packageRoot,
+  });
 
-  if (!profile) {
+  if (scopeResolution.status === 'invalid-scope') {
     throw new Error(`Invalid scope profile: ${selectedScope}`);
   }
+
+  if (scopeResolution.status === 'unavailable-scope') {
+    throw new Error(scopeResolution.message);
+  }
+
+  const profile = scopeResolution.profile;
 
   const scopedPaths = profile.includeRoots.flatMap((scopeRoot) =>
     collectPathsFromScopeRoot(repositoryRoot, scopeRoot, {
@@ -129,6 +140,7 @@ export const collectSuiteScopedSnapshotInputs = (
     walkExcludedDirectories = new Set(),
     skipDotDirectories = true,
     skipSymlinkedCandidateScopeRoots = false,
+    packageRoot,
   } = {},
 ) => {
   const scopedCollection = collectSuiteScopedPaths(repositoryRoot, {
@@ -136,6 +148,7 @@ export const collectSuiteScopedSnapshotInputs = (
     walkExcludedDirectories,
     skipDotDirectories,
     skipSymlinkedCandidateScopeRoots,
+    packageRoot,
   });
   const resolvedTargets = resolveScopedTargets(repositoryRoot, targets);
 

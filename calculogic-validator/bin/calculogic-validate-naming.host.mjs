@@ -9,6 +9,7 @@ const repositoryRoot = resolveRepositoryRoot();
 const usageLines = buildNamingCliUsageLines({
   commandPrefix: 'calculogic-validate-naming',
   strictExampleCommand: 'node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=repo --strict',
+  repositoryRoot,
 });
 const npmArgForwardingMessage = detectNpmArgForwardingFootgun({
   argv: process.argv.slice(2),

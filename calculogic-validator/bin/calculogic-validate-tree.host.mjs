@@ -12,6 +12,7 @@ const repositoryRoot = resolveRepositoryRoot();
 const usageLines = buildDirectValidatorRunnerUsageLines({
   validatorId: 'tree-structure-advisor',
   defaultScopeLine: 'Default scope: validator default (repo for tree-structure-advisor)',
+  repositoryRoot,
   examples: [
     '  ✅ calculogic-validate-tree --scope=repo',
     '  ✅ calculogic-validate-tree --scope=app --target src/tree',

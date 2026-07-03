@@ -126,7 +126,7 @@ test('validate-tree help keeps current command usage surface', () => {
       '  - docs: Documentation-focused scan (doc/docs and root conventional docs: README.md).',
       '  - repo: Repository-wide scan of all reportable files.',
       '  - system: System/tooling files scan (root package/tsconfig/eslint/vite files).',
-      '  - validator: Validator-only scan (calculogic-validator/**).',
+      '  - validator: Validator development-root scan (available only in validator owner/development contexts).',
       'Default scope: validator default (repo for tree-structure-advisor)',
       'Validator: tree-structure-advisor',
       'Examples:',

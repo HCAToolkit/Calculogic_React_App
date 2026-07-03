@@ -2,15 +2,25 @@
   "version": "1",
   "profiles": {
     "app": {
-      "includeRoots": ["src", "test"],
+      "includeRoots": [
+        "src",
+        "test"
+      ],
       "includeRootFiles": []
     },
     "docs": {
-      "includeRoots": ["doc", "docs"],
-      "includeRootFiles": ["README.md"]
+      "includeRoots": [
+        "doc",
+        "docs"
+      ],
+      "includeRootFiles": [
+        "README.md"
+      ]
     },
     "repo": {
-      "includeRoots": ["."],
+      "includeRoots": [
+        "."
+      ],
       "includeRootFiles": []
     },
     "system": {
@@ -24,7 +34,7 @@
       ]
     },
     "validator": {
-      "includeRoots": ["calculogic-validator"],
+      "includeRoots": [],
       "includeRootFiles": []
     }
   }

@@ -51,6 +51,7 @@ const createNamingCandidatePolicy = ({
   reportableExtensions,
   reportableRootFiles,
   walkExclusions,
+  packageRoot,
 }) =>
   createValidatorCandidatePolicyFromValues({
     candidateExtensions: reportableExtensions,
@@ -64,11 +65,13 @@ const collectNamingCandidatePaths = (repositoryRoot, {
   reportableExtensions,
   reportableRootFiles,
   walkExclusions,
+  packageRoot,
 }) =>
   collectValidatorCandidatePaths(repositoryRoot, {
     scope,
     targets,
     skipSymlinkedCandidateScopeRoots: true,
+    packageRoot,
     candidatePolicy: createNamingCandidatePolicy({
       reportableExtensions,
       reportableRootFiles,
@@ -78,7 +81,7 @@ const collectNamingCandidatePaths = (repositoryRoot, {
 
 export const prepareNamingValidatorInputs = (
   repositoryRoot,
-  { scope, config, targets } = {},
+  { scope, config, targets, packageRoot } = {},
 ) => {
   const runtimeInputs = prepareNamingRuntimeInputs(config);
   const selectedScope = scope ?? DEFAULT_VALIDATOR_SCOPE;
@@ -88,6 +91,7 @@ export const prepareNamingValidatorInputs = (
     reportableExtensions: runtimeInputs.reportableExtensions,
     reportableRootFiles: runtimeInputs.reportableRootFiles,
     walkExclusions: runtimeInputs.walkExclusions,
+    packageRoot,
   });
 
   return {
@@ -107,8 +111,8 @@ export const projectNamingOccurrenceBridge = (namingRuntimeOrReportOutput = {}, 
     sourceSnapshotRef: options.sourceSnapshotRef,
   });
 
-export const runNamingValidator = (repositoryRoot, { scope, config, targets, addressedOccurrenceNamespace } = {}) => {
-  const preparedInputs = prepareNamingValidatorInputs(repositoryRoot, { scope, config, targets });
+export const runNamingValidator = (repositoryRoot, { scope, config, targets, packageRoot, addressedOccurrenceNamespace } = {}) => {
+  const preparedInputs = prepareNamingValidatorInputs(repositoryRoot, { scope, config, targets, packageRoot });
 
   const result = runNamingValidatorRuntime(preparedInputs);
   const namingOccurrenceBridge = addressedOccurrenceNamespace !== undefined
@@ -131,6 +135,7 @@ export const collectRepositoryPaths = (rootDirectory, options = {}) => {
     reportableExtensions: options.reportableExtensions ?? runtimeInputs.reportableExtensions,
     reportableRootFiles: options.reportableRootFiles ?? runtimeInputs.reportableRootFiles,
     walkExclusions: options.walkExclusions ?? runtimeInputs.walkExclusions,
+    packageRoot: options.packageRoot,
   }).selectedPaths;
 };
 
