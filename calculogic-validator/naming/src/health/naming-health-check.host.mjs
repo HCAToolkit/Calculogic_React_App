@@ -4,10 +4,14 @@ import { resolveRepositoryRoot } from '../../../src/core/repository-root.logic.m
 export const runNamingHealthCheckEntrypoint = () => {
   try {
     const repositoryRoot = resolveRepositoryRoot();
-    runNamingHealthCheck(repositoryRoot);
+    const healthResult = runNamingHealthCheck(repositoryRoot, { requireDocs: false });
 
     console.log('OK: naming validator deterministic for repo|app|docs|validator|system');
-    console.log('OK: docs match app scope roots');
+    if (healthResult.docsChecked) {
+      console.log('OK: docs match app scope roots');
+    } else {
+      console.log('OK: docs check skipped outside embedded repository docs host');
+    }
     process.exit(0);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

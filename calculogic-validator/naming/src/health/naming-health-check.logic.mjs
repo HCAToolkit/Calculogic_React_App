@@ -59,8 +59,7 @@ export const assertDeterministicNamingScope = (repositoryRoot, scope) => {
   }
 };
 
-export const assertNamingHealthDocs = (repositoryRoot) => {
-  const docsToValidate = [
+export const getNamingHealthDocPaths = (repositoryRoot) => [
     path.resolve(
       repositoryRoot,
       'calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md',
@@ -68,6 +67,8 @@ export const assertNamingHealthDocs = (repositoryRoot) => {
     path.resolve(repositoryRoot, 'doc/nl-config/cfg-namingValidator.md'),
   ];
 
+export const assertNamingHealthDocs = (repositoryRoot) => {
+  const docsToValidate = getNamingHealthDocPaths(repositoryRoot);
   const requiredMentions = ['src/', 'test/', 'calculogic-validator/'];
 
   for (const absoluteDocPath of docsToValidate) {
@@ -82,10 +83,18 @@ export const assertNamingHealthDocs = (repositoryRoot) => {
   }
 };
 
-export const runNamingHealthCheck = (repositoryRoot) => {
+export const runNamingHealthCheck = (repositoryRoot, { requireDocs = true } = {}) => {
   for (const scope of NAMING_HEALTH_SCOPES) {
     assertDeterministicNamingScope(repositoryRoot, scope);
   }
 
-  assertNamingHealthDocs(repositoryRoot);
+  const docsAvailable = getNamingHealthDocPaths(repositoryRoot).every((docPath) =>
+    fs.existsSync(docPath),
+  );
+
+  if (requireDocs || docsAvailable) {
+    assertNamingHealthDocs(repositoryRoot);
+  }
+
+  return { docsChecked: docsAvailable };
 };
