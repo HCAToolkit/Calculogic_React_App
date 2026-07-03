@@ -147,6 +147,7 @@ test('packed validator artifact installs into a clean consumer host and runs pub
     const healthResult = runCommand(healthBinPath, [], { cwd: hostRoot });
     assertSuccessfulCommand({ command: healthBinPath, args: [], cwd: hostRoot, result: healthResult });
     assert.match(healthResult.stdout, /OK: naming validator deterministic/u);
+    assert.match(healthResult.stdout, /OK: docs check skipped outside embedded repository docs host/u);
   } finally {
     await fs.rm(tempRoot, { recursive: true, force: true });
   }

@@ -1,10 +1,32 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { runNamingHealthCheck } from './naming-health-check.logic.mjs';
 import { resolveRepositoryRoot } from '../../../src/core/repository-root.logic.mjs';
+
+export const resolveNamingHealthPackageRoot = ({ moduleUrl = import.meta.url } = {}) =>
+  path.resolve(path.dirname(fileURLToPath(moduleUrl)), '..', '..', '..');
+
+const safeRealPath = (candidatePath) => {
+  try {
+    return fs.realpathSync(candidatePath);
+  } catch {
+    return path.resolve(candidatePath);
+  }
+};
+
+export const shouldRequireEmbeddedDocsForNamingHealth = ({ repositoryRoot, packageRoot }) => {
+  const embeddedPackageRoot = path.resolve(repositoryRoot, 'calculogic-validator');
+
+  return safeRealPath(packageRoot) === safeRealPath(embeddedPackageRoot);
+};
 
 export const runNamingHealthCheckEntrypoint = () => {
   try {
     const repositoryRoot = resolveRepositoryRoot();
-    const healthResult = runNamingHealthCheck(repositoryRoot, { requireDocs: false });
+    const packageRoot = resolveNamingHealthPackageRoot();
+    const requireDocs = shouldRequireEmbeddedDocsForNamingHealth({ repositoryRoot, packageRoot });
+    const healthResult = runNamingHealthCheck(repositoryRoot, { requireDocs });
 
     console.log('OK: naming validator deterministic for repo|app|docs|validator|system');
     if (healthResult.docsChecked) {
