@@ -27,7 +27,8 @@
   "bin": {
     "calculogic-validate": "./bin/calculogic-validate.host.mjs",
     "calculogic-validate-naming": "./bin/calculogic-validate-naming.host.mjs",
-    "calculogic-validator-health": "./bin/calculogic-validator-health.host.mjs"
+    "calculogic-validator-health": "./bin/calculogic-validator-health.host.mjs",
+    "calculogic-validate-tree": "./bin/calculogic-validate-tree.host.mjs"
   },
   "scripts": {
     "test": "cd .. && node --test --experimental-strip-types calculogic-validator/test/**/*.test.mjs calculogic-validator/naming/test/**/*.test.mjs calculogic-validator/tree/test/**/*.test.mjs calculogic-validator/structural-addressing/test/**/*.test.mjs"

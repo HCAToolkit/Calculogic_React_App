@@ -1,36 +1,20 @@
 #!/usr/bin/env node
 
-import {
-  getValidatorScopeProfile,
-  listValidatorScopes,
-} from '../src/core/validator-scopes.logic.mjs';
-import { runValidatorRunner } from '../src/core/validator-runner.logic.mjs';
+import { listValidatorScopes } from '../src/core/validator-scopes.logic.mjs';
 import { listRegisteredValidators } from '../src/core/validator-registry.knowledge.mjs';
 import { resolveRepositoryRoot } from '../src/core/repository-root.logic.mjs';
-import { loadValidatorConfigFromFile } from '../src/core/config/validator-config.logic.mjs';
-import {
-  computeConfigDigest,
-  getValidatorToolVersion,
-} from '../src/core/validator-report-meta.logic.mjs';
-import { deriveExitCodeFromRunnerReport } from '../src/core/validator-exit-code.logic.mjs';
-import {
-  writeValidatorReportToStdout,
-  setValidatorReportExitCode,
-} from '../src/core/cli/validator-cli-output.logic.mjs';
-import {
-  printValidatorUsageToStdout,
-  printValidatorUsageErrorToStderr,
-} from '../src/core/cli/validator-cli-usage.logic.mjs';
+import { parseRepeatableTargetArgument } from '../src/core/cli/validator-cli-targets.logic.mjs';
 import {
   buildSupportedScopeToken,
   buildValidatorScopeUsageLinesFromRuntimeProfiles,
 } from '../src/core/cli/validator-cli-scopes.logic.mjs';
+import { runValidatorRunnerCli } from '../src/core/cli/validator-cli-runner.logic.mjs';
 
 const supportedScopes = listValidatorScopes();
 const supportedScopesToken = buildSupportedScopeToken(supportedScopes);
 
 const usageLines = [
-  `Usage: calculogic-validate [--scope=<${supportedScopesToken}>] [--validators=<id1,id2>] [--config=<path>] [--strict]`,
+  `Usage: calculogic-validate [--scope=<${supportedScopesToken}>] [--validators=<id1,id2>] [--target=<path>]... [--config=<path>] [--strict]`,
   'Validators:',
   ...listRegisteredValidators().map((validatorId) => `  - ${validatorId}`),
   'Scopes:',
@@ -40,9 +24,9 @@ const usageLines = [
   'Examples:',
   '  ✅ npm run validate:naming -- --scope=app',
   '  ✅ npm run validate:all -- --validators=naming --scope=docs',
-  '  ✅ node calculogic-validator/bin/calculogic-validate-naming.host.mjs --scope=app',
-  '  ✅ node calculogic-validator/bin/calculogic-validate.host.mjs --scope=docs',
-  '  ✅ node calculogic-validator/bin/calculogic-validate.host.mjs --scope=repo --strict',
+  '  ✅ calculogic-validate-naming --scope=app',
+  '  ✅ calculogic-validate --scope=docs',
+  '  ✅ calculogic-validate --scope=repo --strict',
 ];
 
 const parseCliArgs = (argv) => {
@@ -50,14 +34,28 @@ const parseCliArgs = (argv) => {
   let validators;
   let configPath;
   let strict = false;
+  const targets = [];
 
-  for (const argument of argv) {
+  for (let index = 0; index < argv.length; index += 1) {
+    const argument = argv[index];
+
     if (argument === '--help' || argument === '-h') {
-      return { helpRequested: true, selectedScope, validators, configPath, strict };
+      return { helpRequested: true, selectedScope, validators, configPath, strict, targets };
     }
 
     if (argument.startsWith('--scope=')) {
       selectedScope = argument.slice('--scope='.length);
+      continue;
+    }
+
+    const targetArgumentResult = parseRepeatableTargetArgument({
+      argv,
+      index,
+      argument,
+      targets,
+    });
+    if (targetArgumentResult.handled) {
+      index = targetArgumentResult.nextIndex;
       continue;
     }
 
@@ -83,44 +81,29 @@ const parseCliArgs = (argv) => {
     throw new Error(`Invalid argument: ${argument}`);
   }
 
-  return { helpRequested: false, selectedScope, validators, configPath, strict };
+  return { helpRequested: false, selectedScope, validators, configPath, strict, targets };
 };
 
-let parsed;
-try {
-  parsed = parseCliArgs(process.argv.slice(2));
-} catch (error) {
-  printValidatorUsageErrorToStderr(error.message, usageLines);
-  process.exit(1);
-}
+const repositoryRoot = resolveRepositoryRoot();
 
-if (parsed.helpRequested) {
-  printValidatorUsageToStdout(usageLines);
-  process.exit(0);
-}
-
-if (parsed.selectedScope && !getValidatorScopeProfile(parsed.selectedScope)) {
-  printValidatorUsageErrorToStderr(`Invalid scope: ${parsed.selectedScope}`, usageLines);
-  process.exit(1);
-}
-
-try {
-  const repositoryRoot = resolveRepositoryRoot();
-  const config = parsed.configPath
-    ? loadValidatorConfigFromFile(parsed.configPath, { cwd: process.cwd() })
-    : undefined;
-
-  const report = runValidatorRunner(repositoryRoot, {
+const result = runValidatorRunnerCli({
+  argv: process.argv.slice(2),
+  usageLines,
+  repositoryRoot,
+  expectedLifecycleEvent: 'validate:all',
+  supportedFlagNames: ['scope', 'target', 'config', 'strict', 'validators'],
+  parseCliArgs,
+  buildRunnerOptions: ({ parsed, config, toolVersion, configDigest }) => ({
     scope: parsed.selectedScope,
     validators: parsed.validators,
     config,
-    toolVersion: getValidatorToolVersion(),
-    ...(config ? { configDigest: computeConfigDigest(config) } : {}),
-  });
+    targets: parsed.targets,
+    toolVersion,
+    ...(config ? { configDigest } : {}),
+  }),
+  buildExitCodeOptions: ({ parsed }) => ({ strict: parsed.strict }),
+});
 
-  writeValidatorReportToStdout(report);
-  setValidatorReportExitCode(deriveExitCodeFromRunnerReport(report, { strict: parsed.strict }));
-} catch (error) {
-  printValidatorUsageErrorToStderr(error.message, usageLines);
-  process.exit(1);
+if (result.shouldExit) {
+  process.exit(result.exitCode);
 }
