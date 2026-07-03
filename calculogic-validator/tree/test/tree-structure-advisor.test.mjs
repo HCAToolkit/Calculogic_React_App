@@ -682,11 +682,13 @@ test('tree-structure-advisor exported runner forwards packageRoot for fixture va
     const result = runTreeStructureAdvisor(fixtureDir, {
       scope: 'validator',
       packageRoot: path.join(fixtureDir, 'calculogic-validator'),
+      targets: ['calculogic-validator/src/naming-validator.logic.mjs'],
     });
 
     assert.equal(result.scope, 'validator');
     assert.equal(result.totalFilesScanned, 1);
-    assert.equal(result.filters.isFiltered, false);
+    assert.equal(result.filters.isFiltered, true);
+    assert.deepEqual(result.filters.targets, ['calculogic-validator/src/naming-validator.logic.mjs']);
     assert.equal(
       result.findings.every((finding) => finding.path.startsWith('calculogic-validator/')),
       true,
