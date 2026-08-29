@@ -38,9 +38,10 @@ The standalone validator checkout remains an independent Git repository and auth
 ```
 
 - `CALCULOGIC_VALIDATOR_CHECKOUT` may override the default sibling checkout location.
-- If the validator checkout already exists as a Git checkout, the helper leaves it unchanged.
+- If the validator checkout path already exists, the helper accepts it only when the path is the actual Git worktree root and its `package.json` identifies `@calculogic/validator`.
+- A valid standalone validator checkout is left unchanged.
 - The helper does not fetch, reset, overwrite, or automatically `npm link` an existing validator checkout.
-- If the target checkout path exists but is not a Git checkout, setup fails rather than overwriting that path.
+- If the target checkout path exists but is not the standalone validator worktree root, setup fails rather than overwriting that path.
 
 ### 2.3 Documentation Contract
 
@@ -87,7 +88,7 @@ Not applicable for this shell.
 
 - **[5.2.1] Primitive – "Install ripgrep"** via `apt-get`.
 - **[5.2.2] Primitive – "Install deps + build"** via npm commands.
-- **[5.2.3] Primitive – "Ensure standalone validator checkout"** by resolving the React app repository root, choosing the sibling/default or explicitly overridden validator checkout location, preserving an existing Git checkout, and cloning `HCAToolkit/calculogic-validator` only when the checkout is absent.
+- **[5.2.3] Primitive – "Ensure standalone validator checkout"** by resolving the React app repository root, choosing the sibling/default or explicitly overridden validator checkout location, accepting an existing path only when it is the actual Git worktree root for `@calculogic/validator`, and cloning `HCAToolkit/calculogic-validator` only when the checkout is absent.
 - **[5.2.4] Primitive – "Keep live linking explicit"** by preparing both repositories without automatically running `npm link`.
 
 ## 6. Knowledge Concern
