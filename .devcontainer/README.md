@@ -21,7 +21,7 @@ The checkout helper ensures the standalone validator repository is available bes
 └─ calculogic-validator/
 ```
 
-If the standalone validator checkout already exists, the helper leaves it in place. The helper does not fetch, reset, overwrite, or automatically link an existing checkout.
+If the target path already exists, the helper accepts it only when that path is the actual Git worktree root and its `package.json` identifies `@calculogic/validator`. A valid standalone checkout is left in place. The helper does not fetch, reset, overwrite, or automatically link an existing checkout.
 
 ## Validator live-development mode
 
