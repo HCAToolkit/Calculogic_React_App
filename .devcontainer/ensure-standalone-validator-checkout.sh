@@ -6,7 +6,7 @@ WORKSPACES_ROOT="$(dirname "$APP_ROOT")"
 VALIDATOR_ROOT="${CALCULOGIC_VALIDATOR_CHECKOUT:-$WORKSPACES_ROOT/calculogic-validator}"
 VALIDATOR_REMOTE="https://github.com/HCAToolkit/calculogic-validator.git"
 
-if [ -d "$VALIDATOR_ROOT/.git" ]; then
+if [ -d "$VALIDATOR_ROOT" ] && git -C "$VALIDATOR_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "Standalone validator checkout already available at: $VALIDATOR_ROOT"
   exit 0
 fi
