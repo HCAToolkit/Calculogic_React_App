@@ -65,17 +65,18 @@ enforces every taxonomy concept in the master list.
 
 ### Tree work
 
-Read in this order:
+Follow the **Canonical Reading Order (Implementation Work)** declared in
+`doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`;
+do not maintain or infer a competing order from this file. That order begins
+with the suite contract and canonical Tree spec, then uses the Naming spec and
+Tree NL/config note as scoped supporting authority/guidance, and reads the
+transitional inventory last for navigation and ownership metadata.
 
-1. `doc/ValidatorSpecs/tree-owned/tree-documentation-map-and-reorg-inventory.md`
-2. `doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
-3. `doc/ValidatorSpecs/tree-structure-advisor-validator.spec.md`
-4. `doc/ConventionRoutines/NamingValidatorSpec.md`
-5. `doc/ValidatorSpecs/nl-config/cfg-treeStructureAdvisor.md`
-
-The documentation map is navigation and ownership guidance only, not runtime
-authority. The suite contract plus tree spec define runtime authority, and the
-NL/config note is the canonical Validator-owned tree NL/config location.
+The inventory is navigation and ownership guidance only, not runtime authority.
+Runtime/spec authority comes from the suite contract plus the canonical Tree
+spec. The Naming spec remains authoritative only within its naming-owned scope,
+and the Tree NL/config note remains supporting implementation guidance at the
+canonical Validator-owned location.
 
 ### Registry model work
 
