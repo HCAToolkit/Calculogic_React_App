@@ -1,6 +1,10 @@
 # Calculogic React App
 
+Calculogic grew from earlier H-CAT work on structured character-development tools, including forms, quizzes, scoring, and reusable, configurable logic. As those needs expanded beyond the original character-development use case, Calculogic evolved into a broader system-building project; this repository contains the current React implementation of that evolving project.
+
 A modular React + TypeScript builder shell for composing configuration-driven workflows. The current app includes a global header shell, a build workspace with resizable panels, and a content drawer backed by namespaced content resolution.
+
+The current standalone and authoritative Validator source is [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator). The `calculogic-validator/` directory in this repository is the historical, pre-extraction Validator implementation retained as part of the host repository's history and integration context.
 
 ---
 
@@ -95,7 +99,7 @@ npm run health:validator # Run validator environment/health checks
 # npm run report:all:*
 ```
 
-For validator workflow details and report commands, see `calculogic-validator/README.md`.
+For current Validator development, workflow details, and documentation, see the authoritative standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. The embedded `calculogic-validator/README.md` documents the retained pre-extraction implementation.
 
 ## Project Structure (Current)
 
@@ -107,7 +111,7 @@ For validator workflow details and report commands, see `calculogic-validator/RE
 │  │  └─ Standards/                    # Package-owned standards docs
 │  ├─ src/
 │  └─ test/
-├─ calculogic-validator/               # @calculogic/validator package + tooling
+├─ calculogic-validator/               # Historical pre-extraction Validator implementation
 │  ├─ doc/
 │  │  └─ ConventionRoutines/           # Validator-owned convention routines
 │  ├─ src/
@@ -152,6 +156,7 @@ For validator workflow details and report commands, see `calculogic-validator/RE
 
 - Canonical doc-engine package documentation lives under `calculogic-doc-engine/doc/**`.
 - `doc/doc-engine/**` in this host repo is host-facing historical/working material unless a package hub explicitly marks an item canonical.
+- Current Validator source and documentation are owned by the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository; the embedded `calculogic-validator/` tree is retained historical pre-extraction material, not a second authoritative implementation.
 
 ## Roadmap (Planned)
 
@@ -172,12 +177,12 @@ The CCS defines concern boundaries and dependency direction across Build / Build
 - Spec: `calculogic-validator/doc/ConventionRoutines/CCS.md`
 - Doc-engine mapping: `doc/Architecture/DocEngine-CCS-Mapping.md`
 
-Conventions are validator-owned so they can be reused across future repos by installing the validator suite. Host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not canonical rule sources.
+Conventions are Validator-owned so they can be reused across future repositories by installing the Validator suite. Their current authoritative source is the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. The local spec path in this section refers to the historical pre-extraction copy retained here; host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not authoritative rule sources.
 
 ## Comment & Provenance Protocol (CCPP)
 
 CCPP defines file headers, section/atomic comments, decision notes, and provenance annotations.
 
-Conventions are validator-owned so they can be reused across future repos by installing the validator suite. Host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not canonical rule sources.
+Conventions are Validator-owned so they can be reused across future repositories by installing the Validator suite. Their current authoritative source is the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. The local spec path in this section refers to the historical pre-extraction copy retained here; host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not authoritative rule sources.
 
 - Spec: `calculogic-validator/doc/ConventionRoutines/CCPP.md`
