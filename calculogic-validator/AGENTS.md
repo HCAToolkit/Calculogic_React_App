@@ -51,6 +51,12 @@ capabilities inventory first. Reuse a matching suite-owned capability; otherwise
 use the helper-area convention for routing and the loader/converter/runtime
 contract for ownership boundaries.
 
+For slice-local runtime, loader, or converter work, read
+`doc/ConventionRoutines/ValidatorLoaderConverterRuntimeOwnership-Contract.md`.
+This requirement includes Naming- and Tree-owned implementations where relevant;
+it does not by itself require the other suite-wide/shared-helper references above
+when the task is otherwise slice-local.
+
 ### Naming work
 
 For naming-validator behavior, naming taxonomy, role/category/status registries,
