@@ -4,7 +4,7 @@ Calculogic grew from earlier H-CAT work on structured character-development tool
 
 A modular React + TypeScript builder shell for composing configuration-driven workflows. The current app includes a global header shell, a build workspace with resizable panels, and a content drawer backed by namespaced content resolution.
 
-The current standalone and authoritative Validator source is [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator). The `calculogic-validator/` directory in this repository is the historical, pre-extraction Validator implementation retained as part of the host repository's history and integration context.
+The current standalone and authoritative Validator source is [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator), and it is the normal home for current Validator development. The `calculogic-validator/` directory in this repository is the retained pre-extraction implementation; the React app's current default package configuration still resolves the Validator and report-capture packages from that embedded tree. Migration to standalone package consumption is a [staged implementation path tracked in issue #695](https://github.com/HCAToolkit/Calculogic_React_App/issues/695).
 
 ---
 
@@ -99,7 +99,7 @@ npm run health:validator # Run validator environment/health checks
 # npm run report:all:*
 ```
 
-For current Validator development, workflow details, and documentation, see the authoritative standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. The embedded `calculogic-validator/README.md` documents the retained pre-extraction implementation.
+In a default React-app checkout, these scripts use the packages resolved from the embedded `calculogic-validator/` tree; see `calculogic-validator/README.md` for workflow and report-command documentation matching that current package configuration. For current Validator development and standalone package documentation, use the authoritative [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. Migration of this app's package consumption is tracked in [issue #695](https://github.com/HCAToolkit/Calculogic_React_App/issues/695) and is not current runtime truth.
 
 ## Project Structure (Current)
 
@@ -111,7 +111,7 @@ For current Validator development, workflow details, and documentation, see the 
 │  │  └─ Standards/                    # Package-owned standards docs
 │  ├─ src/
 │  └─ test/
-├─ calculogic-validator/               # Historical pre-extraction Validator implementation
+├─ calculogic-validator/               # Retained pre-extraction Validator; used by default package wiring
 │  ├─ doc/
 │  │  └─ ConventionRoutines/           # Validator-owned convention routines
 │  ├─ src/
@@ -156,7 +156,9 @@ For current Validator development, workflow details, and documentation, see the 
 
 - Canonical doc-engine package documentation lives under `calculogic-doc-engine/doc/**`.
 - `doc/doc-engine/**` in this host repo is host-facing historical/working material unless a package hub explicitly marks an item canonical.
-- Current Validator source and documentation are owned by the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository; the embedded `calculogic-validator/` tree is retained historical pre-extraction material, not a second authoritative implementation.
+- **Source authority:** Current Validator source and development documentation are owned by the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository.
+- **Current implementation reality:** The embedded `calculogic-validator/` tree is the retained pre-extraction implementation and supplies the Validator and report-capture packages for this app's default package configuration; it is not a second authoritative source.
+- **Staged implementation path:** [Issue #695](https://github.com/HCAToolkit/Calculogic_React_App/issues/695) tracks migration of this app to standalone package consumption; that migration is not current runtime truth.
 
 ## Roadmap (Planned)
 
@@ -177,12 +179,12 @@ The CCS defines concern boundaries and dependency direction across Build / Build
 - Spec: `calculogic-validator/doc/ConventionRoutines/CCS.md`
 - Doc-engine mapping: `doc/Architecture/DocEngine-CCS-Mapping.md`
 
-Conventions are Validator-owned so they can be reused across future repositories by installing the Validator suite. Their current authoritative source is the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. The local spec path in this section refers to the historical pre-extraction copy retained here; host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not authoritative rule sources.
+Conventions are Validator-owned so they can be reused across future repositories by installing the Validator suite. Their current authoritative source is the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. The local spec path in this section identifies the retained pre-extraction copy used by this app's current default package configuration; host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not authoritative rule sources.
 
 ## Comment & Provenance Protocol (CCPP)
 
 CCPP defines file headers, section/atomic comments, decision notes, and provenance annotations.
 
-Conventions are Validator-owned so they can be reused across future repositories by installing the Validator suite. Their current authoritative source is the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. The local spec path in this section refers to the historical pre-extraction copy retained here; host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not authoritative rule sources.
+Conventions are Validator-owned so they can be reused across future repositories by installing the Validator suite. Their current authoritative source is the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. The local spec path in this section identifies the retained pre-extraction copy used by this app's current default package configuration; host docs under `/doc/ConventionRoutines/` are entrypoint wrappers, not authoritative rule sources.
 
 - Spec: `calculogic-validator/doc/ConventionRoutines/CCPP.md`
