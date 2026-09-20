@@ -71,7 +71,7 @@
     "typescript-eslint": "^8.26.1",
     "vite": "^6.4.2",
     "@calculogic/report-capture": "file:calculogic-validator/tools/report-capture",
-    "@calculogic/validator": "file:calculogic-validator",
+    "@calculogic/validator": "git+https://github.com/HCAToolkit/calculogic-validator.git#89748865c70ebc7deffbb30a16e133cc02fc7e67",
     "@types/node": "^22.0.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-unused-imports": "^4.1.4",
