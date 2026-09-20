@@ -86,8 +86,8 @@ npm ci
 After running the sequence, confirm the restoration:
 
 ```bash
-readlink node_modules/@calculogic/validator
-# expected: not a symlink — command should report an error, confirming a real extracted package directory
+test -d node_modules/@calculogic/validator && [ ! -L node_modules/@calculogic/validator ] && echo "OK: real package directory"
+# expected: prints "OK: real package directory" — confirms it exists as a directory and is not a symlink
 
 git status
 # expected: clean, package.json and package-lock.json match the committed stable dependency
@@ -103,7 +103,7 @@ npx calculogic-validate-naming --scope=app
 - Do not edit the legacy embedded `calculogic-validator/` directory in this repository as a substitute for editing the standalone checkout; it is retained for other consumer scripts and is not the live-development target.
 - `@calculogic/report-capture` and some legacy consumer scripts (`addressing:get-tree`, `report:verify`, `report:summarize`, `report:examples:validator`, `validate:naming:validator:*`) still read from the embedded `calculogic-validator/` tree. This live-development workflow does not migrate them; they are unaffected by linking or unlinking `@calculogic/validator`.
 - Updating the pinned stable dependency to a genuinely newer Validator revision is a separate decision, made by changing the committed Git commit reference in `package.json`/`package-lock.json` — this workflow does not itself select or publish a new stable version.
-- Git URL rewriting, local filesystem paths, and any other environment-specific transport behavior you may encounter are not required production configuration; the commands above are the complete, portable workflow.
+- Git URL rewriting, local filesystem paths, and any other environment-specific transport behavior you may encounter are not required production configuration. The commands above were verified in one environment (Node v22.22.2, npm 10.9.7); portability to every local desktop, Codespaces, or CI environment has not been independently confirmed.
 
 ## Maintenance
 
