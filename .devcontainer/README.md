@@ -27,7 +27,16 @@ If the target path already exists, the helper accepts it only when that path is 
 
 The shared Codespace checkout does **not** automatically enable `npm link`. Stable package consumption and live development remain separate, explicit modes.
 
-When live validator development is wanted, link the standalone checkout deliberately:
+### Ownership and prerequisites
+
+- [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) is the authoritative, editable Validator source. All implementation changes belong there.
+- This repository (`Calculogic_React_App`) is the consumer and validation target. It normally resolves `@calculogic/validator` from the immutable pinned Git commit recorded in its committed `package.json`/`package-lock.json` (see PR #710).
+- Live development requires an accessible standalone Validator checkout. The devcontainer's post-create step prepares one as a sibling checkout by default (see above); outside the devcontainer, clone `HCAToolkit/calculogic-validator` yourself.
+- Before entering live mode, start from a clean React app working tree (`git status` with nothing to commit) and make sure any unrelated local changes to `package.json`/`package-lock.json` are committed or stashed elsewhere first — the restoration sequence below discards uncommitted changes to those two files.
+
+### Entering live development
+
+Link the standalone checkout deliberately, one command in each repository:
 
 ```bash
 cd ../calculogic-validator
@@ -37,9 +46,64 @@ cd ../Calculogic_React_App
 npm link @calculogic/validator
 ```
 
-With that link active, validator source edits are made in the standalone `calculogic-validator` Git checkout while commands launched from the React app can exercise those edits against the React app repository.
+Confirm the link resolved to the live checkout rather than the pinned stable package:
 
-Do not edit an installed package copy or the legacy embedded validator directory as a substitute for standalone validator source changes.
+```bash
+readlink node_modules/@calculogic/validator
+# expected: a path pointing at your standalone calculogic-validator checkout, not an extracted package directory
+
+npx calculogic-validator-health
+# expected: two "OK" lines, sourced from the linked checkout
+```
+
+In the npm 10.9.7 environment this workflow was verified against, `npm link @calculogic/validator` did **not** modify `package.json` or `package-lock.json` — only `node_modules/@calculogic/validator` and its bin symlinks changed. This is the observed behavior for that npm version, not a guarantee for every npm release; check `git status` yourself after linking if you want to confirm it for your own environment.
+
+### Working in live mode
+
+- Make Validator implementation changes in the standalone `calculogic-validator` checkout, not in the React app.
+- A fresh process launched from the React app observes those changes immediately — no repacking, reinstalling, or copying source is needed. For example, edit and save a file in the standalone checkout, then simply re-run a command from the React app:
+
+  ```bash
+  npx calculogic-validate-naming --scope=app
+  ```
+
+  The report's `sourceSnapshot.repositoryRoot` should still identify the React app checkout — the React app remains the validation target even though the Validator implementation is being served live from the linked checkout.
+
+### Returning to stable mode
+
+Restore the pinned stable package with this exact sequence:
+
+```bash
+npm unlink @calculogic/validator
+git restore -- package.json package-lock.json
+npm ci
+```
+
+**`npm unlink @calculogic/validator` does more than remove the symlink.** In the tested environment, it removed the `@calculogic/validator` entry entirely from both `package.json` and `package-lock.json` — the first command alone leaves your dependency files in a modified, incomplete state. All three commands are required together.
+
+**`git restore -- package.json package-lock.json` discards _all_ uncommitted changes to those two files, not just the link-related ones.** Before running it, check `git status` and make sure you have not left any other unrelated edits to `package.json` or `package-lock.json` that you meant to keep — commit or stash them elsewhere first.
+
+After running the sequence, confirm the restoration:
+
+```bash
+readlink node_modules/@calculogic/validator
+# expected: not a symlink — command should report an error, confirming a real extracted package directory
+
+git status
+# expected: clean, package.json and package-lock.json match the committed stable dependency
+
+npx calculogic-validator-health
+npx calculogic-validate-naming --scope=app
+# expected: both succeed, with repositoryRoot identifying this React app checkout
+```
+
+### Boundaries and limitations
+
+- Do not edit files under `node_modules/@calculogic/validator` as if they were Validator source — that installed copy is an artifact, not an editable checkout.
+- Do not edit the legacy embedded `calculogic-validator/` directory in this repository as a substitute for editing the standalone checkout; it is retained for other consumer scripts and is not the live-development target.
+- `@calculogic/report-capture` and some legacy consumer scripts (`addressing:get-tree`, `report:verify`, `report:summarize`, `report:examples:validator`, `validate:naming:validator:*`) still read from the embedded `calculogic-validator/` tree. This live-development workflow does not migrate them; they are unaffected by linking or unlinking `@calculogic/validator`.
+- Updating the pinned stable dependency to a genuinely newer Validator revision is a separate decision, made by changing the committed Git commit reference in `package.json`/`package-lock.json` — this workflow does not itself select or publish a new stable version.
+- Git URL rewriting, local filesystem paths, and any other environment-specific transport behavior you may encounter are not required production configuration; the commands above are the complete, portable workflow.
 
 ## Maintenance
 
