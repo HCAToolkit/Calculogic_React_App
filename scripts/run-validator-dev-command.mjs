@@ -40,6 +40,43 @@ const readPackageName = (packageJsonPath) => {
   }
 };
 
+// On Windows, npm is exposed as an extensionless-looking command backed by a `.cmd` (or `.bat`/
+// `.exe`, depending on install method) file; `child_process.spawn('npm', ..., { shell: false })`
+// fails with ENOENT because Windows does not resolve PATHEXT for a bare CreateProcess call the
+// way a shell would (see Node's "Spawning .bat and .cmd files on Windows" doc). Resolves the real
+// executable by searching PATH + PATHEXT, exactly the same approach already established in this
+// project's tools/report-capture/src/report-capture.host.mjs, reused here rather than introducing
+// a second mechanism (`shell: true` quoting risk, or a new dependency). A no-op on every other
+// platform, and a no-op when the given command already carries its own extension. `platform`/`env`
+// are injectable only so this can be exercised deterministically in tests without mutating global
+// process state; real callers always use the defaults.
+export const resolveWindowsCommand = (command, { platform = process.platform, env = process.env } = {}) => {
+  if (platform !== 'win32') {
+    return command;
+  }
+
+  const ext = path.extname(command);
+  if (ext) {
+    return command;
+  }
+
+  const pathValue = env.PATH || '';
+  const pathEntries = pathValue.split(path.delimiter).filter(Boolean);
+  const pathextValue = env.PATHEXT || '.COM;.EXE;.BAT;.CMD';
+  const pathext = pathextValue.split(';').filter(Boolean);
+
+  for (const directory of pathEntries) {
+    for (const extension of pathext) {
+      const candidate = path.join(directory, `${command}${extension.toLowerCase()}`);
+      if (fs.existsSync(candidate)) {
+        return candidate;
+      }
+    }
+  }
+
+  return command;
+};
+
 const GUIDANCE =
   'This command requires an editable standalone Validator checkout connected with ' +
   '`npm link @calculogic/validator` (see .devcontainer/README.md). An ordinary installed ' +
@@ -121,7 +158,7 @@ const run = async () => {
   }
 
   const child = spawn(
-    'npm',
+    resolveWindowsCommand('npm'),
     ['--prefix', VALIDATOR_LINK_PATH, 'run', scriptName, '--', ...forwardedArgs],
     { stdio: 'inherit' },
   );

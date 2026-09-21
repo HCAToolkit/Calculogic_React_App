@@ -36,22 +36,24 @@ Report filenames are deterministic and filesystem-safe:
 
 Root package scripts provide deterministic capture presets for naming, validate-all, and validate-tree across `repo`, `app`, `docs`, `validator`, and `system` scopes, writing files to repo-local `./.reports/` for safe exclusion from validator walking behavior.
 
-Report-capture also provides validator-internal naming presets that preserve scope taxonomy while adding practical granularity:
+Report-capture also provides validator-internal naming presets that preserve scope taxonomy while adding practical granularity. **As of Calculogic_React_App#716, these are Validator self-development commands that require a live `npm link @calculogic/validator` connection and dispatch through `scripts/run-validator-dev-command.mjs` to the linked standalone checkout** (see `.devcontainer/README.md`); in stable/non-linked mode they exit nonzero with a guard message instead of running. Targets are relative to the linked checkout's own root, not the embedded `calculogic-validator/` tree:
 
-- `report:naming:validator:entry` → `--scope=validator --target calculogic-validator/bin --target calculogic-validator/scripts`
-- `report:naming:validator:naming` → `--scope=validator --target calculogic-validator/naming`
-- `report:naming:validator:tree` → `--scope=validator --target calculogic-validator/tree`
-- `report:naming:validator:doc` → `--scope=validator --target calculogic-validator/doc`
+- `report:naming:validator:entry` → `--scope=validator --target bin --target scripts`
+- `report:naming:validator:naming` → `--scope=validator --target naming`
+- `report:naming:validator:tree` → `--scope=validator --target tree`
+- `report:naming:validator:doc` → `--scope=validator --target doc`
+
+(Historical note: before #716, these targeted the embedded `calculogic-validator/bin`, `calculogic-validator/naming`, etc. directly, with no live-link requirement.)
 
 These are convenience scripts only; no additional built-in scope profiles are introduced.
 
 ### 2.5 Verifier workflow contract
 
-A repo-local verifier script (`calculogic-validator/scripts/report-capture-verify.host.mjs`) runs naming validation through report-capture for one or more scopes, parses the metadata JSON line, and asserts the generated report file exists in the configured reports directory and contains a full JSON naming report.
+**As of #716, `report:verify` is also a Validator self-development command**, guarded and dispatched the same way as the presets above - it invokes `report-capture-verify.host.mjs` inside the live-linked standalone checkout (`npm --prefix node_modules/@calculogic/validator run report:verify`), not the repo-local embedded copy. The verifier itself runs naming validation through report-capture for one or more scopes, parses the metadata JSON line, and asserts the generated report file exists in the configured reports directory and contains a full JSON naming report. (Historical note: before #716, this repo invoked the embedded `calculogic-validator/scripts/report-capture-verify.host.mjs` directly by path.)
 
 ### 2.6 Post-capture summarizer contract
 
-A repo-local summarizer script (`calculogic-validator/scripts/report-capture-summarize.host.mjs`) reads the latest captured JSON report per prefix from `./.reports` (or `--dir`) and prints compact per-scope summaries suitable for Codex/PR notes.
+A repo-local summarizer script (`calculogic-validator/scripts/report-capture-summarize.host.mjs`) reads the latest captured JSON report per prefix from `./.reports` (or `--dir`) and prints compact per-scope summaries suitable for Codex/PR notes. Unlike 2.4/2.5, `report:summarize` is **not** gated behind a live link and still invokes the embedded copy directly - it summarizes this React app's own already-captured reports and is unaffected by whether `@calculogic/validator` is linked or pinned (out of scope for #716; see #714/#715 for its own migration status).
 
 ## 3.0 Build Concern
 

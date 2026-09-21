@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { resolveLinkedValidatorCheckout } from '../scripts/run-validator-dev-command.mjs';
+import { resolveLinkedValidatorCheckout, resolveWindowsCommand } from '../scripts/run-validator-dev-command.mjs';
 
 const wrapperScriptPath = path.resolve('scripts/run-validator-dev-command.mjs');
 
@@ -216,5 +216,57 @@ test('dispatch preserves a nonzero exit code from the dispatched standalone scri
     assert.equal(forcedResult.exitCode, 2);
   } finally {
     fixture.cleanup();
+  }
+});
+
+// Windows regression coverage (Refs #716 review discussion_r4058498470): child_process.spawn
+// with shell:false cannot execute a bare `npm` on Windows, where npm is backed by a `.cmd` (or
+// `.bat`/`.exe`) file - Node's own docs describe this exact ENOENT failure mode
+// ("Spawning .bat and .cmd files on Windows"). These tests exercise resolveWindowsCommand's
+// resolution LOGIC deterministically via injected `platform`/`env`, without mutating the real
+// global `process.platform` (which node/npm/the test runner itself depend on) and without an
+// actual Windows machine. This proves the resolution algorithm is correct; it does NOT prove the
+// resulting path is genuinely spawnable by Windows' CreateProcess/cmd.exe - that requires an
+// actual Windows smoke test (documented in the PR, not run here and not claimed as verified here).
+test('resolveWindowsCommand is a no-op on non-Windows platforms, regardless of PATH contents', () => {
+  const result = resolveWindowsCommand('npm', {
+    platform: 'linux',
+    env: { PATH: '/usr/bin', PATHEXT: '.COM;.EXE;.BAT;.CMD' },
+  });
+  assert.equal(result, 'npm');
+});
+
+test('resolveWindowsCommand is a no-op when the command already has an extension', () => {
+  const result = resolveWindowsCommand('npm.cmd', { platform: 'win32', env: { PATH: '', PATHEXT: '.CMD' } });
+  assert.equal(result, 'npm.cmd');
+});
+
+test('resolveWindowsCommand resolves a bare command to its .cmd file by searching PATH + PATHEXT on win32', () => {
+  const fakePathDir = fs.mkdtempSync(path.join(os.tmpdir(), 'resolve-windows-command-'));
+  try {
+    const npmCmdPath = path.join(fakePathDir, 'npm.cmd');
+    fs.writeFileSync(npmCmdPath, '@echo off\r\n');
+
+    const result = resolveWindowsCommand('npm', {
+      platform: 'win32',
+      env: { PATH: fakePathDir, PATHEXT: '.COM;.EXE;.BAT;.CMD' },
+    });
+
+    assert.equal(result, npmCmdPath);
+  } finally {
+    fs.rmSync(fakePathDir, { recursive: true, force: true });
+  }
+});
+
+test('resolveWindowsCommand falls back to the bare command when no PATHEXT candidate exists on win32', () => {
+  const emptyPathDir = fs.mkdtempSync(path.join(os.tmpdir(), 'resolve-windows-command-empty-'));
+  try {
+    const result = resolveWindowsCommand('npm', {
+      platform: 'win32',
+      env: { PATH: emptyPathDir, PATHEXT: '.COM;.EXE;.BAT;.CMD' },
+    });
+    assert.equal(result, 'npm');
+  } finally {
+    fs.rmSync(emptyPathDir, { recursive: true, force: true });
   }
 });
