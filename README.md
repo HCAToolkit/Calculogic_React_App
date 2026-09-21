@@ -1,5 +1,7 @@
 # Calculogic React App
 
+_Curious how AI-assisted development works across HCAToolkit projects? See the [organization overview](https://github.com/HCAToolkit/.github/blob/main/profile/README.md#ai-assisted-development)._
+
 Calculogic grew from earlier H-CAT work on structured character-development tools, including forms, quizzes, scoring, and reusable, configurable logic. As those needs expanded beyond the original character-development use case, Calculogic evolved into a broader system-building project; this repository contains the current React implementation of that evolving project.
 
 A modular React + TypeScript builder shell for composing configuration-driven workflows. The current app includes a global header shell, a build workspace with resizable panels, and a content drawer backed by namespaced content resolution.
