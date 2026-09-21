@@ -220,10 +220,12 @@ npm run report:summarize
 - `report:naming:*`: capture naming validator output for a specific scope.
 - `report:all:*`: capture full-suite output for a specific scope.
 - `report:tree:*`: capture tree validator output for a specific scope.
-- `report:verify`: checks report-capture wiring/outputs.
-- `report:summarize`: summarizes captured reports.
+- `report:verify`: checks report-capture wiring/outputs. **As of the consuming React app's PR #716, this command is a Validator self-development check gated behind a live `npm link @calculogic/validator` connection** — it now runs against a linked, editable standalone checkout, not this embedded copy, and exits nonzero with a guidance message when no such link exists. This retained embedded copy of `report-capture-verify.host.mjs` is no longer what `npm run report:verify` executes from the consuming React app's root; see that repository's `.devcontainer/README.md` for the current, authoritative operational contract.
+- `report:summarize`: summarizes captured reports. Unaffected by #716 — still runs from this embedded copy directly, regardless of link state.
 
 ### Validator-internal naming/report presets (bounded convenience wrappers)
+
+> **Note (as of the consuming React app's PR #716):** these presets are now Validator self-development commands, gated behind a live `npm link @calculogic/validator` connection from the React app root and dispatched to the real, editable standalone checkout — **not** to this embedded copy. This embedded `calculogic-validator/` tree is retained for other consumer scripts (`report:summarize`, `report:examples:validator`) and is not the live-development target for the presets below; it does not execute them and should not be treated as authoritative for their current behavior. The target mapping immediately below reflects this file's own historical content, from when these presets ran directly against this embedded copy — see the consuming repository's `.devcontainer/README.md` and `doc/nl-config/cfg-reportCapture.md` for the current, standalone-checkout-relative target mapping and operational contract.
 
 These presets are convenience wrappers for validator-internal workflows. They **do not** add new built-in scopes; each command remains `--scope=validator` with explicit `--target` narrowing.
 
@@ -238,7 +240,7 @@ npm run report:naming:validator:tree
 npm run report:naming:validator:doc
 ```
 
-Preset target mapping:
+Historical preset target mapping (pre-#716, when these ran directly against this embedded copy):
 - `entry` → `calculogic-validator/bin` + `calculogic-validator/scripts`
 - `naming` → `calculogic-validator/naming`
 - `tree` → `calculogic-validator/tree`
