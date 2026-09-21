@@ -130,6 +130,101 @@ export const resolveLinkedValidatorCheckout = ({ cwd = process.cwd() } = {}) => 
   return { ok: true, realPath };
 };
 
+// A checkout can pass every resolveLinkedValidatorCheckout check above (real link, correct
+// package name, complete test/ directory) and still be INCOMPATIBLE with specific dispatched
+// commands: the devcontainer's own checkout helper deliberately leaves a pre-existing sibling
+// checkout untouched (.devcontainer/README.md, "The helper does not fetch, reset, overwrite, or
+// automatically link an existing checkout"), so a checkout cloned before a given standalone fix
+// landed can stay linked indefinitely. Two commands in scope here depend on standalone-repo fixes
+// that were not always present: addressing:get-tree (PR #24, HCAToolkit/calculogic-validator)
+// requires scripts/addressing-get-tree.host.mjs to resolve its own development root via the
+// resolveValidatorDevelopmentContext identity contract; report:verify (PR #25) requires
+// scripts/report-capture-verify.host.mjs to compute its own repository root one directory level
+// above itself, not two. Before either fix, both scripts silently assumed the old embedded-nested
+// layout and failed (or, worse, could succeed against a coincidentally-named sibling) once run
+// against a real standalone checkout - exactly the failure mode this dispatcher exists to prevent
+// for an ordinary installed copy; an older linked checkout can reintroduce the same failure mode
+// through a different door.
+//
+// Detecting this by comparing the checkout's git history against known-good commit SHAs was
+// considered and rejected: it requires the linked checkout to be a git worktree with reachable,
+// unrewritten history (untrue for a shallow clone, an exported tree, or a detached checkout), and
+// it would need to be kept in sync with the standalone repo's own commit log indefinitely - the
+// general-purpose Validator version-management framework this task explicitly says not to build.
+// A dynamic capability probe (importing the checkout's own script and calling it with a synthetic
+// case) was also considered for addressing-get-tree.host.mjs, which does have a safe entrypoint
+// guard - but report-capture-verify.host.mjs does not: importing it, in either its pre-fix or
+// fixed form, immediately runs it for real (spawns child processes, writes real report files) -
+// exactly the silent modification of the user's checkout this task says to avoid. Since one of the
+// two required checks cannot safely execute any checkout code at all, both use the same
+// mechanism for consistency: a direct read of the dispatched script's own source text, checked for
+// the specific, deliberate statement the real fix commit introduced or removed - not merely
+// whether the file exists (every version of both files, fixed or not, already exists and already
+// has the right name).
+const CHECKOUT_COMPATIBILITY_REQUIREMENTS = {
+  'addressing:get-tree': {
+    relativeScriptPath: path.join('scripts', 'addressing-get-tree.host.mjs'),
+    // Added by PR #24 as the actual fix, not incidentally: the import that wires this script to
+    // the identity contract it needs to resolve a standalone (non-embedded) development root.
+    requiredSubstring: 'resolveValidatorDevelopmentContext',
+    fixDescription:
+      'the addressing:get-tree standalone-root fix (PR #24, HCAToolkit/calculogic-validator)',
+    incompatibilityDetail:
+      `does not yet import resolveValidatorDevelopmentContext, so it would still assume the old ` +
+      `embedded-nested layout and fail (or resolve the wrong root) when run against this checkout`,
+  },
+  'report:verify': {
+    relativeScriptPath: path.join('scripts', 'report-capture-verify.host.mjs'),
+    // Removed by PR #25 as the actual fix: the literal broken path segment the pre-fix script
+    // prepended onto every tool path it located, assuming a nested embedded copy one level
+    // deeper than a real standalone checkout actually is.
+    forbiddenSubstring: 'calculogic-validator/tools/report-capture',
+    fixDescription: 'the report:verify standalone-root fix (PR #25, HCAToolkit/calculogic-validator)',
+    incompatibilityDetail:
+      `still constructs tool paths with the old embedded-nested "calculogic-validator/" prefix, ` +
+      `so it would fail to locate its own report-capture tooling when run against this checkout`,
+  },
+};
+
+export const checkValidatorCheckoutCompatibility = ({ realPath, scriptName }) => {
+  const requirement = CHECKOUT_COMPATIBILITY_REQUIREMENTS[scriptName];
+  if (!requirement) {
+    return { ok: true };
+  }
+
+  const scriptPath = path.join(realPath, requirement.relativeScriptPath);
+  let source;
+  try {
+    source = fs.readFileSync(scriptPath, 'utf8');
+  } catch {
+    return {
+      ok: false,
+      reason:
+        `${requirement.relativeScriptPath} could not be read inside the linked checkout at ` +
+        `${realPath}. This checkout predates ${requirement.fixDescription} (or is otherwise ` +
+        `incomplete/restructured). Update the linked checkout (e.g. \`git -C ${realPath} pull\`) ` +
+        `and try again.`,
+    };
+  }
+
+  const isCompatible =
+    'requiredSubstring' in requirement
+      ? source.includes(requirement.requiredSubstring)
+      : !source.includes(requirement.forbiddenSubstring);
+
+  if (!isCompatible) {
+    return {
+      ok: false,
+      reason:
+        `The linked standalone Validator checkout at ${realPath} predates ${requirement.fixDescription}` +
+        ` - its own ${requirement.relativeScriptPath} ${requirement.incompatibilityDetail}. ` +
+        `Update the linked checkout (e.g. \`git -C ${realPath} pull\`) and try again.`,
+    };
+  }
+
+  return { ok: true };
+};
+
 const parseArgs = (argv) => {
   const separatorIndex = argv.indexOf('--');
   const scriptName = argv[0];
@@ -147,6 +242,13 @@ const run = async () => {
   const linked = resolveLinkedValidatorCheckout();
   if (!linked.ok) {
     process.stderr.write(`${linked.reason}\n`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const compatibility = checkValidatorCheckoutCompatibility({ realPath: linked.realPath, scriptName });
+  if (!compatibility.ok) {
+    process.stderr.write(`${compatibility.reason}\n`);
     process.exitCode = 1;
     return;
   }

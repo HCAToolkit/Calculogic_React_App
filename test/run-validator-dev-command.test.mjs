@@ -4,7 +4,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { resolveLinkedValidatorCheckout, resolveNpmInvocation } from '../scripts/run-validator-dev-command.mjs';
+import {
+  resolveLinkedValidatorCheckout,
+  resolveNpmInvocation,
+  checkValidatorCheckoutCompatibility,
+} from '../scripts/run-validator-dev-command.mjs';
 
 const wrapperScriptPath = path.resolve('scripts/run-validator-dev-command.mjs');
 
@@ -43,7 +47,12 @@ const createConsumerFixture = () => {
   };
 };
 
-const createFakeStandaloneCheckout = ({ parentDir, withTestDir = true, packageName = '@calculogic/validator' }) => {
+const createFakeStandaloneCheckout = ({
+  parentDir,
+  withTestDir = true,
+  packageName = '@calculogic/validator',
+  extraScripts = {},
+}) => {
   const checkoutRoot = path.join(parentDir, 'fake-standalone-checkout');
   fs.mkdirSync(checkoutRoot, { recursive: true });
   fs.writeFileSync(
@@ -54,6 +63,7 @@ const createFakeStandaloneCheckout = ({ parentDir, withTestDir = true, packageNa
         version: '0.0.0',
         scripts: {
           'echo-args': 'node echo-args.mjs',
+          ...extraScripts,
         },
       },
       null,
@@ -69,6 +79,31 @@ const createFakeStandaloneCheckout = ({ parentDir, withTestDir = true, packageNa
     fs.mkdirSync(path.join(checkoutRoot, 'test'), { recursive: true });
   }
   return checkoutRoot;
+};
+
+// Writes minimal stand-ins for the two standalone scripts checkValidatorCheckoutCompatibility
+// inspects, in either their real pre-#24/#25 (broken) or fixed shape - just enough source text to
+// exercise the substring checks, not functioning implementations (checkValidatorCheckoutCompatibility
+// never executes them). Mirrors the exact statements the real fix commits introduced/removed:
+// resolveValidatorDevelopmentContext being imported at all (PR #24), and the old embedded-nested
+// "calculogic-validator/" path prefix being absent (PR #25).
+const writeCompatibilityFixtureScripts = (
+  checkoutRoot,
+  { addressingGetTreeFixed = true, reportVerifyFixed = true } = {},
+) => {
+  fs.mkdirSync(path.join(checkoutRoot, 'scripts'), { recursive: true });
+  fs.writeFileSync(
+    path.join(checkoutRoot, 'scripts', 'addressing-get-tree.host.mjs'),
+    addressingGetTreeFixed
+      ? "import { resolveValidatorDevelopmentContext } from '../src/core/validator-development-context.logic.mjs';\n"
+      : '// pre-#24 stub: does not wire in the identity contract from src/core\n',
+  );
+  fs.writeFileSync(
+    path.join(checkoutRoot, 'scripts', 'report-capture-verify.host.mjs'),
+    reportVerifyFixed
+      ? "const hostPath = path.resolve(repositoryRoot, 'tools/report-capture/src/report-capture.host.mjs');\n"
+      : "const hostPath = path.resolve(repositoryRoot, 'calculogic-validator/tools/report-capture/src/report-capture.host.mjs');\n",
+  );
 };
 
 test('resolveLinkedValidatorCheckout rejects when node_modules/@calculogic/validator does not exist', () => {
@@ -158,6 +193,89 @@ test('resolveLinkedValidatorCheckout accepts a symlink to a correctly-named, com
   }
 });
 
+// Compatibility coverage (Refs #716 review discussion_r4058819696): resolveLinkedValidatorCheckout
+// alone proves the link points at a complete, correctly-named standalone checkout - it says nothing
+// about whether that checkout's own addressing-get-tree.host.mjs / report-capture-verify.host.mjs
+// actually carry the PR #24 / #25 root-resolution fixes. The devcontainer's checkout helper leaves a
+// pre-existing sibling checkout untouched, so an older, structurally-valid checkout can stay linked
+// indefinitely. These tests use writeCompatibilityFixtureScripts's stand-ins directly (no real
+// standalone dependency graph needed) to exercise checkValidatorCheckoutCompatibility's own accept/
+// reject logic in isolation, then the dispatch-level tests below confirm the same distinction holds
+// through the real CLI entrypoint.
+const withTempCheckout = (callback) => {
+  const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'checkout-compatibility-'));
+  try {
+    return callback(parentDir);
+  } finally {
+    fs.rmSync(parentDir, { recursive: true, force: true });
+  }
+};
+
+test('checkValidatorCheckoutCompatibility has no requirement for a script name outside its known list', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    // No scripts/ directory written at all - proves this is a no-op for unrelated commands,
+    // not merely "passes because the right files happen to be present".
+    const result = checkValidatorCheckoutCompatibility({ realPath: checkoutRoot, scriptName: 'echo-args' });
+    assert.equal(result.ok, true);
+  });
+});
+
+test('checkValidatorCheckoutCompatibility rejects addressing:get-tree against a pre-#24 checkout', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    writeCompatibilityFixtureScripts(checkoutRoot, { addressingGetTreeFixed: false });
+
+    const result = checkValidatorCheckoutCompatibility({ realPath: checkoutRoot, scriptName: 'addressing:get-tree' });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /predates the addressing:get-tree standalone-root fix \(PR #24/u);
+    assert.match(result.reason, /resolveValidatorDevelopmentContext/u);
+  });
+});
+
+test('checkValidatorCheckoutCompatibility accepts addressing:get-tree against a post-#24 checkout', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    writeCompatibilityFixtureScripts(checkoutRoot, { addressingGetTreeFixed: true });
+
+    const result = checkValidatorCheckoutCompatibility({ realPath: checkoutRoot, scriptName: 'addressing:get-tree' });
+    assert.equal(result.ok, true);
+  });
+});
+
+test('checkValidatorCheckoutCompatibility rejects report:verify against a pre-#25 checkout', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    writeCompatibilityFixtureScripts(checkoutRoot, { reportVerifyFixed: false });
+
+    const result = checkValidatorCheckoutCompatibility({ realPath: checkoutRoot, scriptName: 'report:verify' });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /predates the report:verify standalone-root fix \(PR #25/u);
+    assert.match(result.reason, /old embedded-nested "calculogic-validator\/" prefix/u);
+  });
+});
+
+test('checkValidatorCheckoutCompatibility accepts report:verify against a post-#25 checkout', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    writeCompatibilityFixtureScripts(checkoutRoot, { reportVerifyFixed: true });
+
+    const result = checkValidatorCheckoutCompatibility({ realPath: checkoutRoot, scriptName: 'report:verify' });
+    assert.equal(result.ok, true);
+  });
+});
+
+test('checkValidatorCheckoutCompatibility rejects when the required script is missing entirely', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    // No scripts/ directory at all - simulates a checkout old or restructured enough that the
+    // dispatched script does not exist yet at its expected path.
+    const result = checkValidatorCheckoutCompatibility({ realPath: checkoutRoot, scriptName: 'report:verify' });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /could not be read/u);
+  });
+});
+
 const runWrapper = ({ cwd, args, env = process.env }) =>
   new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [wrapperScriptPath, ...args], {
@@ -187,6 +305,57 @@ test('dispatch rejects before running anything when not linked, with no downstre
     assert.notEqual(result.exitCode, 0);
     assert.doesNotMatch(result.stdout, /should-not-run/u);
     assert.match(result.stderr, /ordinary installed package, not a live link/u);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test('dispatch rejects clearly, without invoking npm, when linked to a structurally-valid but pre-#24 checkout', async () => {
+  const fixture = createConsumerFixture();
+  try {
+    const realRoot = createFakeStandaloneCheckout({ parentDir: fixture.consumerRoot });
+    writeCompatibilityFixtureScripts(realRoot, { addressingGetTreeFixed: false });
+    fs.symlinkSync(realRoot, fixture.linkPath, 'dir');
+
+    const result = await runWrapper({
+      cwd: fixture.consumerRoot,
+      args: ['addressing:get-tree', '--', 'should-not-run'],
+    });
+
+    assert.notEqual(result.exitCode, 0);
+    // Empty stdout - not just "no should-not-run" - proves npm itself was never invoked (no
+    // "> fake-standalone-checkout@... addressing:get-tree" banner), not just that the dispatched
+    // script happened not to run.
+    assert.equal(result.stdout, '');
+    assert.match(result.stderr, /predates the addressing:get-tree standalone-root fix \(PR #24/u);
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test('dispatch reaches real npm dispatch when linked to a post-#24/#25 checkout', async (t) => {
+  if (!realNpmExecPath) {
+    t.skip('No real npm CLI entry script could be located in this environment.');
+    return;
+  }
+  const fixture = createConsumerFixture();
+  try {
+    const realRoot = createFakeStandaloneCheckout({
+      parentDir: fixture.consumerRoot,
+      extraScripts: { 'addressing:get-tree': 'node echo-args.mjs' },
+    });
+    writeCompatibilityFixtureScripts(realRoot, { addressingGetTreeFixed: true, reportVerifyFixed: true });
+    fs.symlinkSync(realRoot, fixture.linkPath, 'dir');
+
+    const result = await runWrapper({
+      cwd: fixture.consumerRoot,
+      args: ['addressing:get-tree', '--', '--scope=validator'],
+      env: { ...process.env, npm_execpath: realNpmExecPath },
+    });
+
+    assert.equal(result.exitCode, 0, result.stderr);
+    const jsonLine = result.stdout.split(/\r?\n/u).find((line) => line.trim().startsWith('['));
+    assert.deepEqual(JSON.parse(jsonLine), ['--scope=validator']);
   } finally {
     fixture.cleanup();
   }
