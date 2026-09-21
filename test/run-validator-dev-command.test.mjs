@@ -361,6 +361,90 @@ test('dispatch reaches real npm dispatch when linked to a post-#24/#25 checkout'
   }
 });
 
+const spawnAndCollect = (command, args, options = {}) =>
+  new Promise((resolve, reject) => {
+    const child = spawn(command, args, options);
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => (stdout += chunk.toString()));
+    child.stderr.on('data', (chunk) => (stderr += chunk.toString()));
+    child.on('error', reject);
+    child.on('close', (code) => resolve({ exitCode: code ?? 1, stdout, stderr }));
+  });
+
+// End-to-end regression coverage (Refs #716 review discussion_r4058875446): npm's own
+// "> pkg@ver script\n> command\n\n" lifecycle banner used to land, verbatim, in the same stdout
+// stream a wrapping `calculogic-report-capture` invocation captures into its report .txt file -
+// ahead of the dispatched standalone script's own JSON - making the whole captured file invalid
+// JSON for report-capture-summarize.host.mjs (report:summarize) to parse. This test does not settle
+// for "the report file exists" or "the capture command exited 0" - it JSON.parse's the captured
+// file's exact byte content directly, then separately proves the real, unmodified
+// report-capture-summarize.host.mjs (not a reimplementation of its parsing) can read it back
+// through its own --strict CLI, driven through the real calculogic-report-capture binary and the
+// real npm CLI end to end, the same path report:naming:validator:* actually takes.
+test('end-to-end: a live-linked report preset produces a JSON capture that report:summarize can parse', async (t) => {
+  if (!realNpmExecPath) {
+    t.skip('No real npm CLI entry script could be located in this environment.');
+    return;
+  }
+  const fixture = createConsumerFixture();
+  const reportsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'report-capture-e2e-'));
+  try {
+    const fixtureReport = { mode: 'report', scope: 'validator', findings: [], totalFilesScanned: 3 };
+    const realRoot = createFakeStandaloneCheckout({
+      parentDir: fixture.consumerRoot,
+      extraScripts: { 'naming-json': 'node naming-json.mjs' },
+    });
+    fs.writeFileSync(
+      path.join(realRoot, 'naming-json.mjs'),
+      `process.stdout.write(${JSON.stringify(JSON.stringify(fixtureReport))} + '\\n');\n`,
+    );
+    fs.symlinkSync(realRoot, fixture.linkPath, 'dir');
+
+    const reportCaptureScriptPath = fs.realpathSync(path.resolve('node_modules/.bin/calculogic-report-capture'));
+    const summarizeScriptPath = path.resolve('calculogic-validator/scripts/report-capture-summarize.host.mjs');
+    const prefix = 'e2e-naming-json';
+
+    const captureResult = await spawnAndCollect(
+      process.execPath,
+      [
+        reportCaptureScriptPath,
+        '--json',
+        '--dir',
+        reportsDir,
+        '--keep',
+        '20',
+        '--prefix',
+        prefix,
+        '--',
+        process.execPath,
+        wrapperScriptPath,
+        'naming-json',
+      ],
+      { cwd: fixture.consumerRoot, env: { ...process.env, npm_execpath: realNpmExecPath } },
+    );
+    assert.equal(captureResult.exitCode, 0, captureResult.stderr);
+
+    const reportFiles = fs.readdirSync(reportsDir).filter((name) => name.startsWith(`${prefix}-`));
+    assert.equal(reportFiles.length, 1, `expected exactly one captured report, found: ${reportFiles.join(', ')}`);
+    const rawReport = fs.readFileSync(path.join(reportsDir, reportFiles[0]), 'utf8');
+    assert.deepEqual(JSON.parse(rawReport), fixtureReport);
+
+    const summarizeResult = await spawnAndCollect(process.execPath, [
+      summarizeScriptPath,
+      `--dir=${reportsDir}`,
+      `--prefixes=${prefix}`,
+      '--strict',
+    ]);
+    assert.equal(summarizeResult.exitCode, 0, summarizeResult.stderr);
+    assert.doesNotMatch(summarizeResult.stderr, /FAIL/u);
+    assert.match(summarizeResult.stdout, new RegExp(`=== ${prefix} \\(latest\\) ===`, 'u'));
+  } finally {
+    fixture.cleanup();
+    fs.rmSync(reportsDir, { recursive: true, force: true });
+  }
+});
+
 test('dispatch forwards the standalone script name and all args after -- when linked, and preserves exit code', async (t) => {
   if (!realNpmExecPath) {
     t.skip('No real npm CLI entry script could be located in this environment.');

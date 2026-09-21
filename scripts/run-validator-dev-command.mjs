@@ -262,7 +262,23 @@ const run = async () => {
 
   const child = spawn(
     npmInvocation.command,
-    [...npmInvocation.prefixArgs, '--prefix', VALIDATOR_LINK_PATH, 'run', scriptName, '--', ...forwardedArgs],
+    [
+      ...npmInvocation.prefixArgs,
+      // Suppresses npm's own "> pkg@ver script\n> command\n\n" lifecycle banner, which npm
+      // otherwise prints to stdout ahead of the dispatched script's own output (Refs #716 review
+      // discussion_r4058875446). stdio is 'inherit' below, so that banner would land in the same
+      // stdout stream a wrapping `calculogic-report-capture` invocation captures verbatim into its
+      // report file, in front of the Validator's own JSON - making the whole file invalid JSON for
+      // report:summarize to parse. --silent controls only npm's own log output at this loglevel; it
+      // does not touch the dispatched script's own stdout/stderr, which remain fully inherited.
+      '--silent',
+      '--prefix',
+      VALIDATOR_LINK_PATH,
+      'run',
+      scriptName,
+      '--',
+      ...forwardedArgs,
+    ],
     { stdio: 'inherit' },
   );
 
