@@ -4,9 +4,32 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { resolveLinkedValidatorCheckout, resolveWindowsCommand } from '../scripts/run-validator-dev-command.mjs';
+import { resolveLinkedValidatorCheckout, resolveNpmInvocation } from '../scripts/run-validator-dev-command.mjs';
 
 const wrapperScriptPath = path.resolve('scripts/run-validator-dev-command.mjs');
+
+// Locates a real, working npm CLI entry script for the dispatch integration tests below, so they
+// exercise genuine end-to-end npm behavior (real arg parsing, real --prefix handling) rather than
+// an arbitrary placeholder path. Prefers the inherited npm_execpath (set when this test suite
+// itself runs via `npm test`); falls back to the two conventional relative-to-node layouts every
+// official Node.js distribution bundles npm under, since these tests may also run via a bare
+// `node --test`, which does not set npm_execpath. Returns null (tests below then skip) rather than
+// hardcoding a single OS's layout, since this is test-fixture bootstrapping, not production logic.
+const findRealNpmExecPath = () => {
+  if (process.env.npm_execpath && fs.existsSync(process.env.npm_execpath)) {
+    return process.env.npm_execpath;
+  }
+
+  const nodeBinDir = path.dirname(process.execPath);
+  const candidates = [
+    path.join(nodeBinDir, '..', 'lib', 'node_modules', 'npm', 'bin', 'npm-cli.js'), // Unix layout
+    path.join(nodeBinDir, 'node_modules', 'npm', 'bin', 'npm-cli.js'), // Windows layout
+  ];
+
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? null;
+};
+
+const realNpmExecPath = findRealNpmExecPath();
 
 // Isolated fixture: a consumer directory with its own node_modules/@calculogic/validator,
 // so guard behavior never depends on this repo's own real dependency state (Refs #715, #714).
@@ -135,11 +158,11 @@ test('resolveLinkedValidatorCheckout accepts a symlink to a correctly-named, com
   }
 });
 
-const runWrapper = ({ cwd, args }) =>
+const runWrapper = ({ cwd, args, env = process.env }) =>
   new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [wrapperScriptPath, ...args], {
       cwd,
-      env: process.env,
+      env,
     });
 
     let stdout = '';
@@ -169,7 +192,11 @@ test('dispatch rejects before running anything when not linked, with no downstre
   }
 });
 
-test('dispatch forwards the standalone script name and all args after -- when linked, and preserves exit code', async () => {
+test('dispatch forwards the standalone script name and all args after -- when linked, and preserves exit code', async (t) => {
+  if (!realNpmExecPath) {
+    t.skip('No real npm CLI entry script could be located in this environment.');
+    return;
+  }
   const fixture = createConsumerFixture();
   try {
     const realRoot = createFakeStandaloneCheckout({ parentDir: fixture.consumerRoot });
@@ -178,6 +205,7 @@ test('dispatch forwards the standalone script name and all args after -- when li
     const result = await runWrapper({
       cwd: fixture.consumerRoot,
       args: ['echo-args', '--', '--scope=validator', '--target', 'bin', '--target', 'scripts'],
+      env: { ...process.env, npm_execpath: realNpmExecPath },
     });
 
     assert.equal(result.exitCode, 0, result.stderr);
@@ -190,7 +218,11 @@ test('dispatch forwards the standalone script name and all args after -- when li
   }
 });
 
-test('dispatch preserves a nonzero exit code from the dispatched standalone script', async () => {
+test('dispatch preserves a nonzero exit code from the dispatched standalone script', async (t) => {
+  if (!realNpmExecPath) {
+    t.skip('No real npm CLI entry script could be located in this environment.');
+    return;
+  }
   const fixture = createConsumerFixture();
   try {
     const realRoot = createFakeStandaloneCheckout({ parentDir: fixture.consumerRoot });
@@ -199,11 +231,12 @@ test('dispatch preserves a nonzero exit code from the dispatched standalone scri
     const result = await runWrapper({
       cwd: fixture.consumerRoot,
       args: ['echo-args'],
+      env: { ...process.env, npm_execpath: realNpmExecPath },
     });
     // Re-run with a forced nonzero exit from the fake script.
     const child = spawn(process.execPath, [wrapperScriptPath, 'echo-args'], {
       cwd: fixture.consumerRoot,
-      env: { ...process.env, FAKE_EXIT_CODE: '2' },
+      env: { ...process.env, npm_execpath: realNpmExecPath, FAKE_EXIT_CODE: '2' },
     });
     const forcedResult = await new Promise((resolve, reject) => {
       let stdout = '';
@@ -219,54 +252,54 @@ test('dispatch preserves a nonzero exit code from the dispatched standalone scri
   }
 });
 
-// Windows regression coverage (Refs #716 review discussion_r4058498470): child_process.spawn
-// with shell:false cannot execute a bare `npm` on Windows, where npm is backed by a `.cmd` (or
-// `.bat`/`.exe`) file - Node's own docs describe this exact ENOENT failure mode
-// ("Spawning .bat and .cmd files on Windows"). These tests exercise resolveWindowsCommand's
-// resolution LOGIC deterministically via injected `platform`/`env`, without mutating the real
-// global `process.platform` (which node/npm/the test runner itself depend on) and without an
-// actual Windows machine. This proves the resolution algorithm is correct; it does NOT prove the
-// resulting path is genuinely spawnable by Windows' CreateProcess/cmd.exe - that requires an
-// actual Windows smoke test (documented in the PR, not run here and not claimed as verified here).
-test('resolveWindowsCommand is a no-op on non-Windows platforms, regardless of PATH contents', () => {
-  const result = resolveWindowsCommand('npm', {
-    platform: 'linux',
-    env: { PATH: '/usr/bin', PATHEXT: '.COM;.EXE;.BAT;.CMD' },
-  });
-  assert.equal(result, 'npm');
+// Cross-platform dispatch coverage (Refs #716 review discussion_r4058498470, second pass):
+// locating npm.cmd (the prior fix) does not make it spawnable - child_process.spawn with
+// shell:false cannot execute a .cmd/.bat file at all, on any path; only cmd.exe can (Node's own
+// "Spawning .bat and .cmd files on Windows" doc). The actual fix re-invokes npm's own CLI
+// JavaScript entry point through node itself (`process.execPath <npm_execpath>`), which is always
+// a real, natively executable binary - the same code path runs on every platform, with no
+// .cmd/.bat/shell resolution and no shell quoting surface at all. These unit tests prove
+// resolveNpmInvocation's LOGIC is correct on this platform. Combined with the dispatch-level
+// integration tests above (which use this exact mechanism to run a real npm subprocess
+// end-to-end) and below (which prove the correct, non-silent failure when npm_execpath is
+// absent), this demonstrates the mechanism itself is genuinely platform-independent - the only
+// per-platform variable is the npm_execpath value npm supplies, not this code's own behavior.
+// What is NOT verified here, and is not claimed as verified: that Windows' own CreateProcess can
+// actually launch `process.execPath` with a Windows-style npm_execpath value end-to-end. A focused
+// Windows smoke test is documented in the PR for that.
+test('resolveNpmInvocation rejects with a clear, actionable reason when npm_execpath is absent', () => {
+  const result = resolveNpmInvocation({ env: {} });
+  assert.equal(result.ok, false);
+  assert.match(result.reason, /npm_execpath was not found/u);
+  assert.match(result.reason, /npm run <script>/u);
 });
 
-test('resolveWindowsCommand is a no-op when the command already has an extension', () => {
-  const result = resolveWindowsCommand('npm.cmd', { platform: 'win32', env: { PATH: '', PATHEXT: '.CMD' } });
-  assert.equal(result, 'npm.cmd');
+test('resolveNpmInvocation resolves to a node-direct invocation of the given npm_execpath when present', () => {
+  const result = resolveNpmInvocation({ env: { npm_execpath: '/fake/path/to/npm-cli.js' } });
+  assert.equal(result.ok, true);
+  assert.equal(result.command, process.execPath);
+  assert.deepEqual(result.prefixArgs, ['/fake/path/to/npm-cli.js']);
 });
 
-test('resolveWindowsCommand resolves a bare command to its .cmd file by searching PATH + PATHEXT on win32', () => {
-  const fakePathDir = fs.mkdtempSync(path.join(os.tmpdir(), 'resolve-windows-command-'));
+test('dispatch rejects clearly, without running the standalone script, when linked but npm_execpath is absent', async () => {
+  const fixture = createConsumerFixture();
   try {
-    const npmCmdPath = path.join(fakePathDir, 'npm.cmd');
-    fs.writeFileSync(npmCmdPath, '@echo off\r\n');
+    const realRoot = createFakeStandaloneCheckout({ parentDir: fixture.consumerRoot });
+    fs.symlinkSync(realRoot, fixture.linkPath, 'dir');
 
-    const result = resolveWindowsCommand('npm', {
-      platform: 'win32',
-      env: { PATH: fakePathDir, PATHEXT: '.COM;.EXE;.BAT;.CMD' },
+    const envWithoutNpmExecpath = { ...process.env };
+    delete envWithoutNpmExecpath.npm_execpath;
+
+    const result = await runWrapper({
+      cwd: fixture.consumerRoot,
+      args: ['echo-args', '--', 'should-not-run'],
+      env: envWithoutNpmExecpath,
     });
 
-    assert.equal(result, npmCmdPath);
+    assert.notEqual(result.exitCode, 0);
+    assert.doesNotMatch(result.stdout, /should-not-run/u);
+    assert.match(result.stderr, /npm_execpath was not found/u);
   } finally {
-    fs.rmSync(fakePathDir, { recursive: true, force: true });
-  }
-});
-
-test('resolveWindowsCommand falls back to the bare command when no PATHEXT candidate exists on win32', () => {
-  const emptyPathDir = fs.mkdtempSync(path.join(os.tmpdir(), 'resolve-windows-command-empty-'));
-  try {
-    const result = resolveWindowsCommand('npm', {
-      platform: 'win32',
-      env: { PATH: emptyPathDir, PATHEXT: '.COM;.EXE;.BAT;.CMD' },
-    });
-    assert.equal(result, 'npm');
-  } finally {
-    fs.rmSync(emptyPathDir, { recursive: true, force: true });
+    fixture.cleanup();
   }
 });

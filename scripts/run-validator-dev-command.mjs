@@ -40,41 +40,35 @@ const readPackageName = (packageJsonPath) => {
   }
 };
 
-// On Windows, npm is exposed as an extensionless-looking command backed by a `.cmd` (or `.bat`/
-// `.exe`, depending on install method) file; `child_process.spawn('npm', ..., { shell: false })`
-// fails with ENOENT because Windows does not resolve PATHEXT for a bare CreateProcess call the
-// way a shell would (see Node's "Spawning .bat and .cmd files on Windows" doc). Resolves the real
-// executable by searching PATH + PATHEXT, exactly the same approach already established in this
-// project's tools/report-capture/src/report-capture.host.mjs, reused here rather than introducing
-// a second mechanism (`shell: true` quoting risk, or a new dependency). A no-op on every other
-// platform, and a no-op when the given command already carries its own extension. `platform`/`env`
-// are injectable only so this can be exercised deterministically in tests without mutating global
-// process state; real callers always use the defaults.
-export const resolveWindowsCommand = (command, { platform = process.platform, env = process.env } = {}) => {
-  if (platform !== 'win32') {
-    return command;
+// On Windows, npm's own CLI is exposed as `npm.cmd` (or `.ps1`/a shim, depending on install
+// method) - a script, not a native executable, so `child_process.spawn('npm'-or-any-resolved-
+// npm.cmd-path, ..., { shell: false })` cannot run it: CreateProcess cannot execute a .cmd file
+// directly, only cmd.exe can (Node's own "Spawning .bat and .cmd files on Windows" doc). Merely
+// locating npm.cmd (an earlier version of this fix) does not solve that - the located path still
+// cannot be spawned without a shell.
+//
+// This sidesteps the problem entirely rather than working around it: npm always sets
+// `npm_execpath`, the absolute path to its own CLI *JavaScript* entry point, in the environment of
+// any script it runs via `npm run <script>` - this wrapper's only supported invocation (every
+// package.json entry that uses it does so via `npm run`). Re-invoking npm as
+// `process.execPath <npm_execpath> <args>` runs npm's own CLI through node directly - node itself
+// is always a real, natively executable binary on every platform, so no `.cmd`/`.bat`/shell
+// resolution is ever needed, and no shell means no quoting/command-injection surface at all. The
+// exact same code path runs on every platform; only the `npm_execpath` value differs. `env` is
+// injectable only for deterministic testing.
+export const resolveNpmInvocation = ({ env = process.env } = {}) => {
+  const npmExecPath = env.npm_execpath;
+  if (!npmExecPath) {
+    return {
+      ok: false,
+      reason:
+        'npm_execpath was not found in the environment. This command must be invoked via ' +
+        '`npm run <script>` (its only supported invocation) - npm sets npm_execpath ' +
+        'automatically for scripts it runs.',
+    };
   }
 
-  const ext = path.extname(command);
-  if (ext) {
-    return command;
-  }
-
-  const pathValue = env.PATH || '';
-  const pathEntries = pathValue.split(path.delimiter).filter(Boolean);
-  const pathextValue = env.PATHEXT || '.COM;.EXE;.BAT;.CMD';
-  const pathext = pathextValue.split(';').filter(Boolean);
-
-  for (const directory of pathEntries) {
-    for (const extension of pathext) {
-      const candidate = path.join(directory, `${command}${extension.toLowerCase()}`);
-      if (fs.existsSync(candidate)) {
-        return candidate;
-      }
-    }
-  }
-
-  return command;
+  return { ok: true, command: process.execPath, prefixArgs: [npmExecPath] };
 };
 
 const GUIDANCE =
@@ -157,9 +151,16 @@ const run = async () => {
     return;
   }
 
+  const npmInvocation = resolveNpmInvocation();
+  if (!npmInvocation.ok) {
+    process.stderr.write(`${npmInvocation.reason}\n`);
+    process.exitCode = 1;
+    return;
+  }
+
   const child = spawn(
-    resolveWindowsCommand('npm'),
-    ['--prefix', VALIDATOR_LINK_PATH, 'run', scriptName, '--', ...forwardedArgs],
+    npmInvocation.command,
+    [...npmInvocation.prefixArgs, '--prefix', VALIDATOR_LINK_PATH, 'run', scriptName, '--', ...forwardedArgs],
     { stdio: 'inherit' },
   );
 
