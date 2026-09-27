@@ -14,19 +14,23 @@ make ownership, responsibility, role, and extraction boundaries obvious.
 
 - This repository owns the React application, its integration surfaces, and its
   package-consumption configuration.
-- `calculogic-validator/` is the retained pre-extraction Validator and is the
-  app's current default dependency. Its checked-in implementation and docs are
-  needed to describe and operate **current runtime truth** in this checkout.
+- The app's `@calculogic/validator` dependency is supplied by the pinned
+  standalone Validator repository. `calculogic-validator/` is the retained
+  pre-extraction Validator; the `@calculogic/report-capture` dependency, the
+  `report:summarize` and `report:examples:validator` scripts, and the
+  always-read convention docs under `calculogic-validator/doc/ConventionRoutines/`
+  still resolve from it, so those parts remain **current runtime truth** in this
+  checkout.
 - The standalone
   [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator)
   repository is the authoritative source for new Validator development and
   standalone package/development documentation. Do not treat this embedded copy
   as a competing development authority.
-- Migration of this app to linked or otherwise standalone package consumption is
-  a **staged implementation path** tracked by issue #695 and is **not current
-  runtime truth**. Do not change package resolution, links, manifests, lockfiles,
-  scripts, or remove the embedded Validator unless a task explicitly owns that
-  migration.
+- Migration of the remaining embedded dependencies and retirement of the
+  embedded tree is a **staged implementation path** tracked by issue #713 and is
+  **not yet complete**. Do not change package resolution, links, manifests,
+  lockfiles, scripts, or remove the embedded Validator unless a task explicitly
+  owns that migration.
 - Keep cross-repository changes ownership-aligned: change React-app integration
   here; make independently owned Validator product changes in the standalone
   repository. A task must explicitly authorize changes in each repository it
