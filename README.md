@@ -6,7 +6,7 @@ Calculogic grew from earlier H-CAT work on structured character-development tool
 
 A modular React + TypeScript builder shell for composing configuration-driven workflows. The current app includes a global header shell, a build workspace with resizable panels, and a content drawer backed by namespaced content resolution.
 
-The current standalone and authoritative Validator implementation source is [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator), and it is the normal home for current standalone Validator development. The `calculogic-validator/` directory in this repository is the retained pre-extraction implementation; the React app's current default package configuration still resolves the Validator and report-capture packages from that embedded tree. Migration to standalone package consumption is a [staged implementation path tracked in issue #695](https://github.com/HCAToolkit/Calculogic_React_App/issues/695).
+The current standalone and authoritative Validator implementation source is [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator), and it is the normal home for current standalone Validator development. The React app's `@calculogic/validator` dependency is supplied by the pinned standalone Validator repository. The `calculogic-validator/` directory in this repository is the retained pre-extraction implementation; the following still resolve from that embedded tree during the staged migration tracked in [issue #713](https://github.com/HCAToolkit/Calculogic_React_App/issues/713): the `@calculogic/report-capture` dependency, the `report:summarize` and `report:examples:validator` scripts, and the always-read convention docs under `calculogic-validator/doc/ConventionRoutines/`.
 
 ---
 
@@ -101,7 +101,7 @@ npm run health:validator # Run validator environment/health checks
 # npm run report:all:*
 ```
 
-In a default React-app checkout, these scripts use the packages resolved from the embedded `calculogic-validator/` tree; see `calculogic-validator/README.md` for workflow and report-command documentation matching that current package configuration. For current Validator development and standalone package documentation, use the authoritative [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. Migration of this app's package consumption is tracked in [issue #695](https://github.com/HCAToolkit/Calculogic_React_App/issues/695) and is not current runtime truth.
+In a default React-app checkout, the Validator commands in these scripts come from the pinned standalone `@calculogic/validator` package, and report capture comes from `@calculogic/report-capture`, which still resolves from the embedded `calculogic-validator/tools/report-capture`. `report:summarize` and `report:examples:validator` still run embedded `calculogic-validator/scripts/*` files directly. For Validator command, package, and development documentation, use the authoritative [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository; the live-link development workflow and Validator self-development commands are documented in `.devcontainer/README.md`. Migration of the remaining embedded dependencies is tracked in [issue #713](https://github.com/HCAToolkit/Calculogic_React_App/issues/713).
 
 ## Project Structure (Current)
 
@@ -113,7 +113,7 @@ In a default React-app checkout, these scripts use the packages resolved from th
 │  │  └─ Standards/                    # Package-owned standards docs
 │  ├─ src/
 │  └─ test/
-├─ calculogic-validator/               # Retained pre-extraction Validator; used by default package wiring
+├─ calculogic-validator/               # Retained pre-extraction Validator; remaining embedded dependencies (#713)
 │  ├─ doc/
 │  │  └─ ConventionRoutines/           # Validator-owned convention routines
 │  ├─ src/
@@ -159,9 +159,9 @@ In a default React-app checkout, these scripts use the packages resolved from th
 - Canonical doc-engine package documentation lives under `calculogic-doc-engine/doc/**`.
 - `doc/doc-engine/**` in this host repo is host-facing historical/working material unless a package hub explicitly marks an item canonical.
 - **Standalone source and development authority:** The current Validator implementation source and standalone package/development documentation are owned by the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository.
-- **Current implementation reality:** The embedded `calculogic-validator/` tree is the retained pre-extraction implementation and supplies the Validator and report-capture packages for this app's default package configuration; it is not a second authoritative source.
+- **Current implementation reality:** The React app's `@calculogic/validator` dependency is supplied by the pinned standalone Validator repository. The embedded `calculogic-validator/` tree is the retained pre-extraction implementation and still supplies the `@calculogic/report-capture` dependency and the `report:summarize` and `report:examples:validator` scripts; it is not a second authoritative source.
 - **React-repo documentation reality:** Active contributor guidance in `AGENTS.md` and the convention entrypoints under `doc/ConventionRoutines/` still resolve through the embedded Validator tree. Their authority/pointer migration is outside this README clarification.
-- **Staged implementation path:** [Issue #695](https://github.com/HCAToolkit/Calculogic_React_App/issues/695) tracks migration of this app to standalone package consumption; that migration is not current runtime truth.
+- **Staged implementation path:** [Issue #713](https://github.com/HCAToolkit/Calculogic_React_App/issues/713) tracks migration of the remaining embedded dependencies listed above and retirement of the embedded tree; that migration is not yet complete.
 
 ## Roadmap (Planned)
 
