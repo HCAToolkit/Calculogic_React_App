@@ -155,9 +155,13 @@ For registry migrations, follow this sequence:
 
 ## Validator Verification
 
-- The React-app-root npm workflows run the installed standalone package, not the
-  code in this directory, so they do not verify changes made here. Validator
-  behavior changes are made and verified in the standalone repository.
+- The React-app-root Validator workflows (`validate:*`, `report:*`, and
+  `health:validator`) run the installed standalone package, or a live-linked
+  standalone checkout for the Validator self-development commands, never the code
+  in this directory, so they do not verify Validator behavior changed here. Validator
+  behavior changes are made and verified in the standalone repository. Root
+  `npm run lint` (`eslint .`) does lint this directory's JavaScript and
+  TypeScript files, so run it when a task modifies them.
 - Preserve report-first, scope, mode, target, report-envelope, and exit-policy
   contracts when selecting checks.
 - Keep checks limited to the touched slice. If a root workflow cannot target the
