@@ -71,13 +71,15 @@ Also read the narrowest relevant repository or package README, including
 `node_modules/@calculogic/validator/README.md` for operation of the installed
 Validator package.
 
-Items 1–3 resolve only after dependencies are installed. Check the installed
-package first. If `node_modules/@calculogic/validator/` is missing, you may run
-`npm ci` from the repository root when your environment and task permit it;
-otherwise stop and report the missing installation prerequisite. If installation
-fails, or any always-read canonical convention document is still missing after
-it, stop and report it clearly rather than inventing a replacement. Do not
-substitute the copies in the embedded `calculogic-validator/` tree.
+Items 1–3 resolve only after dependencies are installed from the committed
+lockfile. Check those installed paths first. If any of them is missing (for
+example, `node_modules/` is absent, or an older Validator pin without packaged
+docs is still installed), you may run `npm ci` from the repository root when
+your environment and task permit it; otherwise stop and report the missing
+installation prerequisite. If installation fails, or any always-read canonical
+convention document is still missing after it, stop and report it clearly rather
+than inventing a replacement. Do not substitute the copies in the embedded
+`calculogic-validator/` tree.
 
 Paths in this file are relative to the React-app repository root. Commands shown
 in the root `README.md`, root `package.json`, or embedded Validator README as
