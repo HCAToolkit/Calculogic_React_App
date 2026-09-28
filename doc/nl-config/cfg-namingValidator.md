@@ -4,9 +4,9 @@
 > This file is **implementation notes / NL-config context** for this repository and is **not** the canonical validator contract source.
 > Canonical validator-owned docs:
 >
-> - `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`
-> - `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
-> - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+> - `node_modules/@calculogic/validator/doc/ConventionRoutines/NamingValidatorSpec.md`
+> - `node_modules/@calculogic/validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md`
+> - `node_modules/@calculogic/validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
 
 ## 0.0 Version
 
@@ -20,7 +20,7 @@ Define a deterministic V0.1 filename naming validator that runs in report mode o
 
 ### 2.1 Naming authority
 
-Summary only: naming rules are consumed from canonical docs. For normative role/grammar policy, see `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` and `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`.
+Summary only: naming rules are consumed from canonical docs. For normative role/grammar policy, see `node_modules/@calculogic/validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md` and `node_modules/@calculogic/validator/doc/ConventionRoutines/NamingValidatorSpec.md`.
 
 ### 2.2 Scope mode (V0.1.11)
 
@@ -332,7 +332,7 @@ This metadata is additive and does not alter legacy report-mode findings behavio
 
 ### 4.6 Exit behavior (report mode, V0.1.13)
 
-Summary only (canonical policy is defined in `calculogic-validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` and mirrored by `calculogic-validator/doc/ConventionRoutines/NamingValidatorSpec.md`):
+Summary only (canonical policy is defined in `node_modules/@calculogic/validator/doc/ConventionRoutines/ValidatorSuite-Contracts-And-Modes.md` and mirrored by `node_modules/@calculogic/validator/doc/ConventionRoutines/NamingValidatorSpec.md`):
 Report mode prints full JSON report payload to stdout in non-usage-error flows, then exits with deterministic CI-oriented status:
 
 - default mode: exit `2` when any finding has `severity="warn"`.

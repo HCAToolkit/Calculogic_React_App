@@ -17,10 +17,15 @@ make ownership, responsibility, role, and extraction boundaries obvious.
 - The app's `@calculogic/validator` dependency is supplied by the pinned
   standalone Validator repository, and `@calculogic/report-capture` by the
   pinned `HCAToolkit/calculogic-report-capture` repository.
-  `calculogic-validator/` is the retained pre-extraction Validator; the
-  always-read convention docs under `calculogic-validator/doc/ConventionRoutines/`
-  still resolve from it, so those docs remain **current runtime truth** in this
-  checkout.
+  `calculogic-validator/` is the retained pre-extraction Validator; the React
+  app's active repository-level convention entrypoints no longer resolve from its
+  convention-document copies.
+- The always-read Validator-packaged convention docs are supplied by the pinned
+  standalone Validator repository, which ships them in the package. Their local
+  reading path in this checkout is the installed package,
+  `node_modules/@calculogic/validator/doc/ConventionRoutines/`. This describes
+  where the documents are installed; it does not decide the conceptual
+  ownership of the conventions, which is unchanged by this location.
 - The standalone
   [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator)
   repository is the authoritative source for new Validator development and
@@ -55,17 +60,26 @@ make ownership, responsibility, role, and extraction boundaries obvious.
 Before making changes, read these binding convention routines from the React-app
 repository root:
 
-1. `calculogic-validator/doc/ConventionRoutines/CCPP.md`
-2. `calculogic-validator/doc/ConventionRoutines/CCS.md`
-3. `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+1. `node_modules/@calculogic/validator/doc/ConventionRoutines/CCPP.md`
+2. `node_modules/@calculogic/validator/doc/ConventionRoutines/CCS.md`
+3. `node_modules/@calculogic/validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
 4. `doc/ConventionRoutines/General-NL-Skeletons.md`
 5. `doc/ConventionRoutines/NL-First-Workflow.md`
 
 Also read the narrowest relevant repository or package README, including
-`README.md` for app and integration work and `calculogic-validator/README.md`
-for operation of the retained embedded Validator. If any always-read canonical
-convention document is missing, stop and report it clearly rather than inventing
-a replacement.
+`README.md` for app and integration work and
+`node_modules/@calculogic/validator/README.md` for operation of the installed
+Validator package.
+
+Items 1–3 resolve only after dependencies are installed from the committed
+lockfile. Check those installed paths first. If any of them is missing (for
+example, `node_modules/` is absent, or an older Validator pin without packaged
+docs is still installed), you may run `npm ci` from the repository root when
+your environment and task permit it; otherwise stop and report the missing
+installation prerequisite. If installation fails, or any always-read canonical
+convention document is still missing after it, stop and report it clearly rather
+than inventing a replacement. Do not substitute the copies in the embedded
+`calculogic-validator/` tree.
 
 Paths in this file are relative to the React-app repository root. Commands shown
 in the root `README.md`, root `package.json`, or embedded Validator README as
@@ -73,10 +87,12 @@ in the root `README.md`, root `package.json`, or embedded Validator README as
 `calculogic-validator/AGENTS.md`, paths are explicitly identified as either
 embedded-Validator-relative or React-app-root-relative.
 
-Validator-owned convention docs in the embedded tree remain the active local
-convention entrypoints for this checkout. That local path fact preserves current
-integration behavior; it does not make the embedded implementation the authority
-for new standalone Validator development.
+The installed package is the local reading path for the Validator-packaged
+convention docs; the pinned standalone Validator repository is the source of the
+packaged versions. For GitHub navigation, link to the standalone repository at
+the pinned commit or to a repository-local pointer doc rather than to
+`node_modules/`. The copies in the embedded `calculogic-validator/` tree are not
+the React app's repository-level convention entrypoints.
 
 ## Repository-Wide Workflow and Architecture Guardrails
 

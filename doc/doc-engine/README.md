@@ -13,8 +13,8 @@ Doc-engine package-owned docs live under `calculogic-doc-engine/doc/` (including
 
 ## Standards References
 
-- `calculogic-validator/doc/ConventionRoutines/CCPP.md`
-- `calculogic-validator/doc/ConventionRoutines/CCS.md`
+- `node_modules/@calculogic/validator/doc/ConventionRoutines/CCPP.md`
+- `node_modules/@calculogic/validator/doc/ConventionRoutines/CCS.md`
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
 - `doc/ConventionRoutines/NL-First-Workflow.md`
 
