@@ -32,7 +32,7 @@
     "report:all:validator": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-validator -- node scripts/run-validator-dev-command.mjs validate:all -- --scope=validator",
     "report:all:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-system -- calculogic-validate --scope=system",
     "report:verify": "node scripts/run-validator-dev-command.mjs report:verify",
-    "report:summarize": "node calculogic-validator/scripts/report-capture-summarize.host.mjs",
+    "report:summarize": "calculogic-validator-report-summarize",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier . --check",
     "format:write": "prettier . --write",
