@@ -17,8 +17,9 @@ make ownership, responsibility, role, and extraction boundaries obvious.
 - The app's `@calculogic/validator` dependency is supplied by the pinned
   standalone Validator repository, and `@calculogic/report-capture` by the
   pinned `HCAToolkit/calculogic-report-capture` repository.
-  `calculogic-validator/` is the retained pre-extraction Validator; nothing in
-  this checkout reads its convention docs anymore.
+  `calculogic-validator/` is the retained pre-extraction Validator; the React
+  app's active repository-level convention entrypoints no longer resolve from its
+  convention-document copies.
 - The always-read Validator-packaged convention docs are supplied by the pinned
   standalone Validator repository, which ships them in the package. Their local
   reading path in this checkout is the installed package,
@@ -89,7 +90,7 @@ convention docs; the pinned standalone Validator repository is the source of the
 packaged versions. For GitHub navigation, link to the standalone repository at
 the pinned commit or to a repository-local pointer doc rather than to
 `node_modules/`. The copies in the embedded `calculogic-validator/` tree are not
-convention entrypoints for this checkout.
+the React app's repository-level convention entrypoints.
 
 ## Repository-Wide Workflow and Architecture Guardrails
 
