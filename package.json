@@ -42,7 +42,7 @@
     "report:tree:docs": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-docs -- calculogic-validate-tree --scope=docs",
     "report:tree:validator": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-validator -- node scripts/run-validator-dev-command.mjs validate:tree -- --scope=validator",
     "report:tree:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-system -- calculogic-validate-tree --scope=system",
-    "report:examples:validator": "node --experimental-strip-types calculogic-validator/scripts/generate-validator-report-examples.host.mjs",
+    "report:examples:validator": "node scripts/run-validator-dev-command.mjs report:examples:validator --",
     "report:addressing:get-tree:validator": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix addressing-get-tree-validator -- npm run addressing:get-tree -- --scope=validator --format=both",
     "test:validator:source": "node scripts/run-validator-dev-command.mjs test"
   },

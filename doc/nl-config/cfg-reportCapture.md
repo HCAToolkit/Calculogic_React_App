@@ -6,7 +6,7 @@ Current implementation target: **V0.2.0**. The report-capture tool itself is sup
 
 ## 1.0 Purpose
 
-Capture this app's validator runs into timestamped JSON reports under `./.reports`, using the `calculogic-report-capture` command, and define the app-side workflows around those captures (presets, verification and summarization). The wrapper's own behavior is defined by the report-capture contract linked in 0.0.
+Capture this app's validator runs into timestamped JSON reports under `./.reports`, using the `calculogic-report-capture` command, and define the app-side workflows around those captures (presets, verification, summarization, and report-example regeneration). The wrapper's own behavior is defined by the report-capture contract linked in 0.0.
 
 ## 2.0 Inputs and Source of Truth
 
@@ -44,6 +44,17 @@ These are convenience scripts only; no additional built-in scope profiles are in
 ### 2.6 Post-capture summarizer contract
 
 `report:summarize` runs the Validator-owned summarizer through the public `calculogic-validator-report-summarize` command of the installed `@calculogic/validator` package (added in HCAToolkit/calculogic-validator#28). It reads the latest captured JSON report per prefix from `./.reports` (or `--dir`), resolved from the directory it is run in, and prints compact per-scope summaries suitable for Codex/PR notes; `--help` lists its options. Unlike 2.4/2.5, it is **not** gated behind a live link: it summarizes this React app's own already-captured reports in both modes. In stable mode the pinned package supplies the summarizer; in live mode the same command resolves through the link to the linked standalone checkout's summarizer, and it still reads this app's `./.reports`. (Historical note: before this migration, `report:summarize` invoked the embedded `calculogic-validator/scripts/report-capture-summarize.host.mjs` directly by path. Refs #713.)
+
+### 2.7 Report-examples workflow contract
+
+**As of Calculogic_React_App#723, `report:examples:validator` is also a Validator self-development command**, guarded and dispatched the same way as 2.4/2.5: `node scripts/run-validator-dev-command.mjs report:examples:validator --` runs the standalone checkout's own `report:examples:validator` npm script (added in HCAToolkit/calculogic-validator#30) inside the live-linked checkout (`npm --prefix node_modules/@calculogic/validator run report:examples:validator`). In stable/non-linked mode it exits nonzero with the guard message and generates nothing.
+
+- **Execution context:** the generator runs in the linked standalone checkout and documents that checkout's Validator. It takes its development root from where its own code lives, not from this app.
+- **Fixture destination:** by default it regenerates the linked checkout's own normalized report examples in `test/fixtures/report-examples/` of that checkout. It never writes to this app, to its `node_modules`, or to the embedded `calculogic-validator/` tree. Commit refreshed fixtures in the standalone repository.
+- **Argument forwarding:** the app script ends with `--`, so arguments after `npm run report:examples:validator --` are forwarded to the standalone script. `--out-dir=<path>` writes the examples elsewhere. A relative path resolves from the linked checkout, where npm runs the script, so use an absolute path to write outside it.
+- **Checkout compatibility:** the dispatcher requires a linked checkout that includes HCAToolkit/calculogic-validator#30. Its `scripts/generate-validator-report-examples.host.mjs` must call `runValidatorReportExamplesCli`, and its `package.json` must define the `report:examples:validator` npm script. An older or only partly updated checkout is rejected before npm runs, with an instruction to update it.
+
+(Historical note: before #723, this repo ran the embedded `calculogic-validator/scripts/generate-validator-report-examples.host.mjs` directly by path, regenerating fixtures inside the embedded tree. Refs #713.)
 
 ## 3.0 Build Concern
 
@@ -101,6 +112,10 @@ The verifier emits one compact success line per scope (`OK naming:<scope> -> <pa
 
 The summarizer emits a compact block per prefix including latest file metadata, report scope totals, counts, top code counts, and warn samples. It exits non-zero when any requested prefix is missing a report or has invalid JSON.
 
+### 7.5 Report-examples output summary
+
+The generator writes `validate-naming.system.report.example.json` and `validate-all.system.naming.report.example.json` (timestamps, durations, repository root, git SHA and dirty counters normalized) and prints `Wrote 2 report examples to <directory>`. It exits non-zero with a message when generation fails, and exits nonzero from the dispatcher guard in stable mode or against an incompatible linked checkout (2.7).
+
 ## 8.0 ResultsStyle Concern
 
 Not applicable for this CLI feature.
@@ -118,3 +133,4 @@ Owned by the tool. See §9.0 of the report-capture contract ([`doc/cfg-reportCap
 - Pass E: Add report-capture verifier script + integration coverage for metadata/report integrity checks.
 - Pass F: Add latest-report summarizer script + deterministic tests for newest-file selection and missing-prefix failures.
 - Pass G: Replace the embedded `file:calculogic-validator/tools/report-capture` dependency with the pinned standalone `@calculogic/report-capture` package, and move the tool-owned sections of this document to the report-capture repository (Refs #713).
+- Pass H: Route `report:examples:validator` through the live-link dispatcher to the standalone checkout's `report:examples:validator` script, with a checkout-compatibility requirement for HCAToolkit/calculogic-validator#30 (Refs #713).

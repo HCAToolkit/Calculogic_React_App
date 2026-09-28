@@ -18,9 +18,8 @@ make ownership, responsibility, role, and extraction boundaries obvious.
   standalone Validator repository, and `@calculogic/report-capture` by the
   pinned `HCAToolkit/calculogic-report-capture` repository.
   `calculogic-validator/` is the retained pre-extraction Validator; the
-  `report:examples:validator` script and the always-read convention docs under
-  `calculogic-validator/doc/ConventionRoutines/`
-  still resolve from it, so those parts remain **current runtime truth** in this
+  always-read convention docs under `calculogic-validator/doc/ConventionRoutines/`
+  still resolve from it, so those docs remain **current runtime truth** in this
   checkout.
 - The standalone
   [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator)
