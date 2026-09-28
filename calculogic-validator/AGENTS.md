@@ -17,10 +17,11 @@ Validator work; that authority, and the `AGENTS.md` that governs it, belong to t
 standalone repository. Retirement of this directory is a **staged implementation
 path** tracked in React-app issue #713; edits here are not Validator changes.
 
-One read remains until the standalone health check is decoupled from consumer
-documents: the app's `npm run health:validator` conditionally reads
-`doc/ConventionRoutines/NamingValidatorSpec.md` from this directory and asserts
-that it mentions `src/`, `test/`, and `calculogic-validator/`.
+The app's `npm run health:validator` no longer reads documents from this
+directory. Since the pinned standalone Validator includes
+HCAToolkit/calculogic-validator#32, the installed health check runs in its
+installed-consumer context and reads no documents from the app checkout,
+including `doc/ConventionRoutines/NamingValidatorSpec.md` here.
 
 ## Path and Working-Directory Conventions
 
