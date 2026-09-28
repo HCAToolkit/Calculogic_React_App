@@ -12,6 +12,16 @@ import {
 
 const wrapperScriptPath = path.resolve('scripts/run-validator-dev-command.mjs');
 
+// Resolves an installed package's command to the JavaScript file its package.json `bin` declares.
+// node_modules/.bin/<name> is a symlink on POSIX but a command shim on Windows, so it must not be
+// passed to Node directly. The package's own package.json is read by path because
+// @calculogic/validator's `exports` map does not expose `./package.json`.
+const resolveInstalledBinScript = (packageName, binName) => {
+  const packageRoot = path.resolve('node_modules', ...packageName.split('/'));
+  const packageJson = JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8'));
+  return path.resolve(packageRoot, packageJson.bin[binName]);
+};
+
 // Locates a real, working npm CLI entry script for the dispatch integration tests below, so they
 // exercise genuine end-to-end npm behavior (real arg parsing, real --prefix handling) rather than
 // an arbitrary placeholder path. Prefers the inherited npm_execpath (set when this test suite
@@ -401,8 +411,11 @@ test('end-to-end: a live-linked report preset produces a JSON capture that repor
     );
     fs.symlinkSync(realRoot, fixture.linkPath, 'dir');
 
-    const reportCaptureScriptPath = fs.realpathSync(path.resolve('node_modules/.bin/calculogic-report-capture'));
-    const summarizeScriptPath = fs.realpathSync(path.resolve('node_modules/.bin/calculogic-validator-report-summarize'));
+    const reportCaptureScriptPath = resolveInstalledBinScript('@calculogic/report-capture', 'calculogic-report-capture');
+    const summarizeScriptPath = resolveInstalledBinScript(
+      '@calculogic/validator',
+      'calculogic-validator-report-summarize',
+    );
     const prefix = 'e2e-naming-json';
 
     const captureResult = await spawnAndCollect(

@@ -2,35 +2,25 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.1.2** (add validator-internal naming report-capture presets that use `--scope=validator` + stable target unions).
+Current implementation target: **V0.2.0**. The report-capture tool itself is supplied by the pinned `@calculogic/report-capture` package from [`HCAToolkit/calculogic-report-capture`](https://github.com/HCAToolkit/calculogic-report-capture), which owns the tool's contract. This document now covers only how this app uses it: its capture presets and the Validator report workflows around them (Refs #713). Tool-owned sections below point to that contract at commit `624f1a3c325ae7d3f6c576829ee9ee672194c0e1`, the same commit this app pins in `package.json`, so they describe the version this checkout actually runs. When the `@calculogic/report-capture` pin changes, update these links to the new commit in the same change.
 
 ## 1.0 Purpose
 
-Provide a deterministic command wrapper that captures combined stdout/stderr into timestamped reports while still streaming output live to the terminal.
+Capture this app's validator runs into timestamped JSON reports under `./.reports`, using the `calculogic-report-capture` command, and define the app-side workflows around those captures (presets, verification and summarization). The wrapper's own behavior is defined by the report-capture contract linked in 0.0.
 
 ## 2.0 Inputs and Source of Truth
 
 ### 2.1 CLI interface contract
 
-The wrapper accepts pre-command flags (`--dir`, `--keep`, `--no-prune`, `--prefix`, `--warn-on-prune`, `--no-warn-on-prune`, `--json`) followed by a required command after `--`.
+Owned by the tool. See §2.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 2.2 Default report directory
 
-When `--dir` is not provided, report output uses an OS-appropriate user cache base:
-
-- Linux: `$XDG_CACHE_HOME` else `~/.cache`
-- macOS: `~/Library/Caches`
-- Windows: `%LOCALAPPDATA%` else `~/AppData/Local`
-
-Reports live under `<cacheBase>/calculogic-report-capture/reports`.
+Owned by the tool. See §2.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 2.3 Filename contract
 
-Report filenames are deterministic and filesystem-safe:
-
-- `<prefix>-YYYY-MM-DD_HH-MM-SS.txt`
-- Prefix defaults to `report`
-- Timestamp is local time and zero-padded
+Owned by the tool. See §2.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 2.4 Scope capture presets
 
@@ -49,7 +39,7 @@ These are convenience scripts only; no additional built-in scope profiles are in
 
 ### 2.5 Verifier workflow contract
 
-**As of #716, `report:verify` is also a Validator self-development command**, guarded and dispatched the same way as the presets above - it invokes `report-capture-verify.host.mjs` inside the live-linked standalone checkout (`npm --prefix node_modules/@calculogic/validator run report:verify`), not the repo-local embedded copy. The verifier itself runs naming validation through report-capture for one or more scopes, parses the metadata JSON line, and asserts the generated report file exists in the configured reports directory and contains a full JSON naming report. (Historical note: before #716, this repo invoked the embedded `calculogic-validator/scripts/report-capture-verify.host.mjs` directly by path.)
+**As of #716, `report:verify` is also a Validator self-development command**, guarded and dispatched the same way as the presets above - it invokes `report-capture-verify.host.mjs` inside the live-linked standalone checkout (`npm --prefix node_modules/@calculogic/validator run report:verify`), not the repo-local embedded copy. The verifier itself runs naming validation through report-capture for one or more scopes, parses the metadata JSON line, and asserts the generated report file exists in the configured reports directory and contains a full JSON naming report. The linked checkout must have its own dev dependencies installed (`npm ci` in that checkout), because the standalone verifier resolves the `@calculogic/report-capture` dev dependency from there. Without them it exits 1 with a message saying so. (Historical note: before #716, this repo invoked the embedded `calculogic-validator/scripts/report-capture-verify.host.mjs` directly by path.)
 
 ### 2.6 Post-capture summarizer contract
 
@@ -59,15 +49,15 @@ These are convenience scripts only; no additional built-in scope profiles are in
 
 ### 3.1 CLI host assembly
 
-Host module parses argv, resolves directory defaults, warns about pending prune deletions, starts capture run, and exits with the wrapped command exit code.
+Owned by the tool. See §3.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 3.2 Spawn contract
 
-Child process uses `spawn(command, args, { stdio: ['inherit', 'pipe', 'pipe'] })` and avoids shell mode.
+Owned by the tool. See §3.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 3.3 Windows command resolution
 
-When platform is Windows and command is extensionless, resolve via PATH + PATHEXT (`.cmd`, `.exe`, `.bat`, etc.) before spawn.
+Owned by the tool. See §3.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ## 4.0 BuildStyle Concern
 
@@ -77,33 +67,31 @@ Not applicable for this CLI feature.
 
 ### 5.1 Timestamp and filename helpers
 
-Helpers format timestamps and derive safe filenames/prefixes deterministically.
+Owned by the tool. See §5.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 5.2 Prune logic
 
-Prune logic matches `${prefix}-*.txt`, sorts by `mtimeMs` descending, keeps newest `N`, and deletes older files.
+Owned by the tool. See §5.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 5.3 Prune gating logic
 
-A dedicated helper controls whether pruning is active (`--no-prune` disables).
+Owned by the tool. See §5.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ## 6.0 Knowledge Concern
 
 ### 6.1 OS cache directory knowledge
 
-Knowledge module maps current platform and environment variables to the default cache path.
+Owned by the tool. See §6.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ## 7.0 Results Concern
 
 ### 7.1 Output stream behavior
 
-Stdout and stderr both stream to terminal and are appended to the same report file.
+Owned by the tool. See §7.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 7.2 JSON metadata output
 
-When `--json` is set, emit one compact JSON line to stderr with:
-
-- `path`, `exitCode`, `bytes`, `startedAt`, `endedAt`, `durationMs`, `dir`, `prefix`
+Owned by the tool. See §7.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 7.3 Verifier output summary
 
@@ -119,12 +107,7 @@ Not applicable for this CLI feature.
 
 ## 9.0 Assembly Pattern
 
-1. Parse options and command split at `--`.
-2. Resolve output directory and report filename.
-3. Optionally pre-warn if current report count implies post-run pruning.
-4. Run child command while teeing output to terminal and report file.
-5. Close report file, optionally prune, optionally emit JSON metadata.
-6. Exit with child exit code.
+Owned by the tool. See §9.0 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ## 10.0 Implementation Passes
 
@@ -134,3 +117,4 @@ Not applicable for this CLI feature.
 - Pass D: Wire local file dependency for `npx calculogic-report-capture` usage.
 - Pass E: Add report-capture verifier script + integration coverage for metadata/report integrity checks.
 - Pass F: Add latest-report summarizer script + deterministic tests for newest-file selection and missing-prefix failures.
+- Pass G: Replace the embedded `file:calculogic-validator/tools/report-capture` dependency with the pinned standalone `@calculogic/report-capture` package, and move the tool-owned sections of this document to the report-capture repository (Refs #713).

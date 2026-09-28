@@ -15,9 +15,10 @@ make ownership, responsibility, role, and extraction boundaries obvious.
 - This repository owns the React application, its integration surfaces, and its
   package-consumption configuration.
 - The app's `@calculogic/validator` dependency is supplied by the pinned
-  standalone Validator repository. `calculogic-validator/` is the retained
-  pre-extraction Validator; the `@calculogic/report-capture` dependency, the
-  `report:examples:validator` script, and the always-read convention docs under
+  standalone Validator repository, and `@calculogic/report-capture` by the
+  pinned `HCAToolkit/calculogic-report-capture` repository.
+  `calculogic-validator/` is the retained pre-extraction Validator; the
+  `report:examples:validator` script and the always-read convention docs under
   `calculogic-validator/doc/ConventionRoutines/`
   still resolve from it, so those parts remain **current runtime truth** in this
   checkout.
