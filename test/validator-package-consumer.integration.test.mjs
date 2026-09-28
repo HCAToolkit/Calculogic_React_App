@@ -111,10 +111,20 @@ for (const { label, command, expectedScope } of reportCommands) {
   });
 }
 
-test('health public route reports embedded source-host docs coverage', () => {
+// The installed package runs health in its installed-consumer context: it checks only the
+// scopes available here and reads no documents from this checkout (HCAToolkit/calculogic-validator#32).
+test('health public route reports installed-consumer health without reading app documents', () => {
   const commandResult = runCommand(['npm', 'run', '--silent', 'health:validator']);
 
   assert.equal(commandResult.status, 0, commandDiagnostic(commandResult));
-  assert.match(commandResult.stdout, /OK: docs match app scope roots/);
-  assert.doesNotMatch(commandResult.stdout, /docs skipped/i);
+  assert.equal(
+    commandResult.stdout,
+    [
+      'OK: naming validator deterministic for repo|app|docs|system',
+      'SKIP: scope validator not checked (validator-development-root-unavailable)',
+      'OK: docs sanity check not applicable (installed-consumer: no validator development root)',
+      '',
+    ].join('\n'),
+    commandDiagnostic(commandResult),
+  );
 });
