@@ -81,6 +81,24 @@ convention document is still missing after it, stop and report it clearly rather
 than inventing a replacement. Do not substitute the copies in the embedded
 `calculogic-validator/` tree.
 
+Before relying on the installed Validator documentation, run
+`npm run check:validator-pin` from the repository root. Documents being present
+does not prove they are the pinned version: after a pin change, an older
+installation can still provide them, and `npm ls` reports the declared commit
+rather than the installed one. Act on the result
+(`doc/nl-config/cfg-validatorPinConsistency.md`):
+
+- `consistent`: a stable installation whose npm installation record matches the
+  declared pin. The installed documents are the pinned versions (npm's record,
+  not a byte-for-byte comparison).
+- `failed` in a stable installation (for example a stale installation after a
+  pin change): run `npm ci` when your environment and task permit it and rerun
+  the check; otherwise stop and report it. Stop if it still fails.
+- `linked-development`: `node_modules/@calculogic/validator` is an `npm link` to
+  a standalone checkout, so the installed documents come from that checkout's
+  current state, not from the pinned commit. For pinned wording, use the
+  pinned-commit links in the repository-local pointer documents.
+
 Paths in this file are relative to the React-app repository root. Commands shown
 in the root `README.md`, root `package.json`, or embedded Validator README as
 “repo root” commands must be run from the React-app repository root. Within
