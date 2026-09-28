@@ -2,7 +2,7 @@
 
 ## 0.0 Version
 
-Current implementation target: **V0.2.0**. The report-capture tool itself is supplied by the pinned `@calculogic/report-capture` package from [`HCAToolkit/calculogic-report-capture`](https://github.com/HCAToolkit/calculogic-report-capture), which owns the tool's contract. This document now covers only how this app uses it: its capture presets and the Validator report workflows around them (Refs #713). Tool-owned sections below point to that contract.
+Current implementation target: **V0.2.0**. The report-capture tool itself is supplied by the pinned `@calculogic/report-capture` package from [`HCAToolkit/calculogic-report-capture`](https://github.com/HCAToolkit/calculogic-report-capture), which owns the tool's contract. This document now covers only how this app uses it: its capture presets and the Validator report workflows around them (Refs #713). Tool-owned sections below point to that contract at commit `624f1a3c325ae7d3f6c576829ee9ee672194c0e1`, the same commit this app pins in `package.json`, so they describe the version this checkout actually runs. When the `@calculogic/report-capture` pin changes, update these links to the new commit in the same change.
 
 ## 1.0 Purpose
 
@@ -12,15 +12,15 @@ Capture this app's validator runs into timestamped JSON reports under `./.report
 
 ### 2.1 CLI interface contract
 
-Owned by the tool. See §2.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §2.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 2.2 Default report directory
 
-Owned by the tool. See §2.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §2.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 2.3 Filename contract
 
-Owned by the tool. See §2.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §2.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 2.4 Scope capture presets
 
@@ -49,15 +49,15 @@ These are convenience scripts only; no additional built-in scope profiles are in
 
 ### 3.1 CLI host assembly
 
-Owned by the tool. See §3.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §3.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 3.2 Spawn contract
 
-Owned by the tool. See §3.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §3.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 3.3 Windows command resolution
 
-Owned by the tool. See §3.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §3.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ## 4.0 BuildStyle Concern
 
@@ -67,31 +67,31 @@ Not applicable for this CLI feature.
 
 ### 5.1 Timestamp and filename helpers
 
-Owned by the tool. See §5.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §5.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 5.2 Prune logic
 
-Owned by the tool. See §5.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §5.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 5.3 Prune gating logic
 
-Owned by the tool. See §5.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §5.3 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ## 6.0 Knowledge Concern
 
 ### 6.1 OS cache directory knowledge
 
-Owned by the tool. See §6.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §6.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ## 7.0 Results Concern
 
 ### 7.1 Output stream behavior
 
-Owned by the tool. See §7.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §7.1 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 7.2 JSON metadata output
 
-Owned by the tool. See §7.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §7.2 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ### 7.3 Verifier output summary
 
@@ -107,7 +107,7 @@ Not applicable for this CLI feature.
 
 ## 9.0 Assembly Pattern
 
-Owned by the tool. See §9.0 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/main/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
+Owned by the tool. See §9.0 of the report-capture contract ([`doc/cfg-reportCapture.md`](https://github.com/HCAToolkit/calculogic-report-capture/blob/624f1a3c325ae7d3f6c576829ee9ee672194c0e1/doc/cfg-reportCapture.md) in `HCAToolkit/calculogic-report-capture`).
 
 ## 10.0 Implementation Passes
 
