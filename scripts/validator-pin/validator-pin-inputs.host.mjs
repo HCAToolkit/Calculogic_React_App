@@ -31,19 +31,37 @@ const listTrackedFiles = (repositoryRoot) => {
   return result.stdout.split('\0').filter(Boolean);
 };
 
-// Reads tracked text files for the discovery guard. Files containing NUL bytes are binary and
-// cannot hold a pinned link, so they are skipped.
-const readTrackedTextFiles = (repositoryRoot) =>
-  listTrackedFiles(repositoryRoot).flatMap((relativePath) => {
-    const absolutePath = path.join(repositoryRoot, relativePath);
+// Reads every tracked file for the discovery guard. The working-tree copy is preferred so local,
+// unstaged edits are scanned; when it cannot be read (for example a path excluded by a sparse
+// checkout), the content is read from Git's index instead. A path that cannot be read either way
+// is returned as a scan failure, never skipped, so an incomplete scan cannot pass. Files containing
+// NUL bytes are binary and cannot hold a pinned link, so they are not scanned.
+export const readTrackedTextFiles = (repositoryRoot, { trackedPaths = listTrackedFiles(repositoryRoot) } = {}) => {
+  const files = [];
+  const failures = [];
+
+  for (const relativePath of trackedPaths) {
     let content;
     try {
-      content = fs.readFileSync(absolutePath, 'utf8');
-    } catch {
-      return [];
+      content = fs.readFileSync(path.join(repositoryRoot, relativePath), 'utf8');
+    } catch (workingTreeError) {
+      const indexed = runGit(repositoryRoot, ['show', `:${relativePath}`]);
+      if (indexed.status !== 0) {
+        failures.push({
+          path: relativePath,
+          reason: `unreadable in the working tree (${workingTreeError.code ?? workingTreeError.message}) and in the index (${indexed.stderr.trim() || `git exit ${indexed.status}`})`,
+        });
+        continue;
+      }
+      content = indexed.stdout;
     }
-    return content.includes('\0') ? [] : [{ path: relativePath, content }];
-  });
+    if (!content.includes('\0')) {
+      files.push({ path: relativePath, content });
+    }
+  }
+
+  return { files, failures };
+};
 
 export const probeInstallation = (repositoryRoot) => {
   const packageDirectory = path.join(repositoryRoot, 'node_modules', ...VALIDATOR_PACKAGE_NAME.split('/'));
@@ -110,12 +128,14 @@ export const collectValidatorPinInputs = ({ repositoryRoot = resolveAppRepositor
     }).filter(([, content]) => content !== undefined),
   );
   const installation = probeInstallation(repositoryRoot);
+  const trackedScan = readTrackedTextFiles(repositoryRoot);
 
   return {
     packageJson: readJson(path.join(repositoryRoot, 'package.json')),
     packageLock: readJson(path.join(repositoryRoot, 'package-lock.json')),
     documents,
-    trackedFiles: readTrackedTextFiles(repositoryRoot),
+    trackedFiles: trackedScan.files,
+    scanFailures: trackedScan.failures,
     installation,
     checkout: resolveCheckout({ explicitCheckout, environment, installation }),
   };

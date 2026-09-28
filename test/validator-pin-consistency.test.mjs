@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 import {
   INSTALLATION_RECORD_LIMITATION,
@@ -18,6 +19,7 @@ import {
   CHECKOUT_ENVIRONMENT_VARIABLE,
   collectValidatorPinInputs,
   probeInstallation,
+  readTrackedTextFiles,
   resolveCheckout,
 } from '../scripts/validator-pin/validator-pin-inputs.host.mjs';
 import { VALIDATOR_PIN_LINK_REGISTRY } from '../scripts/validator-pin/validator-pin-links.knowledge.mjs';
@@ -38,6 +40,7 @@ const buildInputs = ({
   linkCommits = {},
   documentOverrides = {},
   extraTrackedFiles = [],
+  scanFailures = [],
   installation,
   checkout = null,
 } = {}) => {
@@ -60,6 +63,7 @@ const buildInputs = ({
     },
     documents,
     trackedFiles: [...[...documents].map(([filePath, content]) => ({ path: filePath, content })), ...extraTrackedFiles],
+    scanFailures,
     installation: installation ?? stableInstallation(),
     checkout,
   };
@@ -250,7 +254,81 @@ test('break: an unregistered pinned link fails the discovery guard; the embedded
   assert.equal(evaluateValidatorPin(buildInputs({ extraTrackedFiles: [embedded] })).status, 'consistent');
 });
 
+test('uppercase commit ids are recognized and normalized to lowercase', () => {
+  assert.deepEqual(extractPinnedLinks(linkTo(PIN.toUpperCase(), 'doc/a.md')), [{ commit: PIN, targetPath: 'doc/a.md' }]);
+  assert.equal(parseCommitFromSpec(spec(PIN.toUpperCase())), PIN);
+  // A registered link written in uppercase that names the declared commit is consistent...
+  assert.equal(evaluateValidatorPin(buildInputs({ linkCommits: { ccpp: PIN.toUpperCase() } })).status, 'consistent');
+  // ...and one naming another commit is still caught.
+  assert.equal(evaluateValidatorPin(buildInputs({ linkCommits: { ccpp: OTHER.toUpperCase() } })).status, 'failed');
+});
+
+test('break: an unregistered pinned link with an uppercase commit id fails the discovery guard', () => {
+  const uppercase = { path: 'doc/new-note.md', content: linkTo(PIN.toUpperCase(), 'doc/ConventionRoutines/CCPP.md') };
+  const result = evaluateValidatorPin(buildInputs({ extraTrackedFiles: [uppercase] }));
+
+  assert.equal(result.status, 'failed');
+  assert.deepEqual(result.linkPins.unregistered.map(({ path: filePath, commit }) => [filePath, commit]), [['doc/new-note.md', PIN]]);
+});
+
+test('break: an incomplete scan (any unreadable tracked file) fails instead of passing', () => {
+  const result = evaluateValidatorPin(buildInputs({
+    scanFailures: [{ path: 'doc/unreadable.md', reason: 'unreadable in the working tree (EACCES) and in the index (fatal)' }],
+  }));
+
+  assert.equal(result.status, 'failed');
+  assert.equal(result.linkPins.ok, false);
+  assert.ok(formatValidatorPinReport(result).includes(
+    'FAIL check 2a doc/unreadable.md: tracked file could not be scanned (unreadable in the working tree (EACCES) and in the index (fatal))',
+  ));
+});
+
 // --- input host ----------------------------------------------------------------------------
+
+const git = (cwd, ...args) => {
+  const result = spawnSync('git', ['-C', cwd, ...args], { encoding: 'utf8' });
+  assert.equal(result.status, 0, `git ${args.join(' ')}: ${result.stderr}`);
+  return result.stdout;
+};
+
+test('input host: tracked files missing from a sparse checkout are read from the index, not skipped', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'validator-pin-sparse-'));
+  try {
+    git(root, 'init', '-q');
+    fs.mkdirSync(path.join(root, 'kept'));
+    fs.mkdirSync(path.join(root, 'sparse'));
+    fs.writeFileSync(path.join(root, 'kept', 'a.md'), 'kept\n');
+    fs.writeFileSync(path.join(root, 'sparse', 'b.md'), linkTo(PIN.toUpperCase(), 'doc/ConventionRoutines/CCPP.md'));
+    git(root, 'add', '.');
+    git(root, '-c', 'user.email=t@example.com', '-c', 'user.name=t', 'commit', '-q', '-m', 'fixture');
+    git(root, 'sparse-checkout', 'set', 'kept');
+    assert.equal(fs.existsSync(path.join(root, 'sparse', 'b.md')), false, 'sparse checkout should remove the file from the working tree');
+
+    const scan = readTrackedTextFiles(root);
+    assert.deepEqual(scan.failures, []);
+    assert.deepEqual(scan.files.map(({ path: filePath }) => filePath).sort(), ['kept/a.md', 'sparse/b.md']);
+    assert.deepEqual(extractPinnedLinks(scan.files.find(({ path: filePath }) => filePath === 'sparse/b.md').content), [
+      { commit: PIN, targetPath: 'doc/ConventionRoutines/CCPP.md' },
+    ]);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('input host: a tracked path readable neither in the working tree nor the index is a scan failure', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'validator-pin-unreadable-'));
+  try {
+    git(root, 'init', '-q');
+    const scan = readTrackedTextFiles(root, { trackedPaths: ['doc/missing.md'] });
+    assert.deepEqual(scan.files, []);
+    assert.equal(scan.failures.length, 1);
+    assert.equal(scan.failures[0].path, 'doc/missing.md');
+    assert.match(scan.failures[0].reason, /unreadable in the working tree \(ENOENT\) and in the index/u);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 
 test('input host: a real package directory without a hidden lockfile is reported as such', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'validator-pin-probe-'));

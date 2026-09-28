@@ -15,10 +15,12 @@ const LOCK_ENTRY_KEY = `node_modules/${VALIDATOR_PACKAGE_NAME}`;
 const COMMIT_ID_PATTERN = /^[0-9a-f]{40}$/u;
 
 // Matches any pinned blob link to the standalone repository, including short commit ids, so a
-// short or stale pin is found and then reported by the commit comparison.
+// short or stale pin is found and then reported by the commit comparison. Matching is
+// case-insensitive because Git accepts uppercase object ids; extracted ids are normalized to
+// lowercase before any comparison.
 const PINNED_LINK_PATTERN = new RegExp(
   `${VALIDATOR_REPOSITORY_BLOB_URL_PREFIX.replaceAll('.', '\\.').replaceAll('/', '\\/')}([0-9a-f]{7,40})\\/([^\\s)\\]"'\`<>]+)`,
-  'gu',
+  'giu',
 );
 
 export const INSTALLATION_RECORD_LIMITATION =
@@ -30,12 +32,12 @@ export const parseCommitFromSpec = (spec) => {
     return null;
   }
   const hashIndex = spec.lastIndexOf('#');
-  const candidate = hashIndex === -1 ? '' : spec.slice(hashIndex + 1);
+  const candidate = hashIndex === -1 ? '' : spec.slice(hashIndex + 1).toLowerCase();
   return COMMIT_ID_PATTERN.test(candidate) ? candidate : null;
 };
 
 export const extractPinnedLinks = (content) =>
-  [...content.matchAll(PINNED_LINK_PATTERN)].map((match) => ({ commit: match[1], targetPath: match[2] }));
+  [...content.matchAll(PINNED_LINK_PATTERN)].map((match) => ({ commit: match[1].toLowerCase(), targetPath: match[2] }));
 
 const shortCommit = (commit) => (commit ? commit.slice(0, 7) : '(none)');
 
@@ -60,7 +62,7 @@ export const checkDeclaredPin = ({ packageJson, packageLock }) => {
   };
 };
 
-export const checkLinkPins = ({ declaredCommit, documents, trackedFiles, registry = VALIDATOR_PIN_LINK_REGISTRY }) => {
+export const checkLinkPins = ({ declaredCommit, documents, trackedFiles, scanFailures = [], registry = VALIDATOR_PIN_LINK_REGISTRY }) => {
   const results = registry.map((entry) => {
     const content = documents.get(entry.sourceDocument);
     if (content === undefined) {
@@ -86,10 +88,13 @@ export const checkLinkPins = ({ declaredCommit, documents, trackedFiles, registr
     .filter(({ path }) => !registeredSources.has(path))
     .flatMap(({ path, content }) => extractPinnedLinks(content).map((link) => ({ path, ...link })));
 
+  // A tracked file that could not be read was not scanned, so the discovery guard cannot vouch
+  // for it: any scan failure fails the check rather than being skipped.
   return {
-    ok: results.every(({ ok }) => ok) && unregistered.length === 0,
+    ok: results.every(({ ok }) => ok) && unregistered.length === 0 && scanFailures.length === 0,
     results,
     unregistered,
+    scanFailures,
   };
 };
 
@@ -179,9 +184,9 @@ export const checkLinkTargets = ({ declaredCommit, linkResults, installationStat
   });
 };
 
-export const evaluateValidatorPin = ({ packageJson, packageLock, documents, trackedFiles, installation, checkout = null }) => {
+export const evaluateValidatorPin = ({ packageJson, packageLock, documents, trackedFiles, scanFailures = [], installation, checkout = null }) => {
   const declaredPin = checkDeclaredPin({ packageJson, packageLock });
-  const linkPins = checkLinkPins({ declaredCommit: declaredPin.declaredCommit, documents, trackedFiles });
+  const linkPins = checkLinkPins({ declaredCommit: declaredPin.declaredCommit, documents, trackedFiles, scanFailures });
   const installationResult = declaredPin.ok
     ? classifyInstallation({ declaredCommit: declaredPin.declaredCommit, lockIntegrity: declaredPin.lockIntegrity, installation })
     : { state: 'failed', message: 'installation not checked: the declared pin is inconsistent' };
@@ -221,6 +226,9 @@ export const formatValidatorPinReport = (result) => {
   }
   for (const link of result.linkPins.unregistered) {
     lines.push(`FAIL check 2a ${link.path}: unregistered pinned link to ${link.targetPath} at ${shortCommit(link.commit)}`);
+  }
+  for (const failure of result.linkPins.scanFailures) {
+    lines.push(`FAIL check 2a ${failure.path}: tracked file could not be scanned (${failure.reason})`);
   }
   lines.push(`${mark(result.installation.state !== 'failed')} check 3  ${result.installation.message}`);
   for (const target of result.targets) {

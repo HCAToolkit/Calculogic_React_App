@@ -33,6 +33,10 @@ Specs are compared by their 40-character commit id, not as whole strings: the lo
 
 A discovery guard scans every tracked file outside the embedded `calculogic-validator/` tree for pinned links. Any link that is not registered fails the check, so a new pinned link cannot bypass verification.
 
+- Commit ids are matched case-insensitively and normalized to lowercase before any comparison, because Git accepts uppercase object ids.
+- Each tracked file is read from the working tree; when that fails (for example a path excluded by a sparse checkout), its content is read from Git's index (`git show :<path>`). A tracked path that cannot be read either way is a scan failure, and any scan failure fails the check, so an incomplete scan never produces a passing result.
+- Only tracked files are scanned: a new file is covered once it is added to the index.
+
 ### 2.3 Installation record
 
 - `node_modules/@calculogic/validator`: a real directory (stable installation) or a symlink created by `npm link` (linked development);
