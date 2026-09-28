@@ -42,7 +42,7 @@ The four statuses above are the **minimum/core scaffold** for this policy. Addit
 ## Naming Guidance References
 
 - Use semantic, low-churn NL filenames aligned with the naming philosophy in:
-  - `calculogic-validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
+  - `node_modules/@calculogic/validator/doc/ConventionRoutines/FileNamingMasterList-V1_1.md`
 - Keep migration-order readability via index/manifest docs where needed, instead of churn-prone filename prefixes.
 
 ## High-Level Slice Done Checklist (Code + NL Co-Migration)
@@ -60,5 +60,5 @@ A slice is considered done when all of the following are true:
 - `doc/ConventionRoutines/StatusVocabularyRegistry-V1.md`
 - `doc/ConventionRoutines/General-NL-Skeletons.md`
 - `doc/ConventionRoutines/NL-First-Workflow.md`
-- `calculogic-validator/doc/ConventionRoutines/CCPP.md`
-- `calculogic-validator/doc/ConventionRoutines/CCS.md`
+- `node_modules/@calculogic/validator/doc/ConventionRoutines/CCPP.md`
+- `node_modules/@calculogic/validator/doc/ConventionRoutines/CCS.md`

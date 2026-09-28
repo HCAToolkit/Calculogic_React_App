@@ -178,7 +178,7 @@ When you add or refactor doc-engine code, keep these CCPP requirements in scope:
 - Decision notes and TODOs must follow the CCPP format (owner + date).
 - Provenance blocks only when external sources influence logic.
 
-Reference: `calculogic-validator/doc/ConventionRoutines/CCPP.md`.
+Reference: `node_modules/@calculogic/validator/doc/ConventionRoutines/CCPP.md`.
 
 ## Modal MVP Plan (Before Extraction)
 
