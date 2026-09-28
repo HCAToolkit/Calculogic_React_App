@@ -96,12 +96,13 @@ npm run preview          # Preview the built app locally
 npm run validate:naming  # Run validator naming workflow
 npm run validate:all     # Run full validator suite workflow
 npm run health:validator # Run validator environment/health checks
+npm run check:validator-pin # Check the Validator pin, pinned doc links, and installation (offline)
 # Optional report capture workflows:
 # npm run report:naming:*
 # npm run report:all:*
 ```
 
-In a default React-app checkout, the Validator commands in these scripts come from the pinned standalone `@calculogic/validator` package, and report capture comes from the pinned `@calculogic/report-capture` package ([`HCAToolkit/calculogic-report-capture`](https://github.com/HCAToolkit/calculogic-report-capture)). `report:summarize` runs the Validator's public `calculogic-validator-report-summarize` command against this app's `./.reports`; `report:examples:validator` is a Validator self-development command that runs in the linked standalone checkout (see `.devcontainer/README.md`). For Validator command, package, and development documentation, use the authoritative [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository; the live-link development workflow and Validator self-development commands are documented in `.devcontainer/README.md`. Migration of the remaining embedded dependencies is tracked in [issue #713](https://github.com/HCAToolkit/Calculogic_React_App/issues/713).
+In a default React-app checkout, the Validator commands in these scripts come from the pinned standalone `@calculogic/validator` package, and report capture comes from the pinned `@calculogic/report-capture` package ([`HCAToolkit/calculogic-report-capture`](https://github.com/HCAToolkit/calculogic-report-capture)). `report:summarize` runs the Validator's public `calculogic-validator-report-summarize` command against this app's `./.reports`; `report:examples:validator` is a Validator self-development command that runs in the linked standalone checkout (see `.devcontainer/README.md`). For Validator command, package, and development documentation, use the authoritative [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository; the live-link development workflow and Validator self-development commands are documented in `.devcontainer/README.md`. Migration of the remaining embedded dependencies is tracked in [issue #713](https://github.com/HCAToolkit/Calculogic_React_App/issues/713). After a Validator pin change, a stable installation must run `npm ci`; `npm run check:validator-pin` (also part of `npm test`) reports a stale installation, which `npm ls` does not (`doc/nl-config/cfg-validatorPinConsistency.md`).
 
 ## Project Structure (Current)
 

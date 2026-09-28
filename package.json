@@ -17,6 +17,7 @@
     "addressing:get-tree": "node scripts/run-validator-dev-command.mjs addressing:get-tree --",
     "validate:all": "calculogic-validate",
     "health:validator": "calculogic-validator-health",
+    "check:validator-pin": "node scripts/validator-pin/check-validator-pin.host.mjs",
     "report:naming:repo": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-repo -- calculogic-validate-naming --scope=repo",
     "report:naming:app": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-app -- calculogic-validate-naming --scope=app",
     "report:naming:docs": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-docs -- calculogic-validate-naming --scope=docs",
