@@ -376,10 +376,10 @@ const spawnAndCollect = (command, args, options = {}) =>
 // "> pkg@ver script\n> command\n\n" lifecycle banner used to land, verbatim, in the same stdout
 // stream a wrapping `calculogic-report-capture` invocation captures into its report .txt file -
 // ahead of the dispatched standalone script's own JSON - making the whole captured file invalid
-// JSON for report-capture-summarize.host.mjs (report:summarize) to parse. This test does not settle
+// JSON for the Validator's report summarizer (report:summarize) to parse. This test does not settle
 // for "the report file exists" or "the capture command exited 0" - it JSON.parse's the captured
-// file's exact byte content directly, then separately proves the real, unmodified
-// report-capture-summarize.host.mjs (not a reimplementation of its parsing) can read it back
+// file's exact byte content directly, then separately proves the real, unmodified installed
+// calculogic-validator-report-summarize command (not a reimplementation of its parsing) can read it back
 // through its own --strict CLI, driven through the real calculogic-report-capture binary and the
 // real npm CLI end to end, the same path report:naming:validator:* actually takes.
 test('end-to-end: a live-linked report preset produces a JSON capture that report:summarize can parse', async (t) => {
@@ -402,7 +402,7 @@ test('end-to-end: a live-linked report preset produces a JSON capture that repor
     fs.symlinkSync(realRoot, fixture.linkPath, 'dir');
 
     const reportCaptureScriptPath = fs.realpathSync(path.resolve('node_modules/.bin/calculogic-report-capture'));
-    const summarizeScriptPath = path.resolve('calculogic-validator/scripts/report-capture-summarize.host.mjs');
+    const summarizeScriptPath = fs.realpathSync(path.resolve('node_modules/.bin/calculogic-validator-report-summarize'));
     const prefix = 'e2e-naming-json';
 
     const captureResult = await spawnAndCollect(

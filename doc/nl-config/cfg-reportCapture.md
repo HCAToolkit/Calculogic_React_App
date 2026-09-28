@@ -53,7 +53,7 @@ These are convenience scripts only; no additional built-in scope profiles are in
 
 ### 2.6 Post-capture summarizer contract
 
-A repo-local summarizer script (`calculogic-validator/scripts/report-capture-summarize.host.mjs`) reads the latest captured JSON report per prefix from `./.reports` (or `--dir`) and prints compact per-scope summaries suitable for Codex/PR notes. Unlike 2.4/2.5, `report:summarize` is **not** gated behind a live link and still invokes the embedded copy directly - it summarizes this React app's own already-captured reports and is unaffected by whether `@calculogic/validator` is linked or pinned (out of scope for #716; see #714/#715 for its own migration status).
+`report:summarize` runs the Validator-owned summarizer through the public `calculogic-validator-report-summarize` command of the installed `@calculogic/validator` package (added in HCAToolkit/calculogic-validator#28). It reads the latest captured JSON report per prefix from `./.reports` (or `--dir`), resolved from the directory it is run in, and prints compact per-scope summaries suitable for Codex/PR notes; `--help` lists its options. Unlike 2.4/2.5, it is **not** gated behind a live link: it summarizes this React app's own already-captured reports in both modes. In stable mode the pinned package supplies the summarizer; in live mode the same command resolves through the link to the linked standalone checkout's summarizer, and it still reads this app's `./.reports`. (Historical note: before this migration, `report:summarize` invoked the embedded `calculogic-validator/scripts/report-capture-summarize.host.mjs` directly by path. Refs #713.)
 
 ## 3.0 Build Concern
 

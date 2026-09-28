@@ -17,8 +17,8 @@ make ownership, responsibility, role, and extraction boundaries obvious.
 - The app's `@calculogic/validator` dependency is supplied by the pinned
   standalone Validator repository. `calculogic-validator/` is the retained
   pre-extraction Validator; the `@calculogic/report-capture` dependency, the
-  `report:summarize` and `report:examples:validator` scripts, and the
-  always-read convention docs under `calculogic-validator/doc/ConventionRoutines/`
+  `report:examples:validator` script, and the always-read convention docs under
+  `calculogic-validator/doc/ConventionRoutines/`
   still resolve from it, so those parts remain **current runtime truth** in this
   checkout.
 - The standalone
