@@ -144,7 +144,11 @@ export const resolveLinkedValidatorCheckout = ({ cwd = process.cwd() } = {}) => 
 // layout and failed (or, worse, could succeed against a coincidentally-named sibling) once run
 // against a real standalone checkout - exactly the failure mode this dispatcher exists to prevent
 // for an ordinary installed copy; an older linked checkout can reintroduce the same failure mode
-// through a different door.
+// through a different door. report:examples:validator (PR #30) is a third such command: before
+// it, the standalone checkout had no report:examples:validator npm script at all, and its
+// generator host ran only behind a main-module guard that silently did nothing on some paths.
+// PR #30 made scripts/generate-validator-report-examples.host.mjs a thin host that calls
+// runValidatorReportExamplesCli, so the same source-text check identifies a compatible checkout.
 //
 // Detecting this by comparing the checkout's git history against known-good commit SHAs was
 // considered and rejected: it requires the linked checkout to be a git worktree with reachable,
@@ -183,6 +187,18 @@ const CHECKOUT_COMPATIBILITY_REQUIREMENTS = {
     incompatibilityDetail:
       `still constructs tool paths with the old embedded-nested "calculogic-validator/" prefix, ` +
       `so it would fail to locate its own report-capture tooling when run against this checkout`,
+  },
+  'report:examples:validator': {
+    relativeScriptPath: path.join('scripts', 'generate-validator-report-examples.host.mjs'),
+    // Added by PR #30 as the actual fix: the thin host now calls the shared, side-effect-free
+    // entrypoint instead of running behind a main-module guard. The same PR added the
+    // report:examples:validator npm script this dispatch targets.
+    requiredSubstring: 'runValidatorReportExamplesCli',
+    fixDescription:
+      'the report:examples:validator script and generator entrypoint fix (PR #30, HCAToolkit/calculogic-validator)',
+    incompatibilityDetail:
+      `does not yet call runValidatorReportExamplesCli, so this checkout has no ` +
+      `report:examples:validator npm script and its generator can silently write nothing`,
   },
 };
 

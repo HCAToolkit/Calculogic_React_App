@@ -99,7 +99,7 @@ const createFakeStandaloneCheckout = ({
 // "calculogic-validator/" path prefix being absent (PR #25).
 const writeCompatibilityFixtureScripts = (
   checkoutRoot,
-  { addressingGetTreeFixed = true, reportVerifyFixed = true } = {},
+  { addressingGetTreeFixed = true, reportVerifyFixed = true, reportExamplesFixed = true } = {},
 ) => {
   fs.mkdirSync(path.join(checkoutRoot, 'scripts'), { recursive: true });
   fs.writeFileSync(
@@ -113,6 +113,12 @@ const writeCompatibilityFixtureScripts = (
     reportVerifyFixed
       ? "const hostPath = path.resolve(repositoryRoot, 'tools/report-capture/src/report-capture.host.mjs');\n"
       : "const hostPath = path.resolve(repositoryRoot, 'calculogic-validator/tools/report-capture/src/report-capture.host.mjs');\n",
+  );
+  fs.writeFileSync(
+    path.join(checkoutRoot, 'scripts', 'generate-validator-report-examples.host.mjs'),
+    reportExamplesFixed
+      ? "import { runValidatorReportExamplesCli } from '../src/core/cli/validator-report-examples.logic.mjs';\n"
+      : "if (import.meta.url === `file://${process.argv[1]}`) {\n  runAsScript();\n}\n",
   );
 };
 
@@ -271,6 +277,34 @@ test('checkValidatorCheckoutCompatibility accepts report:verify against a post-#
     writeCompatibilityFixtureScripts(checkoutRoot, { reportVerifyFixed: true });
 
     const result = checkValidatorCheckoutCompatibility({ realPath: checkoutRoot, scriptName: 'report:verify' });
+    assert.equal(result.ok, true);
+  });
+});
+
+test('checkValidatorCheckoutCompatibility rejects report:examples:validator against a pre-#30 checkout', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    writeCompatibilityFixtureScripts(checkoutRoot, { reportExamplesFixed: false });
+
+    const result = checkValidatorCheckoutCompatibility({
+      realPath: checkoutRoot,
+      scriptName: 'report:examples:validator',
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /predates the report:examples:validator script and generator entrypoint fix \(PR #30/u);
+    assert.match(result.reason, /runValidatorReportExamplesCli/u);
+  });
+});
+
+test('checkValidatorCheckoutCompatibility accepts report:examples:validator against a post-#30 checkout', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    writeCompatibilityFixtureScripts(checkoutRoot, { reportExamplesFixed: true });
+
+    const result = checkValidatorCheckoutCompatibility({
+      realPath: checkoutRoot,
+      scriptName: 'report:examples:validator',
+    });
     assert.equal(result.ok, true);
   });
 });
