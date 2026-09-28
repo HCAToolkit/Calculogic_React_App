@@ -296,9 +296,43 @@ test('checkValidatorCheckoutCompatibility rejects report:examples:validator agai
   });
 });
 
+const reportExamplesNpmScript = {
+  'report:examples:validator': 'node --experimental-strip-types scripts/generate-validator-report-examples.host.mjs',
+};
+
+test('checkValidatorCheckoutCompatibility rejects report:examples:validator when the host is updated but the npm script is missing', () => {
+  withTempCheckout((parentDir) => {
+    // Partly updated checkout, e.g. the #30 host cherry-picked without its package.json change.
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    writeCompatibilityFixtureScripts(checkoutRoot, { reportExamplesFixed: true });
+
+    const result = checkValidatorCheckoutCompatibility({
+      realPath: checkoutRoot,
+      scriptName: 'report:examples:validator',
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /only partly updated/u);
+    assert.match(result.reason, /package\.json does not define the "report:examples:validator" npm script/u);
+  });
+});
+
+test('checkValidatorCheckoutCompatibility rejects report:examples:validator when the npm script exists but the host predates #30', () => {
+  withTempCheckout((parentDir) => {
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir, extraScripts: reportExamplesNpmScript });
+    writeCompatibilityFixtureScripts(checkoutRoot, { reportExamplesFixed: false });
+
+    const result = checkValidatorCheckoutCompatibility({
+      realPath: checkoutRoot,
+      scriptName: 'report:examples:validator',
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /predates the report:examples:validator script and generator entrypoint fix/u);
+  });
+});
+
 test('checkValidatorCheckoutCompatibility accepts report:examples:validator against a post-#30 checkout', () => {
   withTempCheckout((parentDir) => {
-    const checkoutRoot = createFakeStandaloneCheckout({ parentDir });
+    const checkoutRoot = createFakeStandaloneCheckout({ parentDir, extraScripts: reportExamplesNpmScript });
     writeCompatibilityFixtureScripts(checkoutRoot, { reportExamplesFixed: true });
 
     const result = checkValidatorCheckoutCompatibility({

@@ -194,6 +194,10 @@ const CHECKOUT_COMPATIBILITY_REQUIREMENTS = {
     // entrypoint instead of running behind a main-module guard. The same PR added the
     // report:examples:validator npm script this dispatch targets.
     requiredSubstring: 'runValidatorReportExamplesCli',
+    // The dispatched npm script is a separate part of the same fix: a checkout whose generator host
+    // was updated (e.g. cherry-picked) without its package.json would pass the source check and then
+    // fail in npm with a generic "Missing script". Both must be present.
+    requiredNpmScript: 'report:examples:validator',
     fixDescription:
       'the report:examples:validator script and generator entrypoint fix (PR #30, HCAToolkit/calculogic-validator)',
     incompatibilityDetail:
@@ -236,6 +240,27 @@ export const checkValidatorCheckoutCompatibility = ({ realPath, scriptName }) =>
         ` - its own ${requirement.relativeScriptPath} ${requirement.incompatibilityDetail}. ` +
         `Update the linked checkout (e.g. \`git -C ${realPath} pull\`) and try again.`,
     };
+  }
+
+  if ('requiredNpmScript' in requirement) {
+    let definesScript = false;
+    try {
+      const packageJson = JSON.parse(fs.readFileSync(path.join(realPath, 'package.json'), 'utf8'));
+      definesScript = typeof packageJson.scripts?.[requirement.requiredNpmScript] === 'string';
+    } catch {
+      definesScript = false;
+    }
+
+    if (!definesScript) {
+      return {
+        ok: false,
+        reason:
+          `The linked standalone Validator checkout at ${realPath} is only partly updated for ` +
+          `${requirement.fixDescription} - its package.json does not define the ` +
+          `"${requirement.requiredNpmScript}" npm script this command dispatches to. ` +
+          `Update the linked checkout (e.g. \`git -C ${realPath} pull\`) and try again.`,
+      };
+    }
   }
 
   return { ok: true };
