@@ -6,6 +6,29 @@ WORKSPACES_ROOT="$(dirname "$APP_ROOT")"
 VALIDATOR_ROOT="${CALCULOGIC_VALIDATOR_CHECKOUT:-$WORKSPACES_ROOT/calculogic-validator}"
 VALIDATOR_REMOTE="https://github.com/HCAToolkit/calculogic-validator.git"
 
+# The checkout must never be nested in the React app checkout. Resolve the location to a canonical
+# absolute path (relative paths resolve from the current directory; symbolic links in its existing
+# part are followed) and reject the app root or anything inside it before creating anything.
+VALIDATOR_ROOT_RESOLVED="$(node -e '
+  const fs = require("node:fs");
+  const path = require("node:path");
+  let existing = path.resolve(process.argv[1]);
+  const missing = [];
+  while (!fs.existsSync(existing) && path.dirname(existing) !== existing) {
+    missing.unshift(path.basename(existing));
+    existing = path.dirname(existing);
+  }
+  process.stdout.write(path.join(fs.realpathSync.native(existing), ...missing));
+' "$VALIDATOR_ROOT")"
+APP_ROOT_REAL="$(cd "$APP_ROOT" && pwd -P)"
+
+case "$VALIDATOR_ROOT_RESOLVED/" in
+  "$APP_ROOT_REAL"/*)
+    echo "Cannot prepare standalone validator checkout: $VALIDATOR_ROOT resolves to $VALIDATOR_ROOT_RESOLVED, which is inside the React app checkout ($APP_ROOT_REAL). Set CALCULOGIC_VALIDATOR_CHECKOUT to a path outside it." >&2
+    exit 1
+    ;;
+esac
+
 if [ -d "$VALIDATOR_ROOT" ]; then
   GIT_TOP_LEVEL="$(git -C "$VALIDATOR_ROOT" rev-parse --show-toplevel 2>/dev/null || true)"
 
