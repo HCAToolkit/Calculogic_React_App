@@ -8,13 +8,19 @@ continues to govern issue/PR discipline, the always-read conventions, NL-first
 workflow, status wording, task boundaries, and verification; do not interpret
 this file as replacing those inherited requirements.
 
-This directory is the retained embedded Validator used by the app's current
-default package wiring. It documents and supports **current runtime truth** for
-this checkout, but it is not the development authority for new Validator work.
-That authority belongs to the standalone
+This directory is the retained pre-extraction Validator. The app's
+`@calculogic/validator` dependency is supplied by the pinned standalone
 [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator)
-repository. Do not perform the linked-installation migration tracked in React-app
-issue #695 as an incidental part of Validator work.
+repository, and no app npm script or package dependency executes code from this
+directory. It is not a development target and not the development authority for
+Validator work; that authority, and the `AGENTS.md` that governs it, belong to the
+standalone repository. Retirement of this directory is a **staged implementation
+path** tracked in React-app issue #713; edits here are not Validator changes.
+
+One read remains until the standalone health check is decoupled from consumer
+documents: the app's `npm run health:validator` conditionally reads
+`doc/ConventionRoutines/NamingValidatorSpec.md` from this directory and asserts
+that it mentions `src/`, `test/`, and `calculogic-validator/`.
 
 ## Path and Working-Directory Conventions
 
@@ -149,8 +155,9 @@ For registry migrations, follow this sequence:
 
 ## Validator Verification
 
-- Use the React-app-root npm workflows documented by the embedded Validator
-  README unless a narrower package-owned check is explicitly documented.
+- The React-app-root npm workflows run the installed standalone package, not the
+  code in this directory, so they do not verify changes made here. Validator
+  behavior changes are made and verified in the standalone repository.
 - Preserve report-first, scope, mode, target, report-envelope, and exit-policy
   contracts when selecting checks.
 - Keep checks limited to the touched slice. If a root workflow cannot target the
