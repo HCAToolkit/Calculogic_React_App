@@ -54,7 +54,7 @@ The standalone validator checkout remains an independent Git repository and auth
 
 - Devcontainer image determines Node baseline.
 - React app and standalone validator remain sibling Git repositories rather than one nested source tree.
-- The existing embedded `calculogic-validator/` directory is not the authoritative standalone checkout prepared by this shell.
+- The React app contains no embedded Validator copy; the standalone checkout prepared by this shell is the only Validator source tree (the embedded pre-extraction tree was retired under #713).
 
 ### 3.1 Containers
 

@@ -31,7 +31,7 @@ Specs are compared by their 40-character commit id, not as whole strings: the lo
 - **packaged**: the target is one of the documents distributed in the installed package (`doc/ConventionRoutines/CCPP.md`, `doc/ConventionRoutines/CCS.md`);
 - **unpackaged**: the target is repository-owned standalone development documentation that the package does not distribute (the Tree, Naming, and Runner NL/config notes under `doc/ValidatorSpecs/nl-config/`). An unpackaged target is never expected in `node_modules`.
 
-A discovery guard scans every tracked file outside the embedded `calculogic-validator/` tree for pinned links. Any link that is not registered fails the check, so a new pinned link cannot bypass verification.
+A discovery guard scans every tracked file for pinned links, with no excluded paths. Any link that is not registered fails the check, so a new pinned link cannot bypass verification.
 
 - Commit ids are matched case-insensitively and normalized to lowercase before any comparison, because Git accepts uppercase object ids.
 - Each tracked file is read from the working tree; when that fails (for example a path excluded by a sparse checkout), its content is read from Git's index (`git show :<path>`). A tracked path that cannot be read either way is a scan failure, and any scan failure fails the check, so an incomplete scan never produces a passing result.
