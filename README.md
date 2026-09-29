@@ -49,13 +49,13 @@ The current standalone and authoritative Validator implementation source is [`HC
 - TypeScript 5
 - Vite 6
 - ESLint 9 + typescript-eslint
+- Prettier 3 (`npm run format:check`, `npm run format:write`)
 - Node.js built-in test runner (`node --test`) for unit tests
 
 ## Future Additions (Planned)
 
 These are intentionally planned but not yet baseline in this repository:
 
-- Prettier formatting pipeline
 - Jest and/or React Testing Library integration for component-level testing
 - CI quality gates that enforce lint/build/test on every pull request
 - Expanded integration test coverage for builder interactions
@@ -84,6 +84,16 @@ npm run dev
 ```
 
 Open `http://localhost:5173`.
+
+### Validator documentation
+
+The Validator conventions this repository follows (CCPP, CCS, the file-naming master list and related contracts) are owned by the standalone [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator) repository. Where you read them depends on how the Validator is installed:
+
+- **Stable installation (default).** After dependencies are installed, the packaged documents are in `node_modules/@calculogic/validator/doc/`. Run `npm run check:validator-pin` first: `consistent` confirms the installation matches the pinned commit; after a pin change, a `failed` result usually means you need `npm ci`.
+- **Linked development.** When `node_modules/@calculogic/validator` is an `npm link` to a standalone checkout (see `.devcontainer/README.md`), the check reports `linked-development` and the documents, including the checkout's full `doc/` tree, come from that checkout's current state (by default `../calculogic-validator/`).
+- **Documents that are not packaged.** The package ships the consumer-facing conventions only (see the Validator README's [Packaged documentation](https://github.com/HCAToolkit/calculogic-validator#packaged-documentation) section). Read other Validator specs, audits and development documentation in the standalone repository; the pointer documents in `doc/ConventionRoutines/` and `doc/nl-config/` link to the pinned versions.
+
+Contributors and coding agents follow the reading list and pin-check rules in [`AGENTS.md`](AGENTS.md).
 
 ## Current Scripts
 
