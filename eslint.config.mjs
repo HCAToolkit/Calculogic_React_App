@@ -68,11 +68,7 @@ export default [
   },
 
   {
-    files: [
-      'calculogic-validator/**/*.{js,mjs,ts,tsx}',
-      'scripts/**/*.{js,mjs}',
-      'bin/**/*.{js,mjs}',
-    ],
+    files: ['scripts/**/*.{js,mjs}', 'bin/**/*.{js,mjs}'],
     languageOptions: {
       globals: {
         ...globals.node,

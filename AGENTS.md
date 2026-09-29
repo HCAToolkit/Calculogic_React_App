@@ -3,9 +3,11 @@
 ## Scope, Inheritance, and Purpose
 
 This file applies to the entire React-app repository. More-specific `AGENTS.md`
-files add instructions for their directory trees; in particular,
-`calculogic-validator/AGENTS.md` owns guidance specific to the retained embedded
-Validator and inherits this file.
+files add instructions for their directory trees. Validator development is
+governed by the standalone
+[`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator)
+repository and its own `AGENTS.md`; this repository contains no embedded
+Validator copy.
 
 Use docs-first, deterministic, ownership-aligned changes. Prefer structures that
 make ownership, responsibility, role, and extraction boundaries obvious.
@@ -17,9 +19,6 @@ make ownership, responsibility, role, and extraction boundaries obvious.
 - The app's `@calculogic/validator` dependency is supplied by the pinned
   standalone Validator repository, and `@calculogic/report-capture` by the
   pinned `HCAToolkit/calculogic-report-capture` repository.
-  `calculogic-validator/` is the retained pre-extraction Validator; the React
-  app's active repository-level convention entrypoints no longer resolve from its
-  convention-document copies.
 - The always-read Validator-packaged convention docs are supplied by the pinned
   standalone Validator repository, which ships them in the package. Their local
   reading path in this checkout is the installed package,
@@ -29,13 +28,16 @@ make ownership, responsibility, role, and extraction boundaries obvious.
 - The standalone
   [`HCAToolkit/calculogic-validator`](https://github.com/HCAToolkit/calculogic-validator)
   repository is the authoritative source for new Validator development and
-  standalone package/development documentation. Do not treat this embedded copy
-  as a competing development authority.
-- Migration of the remaining embedded dependencies and retirement of the
-  embedded tree is a **staged implementation path** tracked by issue #713 and is
-  **not yet complete**. Do not change package resolution, links, manifests,
-  lockfiles, scripts, or remove the embedded Validator unless a task explicitly
-  owns that migration.
+  standalone package/development documentation. Validator behavior changes are
+  made and verified there: the React-app-root `validate:*`, `report:*`, and
+  `health:validator` workflows run the installed standalone package, or a
+  live-linked standalone checkout for the Validator self-development commands,
+  so they do not verify changes to Validator source.
+- **Current implementation reality:** the embedded pre-extraction Validator tree
+  (`calculogic-validator/`) was retired under issue #713 after its remaining
+  consumers moved to the pinned standalone packages. Do not change package
+  resolution, links, manifests, lockfiles, or scripts unless a task explicitly
+  owns that integration change.
 - Keep cross-repository changes ownership-aligned: change React-app integration
   here; make independently owned Validator product changes in the standalone
   repository. A task must explicitly authorize changes in each repository it
@@ -78,8 +80,7 @@ docs is still installed), you may run `npm ci` from the repository root when
 your environment and task permit it; otherwise stop and report the missing
 installation prerequisite. If installation fails, or any always-read canonical
 convention document is still missing after it, stop and report it clearly rather
-than inventing a replacement. Do not substitute the copies in the embedded
-`calculogic-validator/` tree.
+than inventing a replacement.
 
 Before relying on the installed Validator documentation, run
 `npm run check:validator-pin` from the repository root. Documents being present
@@ -100,17 +101,14 @@ rather than the installed one. Act on the result
   pinned-commit links in the repository-local pointer documents.
 
 Paths in this file are relative to the React-app repository root. Commands shown
-in the root `README.md`, root `package.json`, or embedded Validator README as
-“repo root” commands must be run from the React-app repository root. Within
-`calculogic-validator/AGENTS.md`, paths are explicitly identified as either
-embedded-Validator-relative or React-app-root-relative.
+in the root `README.md` or root `package.json` as “repo root” commands must be
+run from the React-app repository root.
 
 The installed package is the local reading path for the Validator-packaged
 convention docs; the pinned standalone Validator repository is the source of the
 packaged versions. For GitHub navigation, link to the standalone repository at
 the pinned commit or to a repository-local pointer doc rather than to
-`node_modules/`. The copies in the embedded `calculogic-validator/` tree are not
-the React app's repository-level convention entrypoints.
+`node_modules/`.
 
 ## Repository-Wide Workflow and Architecture Guardrails
 
