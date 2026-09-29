@@ -6,7 +6,6 @@
 
 import {
   VALIDATOR_PACKAGE_NAME,
-  VALIDATOR_PIN_DISCOVERY_EXCLUDED_PREFIXES,
   VALIDATOR_PIN_LINK_REGISTRY,
   VALIDATOR_REPOSITORY_BLOB_URL_PREFIX,
 } from './validator-pin-links.knowledge.mjs';
@@ -84,7 +83,6 @@ export const checkLinkPins = ({ declaredCommit, documents, trackedFiles, scanFai
 
   const registeredSources = new Set(registry.map(({ sourceDocument }) => sourceDocument));
   const unregistered = trackedFiles
-    .filter(({ path }) => !VALIDATOR_PIN_DISCOVERY_EXCLUDED_PREFIXES.some((prefix) => path.startsWith(prefix)))
     .filter(({ path }) => !registeredSources.has(path))
     .flatMap(({ path, content }) => extractPinnedLinks(content).map((link) => ({ path, ...link })));
 

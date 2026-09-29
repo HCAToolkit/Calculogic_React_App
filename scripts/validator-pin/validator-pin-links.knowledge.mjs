@@ -41,7 +41,3 @@ export const VALIDATOR_PIN_LINK_REGISTRY = [
     distribution: 'unpackaged',
   },
 ];
-
-// The embedded pre-extraction tree keeps its own historical references and is excluded from
-// the discovery guard.
-export const VALIDATOR_PIN_DISCOVERY_EXCLUDED_PREFIXES = ['calculogic-validator/'];

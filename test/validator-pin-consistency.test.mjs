@@ -243,15 +243,18 @@ test('break: an invalid npm link fails check 3', () => {
   assert.match(result.installation.message, /invalid npm link: broken symlink/u);
 });
 
-test('break: an unregistered pinned link fails the discovery guard; the embedded tree is excluded', () => {
+test('break: an unregistered pinned link fails the discovery guard; no path is excluded', () => {
   const unregistered = { path: 'README.md', content: linkTo(PIN, 'doc/ConventionRoutines/CCPP.md') };
-  const embedded = { path: 'calculogic-validator/doc/x.md', content: linkTo(OTHER, 'doc/y.md') };
+  // The retired embedded tree's path was once excluded; a link there must now be caught like any other.
+  const underRetiredPath = { path: 'calculogic-validator/doc/x.md', content: linkTo(OTHER, 'doc/y.md') };
 
   const failed = evaluateValidatorPin(buildInputs({ extraTrackedFiles: [unregistered] }));
   assert.equal(failed.status, 'failed');
   assert.deepEqual(failed.linkPins.unregistered.map(({ path: filePath }) => filePath), ['README.md']);
 
-  assert.equal(evaluateValidatorPin(buildInputs({ extraTrackedFiles: [embedded] })).status, 'consistent');
+  const failedRetired = evaluateValidatorPin(buildInputs({ extraTrackedFiles: [underRetiredPath] }));
+  assert.equal(failedRetired.status, 'failed');
+  assert.deepEqual(failedRetired.linkPins.unregistered.map(({ path: filePath }) => filePath), ['calculogic-validator/doc/x.md']);
 });
 
 test('uppercase commit ids are recognized and normalized to lowercase', () => {
