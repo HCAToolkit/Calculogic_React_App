@@ -38,6 +38,7 @@ The standalone validator checkout remains an independent Git repository and auth
 ```
 
 - `CALCULOGIC_VALIDATOR_CHECKOUT` may override the default sibling checkout location.
+- The checkout location, default or overridden, must lie outside the React app checkout. The helper resolves it to a canonical absolute path first (a relative override is resolved from the current directory, and symbolic links in its existing part are followed) and fails, without creating or cloning anything, when that path is the React app root or inside it. The standalone validator must never become a nested checkout of the React app.
 - If the validator checkout path already exists, the helper accepts it only when the path is the actual Git worktree root and its `package.json` identifies `@calculogic/validator`.
 - A valid standalone validator checkout is left unchanged.
 - The helper does not fetch, reset, overwrite, or automatically `npm link` an existing validator checkout.
@@ -88,7 +89,7 @@ Not applicable for this shell.
 
 - **[5.2.1] Primitive – "Install ripgrep"** via `apt-get`.
 - **[5.2.2] Primitive – "Install deps + build"** via npm commands.
-- **[5.2.3] Primitive – "Ensure standalone validator checkout"** by resolving the React app repository root, choosing the sibling/default or explicitly overridden validator checkout location, accepting an existing path only when it is the actual Git worktree root for `@calculogic/validator`, and cloning `HCAToolkit/calculogic-validator` only when the checkout is absent.
+- **[5.2.3] Primitive – "Ensure standalone validator checkout"** by resolving the React app repository root, choosing the sibling/default or explicitly overridden validator checkout location, rejecting a location that resolves to the React app root or inside it, accepting an existing path only when it is the actual Git worktree root for `@calculogic/validator`, and cloning `HCAToolkit/calculogic-validator` only when the checkout is absent.
 - **[5.2.4] Primitive – "Keep live linking explicit"** by preparing both repositories without automatically running `npm link`.
 
 ## 6. Knowledge Concern
@@ -118,6 +119,7 @@ Not applicable.
 - `.devcontainer/devcontainer.json`
 - `.devcontainer/README.md`
 - `.devcontainer/ensure-standalone-validator-checkout.sh`
+- `test/ensure-standalone-validator-checkout.test.mjs` (runs the helper against temporary repositories and a local Git remote; no network access)
 - `README.md`
 - `package.json`
 
@@ -136,3 +138,4 @@ Not applicable.
 - Pass 2: Add standalone validator checkout helper.
 - Pass 3: Update devcontainer baseline README with shared-checkout and explicit-link behavior.
 - Pass 4: Align package engines and root README pointer when the runtime baseline changes.
+- Pass 5: Reject checkout locations inside the React app checkout, covered by the helper test (Refs #713).

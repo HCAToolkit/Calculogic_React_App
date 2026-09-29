@@ -21,6 +21,8 @@ The checkout helper ensures the standalone validator repository is available bes
 └─ calculogic-validator/
 ```
 
+`CALCULOGIC_VALIDATOR_CHECKOUT` may point the helper at a different location. Whether default or overridden, the location must be outside this React app checkout: the helper resolves it (a relative path from the current directory, following symbolic links) and fails without creating or cloning anything if it is the app root or inside it.
+
 If the target path already exists, the helper accepts it only when that path is the actual Git worktree root and its `package.json` identifies `@calculogic/validator`. A valid standalone checkout is left in place. The helper does not fetch, reset, overwrite, or automatically link an existing checkout.
 
 ## Validator live-development mode
