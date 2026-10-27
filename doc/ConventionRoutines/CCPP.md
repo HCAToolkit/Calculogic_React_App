@@ -1,6 +1,6 @@
 # Calculogic Comment & Provenance Protocol (CCPP)
 
-> **Canonical source (validator-owned):** [`doc/ConventionRoutines/CCPP.md`](https://github.com/HCAToolkit/calculogic-validator/blob/5154a96bbb35424e89db08fb23832c7692c45cd8/doc/ConventionRoutines/CCPP.md) in the standalone `HCAToolkit/calculogic-validator` repository, at the commit pinned by this repo's `@calculogic/validator` dependency.  
+> **Canonical source (validator-owned):** [`doc/ConventionRoutines/CCPP.md`](https://github.com/HCAToolkit/calculogic-validator/blob/795f694aed0985d276aec2ed9ec91c91db6775a1/doc/ConventionRoutines/CCPP.md) in the standalone `HCAToolkit/calculogic-validator` repository, at the commit pinned by this repo's `@calculogic/validator` dependency.  
 > **Local reading path:** `node_modules/@calculogic/validator/doc/ConventionRoutines/CCPP.md` (installed package).  
 > This host document is a convenience pointer. To change protocol rules, update the canonical validator source (not this wrapper).
 
