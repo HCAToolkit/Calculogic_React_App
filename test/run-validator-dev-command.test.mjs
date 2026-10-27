@@ -552,6 +552,99 @@ test('dispatch forwards the standalone script name and all args after -- when li
   }
 });
 
+// #724: `npm run <script> -- <args>` appends <args> to the script's command without a separator,
+// and the runner forwards only what follows `--`. Every dispatching script must therefore put `--`
+// immediately after its standalone script name; preset arguments may follow it.
+const RUNNER_COMMAND_PATTERN = /node scripts\/run-validator-dev-command\.mjs (.*)$/u;
+const readDispatchingScripts = () =>
+  Object.entries(JSON.parse(fs.readFileSync(path.resolve('package.json'), 'utf8')).scripts)
+    .map(([name, command]) => [name, command, command.match(RUNNER_COMMAND_PATTERN)])
+    .filter(([, , match]) => match)
+    .map(([name, command, match]) => ({ name, command, runnerArgs: match[1].trim().split(/\s+/u) }));
+
+test('every package script that dispatches through the runner puts -- right after the standalone script name', () => {
+  const scripts = readDispatchingScripts();
+  assert.ok(scripts.length >= 15, `found ${scripts.length} dispatching scripts`);
+  for (const { name, command, runnerArgs } of scripts) {
+    assert.equal(runnerArgs[1], '--', `${name}: ${command}`);
+  }
+  // The two scripts #724 found without a separator now end with one.
+  const byName = Object.fromEntries(scripts.map((script) => [script.name, script.runnerArgs]));
+  assert.deepEqual(byName['report:verify'], ['report:verify', '--']);
+  assert.deepEqual(byName['test:validator:source'], ['test', '--']);
+  // Preset arguments after the separator are unchanged.
+  assert.deepEqual(byName['validate:naming:validator:entry'], ['validate:naming', '--', '--scope=validator', '--target', 'bin', '--target', 'scripts']);
+});
+
+test('dispatch refuses arguments placed before -- immediately, before any link check, instead of dropping them', async () => {
+  const fixture = createConsumerFixture();
+  try {
+    // No link exists: a refusal from argument parsing must come before the link diagnostic.
+    for (const args of [['report:verify', '--scopes=docs'], ['echo-args', 'stray', '--', 'kept']]) {
+      const result = await runWrapper({ cwd: fixture.consumerRoot, args });
+      assert.equal(result.exitCode, 1, args.join(' '));
+      assert.equal(result.stdout, '');
+      assert.match(result.stderr, /Arguments before "--" would not be forwarded: (--scopes=docs|stray)\./u);
+      assert.match(result.stderr, /must end its command with "--"/u);
+      assert.doesNotMatch(result.stderr, /live link|npm link/u);
+    }
+    // No arguments, and arguments only after --, still reach the link check as before.
+    for (const args of [['report:verify'], ['report:verify', '--', '--scopes=docs']]) {
+      const result = await runWrapper({ cwd: fixture.consumerRoot, args });
+      assert.equal(result.exitCode, 1);
+      assert.doesNotMatch(result.stderr, /would not be forwarded/u);
+    }
+  } finally {
+    fixture.cleanup();
+  }
+});
+
+test('npm run report:verify and test:validator:source forward user arguments unchanged to the linked checkout', async (t) => {
+  if (!realNpmExecPath) {
+    t.skip('No real npm CLI entry script could be located in this environment.');
+    return;
+  }
+  const fixture = createConsumerFixture();
+  try {
+    // The dispatched standalone scripts only echo what they receive: this checks forwarding, not
+    // what the real standalone commands do with the arguments.
+    const realRoot = createFakeStandaloneCheckout({
+      parentDir: fixture.consumerRoot,
+      extraScripts: { 'report:verify': 'node echo-args.mjs', test: 'node echo-args.mjs' },
+    });
+    writeCompatibilityFixtureScripts(realRoot);
+    fs.symlinkSync(realRoot, fixture.linkPath, 'dir');
+    // The consumer's real package script commands, pointed at this repository's runner.
+    const scripts = Object.fromEntries(
+      readDispatchingScripts()
+        .filter(({ name }) => name === 'report:verify' || name === 'test:validator:source')
+        .map(({ name, command }) => [name, command.replace('scripts/run-validator-dev-command.mjs', JSON.stringify(wrapperScriptPath))]),
+    );
+    assert.deepEqual(Object.keys(scripts).sort(), ['report:verify', 'test:validator:source']);
+    fs.writeFileSync(path.join(fixture.consumerRoot, 'package.json'), `${JSON.stringify({ name: 'consumer-fixture', private: true, scripts })}\n`);
+
+    const npmRun = (scriptName, userArgs) =>
+      spawnAndCollect(process.execPath, [realNpmExecPath, 'run', '--silent', scriptName, ...(userArgs ? ['--', ...userArgs] : [])], {
+        cwd: fixture.consumerRoot,
+        env: { ...process.env, npm_execpath: realNpmExecPath },
+      });
+    const forwardedBy = (result) => JSON.parse(result.stdout.split(/\r?\n/u).find((line) => line.trim().startsWith('[')));
+
+    for (const [scriptName, userArgs] of [
+      ['report:verify', ['--scopes=docs,app']],
+      ['test:validator:source', ['--test-name-pattern=registry lifecycle', 'test/one.test.mjs']],
+    ]) {
+      const result = await npmRun(scriptName, userArgs);
+      assert.equal(result.exitCode, 0, result.stderr);
+      assert.deepEqual(forwardedBy(result), userArgs, scriptName);
+      // Without user arguments, nothing is forwarded.
+      assert.deepEqual(forwardedBy(await npmRun(scriptName)), [], scriptName);
+    }
+  } finally {
+    fixture.cleanup();
+  }
+});
+
 test('dispatch preserves a nonzero exit code from the dispatched standalone script', async (t) => {
   if (!realNpmExecPath) {
     t.skip('No real npm CLI entry script could be located in this environment.');

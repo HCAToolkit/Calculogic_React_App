@@ -266,11 +266,26 @@ export const checkValidatorCheckoutCompatibility = ({ realPath, scriptName }) =>
   return { ok: true };
 };
 
+const USAGE = 'Usage: run-validator-dev-command.mjs <standalone-script-name> [-- <forwarded args>]';
+
+// Only arguments after `--` are forwarded. `npm run <script> -- <args>` appends <args> to the
+// script's command without a separator, so a package script that dispatches here must end its
+// command with `--` (or `-- <preset args>`); otherwise <args> would land before any `--`. Such
+// arguments are refused rather than dropped, so a script missing its `--` fails loudly (#724).
 const parseArgs = (argv) => {
-  const separatorIndex = argv.indexOf('--');
   const scriptName = argv[0];
   if (!scriptName) {
-    throw new Error('Usage: run-validator-dev-command.mjs <standalone-script-name> [-- <forwarded args>]');
+    throw new Error(USAGE);
+  }
+
+  const separatorIndex = argv.indexOf('--', 1);
+  const unforwardedArgs = separatorIndex === -1 ? argv.slice(1) : argv.slice(1, separatorIndex);
+  if (unforwardedArgs.length > 0) {
+    throw new Error(
+      `Arguments before "--" would not be forwarded: ${unforwardedArgs.join(' ')}. ${USAGE}. ` +
+        `A package script that dispatches through this runner must end its command with "--" so that ` +
+        `\`npm run <script> -- <args>\` forwards <args>.`,
+    );
   }
 
   const forwardedArgs = separatorIndex === -1 ? [] : argv.slice(separatorIndex + 1);

@@ -32,7 +32,7 @@
     "report:naming:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix naming-system -- calculogic-validate-naming --scope=system",
     "report:all:validator": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-validator -- node scripts/run-validator-dev-command.mjs validate:all -- --scope=validator",
     "report:all:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-all-system -- calculogic-validate --scope=system",
-    "report:verify": "node scripts/run-validator-dev-command.mjs report:verify",
+    "report:verify": "node scripts/run-validator-dev-command.mjs report:verify --",
     "report:summarize": "calculogic-validator-report-summarize",
     "lint:fix": "eslint . --fix",
     "format:check": "prettier . --check",
@@ -45,7 +45,7 @@
     "report:tree:system": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix validate-tree-system -- calculogic-validate-tree --scope=system",
     "report:examples:validator": "node scripts/run-validator-dev-command.mjs report:examples:validator --",
     "report:addressing:get-tree:validator": "calculogic-report-capture --json --dir ./.reports --keep 20 --prefix addressing-get-tree-validator -- npm run addressing:get-tree -- --scope=validator --format=both",
-    "test:validator:source": "node scripts/run-validator-dev-command.mjs test"
+    "test:validator:source": "node scripts/run-validator-dev-command.mjs test --"
   },
   "dependencies": {
     "json-logic-js": "^2.0.5",
