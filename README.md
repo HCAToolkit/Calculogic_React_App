@@ -95,6 +95,18 @@ The Validator conventions this repository follows (CCPP, CCS, the file-naming ma
 
 Contributors and coding agents follow the reading list and pin-check rules in [`AGENTS.md`](AGENTS.md).
 
+### Validator compatibility and retained output
+
+**Current implementation reality:** the stable dependency pins Validator commit `65b039492f0574defac605ce9e0d6f32344c93e1`. Its Structural Addressing producer uses UTF-16 code-unit ordering and emits `tree-codebase@1`. Structural Addressing owns that policy and identity; Tree qualifies addressed evidence, and Naming owns interpretation. The separate snapshot namespace is unchanged and does not identify a particular snapshot instance.
+
+The upgrade also includes Linguistic Foundation support, Tree placement and advisory metadata, Naming registry updates, and source-path integrity checks. Default commands still select no linguistic profile. Finding counts alone cannot establish that addressed associations are correct; the installed-package consumer tests exercise ordering, identity and rejection. A stable upgrade requires `npm ci`, `npm run check:validator-pin`, application tests/build/lint, installed-consumer health and review of report differences. The pin check verifies npm's installation record, not installed bytes.
+
+Compatibility rejection is visible only through the prepared `treeNamingOccurrenceBridgeIntake.diagnostics` boundary. Ordinary CLI/runtime reports do not expose it. Any integration supplying addressed payloads must inspect rejection before rollout; old, missing or unknown identities must not be assumed current or recovered through path/address aliases. No such application integration is identified in the tracked source; untracked or external consumers remain unknown.
+
+Historical reports and addressed payloads retain their original producer, inputs and identities. Do not relabel them as `tree-codebase@1`, rewrite historical audits, regenerate retained payloads, or prune existing reports as part of a dependency upgrade. Keep qualification captures in a separate directory: `report:summarize` selecting the latest capture does not establish compatibility. Build output such as `dist/` can affect Tree's top-level shape findings even when its files are excluded from scanning; compare clean and post-build targets separately.
+
+External deployment, linked-checkout updates and retained-payload regeneration require separate acceptance. To roll back, restore the previous manifest, corresponding lockfile, five registered documentation links and associated upgrade documentation/test expectations together through a reviewed revert, then run `npm ci`, pin/health/application checks and restart affected processes. Restore a complete artifact, not individual files or identity strings; the previous package does not thereby become compatible with revision-1 evidence.
+
 ## Current Scripts
 
 ```bash
