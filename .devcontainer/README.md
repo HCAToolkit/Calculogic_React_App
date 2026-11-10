@@ -62,6 +62,14 @@ In the npm 10.9.7 environment this workflow was verified against, `npm link @cal
 
 ### Working in live mode
 
+#### Addressing compatibility during checkout changes
+
+**Current runtime truth:** `npm run check:validator-pin` reports a valid link as `linked-development`, not stable-pin qualification. Before using a linked checkout, record its resolved path, HEAD, dirty state and emitted addressing-policy identity. An updated stable dependency does not update an existing sibling checkout: the helper continues to leave it untouched.
+
+Move a linked environment between policies only through a separately authorized, coordinated checkout/artifact update, and restart workers or other long-lived processes. Keep comparator and compatibility metadata together; partial file overlays and identity-only edits are unsupported. Upgrade or fence pre-Stage-1 consumers before exchanging versioned evidence. External caller-supplied payload integrations must inspect prepared compatibility diagnostics because ordinary CLI/runtime reports omit them. Never relabel retained payloads or treat a successful health/pin check as proof of correct historical associations.
+
+The installed-package qualification tests use isolated fixtures and do not update linked checkouts. Returning to stable mode below restores the committed pin; policy rollback instead requires a reviewed revert of the complete dependency integration, followed by reinstall and verification.
+
 - Make Validator implementation changes in the standalone `calculogic-validator` checkout, not in the React app.
 - A fresh process launched from the React app observes those changes immediately — no repacking, reinstalling, or copying source is needed. For example, edit and save a file in the standalone checkout, then simply re-run a command from the React app:
 
